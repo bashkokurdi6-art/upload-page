@@ -1,44 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Upload</title>
-<style>
-body{
-    font-family: sans-serif;
-    text-align:center;
-    background: transparent;
-}
-.upload-box{
-    border:none;
-}
-input[type="file"]{
-    border:none;
-    outline:none;
-}
-button{
-    background:#ff2b2b;
-    color:white;
-    border:none;
-    padding:10px 25px;
-    border-radius:8px;
-    font-size:16px;
-}
-</style>
-</head>
+<form action="https://formspree.io/f/mqedjear" method="POST" enctype="multipart/form-data">
 
-<body>
+  <input type="text" name="full_name" placeholder="ناوی سیانی" required>
+  <br><br>
 
-<h3>وێنەی پاسپۆرت هەڵبژێرە</h3>
+  <input type="tel" name="mobile" placeholder="ژمارە مۆبایل" required>
+  <br><br>
 
-<div class="upload-box">
-<input type="file" accept="image/*">
-</div>
+  <input type="text" name="departure" placeholder="بەوڵاتی دەرچون" required>
+  <br><br>
 
-<br><br>
+  <input type="text" name="return" placeholder="بەوڵاتی گەرانەوە" required>
+  <br><br>
 
-<button>ناردن</button>
+  <input type="file" name="passport_image" accept="image/*" required>
+  <br><br>
 
-</body>
-</html>
+  <button type="submit">ناردن</button>
 
+</form>
