@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIWAK Admin Panel</title>
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:sans-serif;
+    }
+
+    :root{
+      --bg:#0f172a;
+      --bg2:#111827;
+      --card:#1e293b;
+      --card2:#0b1220;
+      --line:rgba(255,255,255,0.08);
+      --text:#ffffff;
+      --muted:rgba(255,255,255,0.72);
+      --primary:#2563eb;
+      --primary2:#38bdf8;
+      --success:#10b981;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 12px 30px rgba(0,0,0,0.25);
+      --radius:20px;
+    }
+
+    body{
+      background:linear-gradient(180deg,var(--bg),var(--bg2));
+      color:var(--text);
+      min-height:100vh;
+      padding:20px;
+    }
+
+    .container{
+      max-width:1300px;
+      margin:0 auto;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .title-box h1{
+      font-size:30px;
+      margin-bottom:6px;
+      font-weight:800;
+    }
+
+    .title-box p{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .admin-badge{
+      background:rgba(255,255,255,0.06);
+      border:1px solid var(--line);
+      padding:12px 16px;
+      border-radius:16px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+      margin-bottom:20px;
+    }
+
+    .stat-card{
+      background:linear-gradient(180deg,#18253b,#132033);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .stat-card .label{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:8px;
+    }
+
+    .stat-card .value{
+      font-size:32px;
+      font-weight:800;
+    }
+
+    .panel{
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .controls{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .tab-btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      background:#172235;
+      color:#fff;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid transparent;
+      transition:0.2s ease;
+    }
+
+    .tab-btn.active{
+      background:linear-gradient(135deg,var(--primary),var(--primary2));
+      border-color:transparent;
+    }
+
+    .search-box{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .search-box input,
+    .search-box select{
+      background:#0f172a;
+      color:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      min-width:180px;
+      outline:none;
+    }
+
+    .search-box input:focus,
+    .search-box select:focus{
+      border-color:#60a5fa;
+      box-shadow:0 0 0 3px rgba(96,165,250,0.15);
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border-radius:18px;
+      border:1px solid var(--line);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:980px;
+      background:#0f172a;
+    }
+
+    thead{
+      background:#162236;
+    }
+
+    th,td{
+      padding:14px 12px;
+      text-align:right;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      font-size:14px;
+      vertical-align:middle;
+    }
+
+    th{
+      color:#cbd5e1;
+      font-weight:700;
+    }
+
+    td{
+      color:#fff;
+    }
+
+    tr:hover td{
+      background:rgba(255,255,255,0.02);
+    }
+
+    .status{
+      display:inline-block;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .pending{
+      background:rgba(245,158,11,0.14);
+      color:#fbbf24;
+      border:1px solid rgba(245,158,11,0.25);
+    }
+
+    .approved{
+      background:rgba(16,185,129,0.14);
+      color:#34d399;
+      border:1px solid rgba(16,185,129,0.25);
+    }
+
+    .rejected{
+      background:rgba(239,68,68,0.14);
+      color:#f87171;
+      border:1px solid rgba(239,68,68,0.25);
+    }
+
+    .done{
+      background:rgba(59,130,246,0.14);
+      color:#60a5fa;
+      border:1px solid rgba(59,130,246,0.25);
+    }
+
+    .action-group{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:9px 12px;
+      font-size:12px;
+      font-weight:700;
+      cursor:pointer;
+      color:#fff;
+    }
+
+    .btn-view{ background:#334155; }
+    .btn-approve{ background:#059669; }
+    .btn-reject{ background:#dc2626; }
+    .btn-done{ background:#2563eb; }
+
+    .hidden{
+      display:none;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:999;
+    }
+
+    .modal.show{
+      display:flex;
+    }
+
+    .modal-card{
+      width:100%;
+      max-width:620px;
+      background:#0f172a;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .modal-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .modal-head h3{
+      font-size:22px;
+    }
+
+    .close-btn{
+      background:#1e293b;
+      color:#fff;
+      border:none;
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:18px;
+    }
+
+    .detail-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .detail-item{
+      background:#111827;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+
+    .detail-item .k{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+
+    .detail-item .v{
+      font-size:14px;
+      line-height:1.8;
+      word-break:break-word;
+    }
+
+    .footer-note{
+      margin-top:18px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    @media (max-width: 1100px){
+      .stats{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media (max-width: 700px){
+      body{
+        padding:12px;
+      }
+
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .detail-grid{
+        grid-template-columns:1fr;
+      }
+
+      .title-box h1{
+        font-size:24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="title-box">
+        <h1>SIWAK Admin Panel</h1>
+        <p>بەڕێوەبردنی داواکارییەکانی ڤیزە، ڕەوزە و پشتیوانی</p>
+      </div>
+      <div class="admin-badge">Admin Dashboard</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="label">کۆی داواکاریی ڤیزە</div>
+        <div class="value" id="visaCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">کۆی داواکاریی ڕەوزە</div>
+        <div class="value" id="rawzaCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">پەیامی پشتیوانی</div>
+        <div class="value" id="supportCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">هەموو تۆمارەکان</div>
+        <div class="value" id="allCount">0</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="controls">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="visa">داواکاریی ڤیزە</button>
+          <button class="tab-btn" data-tab="rawza">داواکاریی ڕەوزە</button>
+          <button class="tab-btn" data-tab="support">پشتیوانی</button>
+        </div>
+
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="گەڕان بە ناو یان ژمارە..." />
+          <select id="statusFilter">
+            <option value="all">هەموو دۆخەکان</option>
+            <option value="pending">چاوەڕوان</option>
+            <option value="approved">پەسەندکراو</option>
+            <option value="rejected">ڕەتکراوەتەوە</option>
+            <option value="done">تەواوبوو</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>جۆر</th>
+              <th>ناو</th>
+              <th>ژمارە</th>
+              <th>زانیاری زیادە</th>
+              <th>بەروار</th>
+              <th>دۆخ</th>
+              <th>هەڵبژاردن</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="footer-note">
+        ئێستا ئەم پانێڵە بە sample data کار دەکات. دواتر دەتوانین بە Firebase بەستی بدەین.
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="detailModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>وردەکاری تۆمار</h3>
+        <button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+      <div class="detail-grid" id="detailGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    const data = {
+      visa: [
+        {
+          id: 1,
+          type: "ڤیزە",
+          name: "Ahmed Ali",
+          phone: "07501234567",
+          extra: "دەرچوون: 2026-04-10 / گەڕانەوە: 2026-04-20",
+          date: "2026-03-10",
+          status: "pending",
+          details: {
+            "ناوی سیانی": "Ahmed Ali",
+            "ژمارە مۆبایل": "07501234567",
+            "بەرواری دەرچوون": "2026-04-10",
+            "بەرواری گەڕانەوە": "2026-04-20",
+            "ژمارەی پاسپۆرت": "A1234567",
+            "وڵاتی مەبەست": "Saudi Arabia",
+            "تێبینی": "داواکاری ئاسایی"
+          }
+        },
+        {
+          id: 2,
+          type: "ڤیزە",
+          name: "Sara Omar",
+          phone: "07721234567",
+          extra: "دەرچوون: 2026-05-01 / گەڕانەوە: 2026-05-14",
+          date: "2026-03-09",
+          status: "approved",
+          details: {
+            "ناوی سیانی": "Sara Omar",
+            "ژمارە مۆبایل": "07721234567",
+            "بەرواری دەرچوون": "2026-05-01",
+            "بەرواری گەڕانەوە": "2026-05-14",
+            "ژمارەی پاسپۆرت": "B9823412",
+            "وڵاتی مەبەست": "Saudi Arabia",
+            "تێبینی": "داواکاری خێرا"
+          }
+        }
+      ],
+      rawza: [
+        {
+          id: 3,
+          type: "ڕەوزە",
+          name: "Mohammed Hasan",
+          phone: "07801230000",
+          extra: "ژمارەی پاسپۆرت: R778899",
+          date: "2026-03-10",
+          status: "pending",
+          details: {
+            "ناوی سیانی": "Mohammed Hasan",
+            "ژمارەی واتسئاپ/مۆبایل": "07801230000",
+            "ژمارەی پاسپۆرت": "R778899",
+            "تێبینی": "وێنەی ڤیزە نێردراوە"
+          }
+        },
+        {
+          id: 4,
+          type: "ڕەوزە",
+          name: "Aya Karim",
+          phone: "07509998888",
+          extra: "ژمارەی پاسپۆرت: Q112233",
+          date: "2026-03-08",
+          status: "done",
+          details: {
+            "ناوی سیانی": "Aya Karim",
+            "ژمارەی واتسئاپ/مۆبایل": "07509998888",
+            "ژمارەی پاسپۆرت": "Q112233",
+            "تێبینی": "ئەنجام نێردراوەتەوە"
+          }
+        }
+      ],
+      support: [
+        {
+          id: 5,
+          type: "پشتیوانی",
+          name: "Zana",
+          phone: "07730001111",
+          extra: "بابەت: کێشەی ناردن",
+          date: "2026-03-10",
+          status: "pending",
+          details: {
+            "ناو": "Zana",
+            "ژمارە": "07730001111",
+            "بابەت": "کێشەی ناردن",
+            "پەیام": "فۆرمەکە نانێردرێت"
+          }
+        },
+        {
+          id: 6,
+          type: "پشتیوانی",
+          name: "Hemn",
+          phone: "07506667777",
+          extra: "بابەت: زانیاری",
+          date: "2026-03-07",
+          status: "rejected",
+          details: {
+            "ناو": "Hemn",
+            "ژمارە": "07506667777",
+            "بابەت": "زانیاری",
+            "پەیام": "پرسیار لەسەر ڤیزە هەبوو"
+          }
+        }
+      ]
+    };
+
+    let currentTab = "visa";
+
+    const tableBody = document.getElementById("tableBody");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const tabButtons = document.querySelectorAll(".tab-btn");
+
+    function getStatusLabel(status){
+      const labels = {
+        pending: "چاوەڕوان",
+        approved: "پەسەندکراو",
+        rejected: "ڕەتکراوەتەوە",
+        done: "تەواوبوو"
+      };
+      return labels[status] || status;
+    }
+
+    function renderStats(){
+      const visaCount = data.visa.length;
+      const rawzaCount = data.rawza.length;
+      const supportCount = data.support.length;
+      const allCount = visaCount + rawzaCount + supportCount;
+
+      document.getElementById("visaCount").textContent = visaCount;
+      document.getElementById("rawzaCount").textContent = rawzaCount;
+      document.getElementById("supportCount").textContent = supportCount;
+      document.getElementById("allCount").textContent = allCount;
+    }
+
+    function renderTable(){
+      const search = searchInput.value.trim().toLowerCase();
+      const status = statusFilter.value;
+
+      let rows = data[currentTab];
+
+      rows = rows.filter(item => {
+        const matchesSearch =
+          item.name.toLowerCase().includes(search) ||
+          item.phone.toLowerCase().includes(search);
+
+        const matchesStatus = status === "all" ? true : item.status === status;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      tableBody.innerHTML = "";
+
+      if(rows.length === 0){
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align:center;color:rgba(255,255,255,0.65);padding:30px;">
+              هیچ تۆمارێک نەدۆزرایەوە
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      rows.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.type}</td>
+          <td>${item.name}</td>
+          <td>${item.phone}</td>
+          <td>${item.extra}</td>
+          <td>${item.date}</td>
+          <td><span class="status ${item.status}">${getStatusLabel(item.status)}</span></td>
+          <td>
+            <div class="action-group">
+              <button class="btn btn-view" onclick="showDetails(${item.id})">بینین</button>
+              <button class="btn btn-approve" onclick="changeStatus(${item.id}, 'approved')">پەسەند</button>
+              <button class="btn btn-reject" onclick="changeStatus(${item.id}, 'rejected')">ڕەتکردنەوە</button>
+              <button class="btn btn-done" onclick="changeStatus(${item.id}, 'done')">تەواوبوو</button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function findItemById(id){
+      const all = [...data.visa, ...data.rawza, ...data.support];
+      return all.find(item => item.id === id);
+    }
+
+    function showDetails(id){
+      const item = findItemById(id);
+      if(!item) return;
+
+      const grid = document.getElementById("detailGrid");
+      grid.innerHTML = "";
+
+      Object.entries(item.details).forEach(([key, value]) => {
+        const div = document.createElement("div");
+        div.className = "detail-item";
+        div.innerHTML = `
+          <div class="k">${key}</div>
+          <div class="v">${value}</div>
+        `;
+        grid.appendChild(div);
+      });
+
+      document.getElementById("detailModal").classList.add("show");
+    }
+
+    function closeModal(){
+      document.getElementById("detailModal").classList.remove("show");
+    }
+
+    function changeStatus(id, newStatus){
+      const item = findItemById(id);
+      if(!item) return;
+      item.status = newStatus;
+      renderTable();
+    }
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentTab = btn.dataset.tab;
+        renderTable();
+      });
+    });
+
+    searchInput.addEventListener("input", renderTable);
+    statusFilter.addEventListener("change", renderTable);
+
+    window.addEventListener("click", function(e){
+      const modal = document.getElementById("detailModal");
+      if(e.target === modal){
+        closeModal();
+      }
+    });
+
+    renderStats();
+    renderTable();
+  </script>
+</body>
+</html>
