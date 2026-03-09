@@ -1,21 +1,228 @@
-<form action="https://formspree.io/f/mqedjear" method="POST" enctype="multipart/form-data">
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>فۆڕمی زانیاری</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  <input type="text" name="full_name" placeholder="ناوی سیانی" required>
-  <br><br>
+    body {
+      font-family: sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.22), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.20), transparent 30%),
+        linear-gradient(135deg, #0f172a, #111827, #1e293b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-  <input type="tel" name="mobile" placeholder="ژمارە مۆبایل" required>
-  <br><br>
+    .card {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      padding: 24px;
+      color: #fff;
+    }
 
-  <input type="text" name="departure" placeholder="؛كاتي دەرچون" required>
-  <br><br>
+    .top {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-  <input type="text" name="return" placeholder="كاتي گەرانەوە" required>
-  <br><br>
+    .top h1 {
+      font-size: 26px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
 
-  <input type="file" name="passport_image" accept="image/*" required>
-  <br><br>
+    .top p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.7;
+    }
 
-  <button type="submit">ناردن</button>
+    .form-group {
+      margin-bottom: 14px;
+    }
 
-</form>
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.92);
+    }
 
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      font-size: 15px;
+      outline: none;
+      transition: 0.25s ease;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    input:focus {
+      border-color: #60a5fa;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.18);
+    }
+
+    .file-box {
+      border: 2px dashed rgba(255, 255, 255, 0.22);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+      transition: 0.25s ease;
+    }
+
+    .file-box:hover {
+      border-color: #60a5fa;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .file-box input[type="file"] {
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    .preview {
+      margin-top: 14px;
+      display: none;
+    }
+
+    .preview img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: white;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+      transition: 0.25s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 30px rgba(37, 99, 235, 0.45);
+    }
+
+    .note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .top h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="top">
+      <h1>فۆڕمی زانیاری</h1>
+      <p>تکایە زانیاریەکانت پڕبکەرەوە و وێنەی پاسپۆرتەکەت باربکە</p>
+    </div>
+
+    <form>
+      <div class="form-group">
+        <label>ناوی سیانی</label>
+        <input type="text" placeholder="ناوی سیانی بنووسە">
+      </div>
+
+      <div class="form-group">
+        <label>ژمارە مۆبایل</label>
+        <input type="tel" placeholder="ژمارە مۆبایل بنووسە">
+      </div>
+
+      <div class="form-group">
+        <label>کاتی دەرچوون</label>
+        <input type="text" placeholder="بەروار یان کاتی دەرچوون">
+      </div>
+
+      <div class="form-group">
+        <label>کاتی گەڕانەوە</label>
+        <input type="text" placeholder="بەروار یان کاتی گەڕانەوە">
+      </div>
+
+      <div class="form-group">
+        <label>وێنەی پاسپۆرت</label>
+        <div class="file-box">
+          <div>وێنەکە هەڵبژێرە</div>
+          <input type="file" id="passportImage" accept="image/*">
+          <div class="preview" id="previewBox">
+            <img id="previewImage" src="" alt="preview">
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn">ناردن</button>
+
+      <div class="note">
+        دیزاینێکی مۆدێرن بۆ مۆبایل و گیتهاب پیج
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById("passportImage");
+    const previewBox = document.getElementById("previewBox");
+    const previewImage = document.getElementById("previewImage");
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        previewImage.src = URL.createObjectURL(file);
+        previewBox.style.display = "block";
+      }
+    });
+  </script>
+
+</body>
+</html>
