@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SIWAK Admin Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{
       box-sizing:border-box;
@@ -16,7 +17,6 @@
       --bg:#0f172a;
       --bg2:#111827;
       --card:#1e293b;
-      --card2:#0b1220;
       --line:rgba(255,255,255,0.08);
       --text:#ffffff;
       --muted:rgba(255,255,255,0.72);
@@ -153,12 +153,6 @@
       outline:none;
     }
 
-    .search-box input:focus,
-    .search-box select:focus{
-      border-color:#60a5fa;
-      box-shadow:0 0 0 3px rgba(96,165,250,0.15);
-    }
-
     .table-wrap{
       overflow:auto;
       border-radius:18px;
@@ -191,10 +185,6 @@
 
     td{
       color:#fff;
-    }
-
-    tr:hover td{
-      background:rgba(255,255,255,0.02);
     }
 
     .status{
@@ -249,10 +239,6 @@
     .btn-approve{ background:#059669; }
     .btn-reject{ background:#dc2626; }
     .btn-done{ background:#2563eb; }
-
-    .hidden{
-      display:none;
-    }
 
     .modal{
       position:fixed;
@@ -364,9 +350,9 @@
     <div class="topbar">
       <div class="title-box">
         <h1>SIWAK Admin Panel</h1>
-        <p>بەڕێوەبردنی داواکارییەکانی ڤیزە، ڕەوزە و پشتیوانی</p>
+        <p>بەڕێوەبردنی داواکاریی ڤیزە، ڕەوزە و پشتیوانی</p>
       </div>
-      <div class="admin-badge">Admin Dashboard</div>
+      <div class="admin-badge">Connected to Supabase</div>
     </div>
 
     <div class="stats">
@@ -426,7 +412,7 @@
       </div>
 
       <div class="footer-note">
-        ئێستا ئەم پانێڵە بە sample data کار دەکات. دواتر دەتوانین بە Firebase بەستی بدەین.
+        ئەگەر خالی بوو، واتە هێشتا هیچ داتا لە table ـەکانتدا نییە یان RLS ڕێگا نادات.
       </div>
     </div>
   </div>
@@ -442,112 +428,17 @@
   </div>
 
   <script>
-    const data = {
-      visa: [
-        {
-          id: 1,
-          type: "ڤیزە",
-          name: "Ahmed Ali",
-          phone: "07501234567",
-          extra: "دەرچوون: 2026-04-10 / گەڕانەوە: 2026-04-20",
-          date: "2026-03-10",
-          status: "pending",
-          details: {
-            "ناوی سیانی": "Ahmed Ali",
-            "ژمارە مۆبایل": "07501234567",
-            "بەرواری دەرچوون": "2026-04-10",
-            "بەرواری گەڕانەوە": "2026-04-20",
-            "ژمارەی پاسپۆرت": "A1234567",
-            "وڵاتی مەبەست": "Saudi Arabia",
-            "تێبینی": "داواکاری ئاسایی"
-          }
-        },
-        {
-          id: 2,
-          type: "ڤیزە",
-          name: "Sara Omar",
-          phone: "07721234567",
-          extra: "دەرچوون: 2026-05-01 / گەڕانەوە: 2026-05-14",
-          date: "2026-03-09",
-          status: "approved",
-          details: {
-            "ناوی سیانی": "Sara Omar",
-            "ژمارە مۆبایل": "07721234567",
-            "بەرواری دەرچوون": "2026-05-01",
-            "بەرواری گەڕانەوە": "2026-05-14",
-            "ژمارەی پاسپۆرت": "B9823412",
-            "وڵاتی مەبەست": "Saudi Arabia",
-            "تێبینی": "داواکاری خێرا"
-          }
-        }
-      ],
-      rawza: [
-        {
-          id: 3,
-          type: "ڕەوزە",
-          name: "Mohammed Hasan",
-          phone: "07801230000",
-          extra: "ژمارەی پاسپۆرت: R778899",
-          date: "2026-03-10",
-          status: "pending",
-          details: {
-            "ناوی سیانی": "Mohammed Hasan",
-            "ژمارەی واتسئاپ/مۆبایل": "07801230000",
-            "ژمارەی پاسپۆرت": "R778899",
-            "تێبینی": "وێنەی ڤیزە نێردراوە"
-          }
-        },
-        {
-          id: 4,
-          type: "ڕەوزە",
-          name: "Aya Karim",
-          phone: "07509998888",
-          extra: "ژمارەی پاسپۆرت: Q112233",
-          date: "2026-03-08",
-          status: "done",
-          details: {
-            "ناوی سیانی": "Aya Karim",
-            "ژمارەی واتسئاپ/مۆبایل": "07509998888",
-            "ژمارەی پاسپۆرت": "Q112233",
-            "تێبینی": "ئەنجام نێردراوەتەوە"
-          }
-        }
-      ],
-      support: [
-        {
-          id: 5,
-          type: "پشتیوانی",
-          name: "Zana",
-          phone: "07730001111",
-          extra: "بابەت: کێشەی ناردن",
-          date: "2026-03-10",
-          status: "pending",
-          details: {
-            "ناو": "Zana",
-            "ژمارە": "07730001111",
-            "بابەت": "کێشەی ناردن",
-            "پەیام": "فۆرمەکە نانێردرێت"
-          }
-        },
-        {
-          id: 6,
-          type: "پشتیوانی",
-          name: "Hemn",
-          phone: "07506667777",
-          extra: "بابەت: زانیاری",
-          date: "2026-03-07",
-          status: "rejected",
-          details: {
-            "ناو": "Hemn",
-            "ژمارە": "07506667777",
-            "بابەت": "زانیاری",
-            "پەیام": "پرسیار لەسەر ڤیزە هەبوو"
-          }
-        }
-      ]
-    };
+    const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentTab = "visa";
+    let data = {
+      visa: [],
+      rawza: [],
+      support: []
+    };
 
     const tableBody = document.getElementById("tableBody");
     const searchInput = document.getElementById("searchInput");
@@ -561,7 +452,7 @@
         rejected: "ڕەتکراوەتەوە",
         done: "تەواوبوو"
       };
-      return labels[status] || status;
+      return labels[status] || "چاوەڕوان";
     }
 
     function renderStats(){
@@ -580,15 +471,13 @@
       const search = searchInput.value.trim().toLowerCase();
       const status = statusFilter.value;
 
-      let rows = data[currentTab];
+      let rows = data[currentTab] || [];
 
       rows = rows.filter(item => {
-        const matchesSearch =
-          item.name.toLowerCase().includes(search) ||
-          item.phone.toLowerCase().includes(search);
-
-        const matchesStatus = status === "all" ? true : item.status === status;
-
+        const name = String(item.name || "").toLowerCase();
+        const phone = String(item.phone || "").toLowerCase();
+        const matchesSearch = name.includes(search) || phone.includes(search);
+        const matchesStatus = status === "all" ? true : String(item.status || "pending") === status;
         return matchesSearch && matchesStatus;
       });
 
@@ -606,20 +495,30 @@
       }
 
       rows.forEach(item => {
+        let extra = "-";
+
+        if(currentTab === "visa"){
+          extra = `وێنە پاسپۆرت: ${item.passport_image || "-"}`;
+        } else if(currentTab === "rawza"){
+          extra = `وێنە ڤیزە: ${item.visa_image || "-"}`;
+        } else {
+          extra = `پەیام: ${item.message || "-"}`;
+        }
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${item.type}</td>
-          <td>${item.name}</td>
-          <td>${item.phone}</td>
-          <td>${item.extra}</td>
-          <td>${item.date}</td>
-          <td><span class="status ${item.status}">${getStatusLabel(item.status)}</span></td>
+          <td>${item.name || "-"}</td>
+          <td>${item.phone || "-"}</td>
+          <td>${extra}</td>
+          <td>${item.date || item.created_at || "-"}</td>
+          <td><span class="status ${item.status || "pending"}">${getStatusLabel(item.status)}</span></td>
           <td>
             <div class="action-group">
-              <button class="btn btn-view" onclick="showDetails(${item.id})">بینین</button>
-              <button class="btn btn-approve" onclick="changeStatus(${item.id}, 'approved')">پەسەند</button>
-              <button class="btn btn-reject" onclick="changeStatus(${item.id}, 'rejected')">ڕەتکردنەوە</button>
-              <button class="btn btn-done" onclick="changeStatus(${item.id}, 'done')">تەواوبوو</button>
+              <button class="btn btn-view" onclick="showDetails('${currentTab}', ${item.id})">بینین</button>
+              <button class="btn btn-approve" onclick="changeStatus('${currentTab}', ${item.id}, 'approved')">پەسەند</button>
+              <button class="btn btn-reject" onclick="changeStatus('${currentTab}', ${item.id}, 'rejected')">ڕەتکردنەوە</button>
+              <button class="btn btn-done" onclick="changeStatus('${currentTab}', ${item.id}, 'done')">تەواوبوو</button>
             </div>
           </td>
         `;
@@ -627,24 +526,26 @@
       });
     }
 
-    function findItemById(id){
-      const all = [...data.visa, ...data.rawza, ...data.support];
-      return all.find(item => item.id === id);
+    function findItemById(tab, id){
+      const rows = data[tab] || [];
+      return rows.find(item => Number(item.id) === Number(id));
     }
 
-    function showDetails(id){
-      const item = findItemById(id);
+    function showDetails(tab, id){
+      const item = findItemById(tab, id);
       if(!item) return;
 
       const grid = document.getElementById("detailGrid");
       grid.innerHTML = "";
 
-      Object.entries(item.details).forEach(([key, value]) => {
+      Object.entries(item).forEach(([key, value]) => {
+        if(key === "type") return;
+
         const div = document.createElement("div");
         div.className = "detail-item";
         div.innerHTML = `
           <div class="k">${key}</div>
-          <div class="v">${value}</div>
+          <div class="v">${value ?? "-"}</div>
         `;
         grid.appendChild(div);
       });
@@ -656,19 +557,98 @@
       document.getElementById("detailModal").classList.remove("show");
     }
 
-    function changeStatus(id, newStatus){
-      const item = findItemById(id);
-      if(!item) return;
-      item.status = newStatus;
+    async function loadVisa(){
+      const { data: rows, error } = await client
+        .from("visa_requests")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if(error){
+        console.error("visa error:", error);
+        return;
+      }
+
+      data.visa = (rows || []).map(item => ({
+        ...item,
+        type: "ڤیزە",
+        status: item.status || "pending"
+      }));
+    }
+
+    async function loadRawza(){
+      const { data: rows, error } = await client
+        .from("rawza_requests")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if(error){
+        console.error("rawza error:", error);
+        return;
+      }
+
+      data.rawza = (rows || []).map(item => ({
+        ...item,
+        type: "ڕەوزە",
+        status: item.status || "pending"
+      }));
+    }
+
+    async function loadSupport(){
+      const { data: rows, error } = await client
+        .from("support_messages")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if(error){
+        console.error("support error:", error);
+        return;
+      }
+
+      data.support = (rows || []).map(item => ({
+        ...item,
+        type: "پشتیوانی",
+        status: item.status || "pending"
+      }));
+    }
+
+    async function refreshCurrentTab(){
+      if(currentTab === "visa") await loadVisa();
+      if(currentTab === "rawza") await loadRawza();
+      if(currentTab === "support") await loadSupport();
+
+      renderStats();
       renderTable();
     }
 
+    async function changeStatus(tab, id, newStatus){
+      let tableName = "";
+
+      if(tab === "visa") tableName = "visa_requests";
+      if(tab === "rawza") tableName = "rawza_requests";
+      if(tab === "support") tableName = "support_messages";
+
+      if(!tableName) return;
+
+      const { error } = await client
+        .from(tableName)
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if(error){
+        console.error("status error:", error);
+        alert("هەڵە لە گۆڕینی دۆخ");
+        return;
+      }
+
+      await refreshCurrentTab();
+    }
+
     tabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", async () => {
         tabButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         currentTab = btn.dataset.tab;
-        renderTable();
+        await refreshCurrentTab();
       });
     });
 
@@ -682,8 +662,15 @@
       }
     });
 
-    renderStats();
-    renderTable();
+    async function init(){
+      await loadVisa();
+      await loadRawza();
+      await loadSupport();
+      renderStats();
+      renderTable();
+    }
+
+    init();
   </script>
 </body>
 </html>
