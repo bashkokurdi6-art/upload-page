@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  />
+  <title>داواکاری ڕەوزە</title>
+
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    :root{
+      --bg1:#0b1530;
+      --bg2:#10224a;
+      --card:#13285a;
+      --line:rgba(255,255,255,0.10);
+      --input:rgba(255,255,255,0.07);
+      --text:#ffffff;
+      --muted:rgba(255,255,255,0.75);
+      --primary1:#1d4ed8;
+      --primary2:#0ea5e9;
+      --successBg:rgba(16,185,129,0.14);
+      --successBorder:rgba(16,185,129,0.35);
+      --errorBg:rgba(239,68,68,0.14);
+      --errorBorder:rgba(239,68,68,0.35);
+    }
+
+    html{
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      min-height:100%;
+      overflow-x:hidden;
+    }
+
+    body{
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      font-family:sans-serif;
+      color:var(--text);
+      min-height:100%;
+      overflow-x:hidden;
+      padding:12px 10px 140px;
+    }
+
+    .page{
+      width:100%;
+      max-width:420px;
+      margin:0 auto;
+      padding-bottom:120px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:18px 14px 22px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.22);
+    }
+
+    .badge{
+      width:fit-content;
+      margin:0 auto 14px;
+      padding:8px 16px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.05);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    h1{
+      text-align:center;
+      font-size:22px;
+      margin-bottom:10px;
+      font-weight:800;
+    }
+
+    .desc{
+      text-align:center;
+      font-size:14px;
+      line-height:1.9;
+      color:var(--muted);
+      margin-bottom:18px;
+    }
+
+    .message{
+      display:none;
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:14px;
+      font-size:14px;
+      line-height:1.8;
+    }
+
+    .message.success{
+      background:var(--successBg);
+      border:1px solid var(--successBorder);
+      color:#d1fae5;
+    }
+
+    .message.error{
+      background:var(--errorBg);
+      border:1px solid var(--errorBorder);
+      color:#fee2e2;
+    }
+
+    .field{
+      margin-bottom:14px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-size:14px;
+      font-weight:700;
+      color:#fff;
+    }
+
+    .required{
+      color:#7dd3fc;
+    }
+
+    input,
+    textarea{
+      width:100%;
+      background:var(--input);
+      border:1px solid var(--line);
+      color:#fff;
+      border-radius:16px;
+      padding:14px 13px;
+      font-size:15px;
+      outline:none;
+      min-height:52px;
+    }
+
+    input::placeholder,
+    textarea::placeholder{
+      color:rgba(255,255,255,0.40);
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:#60a5fa;
+      background:rgba(255,255,255,0.09);
+      box-shadow:0 0 0 3px rgba(96,165,250,0.14);
+    }
+
+    textarea{
+      min-height:95px;
+      resize:vertical;
+    }
+
+    .upload-box{
+      border:1px dashed rgba(255,255,255,0.20);
+      border-radius:18px;
+      padding:14px;
+      background:rgba(255,255,255,0.04);
+    }
+
+    .upload-title{
+      text-align:center;
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:10px;
+      line-height:1.8;
+    }
+
+    input[type="file"]{
+      border:none;
+      background:transparent;
+      min-height:auto;
+      padding:0;
+    }
+
+    .preview-wrap{
+      display:none;
+      margin-top:12px;
+    }
+
+    .preview-wrap img{
+      width:100%;
+      max-height:180px;
+      object-fit:cover;
+      border-radius:14px;
+      border:1px solid var(--line);
+    }
+
+    .mini{
+      margin-top:8px;
+      font-size:12px;
+      color:rgba(255,255,255,0.60);
+      line-height:1.7;
+      text-align:center;
+    }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:18px;
+      padding:15px;
+      font-size:16px;
+      font-weight:800;
+      color:#fff;
+      cursor:pointer;
+      background:linear-gradient(135deg,var(--primary1),var(--primary2));
+      box-shadow:0 10px 24px rgba(29,78,216,0.28);
+      margin-top:6px;
+    }
+
+    .btn:disabled{
+      opacity:0.72;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+
+    .subtext{
+      text-align:center;
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(255,255,255,0.62);
+      line-height:1.8;
+    }
+
+    .hidden-field{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+      width:1px;
+      height:1px;
+    }
+
+    .bottom-space{
+      height:110px;
+    }
+
+    @media (max-width:380px){
+      body{
+        padding:10px 8px 145px;
+      }
+
+      .card{
+        border-radius:20px;
+        padding:16px 12px 20px;
+      }
+
+      h1{
+        font-size:20px;
+      }
+
+      .desc{
+        font-size:13px;
+      }
+
+      input,
+      textarea{
+        font-size:14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="badge">داواکاری ڕەوزە</div>
+      <h1>فۆرمی زانیاری</h1>
+      <div class="desc">
+        تکایە ناوی سیانی، ژمارەی واتسئاپ و وێنەی ڤیزەکەت بنێرە. دوای پشکنین، ئەنجامەکە بۆت دەنێرێتەوە.
+      </div>
+
+      <form
+        id="rawzaForm"
+        action="https://formspree.io/f/mqedjear"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <div id="successBox" class="message success">
+          داواکاریەکەت بە سەرکەوتوویی نێردرا.
+        </div>
+
+        <div id="errorBox" class="message error">
+          هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدەوە.
+        </div>
+
+        <input type="hidden" name="_subject" value="داواکاری نوێی ڕەوزە" />
+        <input type="text" name="_gotcha" class="hidden-field" tabindex="-1" autocomplete="off" />
+
+        <div class="field">
+          <label for="name">ناوی سیانی <span class="required">*</span></label>
+          <input id="name" name="name" type="text" placeholder="ناوی سیانی بنووسە" required />
+        </div>
+
+        <div class="field">
+          <label for="whatsapp">ژمارەی واتسئاپ <span class="required">*</span></label>
+          <input id="whatsapp" name="whatsapp" type="tel" placeholder="ژمارەی واتسئاپ بنووسە" required />
+        </div>
+
+        <div class="field">
+          <label for="passport_number">ژمارەی پاسپۆرت</label>
+          <input id="passport_number" name="passport_number" type="text" placeholder="ژمارەی پاسپۆرت" />
+        </div>
+
+        <div class="field">
+          <label for="notes">تێبینی</label>
+          <textarea id="notes" name="notes" placeholder="هەر تێبینییەکی زیاتر لێرە بنووسە"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="visa_image">وێنەی ڤیزە <span class="required">*</span></label>
+          <div class="upload-box">
+            <div class="upload-title">وێنەی ڤیزە هەڵبژێرە</div>
+            <input
+              id="visa_image"
+              name="visa_image"
+              type="file"
+              accept="image/png, image/jpeg, image/jpg, application/pdf"
+              required
+            />
+            <div class="preview-wrap" id="previewWrap">
+              <img id="previewImage" alt="preview" />
+            </div>
+            <div class="mini">JPG / PNG / PDF</div>
+          </div>
+        </div>
+
+        <button id="submitBtn" type="submit" class="btn">ناردنی داواکاری</button>
+        <div class="subtext">داواکاریەکان دەگەن بە Formspree.</div>
+      </form>
+    </div>
+
+    <div class="bottom-space"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("rawzaForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const successBox = document.getElementById("successBox");
+    const errorBox = document.getElementById("errorBox");
+    const visaInput = document.getElementById("visa_image");
+    const previewWrap = document.getElementById("previewWrap");
+    const previewImage = document.getElementById("previewImage");
+
+    visaInput.addEventListener("change", function () {
+      const file = this.files[0];
+
+      if (!file) {
+        previewWrap.style.display = "none";
+        previewImage.removeAttribute("src");
+        return;
+      }
+
+      if (file.type.startsWith("image/")) {
+        previewImage.src = URL.createObjectURL(file);
+        previewWrap.style.display = "block";
+      } else {
+        previewWrap.style.display = "none";
+        previewImage.removeAttribute("src");
+      }
+    });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      successBox.style.display = "none";
+      errorBox.style.display = "none";
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "لە ناردن دایە...";
+
+      try {
+        const formData = new FormData(form);
+
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: formData,
+          headers: { "Accept": "application/json" }
+        });
+
+        if (response.ok) {
+          successBox.style.display = "block";
+          form.reset();
+          previewWrap.style.display = "none";
+          previewImage.removeAttribute("src");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          errorBox.textContent = "هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدەوە.";
+          errorBox.style.display = "block";
+        }
+      } catch (err) {
+        errorBox.textContent = "کێشەی پەیوەندی هەیە. تکایە دووبارە هەوڵ بدەوە.";
+        errorBox.style.display = "block";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ناردنی داواکاری";
+      }
+    });
+  </script>
+</body>
+</html>
