@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK Payment</title>
+  <title>SIWAK Admin Panel</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     * {
@@ -16,175 +16,161 @@
       font-family: Arial, sans-serif;
       min-height: 100vh;
       background:
-        radial-gradient(circle at top left, rgba(255, 215, 0, 0.12), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(0, 153, 255, 0.10), transparent 30%),
-        linear-gradient(135deg, #0b0b0f, #111827, #0f172a);
+        radial-gradient(circle at top left, rgba(250, 204, 21, 0.10), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.10), transparent 28%),
+        linear-gradient(135deg, #05070d, #0f172a, #111827);
       color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       padding: 20px;
     }
 
-    .card {
-      width: 100%;
-      max-width: 520px;
-      background: rgba(17, 24, 39, 0.88);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .top-header {
+      text-align: center;
+      margin-bottom: 22px;
     }
 
     .logo {
-      width: 64px;
-      height: 64px;
+      width: 72px;
+      height: 72px;
       margin: 0 auto 14px;
-      border-radius: 18px;
+      border-radius: 20px;
       background: linear-gradient(135deg, #facc15, #f59e0b);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #111;
-      font-size: 28px;
+      color: #111827;
+      font-size: 30px;
       font-weight: bold;
-      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35);
     }
 
-    h1 {
-      text-align: center;
-      font-size: 32px;
+    .title {
+      font-size: 34px;
+      font-weight: bold;
       margin-bottom: 8px;
-      letter-spacing: 0.5px;
     }
 
     .subtitle {
-      text-align: center;
       color: #cbd5e1;
       font-size: 14px;
-      margin-bottom: 22px;
-      line-height: 1.8;
     }
 
-    .field {
+    .card {
+      background: rgba(17, 24, 39, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.38);
+      margin-bottom: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (max-width: 820px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    h2 {
       margin-bottom: 14px;
+      font-size: 22px;
     }
 
-    .label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #e5e7eb;
-      font-weight: bold;
-    }
-
-    input,
-    select,
-    textarea {
+    input, button {
       width: 100%;
       padding: 14px 16px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.06);
-      color: #fff;
       font-size: 15px;
       outline: none;
-      transition: 0.2s;
     }
 
-    input::placeholder,
-    textarea::placeholder {
+    input {
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+    }
+
+    input::placeholder {
       color: #94a3b8;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
+    input:focus {
       border-color: #facc15;
-      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.15);
+      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.14);
       background: rgba(255,255,255,0.08);
     }
 
-    select option {
-      color: #000;
-    }
-
-    textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
-
-    .number-box {
-      margin-bottom: 16px;
-      border-radius: 20px;
-      padding: 18px;
-      background: linear-gradient(135deg, rgba(250, 204, 21, 0.14), rgba(59, 130, 246, 0.12));
-      border: 1px solid rgba(250, 204, 21, 0.22);
-      text-align: center;
-    }
-
-    .number-title {
-      font-size: 13px;
-      color: #e5e7eb;
-      margin-bottom: 8px;
-    }
-
-    .number-value {
-      font-size: 24px;
-      font-weight: bold;
-      color: #fff;
-      word-break: break-word;
-      margin-bottom: 12px;
-    }
-
-    .copy-btn {
-      width: 100%;
+    button {
       border: none;
-      border-radius: 14px;
-      padding: 13px;
-      font-size: 15px;
-      font-weight: bold;
       cursor: pointer;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: white;
+      font-weight: bold;
       transition: 0.2s;
     }
 
-    .copy-btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
-    }
-
-    .file-box {
-      background: rgba(255,255,255,0.05);
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px dashed rgba(255,255,255,0.12);
-    }
-
-    .submit-btn {
-      width: 100%;
-      border: none;
-      border-radius: 16px;
-      padding: 16px;
-      margin-top: 8px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-      background: linear-gradient(135deg, #facc15, #f59e0b);
-      color: #111827;
-      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.28);
-      transition: 0.2s;
-    }
-
-    .submit-btn:hover {
+    button:hover {
       transform: translateY(-1px);
       opacity: 0.97;
     }
 
+    .btn-gold {
+      background: linear-gradient(135deg, #facc15, #f59e0b);
+      color: #111827;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+    }
+
+    .btn-green {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff;
+      width: auto;
+      min-width: 120px;
+    }
+
+    .btn-red {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      width: auto;
+      min-width: 120px;
+    }
+
+    .btn-gray {
+      background: linear-gradient(135deg, #475569, #334155);
+      color: #fff;
+      width: auto;
+      min-width: 120px;
+    }
+
+    .btn-logout {
+      max-width: 180px;
+      margin-left: auto;
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+
     .msg {
-      margin-top: 16px;
+      margin-top: 12px;
       padding: 14px;
       border-radius: 14px;
       font-size: 14px;
@@ -203,63 +189,154 @@
       border: 1px solid rgba(239, 68, 68, 0.22);
     }
 
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .request-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+      margin-bottom: 14px;
+      color: #e5e7eb;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 700px) {
+      .meta {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .pending {
+      background: rgba(250, 204, 21, 0.16);
+      color: #fde68a;
+      border: 1px solid rgba(250, 204, 21, 0.22);
+    }
+
+    .approved {
+      background: rgba(34, 197, 94, 0.16);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.22);
+    }
+
+    .rejected {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.22);
+    }
+
+    .thumb {
+      width: 100%;
+      max-width: 260px;
+      border-radius: 16px;
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .small {
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+
     .footer-note {
       text-align: center;
-      margin-top: 14px;
       color: #94a3b8;
       font-size: 12px;
+      margin-top: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">S</div>
-    <h1>SIWAK Payment</h1>
-    <div class="subtitle">
-      تکایە جۆری پارەدان هەڵبژێرە، پارەکە بنێرە، پاشان فۆڕمەکە پڕ بکەوە
+  <div class="wrap">
+    <div class="top-header">
+      <div class="logo">S</div>
+      <div class="title">SIWAK Admin</div>
+      <div class="subtitle">بەڕێوەبردنی ژمارەی پارەدان و داواکارییەکان</div>
     </div>
 
-    <div class="field">
-      <label class="label">جۆری پارەدان</label>
-      <select id="paymentType">
-        <option value="FIB">FIB</option>
-        <option value="FastPay">FastPay</option>
-        <option value="Qi Card">Qi Card</option>
-      </select>
-    </div>
+    <div id="globalMsg"></div>
 
-    <div class="number-box">
-      <div class="number-title">ژمارەی ناردنی پارە</div>
-      <div id="paymentNumber" class="number-value">Loading...</div>
-      <button type="button" id="copyBtn" class="copy-btn">Copy Number</button>
-    </div>
+    <div id="authBox" class="grid-2">
+      <div class="card">
+        <h2>Signup</h2>
+        <div class="grid">
+          <input type="email" id="signupEmail" placeholder="Email" />
+          <input type="password" id="signupPassword" placeholder="Password" />
+          <button id="signupBtn" class="btn-gold">Signup</button>
+          <div class="small">تەنها یەک جار هەژمار دروست بکە، پاشان هەمیشە login بکە.</div>
+        </div>
+      </div>
 
-    <div class="field">
-      <label class="label">ناوی سیانی</label>
-      <input type="text" id="fullName" placeholder="ناوی تەواو بنووسە" />
-    </div>
-
-    <div class="field">
-      <label class="label">ژمارەی مۆبایل</label>
-      <input type="text" id="phone" placeholder="07xxxxxxxxx" />
-    </div>
-
-    <div class="field">
-      <label class="label">سکرینشۆتی ناردنی پارە</label>
-      <div class="file-box">
-        <input type="file" id="screenshot" accept="image/*" />
+      <div class="card">
+        <h2>Login</h2>
+        <div class="grid">
+          <input type="email" id="loginEmail" placeholder="Email" />
+          <input type="password" id="loginPassword" placeholder="Password" />
+          <button id="loginBtn" class="btn-blue">Login</button>
+        </div>
       </div>
     </div>
 
-    <div class="field">
-      <label class="label">تێبینی</label>
-      <textarea id="note" placeholder="ئەگەر تێبینییەکت هەیە لێرەی بنووسە"></textarea>
+    <div id="adminBox" class="hidden">
+      <div class="card">
+        <button id="logoutBtn" class="btn-gray btn-logout">Logout</button>
+      </div>
+
+      <div class="card">
+        <h2>ژمارەکانی پارەدان</h2>
+        <div class="grid">
+          <input type="text" id="fibNumber" placeholder="FIB Number" />
+          <input type="text" id="fastpayNumber" placeholder="FastPay Number" />
+          <input type="text" id="qiNumber" placeholder="Qi Card Number" />
+          <button id="saveSettingsBtn" class="btn-gold">Save Numbers</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <h2>داواکارییەکان</h2>
+          <button id="refreshBtn" class="btn-blue" style="width:auto; min-width:160px;">Refresh</button>
+        </div>
+        <div id="requestsList">Loading...</div>
+      </div>
     </div>
 
-    <button id="submitBtn" class="submit-btn">ناردن</button>
-
-    <div id="msgBox"></div>
-    <div class="footer-note">SIWAK © Payment Request</div>
+    <div class="footer-note">SIWAK © Admin Panel</div>
   </div>
 
   <script>
@@ -269,31 +346,73 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const paymentTypeEl = document.getElementById("paymentType");
-    const paymentNumberEl = document.getElementById("paymentNumber");
-    const msgBox = document.getElementById("msgBox");
-
-    let settingsData = {
-      fib_number: "",
-      fastpay_number: "",
-      qi_number: ""
-    };
+    const authBox = document.getElementById("authBox");
+    const adminBox = document.getElementById("adminBox");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const globalMsg = document.getElementById("globalMsg");
 
     function showMsg(text, type = "ok") {
-      msgBox.innerHTML = `<div class="msg ${type}">${text}</div>`;
+      globalMsg.innerHTML = `<div class="msg ${type}">${text}</div>`;
     }
 
-    function getCurrentNumber() {
-      const type = paymentTypeEl.value;
-      if (type === "FIB") return settingsData.fib_number || "";
-      if (type === "FastPay") return settingsData.fastpay_number || "";
-      if (type === "Qi Card") return settingsData.qi_number || "";
-      return "";
+    async function ensureAdminRow(user) {
+      const { error } = await db
+        .from("admin_users")
+        .upsert([{ user_id: user.id, email: user.email }], { onConflict: "user_id" });
+
+      if (error) showMsg(error.message, "err");
     }
 
-    function updateNumberView() {
-      const num = getCurrentNumber();
-      paymentNumberEl.textContent = num || "No number";
+    async function signup() {
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value.trim();
+
+      if (!email || !password) {
+        showMsg("Email و Password پڕ بکە", "err");
+        return;
+      }
+
+      const { data, error } = await db.auth.signUp({ email, password });
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      if (data.user) {
+        await ensureAdminRow(data.user);
+        showMsg("Signup سەرکەوتوو بوو");
+        await checkSession();
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      if (!email || !password) {
+        showMsg("Email و Password پڕ بکە", "err");
+        return;
+      }
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      if (data.user) {
+        showMsg("Login سەرکەوتوو بوو");
+        await checkSession();
+      }
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      authBox.classList.remove("hidden");
+      adminBox.classList.add("hidden");
+      showMsg("Logout کرا");
     }
 
     async function loadSettings() {
@@ -304,96 +423,152 @@
         .single();
 
       if (error) {
-        showMsg("کێشە هەیە لە هێنانی ژمارەکان", "err");
+        showMsg(error.message, "err");
         return;
       }
 
-      settingsData = data;
-      updateNumberView();
+      document.getElementById("fibNumber").value = data.fib_number || "";
+      document.getElementById("fastpayNumber").value = data.fastpay_number || "";
+      document.getElementById("qiNumber").value = data.qi_number || "";
     }
 
-    async function uploadScreenshot(file) {
-      const ext = file.name.split(".").pop();
-      const fileName = `shot_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    async function saveSettings() {
+      const fib_number = document.getElementById("fibNumber").value.trim();
+      const fastpay_number = document.getElementById("fastpayNumber").value.trim();
+      const qi_number = document.getElementById("qiNumber").value.trim();
 
-      const { error: uploadError } = await db.storage
-        .from("payment-screenshots")
-        .upload(fileName, file);
+      const { error } = await db
+        .from("payment_settings")
+        .update({
+          fib_number,
+          fastpay_number,
+          qi_number,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", 1);
 
-      if (uploadError) throw uploadError;
-
-      const { data } = db.storage
-        .from("payment-screenshots")
-        .getPublicUrl(fileName);
-
-      return data.publicUrl;
-    }
-
-    async function submitForm() {
-      const full_name = document.getElementById("fullName").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const payment_type = paymentTypeEl.value;
-      const note = document.getElementById("note").value.trim();
-      const screenshotFile = document.getElementById("screenshot").files[0];
-
-      if (!full_name || !phone || !screenshotFile) {
-        showMsg("تکایە ناو، ژمارەی مۆبایل و وێنەکە پڕ بکە", "err");
+      if (error) {
+        showMsg(error.message, "err");
         return;
       }
 
-      try {
-        showMsg("چاوەڕێبە... بە ناردندا دەچێت");
-
-        const screenshot_url = await uploadScreenshot(screenshotFile);
-
-        const { error } = await db
-          .from("payment_requests")
-          .insert([{
-            full_name,
-            phone,
-            triple_code: "-",
-            payment_type,
-            screenshot_url,
-            note
-          }]);
-
-        if (error) {
-          showMsg(error.message, "err");
-          return;
-        }
-
-        showMsg("داواکارییەکەت بە سەرکەوتوویی نێردرا", "ok");
-
-        document.getElementById("fullName").value = "";
-        document.getElementById("phone").value = "";
-        document.getElementById("note").value = "";
-        document.getElementById("screenshot").value = "";
-        paymentTypeEl.value = "FIB";
-        updateNumberView();
-      } catch (err) {
-        showMsg(err.message || "هەڵەیەک ڕوویدا", "err");
-      }
+      showMsg("ژمارەکان پاشەکەوت کران");
     }
 
-    document.getElementById("copyBtn").addEventListener("click", async () => {
-      const num = getCurrentNumber();
-      if (!num) {
-        showMsg("هێشتا ژمارە نییە", "err");
+    function badgeClass(status) {
+      if (status === "approved") return "approved";
+      if (status === "rejected") return "rejected";
+      return "pending";
+    }
+
+    async function loadRequests() {
+      const list = document.getElementById("requestsList");
+      list.innerHTML = "Loading...";
+
+      const { data, error } = await db
+        .from("payment_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        list.innerHTML = `<div class="msg err">${error.message}</div>`;
         return;
       }
 
-      try {
-        await navigator.clipboard.writeText(num);
-        showMsg("ژمارەکە کۆپی کرا", "ok");
-      } catch {
-        showMsg("کۆپی نەکرا", "err");
+      if (!data || data.length === 0) {
+        list.innerHTML = `<div class="small">هێشتا هیچ داواکارییەک نییە.</div>`;
+        return;
       }
-    });
 
-    paymentTypeEl.addEventListener("change", updateNumberView);
-    document.getElementById("submitBtn").addEventListener("click", submitForm);
+      list.innerHTML = data.map(item => `
+        <div class="request-card">
+          <div class="section-head">
+            <h2 style="margin:0; font-size:20px;">#${item.id}</h2>
+            <span class="badge ${badgeClass(item.status)}">${item.status}</span>
+          </div>
 
-    loadSettings();
+          <div class="meta">
+            <div><strong>ناوی سیانی:</strong> ${item.full_name}</div>
+            <div><strong>ژمارەی مۆبایل:</strong> ${item.phone}</div>
+            <div><strong>جۆری پارەدان:</strong> ${item.payment_type}</div>
+            <div><strong>کات:</strong> ${new Date(item.created_at).toLocaleString()}</div>
+            <div><strong>تێبینی:</strong> ${item.note || "-"}</div>
+          </div>
+
+          <div>
+            <strong>سکرینشۆت:</strong><br />
+            <a href="${item.screenshot_url}" target="_blank">کردنەوەی وێنە</a><br />
+            <img class="thumb" src="${item.screenshot_url}" alt="screenshot" />
+          </div>
+
+          <div class="actions">
+            <button class="btn-green" onclick="updateStatus(${item.id}, 'approved')">Approve</button>
+            <button class="btn-red" onclick="updateStatus(${item.id}, 'rejected')">Reject</button>
+            <button class="btn-gray" onclick="deleteRequest(${item.id})">Delete</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function updateStatus(id, status) {
+      const { error } = await db
+        .from("payment_requests")
+        .update({ status })
+        .eq("id", id);
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      showMsg("دۆخەکە نوێکرایەوە");
+      loadRequests();
+    }
+
+    async function deleteRequest(id) {
+      if (!confirm("دڵنیایت لە سڕینەوە؟")) return;
+
+      const { error } = await db
+        .from("payment_requests")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      showMsg("داواکارییەکە سڕایەوە");
+      loadRequests();
+    }
+
+    async function checkSession() {
+      const { data } = await db.auth.getSession();
+      const session = data.session;
+
+      if (session && session.user) {
+        authBox.classList.add("hidden");
+        adminBox.classList.remove("hidden");
+        await loadSettings();
+        await loadRequests();
+      } else {
+        authBox.classList.remove("hidden");
+        adminBox.classList.add("hidden");
+      }
+    }
+
+    document.getElementById("signupBtn").addEventListener("click", signup);
+    document.getElementById("loginBtn").addEventListener("click", login);
+    document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
+    document.getElementById("refreshBtn").addEventListener("click", loadRequests);
+    logoutBtn.addEventListener("click", logout);
+
+    db.auth.onAuthStateChange(() => checkSession());
+
+    checkSession();
+
+    window.updateStatus = updateStatus;
+    window.deleteRequest = deleteRequest;
   </script>
 </body>
 </html>
