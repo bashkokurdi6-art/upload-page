@@ -3,125 +3,271 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK Payment Form</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>SIWAK Payment</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; }
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #f8fafc, #eef2ff);
-      color: #111827;
-    }
-    .wrap {
-      max-width: 700px;
-      margin: 0 auto;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255, 215, 0, 0.12), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(0, 153, 255, 0.10), transparent 30%),
+        linear-gradient(135deg, #0b0b0f, #111827, #0f172a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       padding: 20px;
     }
+
     .card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
-    }
-    h1 {
-      margin-top: 0;
-      text-align: center;
-    }
-    .sub {
-      text-align: center;
-      color: #6b7280;
-      margin-bottom: 20px;
-    }
-    .grid {
-      display: grid;
-      gap: 12px;
-    }
-    input, select, textarea, button {
       width: 100%;
-      padding: 13px;
-      border-radius: 12px;
-      border: 1px solid #d1d5db;
-      font-size: 15px;
+      max-width: 520px;
+      background: rgba(17, 24, 39, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
     }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #facc15, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 14px;
+      margin-bottom: 22px;
+      line-height: 1.8;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #e5e7eb;
+      font-weight: bold;
+    }
+
+    input,
+    select,
     textarea {
-      min-height: 100px;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #facc15;
+      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.15);
+      background: rgba(255,255,255,0.08);
+    }
+
+    select option {
+      color: #000;
+    }
+
+    textarea {
+      min-height: 110px;
       resize: vertical;
     }
-    button {
-      border: none;
-      background: #111827;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+
     .number-box {
-      background: #f3f4f6;
-      border: 1px dashed #9ca3af;
-      border-radius: 14px;
-      padding: 14px;
+      margin-bottom: 16px;
+      border-radius: 20px;
+      padding: 18px;
+      background: linear-gradient(135deg, rgba(250, 204, 21, 0.14), rgba(59, 130, 246, 0.12));
+      border: 1px solid rgba(250, 204, 21, 0.22);
       text-align: center;
     }
-    .label {
-      font-size: 14px;
-      color: #6b7280;
-      margin-bottom: 6px;
+
+    .number-title {
+      font-size: 13px;
+      color: #e5e7eb;
+      margin-bottom: 8px;
     }
-    .number {
-      font-size: 22px;
+
+    .number-value {
+      font-size: 24px;
       font-weight: bold;
+      color: #fff;
       word-break: break-word;
+      margin-bottom: 12px;
     }
-    .msg {
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 14px;
-    }
-    .ok { background: #dcfce7; color: #166534; }
-    .err { background: #fee2e2; color: #991b1b; }
+
     .copy-btn {
-      margin-top: 10px;
-      background: #2563eb;
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      transition: 0.2s;
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .file-box {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,0.12);
+    }
+
+    .submit-btn {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 8px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #facc15, #f59e0b);
+      color: #111827;
+      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.28);
+      transition: 0.2s;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.97;
+    }
+
+    .msg {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .ok {
+      background: rgba(34, 197, 94, 0.16);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.22);
+    }
+
+    .err {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.22);
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 14px;
+      color: #94a3b8;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>SIWAK Payment</h1>
-      <div class="sub">تکایە پارەکە بنێرە، پاشان فۆڕمەکە پڕ بکەوە</div>
+  <div class="card">
+    <div class="logo">S</div>
+    <h1>SIWAK Payment</h1>
+    <div class="subtitle">
+      تکایە جۆری پارەدان هەڵبژێرە، پارەکە بنێرە، پاشان فۆڕمەکە پڕ بکەوە
+    </div>
 
-      <div class="grid">
-        <select id="paymentType">
-          <option value="FIB">FIB</option>
-          <option value="FastPay">FastPay</option>
-          <option value="Qi Card">Qi Card</option>
-        </select>
+    <div class="field">
+      <label class="label">جۆری پارەدان</label>
+      <select id="paymentType">
+        <option value="FIB">FIB</option>
+        <option value="FastPay">FastPay</option>
+        <option value="Qi Card">Qi Card</option>
+      </select>
+    </div>
 
-        <div class="number-box">
-          <div class="label">ژمارەی ناردنی پارە</div>
-          <div id="paymentNumber" class="number">Loading...</div>
-          <button type="button" id="copyBtn" class="copy-btn">Copy Number</button>
-        </div>
+    <div class="number-box">
+      <div class="number-title">ژمارەی ناردنی پارە</div>
+      <div id="paymentNumber" class="number-value">Loading...</div>
+      <button type="button" id="copyBtn" class="copy-btn">Copy Number</button>
+    </div>
 
-        <input type="text" id="fullName" placeholder="ناوی سیانی" />
-        <input type="text" id="phone" placeholder="ژمارەی مۆبایل" />
-        <input type="text" id="tripleCode" placeholder="سێ خانە" />
+    <div class="field">
+      <label class="label">ناوی سیانی</label>
+      <input type="text" id="fullName" placeholder="ناوی تەواو بنووسە" />
+    </div>
+
+    <div class="field">
+      <label class="label">ژمارەی مۆبایل</label>
+      <input type="text" id="phone" placeholder="07xxxxxxxxx" />
+    </div>
+
+    <div class="field">
+      <label class="label">سکرینشۆتی ناردنی پارە</label>
+      <div class="file-box">
         <input type="file" id="screenshot" accept="image/*" />
-        <textarea id="note" placeholder="تێبینی"></textarea>
-        <button id="submitBtn">ناردن</button>
-
-        <div id="msgBox"></div>
       </div>
     </div>
+
+    <div class="field">
+      <label class="label">تێبینی</label>
+      <textarea id="note" placeholder="ئەگەر تێبینییەکت هەیە لێرەی بنووسە"></textarea>
+    </div>
+
+    <button id="submitBtn" class="submit-btn">ناردن</button>
+
+    <div id="msgBox"></div>
+    <div class="footer-note">SIWAK © Payment Request</div>
   </div>
 
   <script>
     const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const paymentTypeEl = document.getElementById("paymentType");
     const paymentNumberEl = document.getElementById("paymentNumber");
@@ -151,14 +297,14 @@
     }
 
     async function loadSettings() {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("payment_settings")
         .select("*")
         .eq("id", 1)
         .single();
 
       if (error) {
-        showMsg(error.message, "err");
+        showMsg("کێشە هەیە لە هێنانی ژمارەکان", "err");
         return;
       }
 
@@ -169,19 +315,16 @@
     async function uploadScreenshot(file) {
       const ext = file.name.split(".").pop();
       const fileName = `shot_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      const filePath = fileName;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await db.storage
         .from("payment-screenshots")
-        .upload(filePath, file);
+        .upload(fileName, file);
 
-      if (uploadError) {
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
 
-      const { data } = supabase.storage
+      const { data } = db.storage
         .from("payment-screenshots")
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
       return data.publicUrl;
     }
@@ -189,27 +332,26 @@
     async function submitForm() {
       const full_name = document.getElementById("fullName").value.trim();
       const phone = document.getElementById("phone").value.trim();
-      const triple_code = document.getElementById("tripleCode").value.trim();
       const payment_type = paymentTypeEl.value;
       const note = document.getElementById("note").value.trim();
       const screenshotFile = document.getElementById("screenshot").files[0];
 
-      if (!full_name || !phone || !triple_code || !payment_type || !screenshotFile) {
-        showMsg("تکایە هەموو خانە گرنگەکان پڕ بکە", "err");
+      if (!full_name || !phone || !screenshotFile) {
+        showMsg("تکایە ناو، ژمارەی مۆبایل و وێنەکە پڕ بکە", "err");
         return;
       }
 
       try {
-        showMsg("چاوەڕێبە...");
+        showMsg("چاوەڕێبە... بە ناردندا دەچێت");
 
         const screenshot_url = await uploadScreenshot(screenshotFile);
 
-        const { error } = await supabase
+        const { error } = await db
           .from("payment_requests")
           .insert([{
             full_name,
             phone,
-            triple_code,
+            triple_code: "-",
             payment_type,
             screenshot_url,
             note
@@ -224,7 +366,6 @@
 
         document.getElementById("fullName").value = "";
         document.getElementById("phone").value = "";
-        document.getElementById("tripleCode").value = "";
         document.getElementById("note").value = "";
         document.getElementById("screenshot").value = "";
         paymentTypeEl.value = "FIB";
@@ -237,11 +378,16 @@
     document.getElementById("copyBtn").addEventListener("click", async () => {
       const num = getCurrentNumber();
       if (!num) {
-        showMsg("ژمارە نییە", "err");
+        showMsg("هێشتا ژمارە نییە", "err");
         return;
       }
-      await navigator.clipboard.writeText(num);
-      showMsg("ژمارەکە کۆپی کرا");
+
+      try {
+        await navigator.clipboard.writeText(num);
+        showMsg("ژمارەکە کۆپی کرا", "ok");
+      } catch {
+        showMsg("کۆپی نەکرا", "err");
+      }
     });
 
     paymentTypeEl.addEventListener("change", updateNumberView);
