@@ -412,32 +412,7 @@
 </head>
 <body>
   <div class="container">
-    <div id="loginView" class="login-wrap">
-      <div class="card login-card">
-        <div class="brand">
-          <span class="brand-dot"></span>
-          <span>SIWAK ADMIN</span>
-        </div>
-        <h1>چوونەژوورەوەی ئەدمین</h1>
-        <p class="sub">بە ئیمەیڵ و وشەی نهێنی Supabase بچۆ ژوورەوە بۆ بەڕێوەبردنی نرخەکان، ژمارەکانی پارەدان و داواکارییەکان.</p>
-
-        <form id="loginForm">
-          <div class="field">
-            <label for="adminEmail">ئیمەیڵ</label>
-            <input type="email" id="adminEmail" placeholder="admin@example.com" required />
-          </div>
-
-          <div class="field">
-            <label for="adminPassword">وشەی نهێنی</label>
-            <input type="password" id="adminPassword" placeholder="••••••••" required />
-          </div>
-
-          <button type="submit" class="btn btn-primary" id="loginBtn" style="width:100%;">چوونەژوورەوە</button>
-        </form>
-      </div>
-    </div>
-
-    <div id="dashboardView" class="hidden">
+    <div id="dashboardView">
       <div class="card topbar">
         <div>
           <h2>SIWAK Dashboard</h2>
@@ -546,10 +521,7 @@
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const loginView = document.getElementById("loginView");
     const dashboardView = document.getElementById("dashboardView");
-    const loginForm = document.getElementById("loginForm");
-    const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
     const refreshBtn = document.getElementById("refreshBtn");
     const saveSettingsBtn = document.getElementById("saveSettingsBtn");
@@ -600,17 +572,8 @@
     }
 
     async function checkSession(){
-      const { data } = await supabase.auth.getSession();
-      const session = data.session;
-
-      if(session){
-        loginView.classList.add("hidden");
-        dashboardView.classList.remove("hidden");
-        await initializeDashboard();
-      }else{
-        loginView.classList.remove("hidden");
-        dashboardView.classList.add("hidden");
-      }
+      dashboardView.classList.remove("hidden");
+      await initializeDashboard();
     }
 
     async function initializeDashboard(){
@@ -780,35 +743,8 @@
       renderRequests();
     };
 
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById("adminEmail").value.trim();
-      const password = document.getElementById("adminPassword").value;
-
-      try{
-        loginBtn.disabled = true;
-        loginBtn.textContent = "چاوەڕێ بکە...";
-
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-        if(error) throw error;
-
-        showToast("بە سەرکەوتوویی چوویتە ژوورەوە");
-        await checkSession();
-      }catch(err){
-        console.error(err);
-        showToast(err.message || "هەڵەیەک ڕوویدا", true);
-      }finally{
-        loginBtn.disabled = false;
-        loginBtn.textContent = "چوونەژوورەوە";
-      }
-    });
-
     logoutBtn.addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      await checkSession();
-      showToast("چوویتە دەرەوە");
+      showToast("login لادراوە");
     });
 
     refreshBtn.addEventListener("click", async () => {
