@@ -3,303 +3,433 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK Support</title>
+  <title>SIWAK Admin Panel</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; }
-    body{
-      margin:0;
+    body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background:#0b141a;
-      color:#e9edef;
+      background: #f5f7fb;
+      color: #1f2937;
     }
-    .app{
-      max-width:520px;
-      margin:0 auto;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      background:#111b21;
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    .topbar{
-      background:#202c33;
-      padding:14px 16px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      border-bottom:1px solid rgba(255,255,255,0.05);
-      position:sticky;
-      top:0;
-      z-index:2;
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin-bottom: 18px;
     }
-    .avatar{
-      width:42px;
-      height:42px;
-      border-radius:50%;
-      background:#25d366;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#fff;
-      font-weight:bold;
+    h1, h2, h3 { margin-top: 0; }
+    .grid {
+      display: grid;
+      gap: 12px;
     }
-    .title{font-weight:700;font-size:16px}
-    .sub{font-size:12px;color:#9aa6ad;margin-top:2px}
-    .chat{
-      flex:1;
-      padding:14px 10px 100px;
-      overflow-y:auto;
-      background:
-        linear-gradient(rgba(17,27,33,0.94), rgba(17,27,33,0.94)),
-        url("https://www.transparenttextures.com/patterns/cubes.png");
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
-    .row{
-      display:flex;
-      margin:8px 0;
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
     }
-    .row.user{justify-content:flex-end}
-    .row.admin{justify-content:flex-start}
-    .bubble{
-      max-width:78%;
-      padding:10px 12px 18px;
-      border-radius:12px;
-      position:relative;
-      line-height:1.45;
-      font-size:14px;
-      white-space:pre-wrap;
-      word-break:break-word;
+    input, select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
     }
-    .row.user .bubble{
-      background:#005c4b;
-      border-top-right-radius:4px;
+    textarea { min-height: 100px; resize: vertical; }
+    button {
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
     }
-    .row.admin .bubble{
-      background:#202c33;
-      border-top-left-radius:4px;
+    .btn {
+      background: #111827;
+      color: white;
     }
-    .meta{
-      position:absolute;
-      right:10px;
-      bottom:4px;
-      font-size:10px;
-      color:#b7c4cc;
+    .btn-green {
+      background: #059669;
+      color: white;
     }
-    .typing{
-      min-height:20px;
-      padding:0 16px 8px;
-      color:#25d366;
-      font-size:12px;
+    .btn-red {
+      background: #dc2626;
+      color: white;
     }
-    .composer{
-      position:fixed;
-      bottom:0;
-      left:50%;
-      transform:translateX(-50%);
-      width:100%;
-      max-width:520px;
-      display:flex;
-      gap:8px;
-      padding:10px;
-      background:#202c33;
-      z-index:3;
+    .btn-gray {
+      background: #6b7280;
+      color: white;
     }
-    .composer input{
-      flex:1;
-      border:none;
-      outline:none;
-      border-radius:24px;
-      padding:14px 16px;
-      font-size:14px;
-      background:#2a3942;
-      color:#fff;
+    .hidden { display: none; }
+    .msg {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
     }
-    .composer button{
-      width:48px;
-      height:48px;
-      border:none;
-      border-radius:50%;
-      background:#25d366;
-      color:#111b21;
-      font-size:18px;
-      font-weight:bold;
-      cursor:pointer;
+    .ok { background: #dcfce7; color: #166534; }
+    .err { background: #fee2e2; color: #991b1b; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
-    .empty,.error{
-      text-align:center;
-      margin-top:30px;
-      color:#8fa3ad;
-      font-size:13px;
+    .request-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      background: #fafafa;
     }
-    .error{color:#ff8a8a}
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 768px) {
+      .meta { grid-template-columns: 1fr; }
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .pending { background: #fef3c7; color: #92400e; }
+    .approved { background: #dcfce7; color: #166534; }
+    .rejected { background: #fee2e2; color: #991b1b; }
+    .thumb {
+      width: 100%;
+      max-width: 220px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      margin-top: 8px;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .small {
+      font-size: 13px;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="avatar">S</div>
-      <div>
-        <div class="title">SIWAK Support</div>
-        <div class="sub" id="onlineStatus">connecting...</div>
+  <div class="wrap">
+    <div class="card">
+      <div class="topbar">
+        <h1>SIWAK Admin Panel</h1>
+        <button id="logoutBtn" class="btn-gray hidden">Logout</button>
+      </div>
+      <div id="globalMsg"></div>
+    </div>
+
+    <div id="authBox" class="grid-2">
+      <div class="card">
+        <h2>Signup</h2>
+        <div class="grid">
+          <input type="email" id="signupEmail" placeholder="Email" />
+          <input type="password" id="signupPassword" placeholder="Password" />
+          <button id="signupBtn" class="btn">Signup</button>
+          <div class="small">تەنها یەک جار signup بکە، پاشان هەمیشە login بکە.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Login</h2>
+        <div class="grid">
+          <input type="email" id="loginEmail" placeholder="Email" />
+          <input type="password" id="loginPassword" placeholder="Password" />
+          <button id="loginBtn" class="btn">Login</button>
+        </div>
       </div>
     </div>
 
-    <div class="chat" id="chatBox">
-      <div class="empty">چات ئامادەیە...</div>
+    <div id="adminBox" class="hidden">
+      <div class="card">
+        <h2>Payment Numbers</h2>
+        <div class="grid">
+          <input type="text" id="fibNumber" placeholder="FIB Number" />
+          <input type="text" id="fastpayNumber" placeholder="FastPay Number" />
+          <input type="text" id="qiNumber" placeholder="Qi Card Number" />
+          <button id="saveSettingsBtn" class="btn">Save Numbers</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="topbar">
+          <h2>Payment Requests</h2>
+          <button id="refreshBtn" class="btn">Refresh</button>
+        </div>
+        <div id="requestsList">Loading...</div>
+      </div>
     </div>
-
-    <div class="typing" id="typingBox"></div>
-  </div>
-
-  <div class="composer">
-    <input id="messageInput" type="text" placeholder="پەیام بنووسە..." />
-    <button id="sendBtn">➤</button>
   </div>
 
   <script>
     const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const chatBox = document.getElementById("chatBox");
-    const typingBox = document.getElementById("typingBox");
-    const onlineStatus = document.getElementById("onlineStatus");
-    const input = document.getElementById("messageInput");
-    const sendBtn = document.getElementById("sendBtn");
+    const authBox = document.getElementById("authBox");
+    const adminBox = document.getElementById("adminBox");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const globalMsg = document.getElementById("globalMsg");
 
-    let typingTimer = null;
-
-    function esc(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
+    function showMsg(text, type = "ok") {
+      globalMsg.innerHTML = `<div class="msg ${type}">${text}</div>`;
+      setTimeout(() => {
+        globalMsg.innerHTML = "";
+      }, 4000);
     }
 
-    function formatTime(v) {
-      const d = new Date(v);
-      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    }
-
-    async function loadMessages() {
-      const { data, error } = await client
-        .from("messages")
-        .select("*")
-        .order("created_at", { ascending: true });
+    async function ensureAdminRow(user) {
+      const { error } = await supabase
+        .from("admin_users")
+        .upsert([{ user_id: user.id, email: user.email }], { onConflict: "user_id" });
 
       if (error) {
-        chatBox.innerHTML = `<div class="error">هەڵە لە بارکردنی پەیامەکان<br>${esc(error.message)}</div>`;
+        console.error(error);
+        showMsg(error.message, "err");
+      }
+    }
+
+    async function signup() {
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value.trim();
+
+      if (!email || !password) {
+        showMsg("Email و Password پڕ بکە", "err");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      if (data.user && data.session) {
+        await ensureAdminRow(data.user);
+        showMsg("Signup سەرکەوتوو بوو");
+        await checkSession();
+      } else {
+        showMsg("ئەگەر login نەکرد، Confirm email داخە لە Supabase", "err");
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      if (!email || !password) {
+        showMsg("Email و Password پڕ بکە", "err");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      if (data.user) {
+        await ensureAdminRow(data.user);
+        showMsg("Login سەرکەوتوو بوو");
+        await checkSession();
+      }
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      authBox.classList.remove("hidden");
+      adminBox.classList.add("hidden");
+      logoutBtn.classList.add("hidden");
+      showMsg("Logout کرا");
+    }
+
+    async function loadSettings() {
+      const { data, error } = await supabase
+        .from("payment_settings")
+        .select("*")
+        .eq("id", 1)
+        .single();
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      document.getElementById("fibNumber").value = data.fib_number || "";
+      document.getElementById("fastpayNumber").value = data.fastpay_number || "";
+      document.getElementById("qiNumber").value = data.qi_number || "";
+    }
+
+    async function saveSettings() {
+      const fib_number = document.getElementById("fibNumber").value.trim();
+      const fastpay_number = document.getElementById("fastpayNumber").value.trim();
+      const qi_number = document.getElementById("qiNumber").value.trim();
+
+      const { error } = await supabase
+        .from("payment_settings")
+        .update({
+          fib_number,
+          fastpay_number,
+          qi_number,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", 1);
+
+      if (error) {
+        showMsg(error.message, "err");
+        return;
+      }
+
+      showMsg("ژمارەکان پاشەکەوت کران");
+    }
+
+    function badgeClass(status) {
+      if (status === "approved") return "approved";
+      if (status === "rejected") return "rejected";
+      return "pending";
+    }
+
+    async function loadRequests() {
+      const list = document.getElementById("requestsList");
+      list.innerHTML = "Loading...";
+
+      const { data, error } = await supabase
+        .from("payment_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        list.innerHTML = `<div class="msg err">${error.message}</div>`;
         return;
       }
 
       if (!data || data.length === 0) {
-        chatBox.innerHTML = `<div class="empty">هیچ پەیامێک نییە</div>`;
+        list.innerHTML = `<div class="small">هیچ داواکارییەک نییە.</div>`;
         return;
       }
 
-      chatBox.innerHTML = data.map(msg => `
-        <div class="row ${msg.sender}">
-          <div class="bubble">
-            ${esc(msg.message)}
-            <div class="meta">${formatTime(msg.created_at)}</div>
+      list.innerHTML = data.map(item => `
+        <div class="request-card">
+          <div class="topbar">
+            <h3>#${item.id}</h3>
+            <span class="badge ${badgeClass(item.status)}">${item.status}</span>
+          </div>
+
+          <div class="meta">
+            <div><strong>ناوی سیانی:</strong> ${item.full_name}</div>
+            <div><strong>ژمارەی مۆبایل:</strong> ${item.phone}</div>
+            <div><strong>سێ خانە:</strong> ${item.triple_code}</div>
+            <div><strong>جۆری پارەدان:</strong> ${item.payment_type}</div>
+            <div><strong>کات:</strong> ${new Date(item.created_at).toLocaleString()}</div>
+            <div><strong>تێبینی:</strong> ${item.note ? item.note : "-"}</div>
+          </div>
+
+          <div>
+            <strong>سکرینشۆت:</strong><br />
+            <a href="${item.screenshot_url}" target="_blank">کردنەوەی وێنە</a><br />
+            <img class="thumb" src="${item.screenshot_url}" alt="screenshot" />
+          </div>
+
+          <div class="actions">
+            <button class="btn-green" onclick="updateStatus(${item.id}, 'approved')">Approve</button>
+            <button class="btn-red" onclick="updateStatus(${item.id}, 'rejected')">Reject</button>
+            <button class="btn-gray" onclick="deleteRequest(${item.id})">Delete</button>
           </div>
         </div>
       `).join("");
-
-      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
-
-      sendBtn.disabled = true;
-
-      const { error } = await client
-        .from("messages")
-        .insert([{ sender: "user", message: text }]);
+    async function updateStatus(id, status) {
+      const { error } = await supabase
+        .from("payment_requests")
+        .update({ status })
+        .eq("id", id);
 
       if (error) {
-        alert("هەڵە لە ناردنی پەیام: " + error.message);
-      } else {
-        input.value = "";
-        await setTyping(false);
-        await loadMessages();
+        showMsg(error.message, "err");
+        return;
       }
 
-      sendBtn.disabled = false;
-      input.focus();
+      showMsg("دۆخەکە نوێکرایەوە");
+      loadRequests();
     }
 
-    async function setTyping(value) {
-      await client.from("typing_status").insert([
-        { user_type: "user", is_typing: value }
-      ]);
-    }
+    async function deleteRequest(id) {
+      if (!confirm("دڵنیایت لە سڕینەوە؟")) return;
 
-    async function setOnline(value) {
-      await client.from("online_status").insert([
-        { user_type: "user", is_online: value }
-      ]);
-    }
+      const { error } = await supabase
+        .from("payment_requests")
+        .delete()
+        .eq("id", id);
 
-    async function checkTyping() {
-      const { data } = await client
-        .from("typing_status")
-        .select("*")
-        .eq("user_type", "admin")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (data && data[0]) {
-        const age = Date.now() - new Date(data[0].created_at).getTime();
-        typingBox.textContent = data[0].is_typing && age < 3000 ? "ئەدمین خەریکی نووسینە..." : "";
-      } else {
-        typingBox.textContent = "";
+      if (error) {
+        showMsg(error.message, "err");
+        return;
       }
+
+      showMsg("داواکارییەکە سڕایەوە");
+      loadRequests();
     }
 
-    async function checkOnline() {
-      const { data } = await client
-        .from("online_status")
-        .select("*")
-        .eq("user_type", "admin")
-        .order("created_at", { ascending: false })
-        .limit(1);
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
 
-      if (data && data[0]) {
-        const age = Date.now() - new Date(data[0].created_at).getTime();
-        onlineStatus.textContent = age < 20000 && data[0].is_online ? "online" : "offline";
+      if (session && session.user) {
+        authBox.classList.add("hidden");
+        adminBox.classList.remove("hidden");
+        logoutBtn.classList.remove("hidden");
+        await loadSettings();
+        await loadRequests();
       } else {
-        onlineStatus.textContent = "offline";
+        authBox.classList.remove("hidden");
+        adminBox.classList.add("hidden");
+        logoutBtn.classList.add("hidden");
       }
     }
 
-    input.addEventListener("input", async () => {
-      await setTyping(true);
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(() => setTyping(false), 1500);
+    document.getElementById("signupBtn").addEventListener("click", signup);
+    document.getElementById("loginBtn").addEventListener("click", login);
+    document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
+    document.getElementById("refreshBtn").addEventListener("click", loadRequests);
+    logoutBtn.addEventListener("click", logout);
+
+    supabase.auth.onAuthStateChange(() => {
+      checkSession();
     });
 
-    input.addEventListener("keydown", e => {
-      if (e.key === "Enter") sendMessage();
-    });
+    checkSession();
 
-    sendBtn.addEventListener("click", sendMessage);
-
-    window.addEventListener("load", async () => {
-      await setOnline(true);
-      await loadMessages();
-      await checkTyping();
-      await checkOnline();
-      input.focus();
-    });
-
-    setInterval(async () => {
-      await setOnline(true);
-      await loadMessages();
-      await checkTyping();
-      await checkOnline();
-    }, 2000);
+    window.updateStatus = updateStatus;
+    window.deleteRequest = deleteRequest;
   </script>
 </body>
 </html>
