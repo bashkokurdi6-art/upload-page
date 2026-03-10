@@ -1,698 +1,860 @@
-<!DOCTYPE html>
+<script>
+  const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
+  const SUPABASE_ANON_KEY = "ANON_KEY_LERA_DABNE";
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  <!DOCTYPE html>
 <html lang="ku">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK Admin Panel</title>
+  <title>SIWAK - Admin Panel</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root{
+      --bg: #060606;
+      --panel: #0f1115;
+      --panel-2: #131722;
+      --text: #f5f2e9;
+      --muted: #a8adba;
+      --gold: #d4af37;
+      --gold-soft: #a8831f;
+      --blue: #0f4c81;
+      --blue-soft: #173d67;
+      --border: rgba(212,175,55,.16);
+      --danger: #e25555;
+      --success: #2fb779;
+      --warning: #c99b2b;
+      --shadow: 0 20px 50px rgba(0,0,0,.45);
+      --radius: 22px;
     }
 
-    body {
+    body{
       font-family: Arial, sans-serif;
       min-height: 100vh;
+      color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(250, 204, 21, 0.10), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.10), transparent 28%),
-        linear-gradient(135deg, #05070d, #0f172a, #111827);
-      color: #fff;
-      padding: 20px;
+        radial-gradient(circle at top left, rgba(212,175,55,.10), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(21,96,189,.14), transparent 32%),
+        linear-gradient(135deg, #050505, #0b0d10 40%, #050505 100%);
+      padding: 22px;
     }
 
-    .wrap {
-      max-width: 1100px;
+    .container{
+      max-width: 1320px;
       margin: 0 auto;
     }
 
-    .top-header {
-      text-align: center;
-      margin-bottom: 22px;
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
     }
 
-    .logo {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 14px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #facc15, #f59e0b);
-      display: flex;
+    .hidden{ display: none !important; }
+
+    .login-wrap{
+      min-height: calc(100vh - 44px);
+      display: grid;
+      place-items: center;
+    }
+
+    .login-card{
+      width: 100%;
+      max-width: 460px;
+      padding: 28px;
+    }
+
+    .brand{
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      color: #111827;
-      font-size: 30px;
+      gap: 10px;
+      color: var(--gold);
       font-weight: bold;
-      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35);
+      letter-spacing: 1px;
+      margin-bottom: 16px;
     }
 
-    .title {
-      font-size: 34px;
-      font-weight: bold;
+    .brand-dot{
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #f5e39d);
+      box-shadow: 0 0 18px rgba(212,175,55,.55);
+    }
+
+    h1{
+      font-size: 30px;
       margin-bottom: 8px;
     }
 
-    .subtitle {
-      color: #cbd5e1;
-      font-size: 14px;
-    }
-
-    .card {
-      background: rgba(17, 24, 39, 0.88);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      padding: 22px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.38);
-      margin-bottom: 18px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    @media (max-width: 820px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    h2 {
-      margin-bottom: 14px;
-      font-size: 22px;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      font-size: 15px;
-      outline: none;
-    }
-
-    input {
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-    }
-
-    input::placeholder {
-      color: #94a3b8;
-    }
-
-    input:focus {
-      border-color: #facc15;
-      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.14);
-      background: rgba(255,255,255,0.08);
-    }
-
-    button {
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      opacity: 0.97;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-gold {
-      background: linear-gradient(135deg, #facc15, #f59e0b);
-      color: #111827;
-      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.25);
-    }
-
-    .btn-blue {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: #fff;
-    }
-
-    .btn-green {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #fff;
-      width: auto;
-      min-width: 120px;
-    }
-
-    .btn-red {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #fff;
-      width: auto;
-      min-width: 120px;
-    }
-
-    .btn-gray {
-      background: linear-gradient(135deg, #475569, #334155);
-      color: #fff;
-      width: auto;
-      min-width: 120px;
-    }
-
-    .btn-logout {
-      max-width: 180px;
-      margin-left: auto;
-      display: block;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .msg {
-      margin-top: 12px;
-      margin-bottom: 14px;
-      padding: 14px;
-      border-radius: 14px;
+    .sub{
+      color: var(--muted);
       font-size: 14px;
       line-height: 1.7;
+      margin-bottom: 22px;
     }
 
-    .ok {
-      background: rgba(34, 197, 94, 0.16);
-      color: #bbf7d0;
-      border: 1px solid rgba(34, 197, 94, 0.22);
+    .field{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
-    .err {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fecaca;
-      border: 1px solid rgba(239, 68, 68, 0.22);
+    label{
+      font-size: 14px;
+      color: #d8dbe3;
     }
 
-    .section-head {
+    input, select, textarea{
+      width: 100%;
+      border: 1px solid rgba(212,175,55,.18);
+      background: rgba(9,11,15,.95);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 14px;
+      outline: none;
+      transition: .25s ease;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(212,175,55,.7);
+      box-shadow: 0 0 0 4px rgba(212,175,55,.10);
+    }
+
+    .btn{
+      border: none;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .btn-primary{
+      color: #081018;
+      background: linear-gradient(135deg, #f2d57a, #caa12a 50%, #0f4c81 120%);
+      box-shadow: 0 16px 30px rgba(212,175,55,.16);
+    }
+
+    .btn-dark{
+      background: #12161f;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .btn:hover{
+      transform: translateY(-2px);
+    }
+
+    .topbar{
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
+      margin-bottom: 18px;
+      padding: 20px 22px;
     }
 
-    .request-card {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-      border-radius: 20px;
-      padding: 18px;
+    .topbar h2{
+      font-size: 24px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .topbar p{
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stats{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .stat{
+      padding: 20px;
+    }
+
+    .stat small{
+      color: var(--muted);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .stat strong{
+      font-size: 28px;
+      color: var(--gold);
+    }
+
+    .layout{
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .side{
+      padding: 22px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .side h3, .content h3{
+      color: var(--gold);
+      margin-bottom: 6px;
+      font-size: 22px;
+    }
+
+    .side p, .content p{
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .content{
+      padding: 22px;
+    }
+
+    .grid-2{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .price-box{
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.05);
       margin-bottom: 16px;
     }
 
-    .meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 16px;
-      margin-bottom: 14px;
-      color: #e5e7eb;
-      line-height: 1.8;
-    }
-
-    @media (max-width: 700px) {
-      .meta {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 7px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .pending {
-      background: rgba(250, 204, 21, 0.16);
-      color: #fde68a;
-      border: 1px solid rgba(250, 204, 21, 0.22);
-    }
-
-    .approved {
-      background: rgba(34, 197, 94, 0.16);
-      color: #bbf7d0;
-      border: 1px solid rgba(34, 197, 94, 0.22);
-    }
-
-    .rejected {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fecaca;
-      border: 1px solid rgba(239, 68, 68, 0.22);
-    }
-
-    .thumb {
-      width: 100%;
-      max-width: 260px;
-      border-radius: 16px;
-      margin-top: 10px;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .actions {
+    .actions{
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .small {
-      color: #94a3b8;
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    a {
-      color: #93c5fd;
-      text-decoration: none;
-    }
-
-    .footer-note {
-      text-align: center;
-      color: #94a3b8;
-      font-size: 12px;
       margin-top: 12px;
+    }
+
+    .toolbar{
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .toolbar .field{
+      margin-bottom: 0;
+      min-width: 180px;
+      flex: 1;
+    }
+
+    .request-list{
+      display: grid;
+      gap: 14px;
+    }
+
+    .request-card{
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .request-top{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .request-name{
+      font-size: 19px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .meta{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      border: 1px solid transparent;
+      height: fit-content;
+    }
+
+    .pill-new{
+      color: #f3d37c;
+      background: rgba(201,155,43,.14);
+      border-color: rgba(201,155,43,.24);
+    }
+
+    .pill-reviewing{
+      color: #8ec5ff;
+      background: rgba(15,76,129,.18);
+      border-color: rgba(15,76,129,.28);
+    }
+
+    .pill-done{
+      color: #7ce0ae;
+      background: rgba(47,183,121,.14);
+      border-color: rgba(47,183,121,.24);
+    }
+
+    .pill-rejected{
+      color: #ff9e9e;
+      background: rgba(226,85,85,.12);
+      border-color: rgba(226,85,85,.22);
+    }
+
+    .request-grid{
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .request-item{
+      padding: 12px;
+      border-radius: 14px;
+      background: #0b0f16;
+      border: 1px solid rgba(255,255,255,.04);
+    }
+
+    .request-item small{
+      display: block;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .request-item strong{
+      color: #f0f1f6;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .req-actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .req-actions select{
+      max-width: 170px;
+    }
+
+    a.preview-link{
+      color: #8fc5ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .empty{
+      text-align: center;
+      color: var(--muted);
+      padding: 28px;
+      border: 1px dashed rgba(255,255,255,.08);
+      border-radius: 18px;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(30px);
+      background: #0f1115;
+      color: #fff;
+      border: 1px solid rgba(212,175,55,.25);
+      border-radius: 16px;
+      padding: 14px 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s ease;
+      z-index: 9999;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1100px){
+      .layout{
+        grid-template-columns: 1fr;
+      }
+      .side{
+        position: static;
+      }
+      .stats{
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px){
+      .stats, .grid-2, .request-grid{
+        grid-template-columns: 1fr;
+      }
+      .topbar{
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top-header">
-      <div class="logo">S</div>
-      <div class="title">SIWAK Admin</div>
-      <div class="subtitle">بەڕێوەبردنی ژمارەی پارەدان و داواکارییەکان</div>
-    </div>
-
-    <div id="globalMsg"></div>
-
-    <div id="authBox" class="grid-2">
-      <div class="card">
-        <h2>Signup</h2>
-        <div class="grid">
-          <input type="email" id="signupEmail" placeholder="Email" />
-          <input type="password" id="signupPassword" placeholder="Password" />
-          <button id="signupBtn" class="btn-gold">Signup</button>
-          <div class="small">تەنها یەک جار هەژمار دروست بکە، پاشان هەمیشە login بکە.</div>
+  <div class="container">
+    <!-- LOGIN -->
+    <div id="loginView" class="login-wrap">
+      <div class="card login-card">
+        <div class="brand">
+          <span class="brand-dot"></span>
+          <span>SIWAK ADMIN</span>
         </div>
-      </div>
+        <h1>چوونەژوورەوەی ئەدمین</h1>
+        <p class="sub">بە ئیمەیڵ و وشەی نهێنی Supabase بچۆ ژوورەوە بۆ بەڕێوەبردنی نرخەکان، ژمارەکانی پارەدان و داواکارییەکان.</p>
 
-      <div class="card">
-        <h2>Login</h2>
-        <div class="grid">
-          <input type="email" id="loginEmail" placeholder="Email" />
-          <input type="password" id="loginPassword" placeholder="Password" />
-          <button id="loginBtn" class="btn-blue">Login</button>
-        </div>
+        <form id="loginForm">
+          <div class="field">
+            <label for="adminEmail">ئیمەیڵ</label>
+            <input type="email" id="adminEmail" placeholder="admin@example.com" required />
+          </div>
+
+          <div class="field">
+            <label for="adminPassword">وشەی نهێنی</label>
+            <input type="password" id="adminPassword" placeholder="••••••••" required />
+          </div>
+
+          <button class="btn btn-primary" id="loginBtn" style="width:100%;">چوونەژوورەوە</button>
+        </form>
       </div>
     </div>
 
-    <div id="adminBox" class="hidden">
-      <div class="card">
-        <button id="logoutBtn" class="btn-gray btn-logout">Logout</button>
-      </div>
-
-      <div class="card">
-        <h2>ژمارەکانی پارەدان</h2>
-        <div class="grid">
-          <input type="text" id="fibNumber" placeholder="FIB Number" />
-          <input type="text" id="fastpayNumber" placeholder="FastPay Number" />
-          <input type="text" id="qiNumber" placeholder="Qi Card Number" />
-          <button id="saveSettingsBtn" class="btn-gold">Save Numbers</button>
+    <!-- DASHBOARD -->
+    <div id="dashboardView" class="hidden">
+      <div class="card topbar">
+        <div>
+          <h2>SIWAK Dashboard</h2>
+          <p>بەڕێوەبردنی نرخ، ژمارەی پارەدان و داواکارییەکان</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-dark" id="refreshBtn">نوێکردنەوە</button>
+          <button class="btn btn-primary" id="logoutBtn">چوونەدەرەوە</button>
         </div>
       </div>
 
-      <div class="card">
-        <div class="section-head">
-          <h2>داواکارییەکان</h2>
-          <button id="refreshBtn" class="btn-blue" style="width:auto; min-width:160px;">Refresh</button>
+      <div class="stats">
+        <div class="card stat">
+          <small>کۆی داواکارییەکان</small>
+          <strong id="statTotal">0</strong>
         </div>
-        <div id="requestsList">Loading...</div>
+        <div class="card stat">
+          <small>نوێ</small>
+          <strong id="statNew">0</strong>
+        </div>
+        <div class="card stat">
+          <small>لە پشکنین</small>
+          <strong id="statReviewing">0</strong>
+        </div>
+        <div class="card stat">
+          <small>تەواوبوو</small>
+          <strong id="statDone">0</strong>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div class="card side">
+          <h3>ڕێکخستنەکان</h3>
+          <p>لێرە دەتوانیت نرخ و ژمارەی پارەدان ڕۆژانە بگۆڕیت.</p>
+
+          <div class="price-box">
+            <div class="grid-2">
+              <div class="field">
+                <label for="visaPriceInput">نرخی ڤیزە</label>
+                <input type="number" id="visaPriceInput" placeholder="0" />
+              </div>
+              <div class="field">
+                <label for="rawzaPriceInput">نرخی ڕەوزە</label>
+                <input type="number" id="rawzaPriceInput" placeholder="0" />
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="fibNumberInput">ژمارەی FIB</label>
+            <input type="text" id="fibNumberInput" placeholder="FIB Number" />
+          </div>
+
+          <div class="field">
+            <label for="fastpayNumberInput">ژمارەی FastPay</label>
+            <input type="text" id="fastpayNumberInput" placeholder="FastPay Number" />
+          </div>
+
+          <div class="field">
+            <label for="qicardNumberInput">ژمارەی Qi Card</label>
+            <input type="text" id="qicardNumberInput" placeholder="Qi Card Number" />
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="saveSettingsBtn" style="width:100%;">پاشەکەوتکردنی ڕێکخستنەکان</button>
+          </div>
+        </div>
+
+        <div class="card content">
+          <h3>داواکارییەکان</h3>
+          <p>هەموو داواکارییەکان لێرە دەبینیت و دەتوانیت بارودۆخەکەیان بگۆڕیت.</p>
+
+          <div class="toolbar">
+            <div class="field">
+              <label for="filterType">فلتەری جۆر</label>
+              <select id="filterType">
+                <option value="all">هەموو</option>
+                <option value="visa">ڤیزە</option>
+                <option value="rawza">ڕەوزە</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="filterStatus">فلتەری بارودۆخ</label>
+              <select id="filterStatus">
+                <option value="all">هەموو</option>
+                <option value="new">نوێ</option>
+                <option value="reviewing">لە پشکنین</option>
+                <option value="done">تەواوبوو</option>
+                <option value="rejected">ڕەتکراوە</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="request-list" id="requestList"></div>
+        </div>
       </div>
     </div>
-
-    <div class="footer-note">SIWAK © Admin Panel</div>
   </div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
     const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const SUPABASE_ANON_KEY = "ANON_KEY_LERA_DABNE";
 
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const authBox = document.getElementById("authBox");
-    const adminBox = document.getElementById("adminBox");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const globalMsg = document.getElementById("globalMsg");
-    const signupBtn = document.getElementById("signupBtn");
+    const loginView = document.getElementById("loginView");
+    const dashboardView = document.getElementById("dashboardView");
+    const loginForm = document.getElementById("loginForm");
     const loginBtn = document.getElementById("loginBtn");
-    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
     const refreshBtn = document.getElementById("refreshBtn");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const requestList = document.getElementById("requestList");
+    const filterTypeEl = document.getElementById("filterType");
+    const filterStatusEl = document.getElementById("filterStatus");
+    const toastEl = document.getElementById("toast");
 
-    function showMsg(text, type = "ok") {
-      globalMsg.innerHTML = `<div class="msg ${type}">${text}</div>`;
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    let settings = null;
+    let allRequests = [];
+
+    function showToast(message, isError = false){
+      toastEl.textContent = message;
+      toastEl.style.borderColor = isError ? "rgba(255,80,80,.35)" : "rgba(212,175,55,.25)";
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 3200);
     }
 
-    function clearMsg() {
-      globalMsg.innerHTML = "";
+    function formatMoney(value){
+      return Number(value || 0).toLocaleString() + " IQD";
     }
 
-    async function ensureAdminRow(user) {
-      const { error } = await db
-        .from("admin_users")
-        .upsert(
-          [{ user_id: user.id, email: user.email }],
-          { onConflict: "user_id" }
-        );
+    function formatDate(dateString){
+      const d = new Date(dateString);
+      return d.toLocaleString();
+    }
 
-      if (error) {
-        console.error("ensureAdminRow error:", error);
-        showMsg("هەڵە لە admin_users: " + error.message, "err");
+    function statusClass(status){
+      if(status === "new") return "pill-new";
+      if(status === "reviewing") return "pill-reviewing";
+      if(status === "done") return "pill-done";
+      return "pill-rejected";
+    }
+
+    function statusLabel(status){
+      if(status === "new") return "نوێ";
+      if(status === "reviewing") return "لە پشکنین";
+      if(status === "done") return "تەواوبوو";
+      return "ڕەتکراوە";
+    }
+
+    async function checkSession(){
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+
+      if(session){
+        loginView.classList.add("hidden");
+        dashboardView.classList.remove("hidden");
+        await initializeDashboard();
+      }else{
+        loginView.classList.remove("hidden");
+        dashboardView.classList.add("hidden");
       }
     }
 
-    async function signup() {
-      const email = document.getElementById("signupEmail").value.trim();
-      const password = document.getElementById("signupPassword").value.trim();
+    async function initializeDashboard(){
+      await Promise.all([loadSettings(), loadRequests()]);
+      renderRequests();
+    }
 
-      if (!email || !password) {
-        showMsg("Email و Password پڕ بکە", "err");
+    async function loadSettings(){
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("*")
+        .eq("id", 1)
+        .single();
+
+      if(error){
+        console.error(error);
+        showToast("هەڵە لە هێنانی ڕێکخستنەکان", true);
         return;
       }
 
-      signupBtn.disabled = true;
-      showMsg("چاوەڕوان بە... هەژمار دروست دەکرێت");
-
-      try {
-        const { data, error } = await db.auth.signUp({ email, password });
-
-        console.log("SIGNUP DATA:", data);
-        console.log("SIGNUP ERROR:", error);
-
-        if (error) {
-          showMsg("هەڵە لە signup: " + error.message, "err");
-          return;
-        }
-
-        if (data.user) {
-          await ensureAdminRow(data.user);
-          showMsg("Signup سەرکەوتوو بوو. ئێستا login بکە.");
-          document.getElementById("loginEmail").value = email;
-          document.getElementById("loginPassword").value = password;
-        } else {
-          showMsg("Signup تەواو نەبوو", "err");
-        }
-      } catch (err) {
-        console.error("Signup catch error:", err);
-        showMsg("هەڵەی نەناسراو لە signup", "err");
-      } finally {
-        signupBtn.disabled = false;
-      }
+      settings = data;
+      document.getElementById("visaPriceInput").value = data.visa_price ?? 0;
+      document.getElementById("rawzaPriceInput").value = data.rawza_price ?? 0;
+      document.getElementById("fibNumberInput").value = data.fib_number ?? "";
+      document.getElementById("fastpayNumberInput").value = data.fastpay_number ?? "";
+      document.getElementById("qicardNumberInput").value = data.qicard_number ?? "";
     }
 
-    async function login() {
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value.trim();
+    async function loadRequests(){
+      const [{ data: visaData, error: visaError }, { data: rawzaData, error: rawzaError }] = await Promise.all([
+        supabase.from("visa_requests").select("*").order("created_at", { ascending: false }),
+        supabase.from("rawza_requests").select("*").order("created_at", { ascending: false })
+      ]);
 
-      if (!email || !password) {
-        showMsg("Email و Password پڕ بکە", "err");
+      if(visaError || rawzaError){
+        console.error(visaError || rawzaError);
+        showToast("هەڵە لە هێنانی داواکارییەکان", true);
         return;
       }
 
-      loginBtn.disabled = true;
-      showMsg("چاوەڕوان بە... هەوڵی چوونەژوورەوە دەدرێت");
+      const visaRequests = (visaData || []).map(item => ({ ...item, request_type: "visa" }));
+      const rawzaRequests = (rawzaData || []).map(item => ({ ...item, request_type: "rawza" }));
 
-      try {
-        console.log("Trying login with:", email);
+      allRequests = [...visaRequests, ...rawzaRequests].sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
 
-        const { data, error } = await db.auth.signInWithPassword({
+      updateStats();
+    }
+
+    function updateStats(){
+      const total = allRequests.length;
+      const statNew = allRequests.filter(x => x.status === "new").length;
+      const statReviewing = allRequests.filter(x => x.status === "reviewing").length;
+      const statDone = allRequests.filter(x => x.status === "done").length;
+
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statNew").textContent = statNew;
+      document.getElementById("statReviewing").textContent = statReviewing;
+      document.getElementById("statDone").textContent = statDone;
+    }
+
+    function renderRequests(){
+      const typeFilter = filterTypeEl.value;
+      const statusFilter = filterStatusEl.value;
+
+      const filtered = allRequests.filter(item => {
+        const typeOk = typeFilter === "all" ? true : item.request_type === typeFilter;
+        const statusOk = statusFilter === "all" ? true : item.status === statusFilter;
+        return typeOk && statusOk;
+      });
+
+      if(!filtered.length){
+        requestList.innerHTML = `<div class="empty">هیچ داواکارییەک نەدۆزرایەوە</div>`;
+        return;
+      }
+
+      requestList.innerHTML = filtered.map(item => `
+        <div class="request-card">
+          <div class="request-top">
+            <div>
+              <div class="request-name">${escapeHtml(item.customer_name)}</div>
+              <div class="meta">
+                ${item.request_type === "visa" ? "جۆر: ڤیزە" : "جۆر: ڕەوزە"}<br>
+                کات: ${formatDate(item.created_at)}
+              </div>
+            </div>
+            <div class="pill ${statusClass(item.status)}">${statusLabel(item.status)}</div>
+          </div>
+
+          <div class="request-grid">
+            <div class="request-item">
+              <small>ژمارەی مۆبایل</small>
+              <strong>${escapeHtml(item.mobile)}</strong>
+            </div>
+
+            <div class="request-item">
+              <small>شێوازی پارەدان</small>
+              <strong>${escapeHtml(item.payment_method.toUpperCase())}</strong>
+            </div>
+
+            <div class="request-item">
+              <small>ژمارەی پارەدان</small>
+              <strong>${escapeHtml(item.payment_number || "-")}</strong>
+            </div>
+
+            <div class="request-item">
+              <small>بڕی پارە</small>
+              <strong>${formatMoney(item.amount)}</strong>
+            </div>
+
+            <div class="request-item" style="grid-column:1/-1;">
+              <small>تێبینی</small>
+              <strong>${escapeHtml(item.note || "-")}</strong>
+            </div>
+
+            <div class="request-item" style="grid-column:1/-1;">
+              <small>وێنەی پارەدان</small>
+              <strong>
+                ${item.payment_image_url
+                  ? `<a class="preview-link" href="${item.payment_image_url}" target="_blank">بینینی وێنە</a>`
+                  : "-"}
+              </strong>
+            </div>
+          </div>
+
+          <div class="req-actions">
+            <select onchange="updateRequestStatus('${item.request_type}', '${item.id}', this.value)">
+              <option value="new" ${item.status === "new" ? "selected" : ""}>نوێ</option>
+              <option value="reviewing" ${item.status === "reviewing" ? "selected" : ""}>لە پشکنین</option>
+              <option value="done" ${item.status === "done" ? "selected" : ""}>تەواوبوو</option>
+              <option value="rejected" ${item.status === "rejected" ? "selected" : ""}>ڕەتکراوە</option>
+            </select>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function saveSettings(){
+      const payload = {
+        visa_price: Number(document.getElementById("visaPriceInput").value || 0),
+        rawza_price: Number(document.getElementById("rawzaPriceInput").value || 0),
+        fib_number: document.getElementById("fibNumberInput").value.trim(),
+        fastpay_number: document.getElementById("fastpayNumberInput").value.trim(),
+        qicard_number: document.getElementById("qicardNumberInput").value.trim()
+      };
+
+      const { error } = await supabase
+        .from("app_settings")
+        .update(payload)
+        .eq("id", 1);
+
+      if(error){
+        console.error(error);
+        showToast("هەڵە لە پاشەکەوتکردنی ڕێکخستنەکان", true);
+        return;
+      }
+
+      showToast("ڕێکخستنەکان بە سەرکەوتوویی پاشەکەوت کران");
+      await loadSettings();
+    }
+
+    window.updateRequestStatus = async function(requestType, id, status){
+      const tableName = requestType === "visa" ? "visa_requests" : "rawza_requests";
+
+      const { error } = await supabase
+        .from(tableName)
+        .update({ status })
+        .eq("id", id);
+
+      if(error){
+        console.error(error);
+        showToast("هەڵە لە گۆڕینی بارودۆخ", true);
+        return;
+      }
+
+      showToast("بارودۆخ نوێ کرایەوە");
+      await loadRequests();
+      renderRequests();
+    };
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("adminEmail").value.trim();
+      const password = document.getElementById("adminPassword").value;
+
+      try{
+        loginBtn.disabled = true;
+        loginBtn.textContent = "چاوەڕێ بکە...";
+
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password
         });
 
-        console.log("LOGIN DATA:", data);
-        console.log("LOGIN ERROR:", error);
+        if(error) throw error;
 
-        if (error) {
-          showMsg("هەڵە لە login: " + error.message, "err");
-          return;
-        }
-
-        if (data?.user) {
-          showMsg("Login سەرکەوتوو بوو");
-          authBox.classList.add("hidden");
-          adminBox.classList.remove("hidden");
-          await loadSettings();
-          await loadRequests();
-        } else {
-          showMsg("Login تەواو نەبوو", "err");
-        }
-      } catch (err) {
-        console.error("Login catch error:", err);
-        showMsg("هەڵەی نەناسراو لە login", "err");
-      } finally {
+        showToast("بە سەرکەوتوویی چوویتە ژوورەوە");
+        await checkSession();
+      }catch(err){
+        console.error(err);
+        showToast("ئیمەیڵ یان وشەی نهێنی هەڵەیە", true);
+      }finally{
         loginBtn.disabled = false;
+        loginBtn.textContent = "چوونەژوورەوە";
       }
-    }
-
-    async function logout() {
-      try {
-        await db.auth.signOut();
-        authBox.classList.remove("hidden");
-        adminBox.classList.add("hidden");
-        showMsg("Logout کرا");
-      } catch (err) {
-        console.error("Logout error:", err);
-        showMsg("هەڵە لە logout", "err");
-      }
-    }
-
-    async function loadSettings() {
-      try {
-        const { data, error } = await db
-          .from("payment_settings")
-          .select("*")
-          .eq("id", 1)
-          .single();
-
-        console.log("SETTINGS DATA:", data);
-        console.log("SETTINGS ERROR:", error);
-
-        if (error) {
-          showMsg("هەڵە لە خوێندنەوەی ژمارەکان: " + error.message, "err");
-          return;
-        }
-
-        document.getElementById("fibNumber").value = data?.fib_number || "";
-        document.getElementById("fastpayNumber").value = data?.fastpay_number || "";
-        document.getElementById("qiNumber").value = data?.qi_number || "";
-      } catch (err) {
-        console.error("loadSettings catch error:", err);
-        showMsg("هەڵەی نەناسراو لە loadSettings", "err");
-      }
-    }
-
-    async function saveSettings() {
-      const fib_number = document.getElementById("fibNumber").value.trim();
-      const fastpay_number = document.getElementById("fastpayNumber").value.trim();
-      const qi_number = document.getElementById("qiNumber").value.trim();
-
-      saveSettingsBtn.disabled = true;
-      showMsg("چاوەڕوان بە... ژمارەکان پاشەکەوت دەکرێن");
-
-      try {
-        const { data, error } = await db
-          .from("payment_settings")
-          .upsert(
-            [{
-              id: 1,
-              fib_number,
-              fastpay_number,
-              qi_number,
-              updated_at: new Date().toISOString()
-            }],
-            { onConflict: "id" }
-          )
-          .select();
-
-        console.log("SAVE SETTINGS DATA:", data);
-        console.log("SAVE SETTINGS ERROR:", error);
-
-        if (error) {
-          showMsg("هەڵە لە پاشەکەوتکردنی ژمارەکان: " + error.message, "err");
-          return;
-        }
-
-        showMsg("ژمارەکان پاشەکەوت کران");
-      } catch (err) {
-        console.error("saveSettings catch error:", err);
-        showMsg("هەڵەی نەناسراو لە saveSettings", "err");
-      } finally {
-        saveSettingsBtn.disabled = false;
-      }
-    }
-
-    function badgeClass(status) {
-      if (status === "approved") return "approved";
-      if (status === "rejected") return "rejected";
-      return "pending";
-    }
-
-    async function loadRequests() {
-      const list = document.getElementById("requestsList");
-      list.innerHTML = "Loading...";
-
-      try {
-        const { data, error } = await db
-          .from("payment_requests")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        console.log("REQUESTS DATA:", data);
-        console.log("REQUESTS ERROR:", error);
-
-        if (error) {
-          list.innerHTML = `<div class="msg err">${error.message}</div>`;
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          list.innerHTML = `<div class="small">هێشتا هیچ داواکارییەک نییە.</div>`;
-          return;
-        }
-
-        list.innerHTML = data.map(item => `
-          <div class="request-card">
-            <div class="section-head">
-              <h2 style="margin:0; font-size:20px;">#${item.id}</h2>
-              <span class="badge ${badgeClass(item.status)}">${item.status || "pending"}</span>
-            </div>
-
-            <div class="meta">
-              <div><strong>ناوی سیانی:</strong> ${item.full_name || "-"}</div>
-              <div><strong>ژمارەی مۆبایل:</strong> ${item.phone || "-"}</div>
-              <div><strong>جۆری پارەدان:</strong> ${item.payment_type || "-"}</div>
-              <div><strong>کات:</strong> ${item.created_at ? new Date(item.created_at).toLocaleString() : "-"}</div>
-              <div><strong>تێبینی:</strong> ${item.note || "-"}</div>
-            </div>
-
-            <div>
-              <strong>سکرینشۆت:</strong><br />
-              ${item.screenshot_url ? `
-                <a href="${item.screenshot_url}" target="_blank">کردنەوەی وێنە</a><br />
-                <img class="thumb" src="${item.screenshot_url}" alt="screenshot" />
-              ` : `<span class="small">وێنە نییە</span>`}
-            </div>
-
-            <div class="actions">
-              <button class="btn-green" onclick="updateStatus(${item.id}, 'approved')">Approve</button>
-              <button class="btn-red" onclick="updateStatus(${item.id}, 'rejected')">Reject</button>
-              <button class="btn-gray" onclick="deleteRequest(${item.id})">Delete</button>
-            </div>
-          </div>
-        `).join("");
-      } catch (err) {
-        console.error("loadRequests catch error:", err);
-        list.innerHTML = `<div class="msg err">هەڵەی نەناسراو لە loadRequests</div>`;
-      }
-    }
-
-    async function updateStatus(id, status) {
-      try {
-        const { error } = await db
-          .from("payment_requests")
-          .update({ status })
-          .eq("id", id);
-
-        if (error) {
-          showMsg("هەڵە لە نوێکردنەوەی دۆخ: " + error.message, "err");
-          return;
-        }
-
-        showMsg("دۆخەکە نوێکرایەوە");
-        await loadRequests();
-      } catch (err) {
-        console.error("updateStatus error:", err);
-        showMsg("هەڵەی نەناسراو لە updateStatus", "err");
-      }
-    }
-
-    async function deleteRequest(id) {
-      if (!confirm("دڵنیایت لە سڕینەوە؟")) return;
-
-      try {
-        const { error } = await db
-          .from("payment_requests")
-          .delete()
-          .eq("id", id);
-
-        if (error) {
-          showMsg("هەڵە لە سڕینەوە: " + error.message, "err");
-          return;
-        }
-
-        showMsg("داواکارییەکە سڕایەوە");
-        await loadRequests();
-      } catch (err) {
-        console.error("deleteRequest error:", err);
-        showMsg("هەڵەی نەناسراو لە deleteRequest", "err");
-      }
-    }
-
-    async function checkSession() {
-      try {
-        const { data, error } = await db.auth.getSession();
-
-        console.log("SESSION DATA:", data);
-        console.log("SESSION ERROR:", error);
-
-        const session = data?.session;
-
-        if (session && session.user) {
-          authBox.classList.add("hidden");
-          adminBox.classList.remove("hidden");
-          clearMsg();
-          await loadSettings();
-          await loadRequests();
-        } else {
-          authBox.classList.remove("hidden");
-          adminBox.classList.add("hidden");
-        }
-      } catch (err) {
-        console.error("checkSession error:", err);
-        showMsg("هەڵەی نەناسراو لە checkSession", "err");
-      }
-    }
-
-    signupBtn.addEventListener("click", signup);
-    loginBtn.addEventListener("click", login);
-    saveSettingsBtn.addEventListener("click", saveSettings);
-    refreshBtn.addEventListener("click", loadRequests);
-    logoutBtn.addEventListener("click", logout);
-
-    db.auth.onAuthStateChange((event, session) => {
-      console.log("AUTH EVENT:", event, session);
-      checkSession();
     });
 
-    checkSession();
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      showToast("چوویتە دەرەوە");
+      await checkSession();
+    });
 
-    window.updateStatus = updateStatus;
-    window.deleteRequest = deleteRequest;
+    refreshBtn.addEventListener("click", async () => {
+      await initializeDashboard();
+      showToast("زانیارییەکان نوێ کرانەوە");
+    });
+
+    saveSettingsBtn.addEventListener("click", saveSettings);
+    filterTypeEl.addEventListener("change", renderRequests);
+    filterStatusEl.addEventListener("change", renderRequests);
+
+    checkSession();
   </script>
 </body>
 </html>
+</script>
