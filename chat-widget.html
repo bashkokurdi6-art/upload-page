@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIWAK Chat Widget</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: transparent;
+    }
+
+    .chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      border: none;
+      background: #06b6d4;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      z-index: 9999;
+    }
+
+    .chat-box {
+      position: fixed;
+      bottom: 95px;
+      right: 20px;
+      width: 340px;
+      max-width: calc(100vw - 20px);
+      height: 500px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      z-index: 9999;
+      border: 1px solid #e5e7eb;
+    }
+
+    .chat-box.open {
+      display: flex;
+    }
+
+    .chat-header {
+      background: #0f172a;
+      color: white;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .close-btn {
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .chat-setup {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f8fafc;
+    }
+
+    .chat-setup input {
+      width: 100%;
+      padding: 11px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 14px;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 10px;
+      background: #06b6d4;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      background: #eef2ff;
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+      word-break: break-word;
+      font-size: 14px;
+    }
+
+    .user {
+      background: #06b6d4;
+      color: white;
+      margin-left: auto;
+    }
+
+    .admin {
+      background: white;
+      color: #111827;
+      border: 1px solid #cbd5e1;
+      margin-right: auto;
+    }
+
+    .composer {
+      display: none;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid #e5e7eb;
+      background: white;
+    }
+
+    .composer.show {
+      display: flex;
+    }
+
+    .composer input {
+      flex: 1;
+      padding: 11px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .composer button {
+      border: none;
+      border-radius: 10px;
+      background: #06b6d4;
+      color: white;
+      padding: 0 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .status {
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #64748b;
+      background: #f8fafc;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 500px) {
+      .chat-box {
+        right: 10px;
+        bottom: 85px;
+        width: calc(100vw - 20px);
+        height: 75vh;
+      }
+
+      .chat-toggle {
+        right: 14px;
+        bottom: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="chat-toggle" onclick="toggleChat()">💬</button>
+
+  <div class="chat-box" id="chatBox">
+    <div class="chat-header">
+      <span>SIWAK Chat</span>
+      <button class="close-btn" onclick="toggleChat()">×</button>
+    </div>
+
+    <div class="chat-setup" id="setupBox">
+      <input id="customerName" type="text" placeholder="Your name" />
+      <input id="customerPhone" type="text" placeholder="Your phone" />
+      <button class="start-btn" onclick="startChat()">Start Chat</button>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="composer" id="composer">
+      <input id="messageInput" type="text" placeholder="Write your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="status" id="statusText">Ready.</div>
+  </div>
+
+  <script>
+    const supabaseUrl = "https://igydtqampcfbvyymlmxg.supabase.co";
+    const supabaseKey = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let currentName = localStorage.getItem("siwak_name") || "";
+    let currentPhone = localStorage.getItem("siwak_phone") || "";
+    let poller = null;
+
+    function setStatus(text) {
+      document.getElementById("statusText").textContent = text;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function toggleChat() {
+      const box = document.getElementById("chatBox");
+      box.classList.toggle("open");
+    }
+
+    function messageKey() {
+      return currentName + "|" + currentPhone;
+    }
+
+    function renderMessages(rows) {
+      const box = document.getElementById("messages");
+      box.innerHTML = "";
+
+      rows.forEach(row => {
+        const div = document.createElement("div");
+        div.className = "msg " + (row.sender === "user" ? "user" : "admin");
+        div.innerHTML = escapeHtml(row.message);
+        box.appendChild(div);
+      });
+
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function startChat() {
+      const name = document.getElementById("customerName").value.trim();
+      const phone = document.getElementById("customerPhone").value.trim();
+
+      if (!name || !phone) {
+        alert("Please enter name and phone.");
+        return;
+      }
+
+      currentName = name;
+      currentPhone = phone;
+
+      localStorage.setItem("siwak_name", name);
+      localStorage.setItem("siwak_phone", phone);
+
+      document.getElementById("setupBox").classList.add("hidden");
+      document.getElementById("composer").classList.add("show");
+
+      setStatus("Chat started.");
+      await loadMessages();
+      startPolling();
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const message = input.value.trim();
+
+      if (!currentName || !currentPhone) {
+        alert("Start chat first.");
+        return;
+      }
+
+      if (!message) return;
+
+      input.value = "";
+      setStatus("Sending...");
+
+      const { error } = await supabase
+        .from("live_chat")
+        .insert([{
+          name: currentName,
+          phone: currentPhone,
+          message: message,
+          sender: "user"
+        }]);
+
+      if (error) {
+        console.error(error);
+        setStatus("Send failed: " + error.message);
+        return;
+      }
+
+      await loadMessages();
+      setStatus("Message sent.");
+    }
+
+    async function loadMessages() {
+      if (!currentName || !currentPhone) return;
+
+      const { data, error } = await supabase
+        .from("live_chat")
+        .select("*")
+        .eq("name", currentName)
+        .eq("phone", currentPhone)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        setStatus("Load failed: " + error.message);
+        return;
+      }
+
+      renderMessages(data || []);
+    }
+
+    function startPolling() {
+      if (poller) clearInterval(poller);
+      poller = setInterval(loadMessages, 2000);
+    }
+
+    function boot() {
+      if (currentName && currentPhone) {
+        document.getElementById("customerName").value = currentName;
+        document.getElementById("customerPhone").value = currentPhone;
+        document.getElementById("setupBox").classList.add("hidden");
+        document.getElementById("composer").classList.add("show");
+        loadMessages();
+        startPolling();
+      }
+    }
+
+    document.getElementById("messageInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    boot();
+  </script>
+</body>
+</html>
