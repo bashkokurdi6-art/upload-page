@@ -1,676 +1,590 @@
 <!DOCTYPE html>
-<html lang="ku" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK Admin Panel</title>
+  <title>SIWAK PRO Admin</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-      font-family:sans-serif;
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
     }
 
-    :root{
-      --bg:#0f172a;
-      --bg2:#111827;
-      --card:#1e293b;
-      --line:rgba(255,255,255,0.08);
-      --text:#ffffff;
-      --muted:rgba(255,255,255,0.72);
-      --primary:#2563eb;
-      --primary2:#38bdf8;
-      --success:#10b981;
-      --warning:#f59e0b;
-      --danger:#ef4444;
-      --shadow:0 12px 30px rgba(0,0,0,0.25);
-      --radius:20px;
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
     }
 
-    body{
-      background:linear-gradient(180deg,var(--bg),var(--bg2));
-      color:var(--text);
-      min-height:100vh;
-      padding:20px;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
-    .container{
-      max-width:1300px;
-      margin:0 auto;
+    .title {
+      font-size: 30px;
+      font-weight: bold;
+      color: #22d3ee;
     }
 
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      margin-bottom:20px;
-      flex-wrap:wrap;
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .title-box h1{
-      font-size:30px;
-      margin-bottom:6px;
-      font-weight:800;
+    button {
+      background: #06b6d4;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
     }
 
-    .title-box p{
-      color:var(--muted);
-      font-size:14px;
+    button:hover {
+      opacity: 0.9;
     }
 
-    .admin-badge{
-      background:rgba(255,255,255,0.06);
-      border:1px solid var(--line);
-      padding:12px 16px;
-      border-radius:16px;
-      font-size:14px;
-      color:var(--muted);
+    .danger {
+      background: #ef4444;
     }
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:16px;
-      margin-bottom:20px;
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
-    .stat-card{
-      background:linear-gradient(180deg,#18253b,#132033);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:20px;
-      box-shadow:var(--shadow);
+    .tab-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
     }
 
-    .stat-card .label{
-      color:var(--muted);
-      font-size:14px;
-      margin-bottom:8px;
+    .tab-btn.active {
+      background: #22d3ee;
+      color: #0f172a;
     }
 
-    .stat-card .value{
-      font-size:32px;
-      font-weight:800;
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
     }
 
-    .panel{
-      background:rgba(255,255,255,0.03);
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:18px;
-      box-shadow:var(--shadow);
+    .card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 18px;
     }
 
-    .controls{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: #94a3b8;
     }
 
-    .tabs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+    .card p {
+      margin: 0;
+      font-size: 28px;
+      font-weight: bold;
+      color: #22d3ee;
     }
 
-    .tab-btn{
-      border:none;
-      border-radius:14px;
-      padding:12px 16px;
-      background:#172235;
-      color:#fff;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:700;
-      border:1px solid transparent;
-      transition:0.2s ease;
+    .panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 18px;
+      padding: 18px;
     }
 
-    .tab-btn.active{
-      background:linear-gradient(135deg,var(--primary),var(--primary2));
-      border-color:transparent;
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
     }
 
-    .search-box{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+    input[type="text"] {
+      flex: 1;
+      min-width: 240px;
+      background: #0f172a;
+      color: white;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      outline: none;
     }
 
-    .search-box input,
-    .search-box select{
-      background:#0f172a;
-      color:#fff;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px 14px;
-      min-width:180px;
-      outline:none;
+    .table-wrap {
+      overflow-x: auto;
     }
 
-    .table-wrap{
-      overflow:auto;
-      border-radius:18px;
-      border:1px solid var(--line);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
     }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:980px;
-      background:#0f172a;
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #1f2937;
+      text-align: left;
+      vertical-align: top;
     }
 
-    thead{
-      background:#162236;
+    th {
+      background: #0b1220;
+      color: #22d3ee;
+      position: sticky;
+      top: 0;
     }
 
-    th,td{
-      padding:14px 12px;
-      text-align:right;
-      border-bottom:1px solid rgba(255,255,255,0.06);
-      font-size:14px;
-      vertical-align:middle;
+    tr:hover {
+      background: rgba(255,255,255,0.03);
     }
 
-    th{
-      color:#cbd5e1;
-      font-weight:700;
+    .img-preview {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #0f172a;
     }
 
-    td{
-      color:#fff;
+    .empty {
+      text-align: center;
+      color: #94a3b8;
+      padding: 30px 0;
     }
 
-    .status{
-      display:inline-block;
-      padding:7px 12px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
+    .status {
+      margin-top: 12px;
+      color: #94a3b8;
+      font-size: 14px;
     }
 
-    .pending{
-      background:rgba(245,158,11,0.14);
-      color:#fbbf24;
-      border:1px solid rgba(245,158,11,0.25);
+    .hidden {
+      display: none;
     }
 
-    .approved{
-      background:rgba(16,185,129,0.14);
-      color:#34d399;
-      border:1px solid rgba(16,185,129,0.25);
+    .small-btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
     }
 
-    .rejected{
-      background:rgba(239,68,68,0.14);
-      color:#f87171;
-      border:1px solid rgba(239,68,68,0.25);
+    .link-btn {
+      background: #334155;
+      text-decoration: none;
+      display: inline-block;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
     }
 
-    .done{
-      background:rgba(59,130,246,0.14);
-      color:#60a5fa;
-      border:1px solid rgba(59,130,246,0.25);
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #1e293b;
+      color: #cbd5e1;
+      font-size: 12px;
     }
 
-    .action-group{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
+    .stats-line {
+      margin-bottom: 14px;
+      color: #94a3b8;
+      font-size: 14px;
     }
 
-    .btn{
-      border:none;
-      border-radius:12px;
-      padding:9px 12px;
-      font-size:12px;
-      font-weight:700;
-      cursor:pointer;
-      color:#fff;
-    }
-
-    .btn-view{ background:#334155; }
-    .btn-approve{ background:#059669; }
-    .btn-reject{ background:#dc2626; }
-    .btn-done{ background:#2563eb; }
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.6);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      z-index:999;
-    }
-
-    .modal.show{
-      display:flex;
-    }
-
-    .modal-card{
-      width:100%;
-      max-width:620px;
-      background:#0f172a;
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:20px;
-      box-shadow:var(--shadow);
-    }
-
-    .modal-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:16px;
-    }
-
-    .modal-head h3{
-      font-size:22px;
-    }
-
-    .close-btn{
-      background:#1e293b;
-      color:#fff;
-      border:none;
-      width:40px;
-      height:40px;
-      border-radius:12px;
-      cursor:pointer;
-      font-size:18px;
-    }
-
-    .detail-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    .detail-item{
-      background:#111827;
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px;
-    }
-
-    .detail-item .k{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-    }
-
-    .detail-item .v{
-      font-size:14px;
-      line-height:1.8;
-      word-break:break-word;
-    }
-
-    .footer-note{
-      margin-top:18px;
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    @media (max-width: 1100px){
-      .stats{
-        grid-template-columns:repeat(2,1fr);
-      }
-    }
-
-    @media (max-width: 700px){
-      body{
-        padding:12px;
-      }
-
-      .stats{
-        grid-template-columns:1fr;
-      }
-
-      .detail-grid{
-        grid-template-columns:1fr;
-      }
-
-      .title-box h1{
-        font-size:24px;
-      }
+    @media (max-width: 700px) {
+      .title { font-size: 22px; }
+      .card p { font-size: 22px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="topbar">
-      <div class="title-box">
-        <h1>SIWAK Admin Panel</h1>
-        <p>بەڕێوەبردنی داواکاریی ڤیزە، ڕەوزە و پشتیوانی</p>
+      <div class="title">SIWAK PRO ADMIN</div>
+      <div class="actions">
+        <button onclick="refreshAll()">Refresh</button>
       </div>
-      <div class="admin-badge">Connected to Supabase</div>
     </div>
 
-    <div class="stats">
-      <div class="stat-card">
-        <div class="label">کۆی داواکاریی ڤیزە</div>
-        <div class="value" id="visaCount">0</div>
+    <div class="cards">
+      <div class="card">
+        <h3>Total Visa Requests</h3>
+        <p id="visaCount">0</p>
       </div>
-      <div class="stat-card">
-        <div class="label">کۆی داواکاریی ڕەوزە</div>
-        <div class="value" id="rawzaCount">0</div>
+      <div class="card">
+        <h3>Total Rawza Requests</h3>
+        <p id="rawzaCount">0</p>
       </div>
-      <div class="stat-card">
-        <div class="label">پەیامی پشتیوانی</div>
-        <div class="value" id="supportCount">0</div>
+      <div class="card">
+        <h3>Total Support Messages</h3>
+        <p id="supportCount">0</p>
       </div>
-      <div class="stat-card">
-        <div class="label">هەموو تۆمارەکان</div>
-        <div class="value" id="allCount">0</div>
-      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('visa', this)">Visa Requests</button>
+      <button class="tab-btn" onclick="showTab('rawza', this)">Rawza Requests</button>
+      <button class="tab-btn" onclick="showTab('support', this)">Support Messages</button>
     </div>
 
     <div class="panel">
-      <div class="controls">
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="visa">داواکاریی ڤیزە</button>
-          <button class="tab-btn" data-tab="rawza">داواکاریی ڕەوزە</button>
-          <button class="tab-btn" data-tab="support">پشتیوانی</button>
+      <div class="filters">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by name, phone, or message..."
+          oninput="applySearch()"
+        />
+      </div>
+
+      <div class="stats-line" id="resultsInfo">Ready.</div>
+
+      <div id="visaSection" class="tab-section">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Passport Image</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="visaTableBody"></tbody>
+          </table>
         </div>
+        <div id="visaEmpty" class="empty hidden">No visa requests found.</div>
+      </div>
 
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="گەڕان بە ناو یان ژمارە..." />
-          <select id="statusFilter">
-            <option value="all">هەموو دۆخەکان</option>
-            <option value="pending">چاوەڕوان</option>
-            <option value="approved">پەسەندکراو</option>
-            <option value="rejected">ڕەتکراوەتەوە</option>
-            <option value="done">تەواوبوو</option>
-          </select>
+      <div id="rawzaSection" class="tab-section hidden">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Passport Image</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rawzaTableBody"></tbody>
+          </table>
         </div>
+        <div id="rawzaEmpty" class="empty hidden">No rawza requests found.</div>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>جۆر</th>
-              <th>ناو</th>
-              <th>ژمارە</th>
-              <th>زانیاری زیادە</th>
-              <th>بەروار</th>
-              <th>دۆخ</th>
-              <th>هەڵبژاردن</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+      <div id="supportSection" class="tab-section hidden">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Message</th>
+                <th>Created At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="supportTableBody"></tbody>
+          </table>
+        </div>
+        <div id="supportEmpty" class="empty hidden">No support messages found.</div>
       </div>
 
-      <div class="footer-note">
-        ئەگەر خالی بوو، واتە هێشتا هیچ داتا لە table ـەکانتدا نییە یان RLS ڕێگا نادات.
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="detailModal">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>وردەکاری تۆمار</h3>
-        <button class="close-btn" onclick="closeModal()">×</button>
-      </div>
-      <div class="detail-grid" id="detailGrid"></div>
+      <div class="status" id="statusText">Ready.</div>
     </div>
   </div>
 
   <script>
-    const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const supabaseUrl = "https://igydtqampcfbvyymlmxg.supabase.co";
+    const supabaseKey = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+    let visaData = [];
+    let rawzaData = [];
+    let supportData = [];
     let currentTab = "visa";
-    let data = {
-      visa: [],
-      rawza: [],
-      support: []
-    };
 
-    const tableBody = document.getElementById("tableBody");
-    const searchInput = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
-    const tabButtons = document.querySelectorAll(".tab-btn");
-
-    function getStatusLabel(status){
-      const labels = {
-        pending: "چاوەڕوان",
-        approved: "پەسەندکراو",
-        rejected: "ڕەتکراوەتەوە",
-        done: "تەواوبوو"
-      };
-      return labels[status] || "چاوەڕوان";
+    function setStatus(text) {
+      document.getElementById("statusText").textContent = text;
     }
 
-    function renderStats(){
-      const visaCount = data.visa.length;
-      const rawzaCount = data.rawza.length;
-      const supportCount = data.support.length;
-      const allCount = visaCount + rawzaCount + supportCount;
-
-      document.getElementById("visaCount").textContent = visaCount;
-      document.getElementById("rawzaCount").textContent = rawzaCount;
-      document.getElementById("supportCount").textContent = supportCount;
-      document.getElementById("allCount").textContent = allCount;
+    function setResultsInfo(text) {
+      document.getElementById("resultsInfo").textContent = text;
     }
 
-    function renderTable(){
-      const search = searchInput.value.trim().toLowerCase();
-      const status = statusFilter.value;
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
-      let rows = data[currentTab] || [];
+    function formatDate(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return value;
+      return date.toLocaleString();
+    }
 
-      rows = rows.filter(item => {
-        const name = String(item.name || "").toLowerCase();
-        const phone = String(item.phone || "").toLowerCase();
-        const matchesSearch = name.includes(search) || phone.includes(search);
-        const matchesStatus = status === "all" ? true : String(item.status || "pending") === status;
-        return matchesSearch && matchesStatus;
+    function imageCell(url) {
+      if (!url) return `<span class="badge">No image</span>`;
+      const safeUrl = escapeHtml(url);
+      return `
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <img src="${safeUrl}" alt="passport" class="img-preview" />
+          <a class="link-btn" href="${safeUrl}" target="_blank">Open</a>
+        </div>
+      `;
+    }
+
+    function showTab(tabName, btn) {
+      currentTab = tabName;
+
+      document.querySelectorAll(".tab-section").forEach(section => {
+        section.classList.add("hidden");
       });
 
-      tableBody.innerHTML = "";
+      document.querySelectorAll(".tab-btn").forEach(button => {
+        button.classList.remove("active");
+      });
 
-      if(rows.length === 0){
-        tableBody.innerHTML = `
+      document.getElementById(tabName + "Section").classList.remove("hidden");
+      if (btn) btn.classList.add("active");
+
+      applySearch();
+    }
+
+    async function loadVisa() {
+      const { data, error } = await supabase
+        .from("visa_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Visa fetch error:", error);
+        setStatus("Visa fetch error: " + error.message);
+        visaData = [];
+        return;
+      }
+
+      visaData = data || [];
+      document.getElementById("visaCount").textContent = visaData.length;
+    }
+
+    async function loadRawza() {
+      const { data, error } = await supabase
+        .from("rawza_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Rawza fetch error:", error);
+        setStatus("Rawza fetch error: " + error.message);
+        rawzaData = [];
+        return;
+      }
+
+      rawzaData = data || [];
+      document.getElementById("rawzaCount").textContent = rawzaData.length;
+    }
+
+    async function loadSupport() {
+      const { data, error } = await supabase
+        .from("support_messages")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Support fetch error:", error);
+        setStatus("Support fetch error: " + error.message);
+        supportData = [];
+        return;
+      }
+
+      supportData = data || [];
+      document.getElementById("supportCount").textContent = supportData.length;
+    }
+
+    function renderVisa(rows) {
+      const tbody = document.getElementById("visaTableBody");
+      const empty = document.getElementById("visaEmpty");
+      tbody.innerHTML = "";
+
+      if (!rows.length) {
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+
+      rows.forEach((row, index) => {
+        tbody.innerHTML += `
           <tr>
-            <td colspan="7" style="text-align:center;color:rgba(255,255,255,0.65);padding:30px;">
-              هیچ تۆمارێک نەدۆزرایەوە
+            <td>${index + 1}</td>
+            <td>${escapeHtml(row.full_name || "-")}</td>
+            <td>${escapeHtml(row.phone || "-")}</td>
+            <td>${imageCell(row.passport_image)}</td>
+            <td>${escapeHtml(formatDate(row.created_at))}</td>
+            <td>
+              <button class="danger small-btn" onclick="deleteRow('visa_requests', '${row.id}')">Delete</button>
             </td>
           </tr>
         `;
-        return;
-      }
-
-      rows.forEach(item => {
-        let extra = "-";
-
-        if(currentTab === "visa"){
-          extra = `وێنە پاسپۆرت: ${item.passport_image || "-"}`;
-        } else if(currentTab === "rawza"){
-          extra = `وێنە ڤیزە: ${item.visa_image || "-"}`;
-        } else {
-          extra = `پەیام: ${item.message || "-"}`;
-        }
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${item.type}</td>
-          <td>${item.name || "-"}</td>
-          <td>${item.phone || "-"}</td>
-          <td>${extra}</td>
-          <td>${item.date || item.created_at || "-"}</td>
-          <td><span class="status ${item.status || "pending"}">${getStatusLabel(item.status)}</span></td>
-          <td>
-            <div class="action-group">
-              <button class="btn btn-view" onclick="showDetails('${currentTab}', ${item.id})">بینین</button>
-              <button class="btn btn-approve" onclick="changeStatus('${currentTab}', ${item.id}, 'approved')">پەسەند</button>
-              <button class="btn btn-reject" onclick="changeStatus('${currentTab}', ${item.id}, 'rejected')">ڕەتکردنەوە</button>
-              <button class="btn btn-done" onclick="changeStatus('${currentTab}', ${item.id}, 'done')">تەواوبوو</button>
-            </div>
-          </td>
-        `;
-        tableBody.appendChild(tr);
       });
     }
 
-    function findItemById(tab, id){
-      const rows = data[tab] || [];
-      return rows.find(item => Number(item.id) === Number(id));
-    }
+    function renderRawza(rows) {
+      const tbody = document.getElementById("rawzaTableBody");
+      const empty = document.getElementById("rawzaEmpty");
+      tbody.innerHTML = "";
 
-    function showDetails(tab, id){
-      const item = findItemById(tab, id);
-      if(!item) return;
+      if (!rows.length) {
+        empty.classList.remove("hidden");
+        return;
+      }
 
-      const grid = document.getElementById("detailGrid");
-      grid.innerHTML = "";
+      empty.classList.add("hidden");
 
-      Object.entries(item).forEach(([key, value]) => {
-        if(key === "type") return;
-
-        const div = document.createElement("div");
-        div.className = "detail-item";
-        div.innerHTML = `
-          <div class="k">${key}</div>
-          <div class="v">${value ?? "-"}</div>
+      rows.forEach((row, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(row.full_name || "-")}</td>
+            <td>${escapeHtml(row.phone || "-")}</td>
+            <td>${imageCell(row.passport_image)}</td>
+            <td>${escapeHtml(formatDate(row.created_at))}</td>
+            <td>
+              <button class="danger small-btn" onclick="deleteRow('rawza_requests', '${row.id}')">Delete</button>
+            </td>
+          </tr>
         `;
-        grid.appendChild(div);
       });
-
-      document.getElementById("detailModal").classList.add("show");
     }
 
-    function closeModal(){
-      document.getElementById("detailModal").classList.remove("show");
-    }
+    function renderSupport(rows) {
+      const tbody = document.getElementById("supportTableBody");
+      const empty = document.getElementById("supportEmpty");
+      tbody.innerHTML = "";
 
-    async function loadVisa(){
-      const { data: rows, error } = await client
-        .from("visa_requests")
-        .select("*")
-        .order("id", { ascending: false });
-
-      if(error){
-        console.error("visa error:", error);
+      if (!rows.length) {
+        empty.classList.remove("hidden");
         return;
       }
 
-      data.visa = (rows || []).map(item => ({
-        ...item,
-        type: "ڤیزە",
-        status: item.status || "pending"
-      }));
+      empty.classList.add("hidden");
+
+      rows.forEach((row, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(row.name || "-")}</td>
+            <td>${escapeHtml(row.phone || "-")}</td>
+            <td>${escapeHtml(row.message || "-")}</td>
+            <td>${escapeHtml(formatDate(row.created_at))}</td>
+            <td>
+              <button class="danger small-btn" onclick="deleteRow('support_messages', '${row.id}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
     }
 
-    async function loadRawza(){
-      const { data: rows, error } = await client
-        .from("rawza_requests")
-        .select("*")
-        .order("id", { ascending: false });
+    function matchesSearch(row, fields, query) {
+      if (!query) return true;
+      const q = query.toLowerCase();
+      return fields.some(field => String(row[field] || "").toLowerCase().includes(q));
+    }
 
-      if(error){
-        console.error("rawza error:", error);
-        return;
+    function applySearch() {
+      const query = document.getElementById("searchInput").value.trim();
+
+      if (currentTab === "visa") {
+        const filtered = visaData.filter(row => matchesSearch(row, ["full_name", "phone"], query));
+        renderVisa(filtered);
+        setResultsInfo(`Visa results: ${filtered.length} / ${visaData.length}`);
       }
 
-      data.rawza = (rows || []).map(item => ({
-        ...item,
-        type: "ڕەوزە",
-        status: item.status || "pending"
-      }));
-    }
-
-    async function loadSupport(){
-      const { data: rows, error } = await client
-        .from("support_messages")
-        .select("*")
-        .order("id", { ascending: false });
-
-      if(error){
-        console.error("support error:", error);
-        return;
+      if (currentTab === "rawza") {
+        const filtered = rawzaData.filter(row => matchesSearch(row, ["full_name", "phone"], query));
+        renderRawza(filtered);
+        setResultsInfo(`Rawza results: ${filtered.length} / ${rawzaData.length}`);
       }
 
-      data.support = (rows || []).map(item => ({
-        ...item,
-        type: "پشتیوانی",
-        status: item.status || "pending"
-      }));
+      if (currentTab === "support") {
+        const filtered = supportData.filter(row => matchesSearch(row, ["name", "phone", "message"], query));
+        renderSupport(filtered);
+        setResultsInfo(`Support results: ${filtered.length} / ${supportData.length}`);
+      }
     }
 
-    async function refreshCurrentTab(){
-      if(currentTab === "visa") await loadVisa();
-      if(currentTab === "rawza") await loadRawza();
-      if(currentTab === "support") await loadSupport();
+    async function deleteRow(tableName, rowId) {
+      const ok = confirm("Are you sure you want to delete this item?");
+      if (!ok) return;
 
-      renderStats();
-      renderTable();
-    }
+      setStatus("Deleting...");
 
-    async function changeStatus(tab, id, newStatus){
-      let tableName = "";
-
-      if(tab === "visa") tableName = "visa_requests";
-      if(tab === "rawza") tableName = "rawza_requests";
-      if(tab === "support") tableName = "support_messages";
-
-      if(!tableName) return;
-
-      const { error } = await client
+      const { error } = await supabase
         .from(tableName)
-        .update({ status: newStatus })
-        .eq("id", id);
+        .delete()
+        .eq("id", rowId);
 
-      if(error){
-        console.error("status error:", error);
-        alert("هەڵە لە گۆڕینی دۆخ");
+      if (error) {
+        console.error("Delete error:", error);
+        setStatus("Delete error: " + error.message);
+        alert("Delete failed: " + error.message);
         return;
       }
 
-      await refreshCurrentTab();
+      setStatus("Deleted successfully.");
+      await refreshAll();
     }
 
-    tabButtons.forEach(btn => {
-      btn.addEventListener("click", async () => {
-        tabButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentTab = btn.dataset.tab;
-        await refreshCurrentTab();
-      });
-    });
+    async function refreshAll() {
+      setStatus("Loading data...");
 
-    searchInput.addEventListener("input", renderTable);
-    statusFilter.addEventListener("change", renderTable);
+      await Promise.all([
+        loadVisa(),
+        loadRawza(),
+        loadSupport()
+      ]);
 
-    window.addEventListener("click", function(e){
-      const modal = document.getElementById("detailModal");
-      if(e.target === modal){
-        closeModal();
-      }
-    });
-
-    async function init(){
-      await loadVisa();
-      await loadRawza();
-      await loadSupport();
-      renderStats();
-      renderTable();
+      applySearch();
+      setStatus("Data loaded successfully.");
     }
 
-    init();
+    refreshAll();
   </script>
 </body>
 </html>
