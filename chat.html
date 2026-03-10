@@ -1,11 +1,4 @@
-.
-<script>
-  const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
-
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ku">
 <head>
   <meta charset="UTF-8" />
@@ -445,9 +438,8 @@
 
   <script>
     const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
-    const SUPABASE_ANON_KEY = "ANON_KEY_LERA_DABNE";
-
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const visaPriceEl = document.getElementById("visaPrice");
     const rawzaPriceEl = document.getElementById("rawzaPrice");
@@ -504,34 +496,35 @@
     }
 
     async function loadSettings(){
-      const { data, error } = await supabase
-        .from("app_settings")
-        .select("*")
-        .eq("id", 1)
-        .single();
+      try{
+        const { data, error } = await sb
+          .from("app_settings")
+          .select("*")
+          .eq("id", 1)
+          .single();
 
-      if(error){
-        console.error(error);
+        if(error) throw error;
+
+        appSettings = data || appSettings;
+        updatePricesUI();
+      }catch(error){
+        console.error("loadSettings error:", error);
         showToast("هەڵەیەک لە وەرگرتنی زانیارییەکان ڕوویدا", true);
-        return;
       }
-
-      appSettings = data;
-      updatePricesUI();
     }
 
     async function uploadImage(file){
-      const ext = file.name.split(".").pop();
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const filePath = `payments/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await sb.storage
         .from("request_uploads")
         .upload(filePath, file, { upsert: false });
 
       if(uploadError) throw uploadError;
 
-      const { data } = supabase.storage
+      const { data } = sb.storage
         .from("request_uploads")
         .getPublicUrl(filePath);
 
@@ -577,7 +570,7 @@
 
         const imageUrl = await uploadImage(imageFile);
 
-        const { error } = await supabase
+        const { error } = await sb
           .from(tableName)
           .insert([{
             customer_name: customerName,
@@ -586,19 +579,20 @@
             payment_number: paymentNumber || "",
             payment_image_url: imageUrl,
             note: note,
-            amount: amount
+            amount: amount,
+            status: "new"
           }]);
 
         if(error) throw error;
 
         form.reset();
-        paymentMethodEl.value = "fib";
         serviceTypeEl.value = "visa";
+        paymentMethodEl.value = "fib";
         updatePricesUI();
 
         showToast("داواکاریەکەت بە سەرکەوتوویی نێردرا");
       }catch(err){
-        console.error(err);
+        console.error("submit error:", err);
         showToast("هەڵەیەک ڕوویدا لە ناردنی داواکاری", true);
       }finally{
         submitBtn.disabled = false;
@@ -613,4 +607,3 @@
   </script>
 </body>
 </html>
-</script>
