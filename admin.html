@@ -3,433 +3,397 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK Admin Panel</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>SIWAK Payment</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; }
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #1f2937;
+      padding: 0;
     }
-    .wrap {
-      max-width: 1100px;
-      margin: 0 auto;
+
+    body {
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255, 215, 0, 0.12), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(0, 153, 255, 0.10), transparent 30%),
+        linear-gradient(135deg, #0b0b0f, #111827, #0f172a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       padding: 20px;
     }
+
     .card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      margin-bottom: 18px;
-    }
-    h1, h2, h3 { margin-top: 0; }
-    .grid {
-      display: grid;
-      gap: 12px;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 768px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
-    input, select, textarea, button {
       width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #d1d5db;
-      font-size: 15px;
+      max-width: 520px;
+      background: rgba(17, 24, 39, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
     }
-    textarea { min-height: 100px; resize: vertical; }
-    button {
-      border: none;
-      cursor: pointer;
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #facc15, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.35);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 14px;
+      margin-bottom: 22px;
+      line-height: 1.8;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #e5e7eb;
       font-weight: bold;
     }
-    .btn {
-      background: #111827;
-      color: white;
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
     }
-    .btn-green {
-      background: #059669;
-      color: white;
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #94a3b8;
     }
-    .btn-red {
-      background: #dc2626;
-      color: white;
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #facc15;
+      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.15);
+      background: rgba(255,255,255,0.08);
     }
-    .btn-gray {
-      background: #6b7280;
-      color: white;
+
+    select option {
+      color: #000;
     }
-    .hidden { display: none; }
-    .msg {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-size: 14px;
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
     }
-    .ok { background: #dcfce7; color: #166534; }
-    .err { background: #fee2e2; color: #991b1b; }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+
+    .number-box {
+      margin-bottom: 16px;
+      border-radius: 20px;
+      padding: 18px;
+      background: linear-gradient(135deg, rgba(250, 204, 21, 0.14), rgba(59, 130, 246, 0.12));
+      border: 1px solid rgba(250, 204, 21, 0.22);
+      text-align: center;
     }
-    .request-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 14px;
-      background: #fafafa;
+
+    .number-title {
+      font-size: 13px;
+      color: #e5e7eb;
+      margin-bottom: 8px;
     }
-    .meta {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px 14px;
+
+    .number-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      word-break: break-word;
       margin-bottom: 12px;
     }
-    @media (max-width: 768px) {
-      .meta { grid-template-columns: 1fr; }
-    }
-    .badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-    .pending { background: #fef3c7; color: #92400e; }
-    .approved { background: #dcfce7; color: #166534; }
-    .rejected { background: #fee2e2; color: #991b1b; }
-    .thumb {
+
+    .copy-btn {
       width: 100%;
-      max-width: 220px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
+      border: none;
+      border-radius: 14px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      transition: 0.2s;
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .file-box {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,0.12);
+    }
+
+    .submit-btn {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
       margin-top: 8px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #facc15, #f59e0b);
+      color: #111827;
+      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.28);
+      transition: 0.2s;
     }
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
+
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.97;
     }
-    .small {
-      font-size: 13px;
-      color: #6b7280;
+
+    .msg {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .ok {
+      background: rgba(34, 197, 94, 0.16);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.22);
+    }
+
+    .err {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.22);
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 14px;
+      color: #94a3b8;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="topbar">
-        <h1>SIWAK Admin Panel</h1>
-        <button id="logoutBtn" class="btn-gray hidden">Logout</button>
-      </div>
-      <div id="globalMsg"></div>
+  <div class="card">
+    <div class="logo">S</div>
+    <h1>SIWAK Payment</h1>
+    <div class="subtitle">
+      تکایە جۆری پارەدان هەڵبژێرە، پارەکە بنێرە، پاشان فۆڕمەکە پڕ بکەوە
     </div>
 
-    <div id="authBox" class="grid-2">
-      <div class="card">
-        <h2>Signup</h2>
-        <div class="grid">
-          <input type="email" id="signupEmail" placeholder="Email" />
-          <input type="password" id="signupPassword" placeholder="Password" />
-          <button id="signupBtn" class="btn">Signup</button>
-          <div class="small">تەنها یەک جار signup بکە، پاشان هەمیشە login بکە.</div>
-        </div>
-      </div>
+    <div class="field">
+      <label class="label">جۆری پارەدان</label>
+      <select id="paymentType">
+        <option value="FIB">FIB</option>
+        <option value="FastPay">FastPay</option>
+        <option value="Qi Card">Qi Card</option>
+      </select>
+    </div>
 
-      <div class="card">
-        <h2>Login</h2>
-        <div class="grid">
-          <input type="email" id="loginEmail" placeholder="Email" />
-          <input type="password" id="loginPassword" placeholder="Password" />
-          <button id="loginBtn" class="btn">Login</button>
-        </div>
+    <div class="number-box">
+      <div class="number-title">ژمارەی ناردنی پارە</div>
+      <div id="paymentNumber" class="number-value">Loading...</div>
+      <button type="button" id="copyBtn" class="copy-btn">Copy Number</button>
+    </div>
+
+    <div class="field">
+      <label class="label">ناوی سیانی</label>
+      <input type="text" id="fullName" placeholder="ناوی تەواو بنووسە" />
+    </div>
+
+    <div class="field">
+      <label class="label">ژمارەی مۆبایل</label>
+      <input type="text" id="phone" placeholder="07xxxxxxxxx" />
+    </div>
+
+    <div class="field">
+      <label class="label">سکرینشۆتی ناردنی پارە</label>
+      <div class="file-box">
+        <input type="file" id="screenshot" accept="image/*" />
       </div>
     </div>
 
-    <div id="adminBox" class="hidden">
-      <div class="card">
-        <h2>Payment Numbers</h2>
-        <div class="grid">
-          <input type="text" id="fibNumber" placeholder="FIB Number" />
-          <input type="text" id="fastpayNumber" placeholder="FastPay Number" />
-          <input type="text" id="qiNumber" placeholder="Qi Card Number" />
-          <button id="saveSettingsBtn" class="btn">Save Numbers</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="topbar">
-          <h2>Payment Requests</h2>
-          <button id="refreshBtn" class="btn">Refresh</button>
-        </div>
-        <div id="requestsList">Loading...</div>
-      </div>
+    <div class="field">
+      <label class="label">تێبینی</label>
+      <textarea id="note" placeholder="ئەگەر تێبینییەکت هەیە لێرەی بنووسە"></textarea>
     </div>
+
+    <button id="submitBtn" class="submit-btn">ناردن</button>
+
+    <div id="msgBox"></div>
+    <div class="footer-note">SIWAK © Payment Request</div>
   </div>
 
   <script>
     const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const authBox = document.getElementById("authBox");
-    const adminBox = document.getElementById("adminBox");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const globalMsg = document.getElementById("globalMsg");
+    const paymentTypeEl = document.getElementById("paymentType");
+    const paymentNumberEl = document.getElementById("paymentNumber");
+    const msgBox = document.getElementById("msgBox");
+
+    let settingsData = {
+      fib_number: "",
+      fastpay_number: "",
+      qi_number: ""
+    };
 
     function showMsg(text, type = "ok") {
-      globalMsg.innerHTML = `<div class="msg ${type}">${text}</div>`;
-      setTimeout(() => {
-        globalMsg.innerHTML = "";
-      }, 4000);
+      msgBox.innerHTML = `<div class="msg ${type}">${text}</div>`;
     }
 
-    async function ensureAdminRow(user) {
-      const { error } = await supabase
-        .from("admin_users")
-        .upsert([{ user_id: user.id, email: user.email }], { onConflict: "user_id" });
-
-      if (error) {
-        console.error(error);
-        showMsg(error.message, "err");
-      }
+    function getCurrentNumber() {
+      const type = paymentTypeEl.value;
+      if (type === "FIB") return settingsData.fib_number || "";
+      if (type === "FastPay") return settingsData.fastpay_number || "";
+      if (type === "Qi Card") return settingsData.qi_number || "";
+      return "";
     }
 
-    async function signup() {
-      const email = document.getElementById("signupEmail").value.trim();
-      const password = document.getElementById("signupPassword").value.trim();
-
-      if (!email || !password) {
-        showMsg("Email و Password پڕ بکە", "err");
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      });
-
-      if (error) {
-        showMsg(error.message, "err");
-        return;
-      }
-
-      if (data.user && data.session) {
-        await ensureAdminRow(data.user);
-        showMsg("Signup سەرکەوتوو بوو");
-        await checkSession();
-      } else {
-        showMsg("ئەگەر login نەکرد، Confirm email داخە لە Supabase", "err");
-      }
-    }
-
-    async function login() {
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value.trim();
-
-      if (!email || !password) {
-        showMsg("Email و Password پڕ بکە", "err");
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        showMsg(error.message, "err");
-        return;
-      }
-
-      if (data.user) {
-        await ensureAdminRow(data.user);
-        showMsg("Login سەرکەوتوو بوو");
-        await checkSession();
-      }
-    }
-
-    async function logout() {
-      await supabase.auth.signOut();
-      authBox.classList.remove("hidden");
-      adminBox.classList.add("hidden");
-      logoutBtn.classList.add("hidden");
-      showMsg("Logout کرا");
+    function updateNumberView() {
+      const num = getCurrentNumber();
+      paymentNumberEl.textContent = num || "No number";
     }
 
     async function loadSettings() {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("payment_settings")
         .select("*")
         .eq("id", 1)
         .single();
 
       if (error) {
-        showMsg(error.message, "err");
+        showMsg("کێشە هەیە لە هێنانی ژمارەکان", "err");
         return;
       }
 
-      document.getElementById("fibNumber").value = data.fib_number || "";
-      document.getElementById("fastpayNumber").value = data.fastpay_number || "";
-      document.getElementById("qiNumber").value = data.qi_number || "";
+      settingsData = data;
+      updateNumberView();
     }
 
-    async function saveSettings() {
-      const fib_number = document.getElementById("fibNumber").value.trim();
-      const fastpay_number = document.getElementById("fastpayNumber").value.trim();
-      const qi_number = document.getElementById("qiNumber").value.trim();
+    async function uploadScreenshot(file) {
+      const ext = file.name.split(".").pop();
+      const fileName = `shot_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
 
-      const { error } = await supabase
-        .from("payment_settings")
-        .update({
-          fib_number,
-          fastpay_number,
-          qi_number,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", 1);
+      const { error: uploadError } = await db.storage
+        .from("payment-screenshots")
+        .upload(fileName, file);
 
-      if (error) {
-        showMsg(error.message, "err");
+      if (uploadError) throw uploadError;
+
+      const { data } = db.storage
+        .from("payment-screenshots")
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    }
+
+    async function submitForm() {
+      const full_name = document.getElementById("fullName").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const payment_type = paymentTypeEl.value;
+      const note = document.getElementById("note").value.trim();
+      const screenshotFile = document.getElementById("screenshot").files[0];
+
+      if (!full_name || !phone || !screenshotFile) {
+        showMsg("تکایە ناو، ژمارەی مۆبایل و وێنەکە پڕ بکە", "err");
         return;
       }
 
-      showMsg("ژمارەکان پاشەکەوت کران");
+      try {
+        showMsg("چاوەڕێبە... بە ناردندا دەچێت");
+
+        const screenshot_url = await uploadScreenshot(screenshotFile);
+
+        const { error } = await db
+          .from("payment_requests")
+          .insert([{
+            full_name,
+            phone,
+            triple_code: "-",
+            payment_type,
+            screenshot_url,
+            note
+          }]);
+
+        if (error) {
+          showMsg(error.message, "err");
+          return;
+        }
+
+        showMsg("داواکارییەکەت بە سەرکەوتوویی نێردرا", "ok");
+
+        document.getElementById("fullName").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("note").value = "";
+        document.getElementById("screenshot").value = "";
+        paymentTypeEl.value = "FIB";
+        updateNumberView();
+      } catch (err) {
+        showMsg(err.message || "هەڵەیەک ڕوویدا", "err");
+      }
     }
 
-    function badgeClass(status) {
-      if (status === "approved") return "approved";
-      if (status === "rejected") return "rejected";
-      return "pending";
-    }
-
-    async function loadRequests() {
-      const list = document.getElementById("requestsList");
-      list.innerHTML = "Loading...";
-
-      const { data, error } = await supabase
-        .from("payment_requests")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        list.innerHTML = `<div class="msg err">${error.message}</div>`;
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const num = getCurrentNumber();
+      if (!num) {
+        showMsg("هێشتا ژمارە نییە", "err");
         return;
       }
 
-      if (!data || data.length === 0) {
-        list.innerHTML = `<div class="small">هیچ داواکارییەک نییە.</div>`;
-        return;
+      try {
+        await navigator.clipboard.writeText(num);
+        showMsg("ژمارەکە کۆپی کرا", "ok");
+      } catch {
+        showMsg("کۆپی نەکرا", "err");
       }
-
-      list.innerHTML = data.map(item => `
-        <div class="request-card">
-          <div class="topbar">
-            <h3>#${item.id}</h3>
-            <span class="badge ${badgeClass(item.status)}">${item.status}</span>
-          </div>
-
-          <div class="meta">
-            <div><strong>ناوی سیانی:</strong> ${item.full_name}</div>
-            <div><strong>ژمارەی مۆبایل:</strong> ${item.phone}</div>
-            <div><strong>سێ خانە:</strong> ${item.triple_code}</div>
-            <div><strong>جۆری پارەدان:</strong> ${item.payment_type}</div>
-            <div><strong>کات:</strong> ${new Date(item.created_at).toLocaleString()}</div>
-            <div><strong>تێبینی:</strong> ${item.note ? item.note : "-"}</div>
-          </div>
-
-          <div>
-            <strong>سکرینشۆت:</strong><br />
-            <a href="${item.screenshot_url}" target="_blank">کردنەوەی وێنە</a><br />
-            <img class="thumb" src="${item.screenshot_url}" alt="screenshot" />
-          </div>
-
-          <div class="actions">
-            <button class="btn-green" onclick="updateStatus(${item.id}, 'approved')">Approve</button>
-            <button class="btn-red" onclick="updateStatus(${item.id}, 'rejected')">Reject</button>
-            <button class="btn-gray" onclick="deleteRequest(${item.id})">Delete</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    async function updateStatus(id, status) {
-      const { error } = await supabase
-        .from("payment_requests")
-        .update({ status })
-        .eq("id", id);
-
-      if (error) {
-        showMsg(error.message, "err");
-        return;
-      }
-
-      showMsg("دۆخەکە نوێکرایەوە");
-      loadRequests();
-    }
-
-    async function deleteRequest(id) {
-      if (!confirm("دڵنیایت لە سڕینەوە؟")) return;
-
-      const { error } = await supabase
-        .from("payment_requests")
-        .delete()
-        .eq("id", id);
-
-      if (error) {
-        showMsg(error.message, "err");
-        return;
-      }
-
-      showMsg("داواکارییەکە سڕایەوە");
-      loadRequests();
-    }
-
-    async function checkSession() {
-      const { data } = await supabase.auth.getSession();
-      const session = data.session;
-
-      if (session && session.user) {
-        authBox.classList.add("hidden");
-        adminBox.classList.remove("hidden");
-        logoutBtn.classList.remove("hidden");
-        await loadSettings();
-        await loadRequests();
-      } else {
-        authBox.classList.remove("hidden");
-        adminBox.classList.add("hidden");
-        logoutBtn.classList.add("hidden");
-      }
-    }
-
-    document.getElementById("signupBtn").addEventListener("click", signup);
-    document.getElementById("loginBtn").addEventListener("click", login);
-    document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
-    document.getElementById("refreshBtn").addEventListener("click", loadRequests);
-    logoutBtn.addEventListener("click", logout);
-
-    supabase.auth.onAuthStateChange(() => {
-      checkSession();
     });
 
-    checkSession();
+    paymentTypeEl.addEventListener("change", updateNumberView);
+    document.getElementById("submitBtn").addEventListener("click", submitForm);
 
-    window.updateStatus = updateStatus;
-    window.deleteRequest = deleteRequest;
+    loadSettings();
   </script>
 </body>
 </html>
