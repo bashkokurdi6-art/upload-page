@@ -1,156 +1,727 @@
 <!DOCTYPE html>
 <html lang="ku">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIWAK Admin Panel</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIWAK - Admin Panel</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    :root{
+      --text: #f5f2e9;
+      --muted: #a8adba;
+      --gold: #d4af37;
+      --border: rgba(212,175,55,.16);
+      --shadow: 0 20px 50px rgba(0,0,0,.45);
+      --radius: 22px;
+    }
 
-<style>
-body{
-font-family:Arial;
-background:#0b0f1a;
-color:white;
-padding:20px
-}
+    body{
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(212,175,55,.10), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(21,96,189,.14), transparent 32%),
+        linear-gradient(135deg, #050505, #0b0d10 40%, #050505 100%);
+      padding: 22px;
+    }
 
-.box{
-background:#111827;
-padding:20px;
-border-radius:15px;
-margin-bottom:20px
-}
+    .container{
+      max-width: 1320px;
+      margin: 0 auto;
+    }
 
-input{
-width:100%;
-padding:12px;
-margin-top:8px;
-margin-bottom:15px;
-border-radius:10px;
-border:none;
-background:#1f2937;
-color:white
-}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
 
-button{
-padding:12px 20px;
-border:none;
-border-radius:12px;
-background:#eab308;
-cursor:pointer;
-font-weight:bold
-}
+    .hidden{ display: none !important; }
 
-.card{
-background:#111827;
-padding:15px;
-border-radius:12px;
-margin-bottom:10px
-}
-</style>
+    .btn{
+      border: none;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .btn-primary{
+      color: #081018;
+      background: linear-gradient(135deg, #f2d57a, #caa12a 50%, #0f4c81 120%);
+      box-shadow: 0 16px 30px rgba(212,175,55,.16);
+    }
+
+    .btn-dark{
+      background: #12161f;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .btn:hover{
+      transform: translateY(-2px);
+    }
+
+    .topbar{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding: 20px 22px;
+    }
+
+    .topbar h2{
+      font-size: 24px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .topbar p{
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stats{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .stat{
+      padding: 20px;
+    }
+
+    .stat small{
+      color: var(--muted);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .stat strong{
+      font-size: 28px;
+      color: var(--gold);
+    }
+
+    .layout{
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .side{
+      padding: 22px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .side h3, .content h3{
+      color: var(--gold);
+      margin-bottom: 6px;
+      font-size: 22px;
+    }
+
+    .side p, .content p{
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .content{
+      padding: 22px;
+    }
+
+    .grid-2{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .price-box{
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.05);
+      margin-bottom: 16px;
+    }
+
+    .actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .field{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    label{
+      font-size: 14px;
+      color: #d8dbe3;
+    }
+
+    input, select{
+      width: 100%;
+      border: 1px solid rgba(212,175,55,.18);
+      background: rgba(9,11,15,.95);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 14px;
+      outline: none;
+      transition: .25s ease;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus{
+      border-color: rgba(212,175,55,.7);
+      box-shadow: 0 0 0 4px rgba(212,175,55,.10);
+    }
+
+    .toolbar{
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .toolbar .field{
+      margin-bottom: 0;
+      min-width: 180px;
+      flex: 1;
+    }
+
+    .request-list{
+      display: grid;
+      gap: 14px;
+    }
+
+    .request-card{
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .request-top{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .request-name{
+      font-size: 19px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .meta{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      border: 1px solid transparent;
+      height: fit-content;
+    }
+
+    .pill-new{
+      color: #f3d37c;
+      background: rgba(201,155,43,.14);
+      border-color: rgba(201,155,43,.24);
+    }
+
+    .pill-reviewing{
+      color: #8ec5ff;
+      background: rgba(15,76,129,.18);
+      border-color: rgba(15,76,129,.28);
+    }
+
+    .pill-done{
+      color: #7ce0ae;
+      background: rgba(47,183,121,.14);
+      border-color: rgba(47,183,121,.24);
+    }
+
+    .pill-rejected{
+      color: #ff9e9e;
+      background: rgba(226,85,85,.12);
+      border-color: rgba(226,85,85,.22);
+    }
+
+    .request-grid{
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .request-item{
+      padding: 12px;
+      border-radius: 14px;
+      background: #0b0f16;
+      border: 1px solid rgba(255,255,255,.04);
+    }
+
+    .request-item small{
+      display: block;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .request-item strong{
+      color: #f0f1f6;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .req-actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .req-actions select{
+      max-width: 170px;
+    }
+
+    a.preview-link{
+      color: #8fc5ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .empty{
+      text-align: center;
+      color: var(--muted);
+      padding: 28px;
+      border: 1px dashed rgba(255,255,255,.08);
+      border-radius: 18px;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(30px);
+      background: #0f1115;
+      color: #fff;
+      border: 1px solid rgba(212,175,55,.25);
+      border-radius: 16px;
+      padding: 14px 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s ease;
+      z-index: 9999;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1100px){
+      .layout{
+        grid-template-columns: 1fr;
+      }
+      .side{
+        position: static;
+      }
+      .stats{
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 720px){
+      .stats, .grid-2, .request-grid{
+        grid-template-columns: 1fr;
+      }
+      .topbar{
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <div id="dashboardView">
+      <div class="card topbar">
+        <div>
+          <h2>SIWAK Dashboard</h2>
+          <p>بەڕێوەبردنی نرخ، ژمارەی پارەدان و داواکارییەکان</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-dark" id="refreshBtn">نوێکردنەوە</button>
+          <button class="btn btn-primary" id="logoutBtn">چوونەدەرەوە</button>
+        </div>
+      </div>
 
-<h2>SIWAK Admin Panel</h2>
+      <div class="stats">
+        <div class="card stat">
+          <small>کۆی داواکارییەکان</small>
+          <strong id="statTotal">0</strong>
+        </div>
+        <div class="card stat">
+          <small>نوێ</small>
+          <strong id="statNew">0</strong>
+        </div>
+        <div class="card stat">
+          <small>لە پشکنین</small>
+          <strong id="statReviewing">0</strong>
+        </div>
+        <div class="card stat">
+          <small>تەواوبوو</small>
+          <strong id="statDone">0</strong>
+        </div>
+      </div>
 
-<div class="box">
+      <div class="layout">
+        <div class="card side">
+          <h3>ڕێکخستنەکان</h3>
+          <p>لێرە دەتوانیت نرخ و ژمارەی پارەدان ڕۆژانە بگۆڕیت.</p>
 
-<label>نرخی ڤیزە</label>
-<input id="visaPrice">
+          <div class="price-box">
+            <div class="grid-2">
+              <div class="field">
+                <label for="visaPriceInput">نرخی ڤیزە</label>
+                <input type="number" id="visaPriceInput" placeholder="0" />
+              </div>
+              <div class="field">
+                <label for="rawzaPriceInput">نرخی ڕەوزە</label>
+                <input type="number" id="rawzaPriceInput" placeholder="0" />
+              </div>
+            </div>
+          </div>
 
-<label>نرخی ڕەوزە</label>
-<input id="rawzaPrice">
+          <div class="field">
+            <label for="fibNumberInput">ژمارەی FIB</label>
+            <input type="text" id="fibNumberInput" placeholder="FIB Number" />
+          </div>
 
-<label>FIB</label>
-<input id="fibNumber">
+          <div class="field">
+            <label for="fastpayNumberInput">ژمارەی FastPay</label>
+            <input type="text" id="fastpayNumberInput" placeholder="FastPay Number" />
+          </div>
 
-<label>FastPay</label>
-<input id="fastpayNumber">
+          <div class="field">
+            <label for="qicardNumberInput">ژمارەی Qi Card</label>
+            <input type="text" id="qicardNumberInput" placeholder="Qi Card Number" />
+          </div>
 
-<label>QiCard</label>
-<input id="qicardNumber">
+          <div class="actions">
+            <button class="btn btn-primary" id="saveSettingsBtn" style="width:100%;">پاشەکەوتکردنی ڕێکخستنەکان</button>
+          </div>
+        </div>
 
-<button onclick="saveSettings()">پاشەکەوتکردن</button>
+        <div class="card content">
+          <h3>داواکارییەکان</h3>
+          <p>هەموو داواکارییەکان لێرە دەبینیت و دەتوانیت بارودۆخەکەیان بگۆڕیت.</p>
 
-</div>
+          <div class="toolbar">
+            <div class="field">
+              <label for="filterType">فلتەری جۆر</label>
+              <select id="filterType">
+                <option value="all">هەموو</option>
+                <option value="visa">ڤیزە</option>
+                <option value="rawza">ڕەوزە</option>
+              </select>
+            </div>
 
-<h3>داواکارییەکان</h3>
+            <div class="field">
+              <label for="filterStatus">فلتەری بارودۆخ</label>
+              <select id="filterStatus">
+                <option value="all">هەموو</option>
+                <option value="new">نوێ</option>
+                <option value="reviewing">لە پشکنین</option>
+                <option value="done">تەواوبوو</option>
+                <option value="rejected">ڕەتکراوە</option>
+              </select>
+            </div>
+          </div>
 
-<div id="requests"></div>
+          <div class="request-list" id="requestList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script>
+  <div class="toast" id="toast"></div>
 
-const SUPABASE_URL="https://igydtqampcfbvyymlmxg.supabase.co"
-const SUPABASE_KEY="sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k"
+  <script>
+    const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const supabase = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)
+    const dashboardView = document.getElementById("dashboardView");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const requestList = document.getElementById("requestList");
+    const filterTypeEl = document.getElementById("filterType");
+    const filterStatusEl = document.getElementById("filterStatus");
+    const toastEl = document.getElementById("toast");
 
-async function loadSettings(){
+    let allRequests = [];
 
-const {data}=await supabase
-.from("app_settings")
-.select("*")
-.eq("id",1)
-.single()
+    function showToast(message, isError = false){
+      toastEl.textContent = message;
+      toastEl.style.borderColor = isError ? "rgba(255,80,80,.35)" : "rgba(212,175,55,.25)";
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 3200);
+    }
 
-if(!data)return
+    function formatMoney(value){
+      return Number(value || 0).toLocaleString() + " IQD";
+    }
 
-visaPrice.value=data.visa_price
-rawzaPrice.value=data.rawza_price
-fibNumber.value=data.fib_number
-fastpayNumber.value=data.fastpay_number
-qicardNumber.value=data.qicard_number
+    function formatDate(dateString){
+      if(!dateString) return "-";
+      const d = new Date(dateString);
+      if (isNaN(d.getTime())) return dateString;
+      return d.toLocaleString();
+    }
 
-}
+    function statusClass(status){
+      if(status === "new") return "pill-new";
+      if(status === "reviewing") return "pill-reviewing";
+      if(status === "done") return "pill-done";
+      return "pill-rejected";
+    }
 
-async function saveSettings(){
+    function statusLabel(status){
+      if(status === "new") return "نوێ";
+      if(status === "reviewing") return "لە پشکنین";
+      if(status === "done") return "تەواوبوو";
+      return "ڕەتکراوە";
+    }
 
-await supabase
-.from("app_settings")
-.update({
-visa_price:visaPrice.value,
-rawza_price:rawzaPrice.value,
-fib_number:fibNumber.value,
-fastpay_number:fastpayNumber.value,
-qicard_number:qicardNumber.value
-})
-.eq("id",1)
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-alert("پاشەکەوت کرا")
+    async function initializeDashboard(){
+      dashboardView.classList.remove("hidden");
+      await Promise.all([loadSettings(), loadRequests()]);
+      renderRequests();
+    }
 
-}
+    async function loadSettings(){
+      try{
+        const { data, error } = await sb
+          .from("app_settings")
+          .select("*")
+          .eq("id", 1)
+          .single();
 
-async function loadRequests(){
+        if(error) throw error;
 
-const {data}=await supabase
-.from("visa_requests")
-.select("*")
-.order("created_at",{ascending:false})
+        document.getElementById("visaPriceInput").value = data?.visa_price ?? 0;
+        document.getElementById("rawzaPriceInput").value = data?.rawza_price ?? 0;
+        document.getElementById("fibNumberInput").value = data?.fib_number ?? "";
+        document.getElementById("fastpayNumberInput").value = data?.fastpay_number ?? "";
+        document.getElementById("qicardNumberInput").value = data?.qicard_number ?? "";
+      }catch(error){
+        console.error("loadSettings error:", error);
+        showToast("هەڵە لە هێنانی ڕێکخستنەکان", true);
+      }
+    }
 
-if(!data)return
+    async function loadRequests(){
+      try{
+        const [
+          { data: visaData, error: visaError },
+          { data: rawzaData, error: rawzaError }
+        ] = await Promise.all([
+          sb.from("visa_requests").select("*").order("created_at", { ascending: false }),
+          sb.from("rawza_requests").select("*").order("created_at", { ascending: false })
+        ]);
 
-requests.innerHTML=""
+        if(visaError) throw visaError;
+        if(rawzaError) throw rawzaError;
 
-data.forEach(r=>{
+        const visaRequests = (visaData || []).map(item => ({ ...item, request_type: "visa" }));
+        const rawzaRequests = (rawzaData || []).map(item => ({ ...item, request_type: "rawza" }));
 
-requests.innerHTML+=`
-<div class="card">
-<b>${r.customer_name}</b><br>
-${r.mobile}<br>
-${r.status}
-</div>
-`
+        allRequests = [...visaRequests, ...rawzaRequests].sort((a, b) => {
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
 
-})
+        updateStats();
+      }catch(error){
+        console.error("loadRequests error:", error);
+        showToast("هەڵە لە هێنانی داواکارییەکان", true);
+      }
+    }
 
-}
+    function updateStats(){
+      document.getElementById("statTotal").textContent = allRequests.length;
+      document.getElementById("statNew").textContent = allRequests.filter(x => x.status === "new").length;
+      document.getElementById("statReviewing").textContent = allRequests.filter(x => x.status === "reviewing").length;
+      document.getElementById("statDone").textContent = allRequests.filter(x => x.status === "done").length;
+    }
 
-loadSettings()
-loadRequests()
+    function renderRequests(){
+      const typeFilter = filterTypeEl.value;
+      const statusFilter = filterStatusEl.value;
 
-</script>
+      const filtered = allRequests.filter(item => {
+        const okType = typeFilter === "all" || item.request_type === typeFilter;
+        const okStatus = statusFilter === "all" || item.status === statusFilter;
+        return okType && okStatus;
+      });
 
+      if(!filtered.length){
+        requestList.innerHTML = `<div class="empty">هیچ داواکارییەک نەدۆزرایەوە</div>`;
+        return;
+      }
+
+      requestList.innerHTML = filtered.map(item => `
+        <div class="request-card">
+          <div class="request-top">
+            <div>
+              <div class="request-name">${escapeHtml(item.customer_name || "بێ ناو")}</div>
+              <div class="meta">
+                ${item.request_type === "visa" ? "جۆر: ڤیزە" : "جۆر: ڕەوزە"}<br>
+                کات: ${formatDate(item.created_at)}
+              </div>
+            </div>
+            <div class="pill ${statusClass(item.status)}">${statusLabel(item.status)}</div>
+          </div>
+
+          <div class="request-grid">
+            <div class="request-item">
+              <small>ژمارەی مۆبایل</small>
+              <strong>${escapeHtml(item.mobile || "-")}</strong>
+            </div>
+
+            <div class="request-item">
+              <small>شێوازی پارەدان</small>
+              <strong>${escapeHtml((item.payment_method || "-").toString().toUpperCase())}</strong>
+            </div>
+
+            <div class="request-item">
+              <small>ژمارەی پارەدان</small>
+              <strong>${escapeHtml(item.payment_number || "-")}</strong>
+            </div>
+
+            <div class="request-item">
+              <small>بڕی پارە</small>
+              <strong>${formatMoney(item.amount)}</strong>
+            </div>
+
+            <div class="request-item" style="grid-column:1/-1;">
+              <small>تێبینی</small>
+              <strong>${escapeHtml(item.note || "-")}</strong>
+            </div>
+
+            <div class="request-item" style="grid-column:1/-1;">
+              <small>وێنەی پارەدان</small>
+              <strong>${item.payment_image_url ? `<a class="preview-link" href="${escapeHtml(item.payment_image_url)}" target="_blank">بینینی وێنە</a>` : "-"}</strong>
+            </div>
+          </div>
+
+          <div class="req-actions">
+            <select onchange="updateRequestStatus('${item.request_type}', '${item.id}', this.value)">
+              <option value="new" ${item.status === "new" ? "selected" : ""}>نوێ</option>
+              <option value="reviewing" ${item.status === "reviewing" ? "selected" : ""}>لە پشکنین</option>
+              <option value="done" ${item.status === "done" ? "selected" : ""}>تەواوبوو</option>
+              <option value="rejected" ${item.status === "rejected" ? "selected" : ""}>ڕەتکراوە</option>
+            </select>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function saveSettings(){
+      try{
+        const payload = {
+          visa_price: Number(document.getElementById("visaPriceInput").value || 0),
+          rawza_price: Number(document.getElementById("rawzaPriceInput").value || 0),
+          fib_number: document.getElementById("fibNumberInput").value.trim(),
+          fastpay_number: document.getElementById("fastpayNumberInput").value.trim(),
+          qicard_number: document.getElementById("qicardNumberInput").value.trim()
+        };
+
+        const { error } = await sb
+          .from("app_settings")
+          .update(payload)
+          .eq("id", 1);
+
+        if(error) throw error;
+
+        showToast("ڕێکخستنەکان پاشەکەوت کران");
+        await loadSettings();
+      }catch(error){
+        console.error("saveSettings error:", error);
+        showToast("هەڵە لە پاشەکەوتکردنی ڕێکخستنەکان", true);
+      }
+    }
+
+    window.updateRequestStatus = async function(requestType, id, status){
+      try{
+        const tableName = requestType === "visa" ? "visa_requests" : "rawza_requests";
+
+        const { error } = await sb
+          .from(tableName)
+          .update({ status })
+          .eq("id", id);
+
+        if(error) throw error;
+
+        showToast("بارودۆخ نوێ کرایەوە");
+        await loadRequests();
+        renderRequests();
+      }catch(error){
+        console.error("updateRequestStatus error:", error);
+        showToast("هەڵە لە گۆڕینی بارودۆخ", true);
+      }
+    };
+
+    logoutBtn.addEventListener("click", () => {
+      showToast("login لادراوە");
+    });
+
+    refreshBtn.addEventListener("click", async () => {
+      await initializeDashboard();
+      showToast("نوێ کرایەوە");
+    });
+
+    saveSettingsBtn.addEventListener("click", saveSettings);
+    filterTypeEl.addEventListener("change", renderRequests);
+    filterStatusEl.addEventListener("change", renderRequests);
+
+    initializeDashboard();
+  </script>
 </body>
 </html>
