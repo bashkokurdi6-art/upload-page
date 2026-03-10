@@ -1,1 +1,21 @@
-<!
+-- visa prices
+create table visa_prices (
+id int primary key,
+price_visa text,
+updated_at timestamp default now()
+);
+
+insert into visa_prices (id,price_visa)
+values (1,'$100');
+
+-- chat messages
+create table chat_messages (
+id bigint generated always as identity primary key,
+user_id text,
+message text,
+sender text,
+created_at timestamp default now()
+);
+
+-- enable realtime
+alter publication supabase_realtime add table chat_messages;
