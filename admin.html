@@ -127,6 +127,12 @@
       opacity: 0.97;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .btn-gold {
       background: linear-gradient(135deg, #facc15, #f59e0b);
       color: #111827;
@@ -171,6 +177,7 @@
 
     .msg {
       margin-top: 12px;
+      margin-bottom: 14px;
       padding: 14px;
       border-radius: 14px;
       font-size: 14px;
@@ -350,17 +357,32 @@
     const adminBox = document.getElementById("adminBox");
     const logoutBtn = document.getElementById("logoutBtn");
     const globalMsg = document.getElementById("globalMsg");
+    const signupBtn = document.getElementById("signupBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
 
     function showMsg(text, type = "ok") {
       globalMsg.innerHTML = `<div class="msg ${type}">${text}</div>`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function clearMsg() {
+      globalMsg.innerHTML = "";
     }
 
     async function ensureAdminRow(user) {
       const { error } = await db
         .from("admin_users")
-        .upsert([{ user_id: user.id, email: user.email }], { onConflict: "user_id" });
+        .upsert(
+          [{ user_id: user.id, email: user.email }],
+          { onConflict: "user_id" }
+        );
 
-      if (error) showMsg(error.message, "err");
+      if (error) {
+        console.error("ensureAdminRow error:", error);
+        showMsg("هەڵە لە admin_users: " + error.message, "err");
+      }
     }
 
     async function signup() {
@@ -372,17 +394,33 @@
         return;
       }
 
-      const { data, error } = await db.auth.signUp({ email, password });
+      signupBtn.disabled = true;
+      showMsg("چاوەڕوان بە... هەژمار دروست دەکرێت");
 
-      if (error) {
-        showMsg(error.message, "err");
-        return;
-      }
+      try {
+        const { data, error } = await db.auth.signUp({ email, password });
 
-      if (data.user) {
-        await ensureAdminRow(data.user);
-        showMsg("Signup سەرکەوتوو بوو");
-        await checkSession();
+        console.log("SIGNUP DATA:", data);
+        console.log("SIGNUP ERROR:", error);
+
+        if (error) {
+          showMsg("هەڵە لە signup: " + error.message, "err");
+          return;
+        }
+
+        if (data.user) {
+          await ensureAdminRow(data.user);
+          showMsg("Signup سەرکەوتوو بوو. ئێستا login بکە.");
+          document.getElementById("loginEmail").value = email;
+          document.getElementById("loginPassword").value = password;
+        } else {
+          showMsg("Signup تەواو نەبوو", "err");
+        }
+      } catch (err) {
+        console.error("Signup catch error:", err);
+        showMsg("هەڵەی نەناسراو لە signup", "err");
+      } finally {
+        signupBtn.disabled = false;
       }
     }
 
@@ -395,41 +433,77 @@
         return;
       }
 
-      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      loginBtn.disabled = true;
+      showMsg("چاوەڕوان بە... هەوڵی چوونەژوورەوە دەدرێت");
 
-      if (error) {
-        showMsg(error.message, "err");
-        return;
-      }
+      try {
+        console.log("Trying login with:", email);
 
-      if (data.user) {
-        showMsg("Login سەرکەوتوو بوو");
-        await checkSession();
+        const { data, error } = await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        console.log("LOGIN DATA:", data);
+        console.log("LOGIN ERROR:", error);
+
+        if (error) {
+          showMsg("هەڵە لە login: " + error.message, "err");
+          return;
+        }
+
+        if (data?.user) {
+          showMsg("Login سەرکەوتوو بوو");
+          authBox.classList.add("hidden");
+          adminBox.classList.remove("hidden");
+          await loadSettings();
+          await loadRequests();
+        } else {
+          showMsg("Login تەواو نەبوو", "err");
+        }
+      } catch (err) {
+        console.error("Login catch error:", err);
+        showMsg("هەڵەی نەناسراو لە login", "err");
+      } finally {
+        loginBtn.disabled = false;
       }
     }
 
     async function logout() {
-      await db.auth.signOut();
-      authBox.classList.remove("hidden");
-      adminBox.classList.add("hidden");
-      showMsg("Logout کرا");
+      try {
+        await db.auth.signOut();
+        authBox.classList.remove("hidden");
+        adminBox.classList.add("hidden");
+        showMsg("Logout کرا");
+      } catch (err) {
+        console.error("Logout error:", err);
+        showMsg("هەڵە لە logout", "err");
+      }
     }
 
     async function loadSettings() {
-      const { data, error } = await db
-        .from("payment_settings")
-        .select("*")
-        .eq("id", 1)
-        .single();
+      try {
+        const { data, error } = await db
+          .from("payment_settings")
+          .select("*")
+          .eq("id", 1)
+          .single();
 
-      if (error) {
-        showMsg(error.message, "err");
-        return;
+        console.log("SETTINGS DATA:", data);
+        console.log("SETTINGS ERROR:", error);
+
+        if (error) {
+          showMsg("هەڵە لە خوێندنەوەی ژمارەکان: " + error.message, "err");
+          return;
+        }
+
+        document.getElementById("fibNumber").value = data?.fib_number || "";
+        document.getElementById("fastpayNumber").value = data?.fastpay_number || "";
+        document.getElementById("qiNumber").value = data?.qi_number || "";
+      } catch (err) {
+        console.error("loadSettings catch error:", err);
+        showMsg("هەڵەی نەناسراو لە loadSettings", "err");
       }
-
-      document.getElementById("fibNumber").value = data.fib_number || "";
-      document.getElementById("fastpayNumber").value = data.fastpay_number || "";
-      document.getElementById("qiNumber").value = data.qi_number || "";
     }
 
     async function saveSettings() {
@@ -437,22 +511,39 @@
       const fastpay_number = document.getElementById("fastpayNumber").value.trim();
       const qi_number = document.getElementById("qiNumber").value.trim();
 
-      const { error } = await db
-        .from("payment_settings")
-        .update({
-          fib_number,
-          fastpay_number,
-          qi_number,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", 1);
+      saveSettingsBtn.disabled = true;
+      showMsg("چاوەڕوان بە... ژمارەکان پاشەکەوت دەکرێن");
 
-      if (error) {
-        showMsg(error.message, "err");
-        return;
+      try {
+        const { data, error } = await db
+          .from("payment_settings")
+          .upsert(
+            [{
+              id: 1,
+              fib_number,
+              fastpay_number,
+              qi_number,
+              updated_at: new Date().toISOString()
+            }],
+            { onConflict: "id" }
+          )
+          .select();
+
+        console.log("SAVE SETTINGS DATA:", data);
+        console.log("SAVE SETTINGS ERROR:", error);
+
+        if (error) {
+          showMsg("هەڵە لە پاشەکەوتکردنی ژمارەکان: " + error.message, "err");
+          return;
+        }
+
+        showMsg("ژمارەکان پاشەکەوت کران");
+      } catch (err) {
+        console.error("saveSettings catch error:", err);
+        showMsg("هەڵەی نەناسراو لە saveSettings", "err");
+      } finally {
+        saveSettingsBtn.disabled = false;
       }
-
-      showMsg("ژمارەکان پاشەکەوت کران");
     }
 
     function badgeClass(status) {
@@ -465,105 +556,138 @@
       const list = document.getElementById("requestsList");
       list.innerHTML = "Loading...";
 
-      const { data, error } = await db
-        .from("payment_requests")
-        .select("*")
-        .order("created_at", { ascending: false });
+      try {
+        const { data, error } = await db
+          .from("payment_requests")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (error) {
-        list.innerHTML = `<div class="msg err">${error.message}</div>`;
-        return;
+        console.log("REQUESTS DATA:", data);
+        console.log("REQUESTS ERROR:", error);
+
+        if (error) {
+          list.innerHTML = `<div class="msg err">${error.message}</div>`;
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          list.innerHTML = `<div class="small">هێشتا هیچ داواکارییەک نییە.</div>`;
+          return;
+        }
+
+        list.innerHTML = data.map(item => `
+          <div class="request-card">
+            <div class="section-head">
+              <h2 style="margin:0; font-size:20px;">#${item.id}</h2>
+              <span class="badge ${badgeClass(item.status)}">${item.status || "pending"}</span>
+            </div>
+
+            <div class="meta">
+              <div><strong>ناوی سیانی:</strong> ${item.full_name || "-"}</div>
+              <div><strong>ژمارەی مۆبایل:</strong> ${item.phone || "-"}</div>
+              <div><strong>جۆری پارەدان:</strong> ${item.payment_type || "-"}</div>
+              <div><strong>کات:</strong> ${item.created_at ? new Date(item.created_at).toLocaleString() : "-"}</div>
+              <div><strong>تێبینی:</strong> ${item.note || "-"}</div>
+            </div>
+
+            <div>
+              <strong>سکرینشۆت:</strong><br />
+              ${item.screenshot_url ? `
+                <a href="${item.screenshot_url}" target="_blank">کردنەوەی وێنە</a><br />
+                <img class="thumb" src="${item.screenshot_url}" alt="screenshot" />
+              ` : `<span class="small">وێنە نییە</span>`}
+            </div>
+
+            <div class="actions">
+              <button class="btn-green" onclick="updateStatus(${item.id}, 'approved')">Approve</button>
+              <button class="btn-red" onclick="updateStatus(${item.id}, 'rejected')">Reject</button>
+              <button class="btn-gray" onclick="deleteRequest(${item.id})">Delete</button>
+            </div>
+          </div>
+        `).join("");
+      } catch (err) {
+        console.error("loadRequests catch error:", err);
+        list.innerHTML = `<div class="msg err">هەڵەی نەناسراو لە loadRequests</div>`;
       }
-
-      if (!data || data.length === 0) {
-        list.innerHTML = `<div class="small">هێشتا هیچ داواکارییەک نییە.</div>`;
-        return;
-      }
-
-      list.innerHTML = data.map(item => `
-        <div class="request-card">
-          <div class="section-head">
-            <h2 style="margin:0; font-size:20px;">#${item.id}</h2>
-            <span class="badge ${badgeClass(item.status)}">${item.status}</span>
-          </div>
-
-          <div class="meta">
-            <div><strong>ناوی سیانی:</strong> ${item.full_name}</div>
-            <div><strong>ژمارەی مۆبایل:</strong> ${item.phone}</div>
-            <div><strong>جۆری پارەدان:</strong> ${item.payment_type}</div>
-            <div><strong>کات:</strong> ${new Date(item.created_at).toLocaleString()}</div>
-            <div><strong>تێبینی:</strong> ${item.note || "-"}</div>
-          </div>
-
-          <div>
-            <strong>سکرینشۆت:</strong><br />
-            <a href="${item.screenshot_url}" target="_blank">کردنەوەی وێنە</a><br />
-            <img class="thumb" src="${item.screenshot_url}" alt="screenshot" />
-          </div>
-
-          <div class="actions">
-            <button class="btn-green" onclick="updateStatus(${item.id}, 'approved')">Approve</button>
-            <button class="btn-red" onclick="updateStatus(${item.id}, 'rejected')">Reject</button>
-            <button class="btn-gray" onclick="deleteRequest(${item.id})">Delete</button>
-          </div>
-        </div>
-      `).join("");
     }
 
     async function updateStatus(id, status) {
-      const { error } = await db
-        .from("payment_requests")
-        .update({ status })
-        .eq("id", id);
+      try {
+        const { error } = await db
+          .from("payment_requests")
+          .update({ status })
+          .eq("id", id);
 
-      if (error) {
-        showMsg(error.message, "err");
-        return;
+        if (error) {
+          showMsg("هەڵە لە نوێکردنەوەی دۆخ: " + error.message, "err");
+          return;
+        }
+
+        showMsg("دۆخەکە نوێکرایەوە");
+        await loadRequests();
+      } catch (err) {
+        console.error("updateStatus error:", err);
+        showMsg("هەڵەی نەناسراو لە updateStatus", "err");
       }
-
-      showMsg("دۆخەکە نوێکرایەوە");
-      loadRequests();
     }
 
     async function deleteRequest(id) {
       if (!confirm("دڵنیایت لە سڕینەوە؟")) return;
 
-      const { error } = await db
-        .from("payment_requests")
-        .delete()
-        .eq("id", id);
+      try {
+        const { error } = await db
+          .from("payment_requests")
+          .delete()
+          .eq("id", id);
 
-      if (error) {
-        showMsg(error.message, "err");
-        return;
+        if (error) {
+          showMsg("هەڵە لە سڕینەوە: " + error.message, "err");
+          return;
+        }
+
+        showMsg("داواکارییەکە سڕایەوە");
+        await loadRequests();
+      } catch (err) {
+        console.error("deleteRequest error:", err);
+        showMsg("هەڵەی نەناسراو لە deleteRequest", "err");
       }
-
-      showMsg("داواکارییەکە سڕایەوە");
-      loadRequests();
     }
 
     async function checkSession() {
-      const { data } = await db.auth.getSession();
-      const session = data.session;
+      try {
+        const { data, error } = await db.auth.getSession();
 
-      if (session && session.user) {
-        authBox.classList.add("hidden");
-        adminBox.classList.remove("hidden");
-        await loadSettings();
-        await loadRequests();
-      } else {
-        authBox.classList.remove("hidden");
-        adminBox.classList.add("hidden");
+        console.log("SESSION DATA:", data);
+        console.log("SESSION ERROR:", error);
+
+        const session = data?.session;
+
+        if (session && session.user) {
+          authBox.classList.add("hidden");
+          adminBox.classList.remove("hidden");
+          clearMsg();
+          await loadSettings();
+          await loadRequests();
+        } else {
+          authBox.classList.remove("hidden");
+          adminBox.classList.add("hidden");
+        }
+      } catch (err) {
+        console.error("checkSession error:", err);
+        showMsg("هەڵەی نەناسراو لە checkSession", "err");
       }
     }
 
-    document.getElementById("signupBtn").addEventListener("click", signup);
-    document.getElementById("loginBtn").addEventListener("click", login);
-    document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
-    document.getElementById("refreshBtn").addEventListener("click", loadRequests);
+    signupBtn.addEventListener("click", signup);
+    loginBtn.addEventListener("click", login);
+    saveSettingsBtn.addEventListener("click", saveSettings);
+    refreshBtn.addEventListener("click", loadRequests);
     logoutBtn.addEventListener("click", logout);
 
-    db.auth.onAuthStateChange(() => checkSession());
+    db.auth.onAuthStateChange((event, session) => {
+      console.log("AUTH EVENT:", event, session);
+      checkSession();
+    });
 
     checkSession();
 
