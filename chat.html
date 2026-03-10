@@ -3,303 +3,251 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK Support</title>
+  <title>SIWAK Payment Form</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; }
-    body{
-      margin:0;
+    body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background:#0b141a;
-      color:#e9edef;
+      background: linear-gradient(180deg, #f8fafc, #eef2ff);
+      color: #111827;
     }
-    .app{
-      max-width:520px;
-      margin:0 auto;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      background:#111b21;
+    .wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    .topbar{
-      background:#202c33;
-      padding:14px 16px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      border-bottom:1px solid rgba(255,255,255,0.05);
-      position:sticky;
-      top:0;
-      z-index:2;
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
     }
-    .avatar{
-      width:42px;
-      height:42px;
-      border-radius:50%;
-      background:#25d366;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#fff;
-      font-weight:bold;
+    h1 {
+      margin-top: 0;
+      text-align: center;
     }
-    .title{font-weight:700;font-size:16px}
-    .sub{font-size:12px;color:#9aa6ad;margin-top:2px}
-    .chat{
-      flex:1;
-      padding:14px 10px 100px;
-      overflow-y:auto;
-      background:
-        linear-gradient(rgba(17,27,33,0.94), rgba(17,27,33,0.94)),
-        url("https://www.transparenttextures.com/patterns/cubes.png");
+    .sub {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 20px;
     }
-    .row{
-      display:flex;
-      margin:8px 0;
+    .grid {
+      display: grid;
+      gap: 12px;
     }
-    .row.user{justify-content:flex-end}
-    .row.admin{justify-content:flex-start}
-    .bubble{
-      max-width:78%;
-      padding:10px 12px 18px;
-      border-radius:12px;
-      position:relative;
-      line-height:1.45;
-      font-size:14px;
-      white-space:pre-wrap;
-      word-break:break-word;
+    input, select, textarea, button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
     }
-    .row.user .bubble{
-      background:#005c4b;
-      border-top-right-radius:4px;
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
-    .row.admin .bubble{
-      background:#202c33;
-      border-top-left-radius:4px;
+    button {
+      border: none;
+      background: #111827;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
     }
-    .meta{
-      position:absolute;
-      right:10px;
-      bottom:4px;
-      font-size:10px;
-      color:#b7c4cc;
+    .number-box {
+      background: #f3f4f6;
+      border: 1px dashed #9ca3af;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
     }
-    .typing{
-      min-height:20px;
-      padding:0 16px 8px;
-      color:#25d366;
-      font-size:12px;
+    .label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 6px;
     }
-    .composer{
-      position:fixed;
-      bottom:0;
-      left:50%;
-      transform:translateX(-50%);
-      width:100%;
-      max-width:520px;
-      display:flex;
-      gap:8px;
-      padding:10px;
-      background:#202c33;
-      z-index:3;
+    .number {
+      font-size: 22px;
+      font-weight: bold;
+      word-break: break-word;
     }
-    .composer input{
-      flex:1;
-      border:none;
-      outline:none;
-      border-radius:24px;
-      padding:14px 16px;
-      font-size:14px;
-      background:#2a3942;
-      color:#fff;
+    .msg {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
     }
-    .composer button{
-      width:48px;
-      height:48px;
-      border:none;
-      border-radius:50%;
-      background:#25d366;
-      color:#111b21;
-      font-size:18px;
-      font-weight:bold;
-      cursor:pointer;
+    .ok { background: #dcfce7; color: #166534; }
+    .err { background: #fee2e2; color: #991b1b; }
+    .copy-btn {
+      margin-top: 10px;
+      background: #2563eb;
     }
-    .empty,.error{
-      text-align:center;
-      margin-top:30px;
-      color:#8fa3ad;
-      font-size:13px;
-    }
-    .error{color:#ff8a8a}
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="avatar">S</div>
-      <div>
-        <div class="title">SIWAK Support</div>
-        <div class="sub" id="onlineStatus">connecting...</div>
+  <div class="wrap">
+    <div class="card">
+      <h1>SIWAK Payment</h1>
+      <div class="sub">تکایە پارەکە بنێرە، پاشان فۆڕمەکە پڕ بکەوە</div>
+
+      <div class="grid">
+        <select id="paymentType">
+          <option value="FIB">FIB</option>
+          <option value="FastPay">FastPay</option>
+          <option value="Qi Card">Qi Card</option>
+        </select>
+
+        <div class="number-box">
+          <div class="label">ژمارەی ناردنی پارە</div>
+          <div id="paymentNumber" class="number">Loading...</div>
+          <button type="button" id="copyBtn" class="copy-btn">Copy Number</button>
+        </div>
+
+        <input type="text" id="fullName" placeholder="ناوی سیانی" />
+        <input type="text" id="phone" placeholder="ژمارەی مۆبایل" />
+        <input type="text" id="tripleCode" placeholder="سێ خانە" />
+        <input type="file" id="screenshot" accept="image/*" />
+        <textarea id="note" placeholder="تێبینی"></textarea>
+        <button id="submitBtn">ناردن</button>
+
+        <div id="msgBox"></div>
       </div>
     </div>
-
-    <div class="chat" id="chatBox">
-      <div class="empty">چات ئامادەیە...</div>
-    </div>
-
-    <div class="typing" id="typingBox"></div>
-  </div>
-
-  <div class="composer">
-    <input id="messageInput" type="text" placeholder="پەیام بنووسە..." />
-    <button id="sendBtn">➤</button>
   </div>
 
   <script>
     const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
+    const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
 
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const chatBox = document.getElementById("chatBox");
-    const typingBox = document.getElementById("typingBox");
-    const onlineStatus = document.getElementById("onlineStatus");
-    const input = document.getElementById("messageInput");
-    const sendBtn = document.getElementById("sendBtn");
+    const paymentTypeEl = document.getElementById("paymentType");
+    const paymentNumberEl = document.getElementById("paymentNumber");
+    const msgBox = document.getElementById("msgBox");
 
-    let typingTimer = null;
+    let settingsData = {
+      fib_number: "",
+      fastpay_number: "",
+      qi_number: ""
+    };
 
-    function esc(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
+    function showMsg(text, type = "ok") {
+      msgBox.innerHTML = `<div class="msg ${type}">${text}</div>`;
     }
 
-    function formatTime(v) {
-      const d = new Date(v);
-      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    function getCurrentNumber() {
+      const type = paymentTypeEl.value;
+      if (type === "FIB") return settingsData.fib_number || "";
+      if (type === "FastPay") return settingsData.fastpay_number || "";
+      if (type === "Qi Card") return settingsData.qi_number || "";
+      return "";
     }
 
-    async function loadMessages() {
-      const { data, error } = await client
-        .from("messages")
+    function updateNumberView() {
+      const num = getCurrentNumber();
+      paymentNumberEl.textContent = num || "No number";
+    }
+
+    async function loadSettings() {
+      const { data, error } = await supabase
+        .from("payment_settings")
         .select("*")
-        .order("created_at", { ascending: true });
+        .eq("id", 1)
+        .single();
 
       if (error) {
-        chatBox.innerHTML = `<div class="error">هەڵە لە بارکردنی پەیامەکان<br>${esc(error.message)}</div>`;
+        showMsg(error.message, "err");
         return;
       }
 
-      if (!data || data.length === 0) {
-        chatBox.innerHTML = `<div class="empty">هیچ پەیامێک نییە</div>`;
+      settingsData = data;
+      updateNumberView();
+    }
+
+    async function uploadScreenshot(file) {
+      const ext = file.name.split(".").pop();
+      const fileName = `shot_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const filePath = fileName;
+
+      const { error: uploadError } = await supabase.storage
+        .from("payment-screenshots")
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from("payment-screenshots")
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    }
+
+    async function submitForm() {
+      const full_name = document.getElementById("fullName").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const triple_code = document.getElementById("tripleCode").value.trim();
+      const payment_type = paymentTypeEl.value;
+      const note = document.getElementById("note").value.trim();
+      const screenshotFile = document.getElementById("screenshot").files[0];
+
+      if (!full_name || !phone || !triple_code || !payment_type || !screenshotFile) {
+        showMsg("تکایە هەموو خانە گرنگەکان پڕ بکە", "err");
         return;
       }
 
-      chatBox.innerHTML = data.map(msg => `
-        <div class="row ${msg.sender}">
-          <div class="bubble">
-            ${esc(msg.message)}
-            <div class="meta">${formatTime(msg.created_at)}</div>
-          </div>
-        </div>
-      `).join("");
+      try {
+        showMsg("چاوەڕێبە...");
 
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+        const screenshot_url = await uploadScreenshot(screenshotFile);
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
+        const { error } = await supabase
+          .from("payment_requests")
+          .insert([{
+            full_name,
+            phone,
+            triple_code,
+            payment_type,
+            screenshot_url,
+            note
+          }]);
 
-      sendBtn.disabled = true;
+        if (error) {
+          showMsg(error.message, "err");
+          return;
+        }
 
-      const { error } = await client
-        .from("messages")
-        .insert([{ sender: "user", message: text }]);
+        showMsg("داواکارییەکەت بە سەرکەوتوویی نێردرا", "ok");
 
-      if (error) {
-        alert("هەڵە لە ناردنی پەیام: " + error.message);
-      } else {
-        input.value = "";
-        await setTyping(false);
-        await loadMessages();
-      }
-
-      sendBtn.disabled = false;
-      input.focus();
-    }
-
-    async function setTyping(value) {
-      await client.from("typing_status").insert([
-        { user_type: "user", is_typing: value }
-      ]);
-    }
-
-    async function setOnline(value) {
-      await client.from("online_status").insert([
-        { user_type: "user", is_online: value }
-      ]);
-    }
-
-    async function checkTyping() {
-      const { data } = await client
-        .from("typing_status")
-        .select("*")
-        .eq("user_type", "admin")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (data && data[0]) {
-        const age = Date.now() - new Date(data[0].created_at).getTime();
-        typingBox.textContent = data[0].is_typing && age < 3000 ? "ئەدمین خەریکی نووسینە..." : "";
-      } else {
-        typingBox.textContent = "";
+        document.getElementById("fullName").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("tripleCode").value = "";
+        document.getElementById("note").value = "";
+        document.getElementById("screenshot").value = "";
+        paymentTypeEl.value = "FIB";
+        updateNumberView();
+      } catch (err) {
+        showMsg(err.message || "هەڵەیەک ڕوویدا", "err");
       }
     }
 
-    async function checkOnline() {
-      const { data } = await client
-        .from("online_status")
-        .select("*")
-        .eq("user_type", "admin")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (data && data[0]) {
-        const age = Date.now() - new Date(data[0].created_at).getTime();
-        onlineStatus.textContent = age < 20000 && data[0].is_online ? "online" : "offline";
-      } else {
-        onlineStatus.textContent = "offline";
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const num = getCurrentNumber();
+      if (!num) {
+        showMsg("ژمارە نییە", "err");
+        return;
       }
-    }
-
-    input.addEventListener("input", async () => {
-      await setTyping(true);
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(() => setTyping(false), 1500);
+      await navigator.clipboard.writeText(num);
+      showMsg("ژمارەکە کۆپی کرا");
     });
 
-    input.addEventListener("keydown", e => {
-      if (e.key === "Enter") sendMessage();
-    });
+    paymentTypeEl.addEventListener("change", updateNumberView);
+    document.getElementById("submitBtn").addEventListener("click", submitForm);
 
-    sendBtn.addEventListener("click", sendMessage);
-
-    window.addEventListener("load", async () => {
-      await setOnline(true);
-      await loadMessages();
-      await checkTyping();
-      await checkOnline();
-      input.focus();
-    });
-
-    setInterval(async () => {
-      await setOnline(true);
-      await loadMessages();
-      await checkTyping();
-      await checkOnline();
-    }, 2000);
+    loadSettings();
   </script>
 </body>
 </html>
