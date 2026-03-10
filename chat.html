@@ -1,1 +1,616 @@
 .
+<script>
+  const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
+  const SUPABASE_ANON_KEY = "ANON_KEY_LERA_DABNE";
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+ <!DOCTYPE html>
+<html lang="ku">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIWAK - User Request</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root{
+      --bg: #060606;
+      --panel: #0f1115;
+      --panel-2: #131722;
+      --text: #f6f1de;
+      --muted: #a9afbd;
+      --gold: #d4af37;
+      --gold-soft: #a8831f;
+      --blue: #0f4c81;
+      --blue-soft: #163a63;
+      --border: rgba(212,175,55,.18);
+      --shadow: 0 20px 50px rgba(0,0,0,.45);
+      --radius: 22px;
+    }
+
+    body{
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(212,175,55,.10), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(21,96,189,.13), transparent 32%),
+        linear-gradient(135deg, #050505, #0b0d10 40%, #050505 100%);
+      padding: 22px;
+    }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero{
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-left{
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left::after{
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(212,175,55,.14), transparent 60%);
+      pointer-events: none;
+    }
+
+    .brand{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+
+    .brand-dot{
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #f5e39d);
+      box-shadow: 0 0 18px rgba(212,175,55,.55);
+    }
+
+    h1{
+      font-size: 34px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .sub{
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .price-box{
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .price-row{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(212,175,55,.08), rgba(15,76,129,.10));
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .price-label{
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .price-value{
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--gold);
+    }
+
+    .main{
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .form-card{
+      padding: 24px;
+    }
+
+    .side-card{
+      padding: 20px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .section-title{
+      font-size: 22px;
+      margin-bottom: 6px;
+      color: var(--gold);
+    }
+
+    .section-sub{
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .grid{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .field.full{
+      grid-column: 1 / -1;
+    }
+
+    label{
+      font-size: 14px;
+      color: #d8dbe3;
+    }
+
+    input, select, textarea{
+      width: 100%;
+      border: 1px solid rgba(212,175,55,.18);
+      background: rgba(9,11,15,.95);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 14px;
+      outline: none;
+      transition: .25s ease;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(212,175,55,.7);
+      box-shadow: 0 0 0 4px rgba(212,175,55,.10);
+    }
+
+    textarea{
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .pay-card{
+      background: linear-gradient(135deg, rgba(15,76,129,.16), rgba(212,175,55,.10));
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .pay-title{
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .pay-number{
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--gold);
+      word-break: break-word;
+    }
+
+    .send-btn{
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #081018;
+      background: linear-gradient(135deg, #f2d57a, #caa12a 50%, #0f4c81 120%);
+      box-shadow: 0 16px 30px rgba(212,175,55,.16);
+      transition: .25s ease;
+    }
+
+    .send-btn:hover{
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .send-btn:disabled{
+      opacity: .6;
+      cursor: wait;
+      transform: none;
+    }
+
+    .mini-list{
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-item{
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .mini-item b{
+      color: var(--gold);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .mini-item span{
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .amount-badge{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(212,175,55,.10);
+      border: 1px solid rgba(212,175,55,.24);
+      color: var(--gold);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      margin-bottom: 14px;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(30px);
+      background: #0f1115;
+      color: #fff;
+      border: 1px solid rgba(212,175,55,.25);
+      border-radius: 16px;
+      padding: 14px 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s ease;
+      z-index: 9999;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 920px){
+      .hero, .main, .grid{
+        grid-template-columns: 1fr;
+      }
+      .side-card{
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="card hero-left">
+        <div class="brand">
+          <span class="brand-dot"></span>
+          <span>SIWAK SYSTEM</span>
+        </div>
+        <h1>فۆڕمی ناردنی داواکاری</h1>
+        <p class="sub">
+          تکایە زانیارییەکان بە دروستی پڕ بکەرەوە، شێوازی پارەدان هەڵبژێرە،
+          و وێنەی سەلماندنی پارەدان بنێرە. هەموو نرخ و ژمارەکان لە لایەن ئەدمینەوە ڕۆژانە نوێ دەکرێنەوە.
+        </p>
+      </div>
+
+      <div class="card price-box">
+        <div class="price-row">
+          <div>
+            <div class="price-label">نرخی ڤیزە</div>
+          </div>
+          <div class="price-value" id="visaPrice">0</div>
+        </div>
+        <div class="price-row">
+          <div>
+            <div class="price-label">نرخی ڕەوزە</div>
+          </div>
+          <div class="price-value" id="rawzaPrice">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="card form-card">
+        <div class="section-title">فۆڕمی داواکاری</div>
+        <div class="section-sub">بە دڵنیاییەوە هەموو خانە گرنگەکان پڕ بکەرەوە</div>
+
+        <div class="amount-badge">
+          <span>بڕی پارەی ئێستا:</span>
+          <span id="selectedAmount">0</span>
+        </div>
+
+        <form id="requestForm">
+          <div class="grid">
+            <div class="field">
+              <label for="serviceType">جۆری خزمەتگوزاری</label>
+              <select id="serviceType" required>
+                <option value="visa">ڤیزە</option>
+                <option value="rawza">ڕەوزە</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="customerName">ناوی سیانی</label>
+              <input type="text" id="customerName" placeholder="ناوەکەت بنوسە" required />
+            </div>
+
+            <div class="field">
+              <label for="mobile">ژمارەی مۆبایل</label>
+              <input type="text" id="mobile" placeholder="07xx xxx xxxx" required />
+            </div>
+
+            <div class="field">
+              <label for="paymentMethod">شێوازی پارەدان</label>
+              <select id="paymentMethod" required>
+                <option value="fib">FIB</option>
+                <option value="fastpay">FastPay</option>
+                <option value="qicard">Qi Card</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <div class="pay-card">
+                <div class="pay-title">ژمارەی پارەدان بۆ ئەم شێوازە</div>
+                <div class="pay-number" id="paymentNumberDisplay">-</div>
+              </div>
+            </div>
+
+            <div class="field full">
+              <label for="paymentImage">ناردنی وێنەی پارەدان</label>
+              <input type="file" id="paymentImage" accept="image/*" required />
+            </div>
+
+            <div class="field full">
+              <label for="note">تێبینی</label>
+              <textarea id="note" placeholder="ئەگەر تێبینی هەیە لێرە بنوسە..."></textarea>
+            </div>
+
+            <div class="field full">
+              <button type="submit" class="send-btn" id="submitBtn">ناردنی داواکاری</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card side-card">
+        <div class="section-title">زانیاری گرنگ</div>
+        <div class="section-sub">پێش ناردن تکایە ئەمانە بخوێنەوە</div>
+
+        <div class="mini-list">
+          <div class="mini-item">
+            <b>١. جۆری داواکاری</b>
+            <span>پێویستە دیاری بکەیت داواکاریەکەت بۆ ڤیزەیە یان ڕەوزە.</span>
+          </div>
+          <div class="mini-item">
+            <b>٢. پارەدان</b>
+            <span>ژمارەی پارەدان بە شێوەی هەڵبژێردراو خۆکارانە پیشان دەدرێت.</span>
+          </div>
+          <div class="mini-item">
+            <b>٣. وێنەی سەلماندن</b>
+            <span>بێ ناردنی وێنەی پارەدان، داواکاریەکە ناتوانرێت پشکنینی بۆ بکرێت.</span>
+          </div>
+          <div class="mini-item">
+            <b>٤. هەڵسەنگاندن</b>
+            <span>داواکاریەکەت لەلایەن ئەدمینەوە پشکنین دەکرێت و دواتر بارودۆخەکەی گۆڕانکاری بەسەردا دێت.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
+    const SUPABASE_ANON_KEY = "ANON_KEY_LERA_DABNE";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const visaPriceEl = document.getElementById("visaPrice");
+    const rawzaPriceEl = document.getElementById("rawzaPrice");
+    const selectedAmountEl = document.getElementById("selectedAmount");
+    const serviceTypeEl = document.getElementById("serviceType");
+    const paymentMethodEl = document.getElementById("paymentMethod");
+    const paymentNumberDisplayEl = document.getElementById("paymentNumberDisplay");
+    const form = document.getElementById("requestForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const toastEl = document.getElementById("toast");
+
+    let appSettings = {
+      visa_price: 0,
+      rawza_price: 0,
+      fib_number: "",
+      fastpay_number: "",
+      qicard_number: ""
+    };
+
+    function showToast(message, isError = false){
+      toastEl.textContent = message;
+      toastEl.style.borderColor = isError ? "rgba(255,80,80,.35)" : "rgba(212,175,55,.25)";
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 3200);
+    }
+
+    function formatMoney(value){
+      const number = Number(value || 0);
+      return number.toLocaleString() + " IQD";
+    }
+
+    function updatePricesUI(){
+      visaPriceEl.textContent = formatMoney(appSettings.visa_price);
+      rawzaPriceEl.textContent = formatMoney(appSettings.rawza_price);
+      updateSelectedAmount();
+      updatePaymentNumber();
+    }
+
+    function updateSelectedAmount(){
+      const serviceType = serviceTypeEl.value;
+      const amount = serviceType === "visa" ? appSettings.visa_price : appSettings.rawza_price;
+      selectedAmountEl.textContent = formatMoney(amount);
+    }
+
+    function updatePaymentNumber(){
+      const method = paymentMethodEl.value;
+      let value = "-";
+
+      if(method === "fib") value = appSettings.fib_number || "-";
+      if(method === "fastpay") value = appSettings.fastpay_number || "-";
+      if(method === "qicard") value = appSettings.qicard_number || "-";
+
+      paymentNumberDisplayEl.textContent = value;
+    }
+
+    async function loadSettings(){
+      const { data, error } = await supabase
+        .from("app_settings")
+        .select("*")
+        .eq("id", 1)
+        .single();
+
+      if(error){
+        console.error(error);
+        showToast("هەڵەیەک لە وەرگرتنی زانیارییەکان ڕوویدا", true);
+        return;
+      }
+
+      appSettings = data;
+      updatePricesUI();
+    }
+
+    async function uploadImage(file){
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const filePath = `payments/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("request_uploads")
+        .upload(filePath, file, { upsert: false });
+
+      if(uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("request_uploads")
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const customerName = document.getElementById("customerName").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const paymentMethod = paymentMethodEl.value;
+      const serviceType = serviceTypeEl.value;
+      const note = document.getElementById("note").value.trim();
+      const imageFile = document.getElementById("paymentImage").files[0];
+
+      if(!customerName || !mobile || !paymentMethod || !serviceType || !imageFile){
+        showToast("تکایە هەموو خانە گرنگەکان پڕ بکەرەوە", true);
+        return;
+      }
+
+      if(!imageFile.type.startsWith("image/")){
+        showToast("تکایە تەنها وێنە بنێرە", true);
+        return;
+      }
+
+      if(imageFile.size > 5 * 1024 * 1024){
+        showToast("قەبارەی وێنە نابێت زیاتر بێت لە 5MB", true);
+        return;
+      }
+
+      const paymentNumber =
+        paymentMethod === "fib" ? appSettings.fib_number :
+        paymentMethod === "fastpay" ? appSettings.fastpay_number :
+        appSettings.qicard_number;
+
+      const amount = serviceType === "visa" ? appSettings.visa_price : appSettings.rawza_price;
+      const tableName = serviceType === "visa" ? "visa_requests" : "rawza_requests";
+
+      try{
+        submitBtn.disabled = true;
+        submitBtn.textContent = "چاوەڕێ بکە...";
+
+        const imageUrl = await uploadImage(imageFile);
+
+        const { error } = await supabase
+          .from(tableName)
+          .insert([{
+            customer_name: customerName,
+            mobile: mobile,
+            payment_method: paymentMethod,
+            payment_number: paymentNumber || "",
+            payment_image_url: imageUrl,
+            note: note,
+            amount: amount
+          }]);
+
+        if(error) throw error;
+
+        form.reset();
+        paymentMethodEl.value = "fib";
+        serviceTypeEl.value = "visa";
+        updatePricesUI();
+
+        showToast("داواکاریەکەت بە سەرکەوتوویی نێردرا");
+      }catch(err){
+        console.error(err);
+        showToast("هەڵەیەک ڕوویدا لە ناردنی داواکاری", true);
+      }finally{
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ناردنی داواکاری";
+      }
+    });
+
+    serviceTypeEl.addEventListener("change", updateSelectedAmount);
+    paymentMethodEl.addEventListener("change", updatePaymentNumber);
+
+    loadSettings();
+  </script>
+</body>
+</html>
+</script>
