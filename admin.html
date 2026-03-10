@@ -2,78 +2,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Chat</title>
+<title>Admin Panel</title>
+
+<link rel="stylesheet" href="style.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-
-body{
-margin:0;
-font-family:sans-serif;
-background:#f2f2f2;
-}
-
-.header{
-background:#222;
-color:white;
-padding:15px;
-font-size:18px;
-}
-
-.chat{
-height:75vh;
-overflow:auto;
-padding:10px;
-}
-
-.msg{
-padding:10px;
-margin:6px;
-border-radius:8px;
-max-width:70%;
-}
-
-.user{
-background:white;
-}
-
-.admin{
-background:#cfe9ff;
-margin-left:auto;
-}
-
-.typing{
-font-size:12px;
-padding:5px;
-color:#666;
-}
-
-.input{
-position:fixed;
-bottom:0;
-width:100%;
-background:white;
-display:flex;
-padding:10px;
-}
-
-input{
-flex:1;
-padding:10px;
-border-radius:20px;
-border:1px solid #ddd;
-}
-
-button{
-background:#222;
-color:white;
-border:none;
-padding:10px 20px;
-border-radius:20px;
-margin-left:10px;
-}
-
-</style>
 </head>
 
 <body>
@@ -84,85 +18,12 @@ Admin Support
 
 <div id="chat" class="chat"></div>
 
-<div id="typing" class="typing"></div>
-
 <div class="input">
-<input id="msg" placeholder="Reply..." oninput="typing()">
+<input id="msg" placeholder="Reply">
 <button onclick="send()">Send</button>
 </div>
 
-<script>
-
-const supabaseUrl="YOUR_SUPABASE_URL"
-const supabaseKey="YOUR_ANON_KEY"
-
-const sb=supabase.createClient(supabaseUrl,supabaseKey)
-
-async function send(){
-
-let text=document.getElementById("msg").value
-if(!text)return
-
-await sb.from("messages")
-.insert([{sender:"admin",message:text}])
-
-document.getElementById("msg").value=""
-
-}
-
-async function load(){
-
-let {data}=await sb
-.from("messages")
-.select("*")
-.order("created_at",{ascending:true})
-
-let box=document.getElementById("chat")
-box.innerHTML=""
-
-data.forEach(m=>{
-
-let div=document.createElement("div")
-div.className="msg "+m.sender
-div.innerText=m.message
-box.appendChild(div)
-
-})
-
-box.scrollTop=box.scrollHeight
-
-}
-
-async function typing(){
-
-await sb.from("typing_status")
-.insert([{user_type:"admin",is_typing:true}])
-
-}
-
-async function checkTyping(){
-
-let {data}=await sb
-.from("typing_status")
-.select("*")
-.order("created_at",{ascending:false})
-.limit(1)
-
-if(data[0]?.user_type=="user")
-document.getElementById("typing").innerText="user typing..."
-else
-document.getElementById("typing").innerText=""
-
-}
-
-sb.from("online_status").insert([{user_type:"admin",is_online:true}])
-
-load()
-
-setInterval(load,1500)
-setInterval(checkTyping,1500)
-
-</script>
+<script src="admin.js"></script>
 
 </body>
 </html>
