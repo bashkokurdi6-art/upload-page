@@ -1,427 +1,143 @@
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-  />
-  <title>فۆرمی زانیاری ڤیزا</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<title>سیواک - حەج و عومرە</title>
 
-    :root {
-      --bg: #0d1b3d;
-      --bg2: #10224a;
-      --card: #13285a;
-      --line: rgba(255, 255, 255, 0.10);
-      --input: rgba(255, 255, 255, 0.07);
-      --text: #ffffff;
-      --muted: rgba(255, 255, 255, 0.75);
-      --primary1: #1d4ed8;
-      --primary2: #0ea5e9;
-      --successBg: rgba(16, 185, 129, 0.14);
-      --successBorder: rgba(16, 185, 129, 0.35);
-      --errorBg: rgba(239, 68, 68, 0.14);
-      --errorBorder: rgba(239, 68, 68, 0.35);
-    }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap');
 
-    html {
-      background: linear-gradient(180deg, var(--bg), var(--bg2));
-      min-height: 100%;
-      overflow-x: hidden;
-    }
+body{
+  margin:0;
+  font-family:'Noto Sans Arabic', sans-serif;
+  background:#020617;
+  color:white;
+}
 
-    body {
-      background: linear-gradient(180deg, var(--bg), var(--bg2));
-      font-family: sans-serif;
-      color: var(--text);
-      min-height: 100%;
-      overflow-x: hidden;
-      padding: 12px 10px 140px;
-    }
+/* HEADER */
+header{
+  text-align:center;
+  padding:15px;
+  font-size:20px;
+  background:#020617;
+}
 
-    .page {
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-      padding-bottom: 120px;
-    }
+/* PAGE */
+.page{
+  display:none;
+  padding:15px;
+  animation:fade 0.4s;
+}
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 18px 14px 22px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-    }
+.active{ display:block; }
 
-    .badge {
-      width: fit-content;
-      margin: 0 auto 14px;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.05);
-      font-size: 13px;
-      font-weight: 700;
-    }
+@keyframes fade{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
+}
 
-    h1 {
-      text-align: center;
-      font-size: 22px;
-      margin-bottom: 10px;
-      font-weight: 800;
-    }
+/* CARD */
+.card{
+  background:#111827;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:12px;
+}
 
-    .desc {
-      text-align: center;
-      font-size: 14px;
-      line-height: 1.9;
-      color: var(--muted);
-      margin-bottom: 18px;
-    }
+/* BUTTON */
+button{
+  width:100%;
+  padding:12px;
+  background:#16a34a;
+  border:none;
+  border-radius:10px;
+  color:white;
+  margin-top:10px;
+}
 
-    .message {
-      display: none;
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 14px;
-      font-size: 14px;
-      line-height: 1.8;
-    }
+/* NAV */
+.nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#020617;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+}
 
-    .message.success {
-      background: var(--successBg);
-      border: 1px solid var(--successBorder);
-      color: #d1fae5;
-    }
-
-    .message.error {
-      background: var(--errorBg);
-      border: 1px solid var(--errorBorder);
-      color: #fee2e2;
-    }
-
-    .field {
-      margin-bottom: 14px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .required {
-      color: #7dd3fc;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      background: var(--input);
-      border: 1px solid var(--line);
-      color: #fff;
-      border-radius: 16px;
-      padding: 14px 13px;
-      font-size: 15px;
-      outline: none;
-      min-height: 52px;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: rgba(255, 255, 255, 0.40);
-    }
-
-    input:focus,
-    textarea:focus {
-      border-color: #60a5fa;
-      background: rgba(255, 255, 255, 0.09);
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.14);
-    }
-
-    textarea {
-      min-height: 95px;
-      resize: vertical;
-    }
-
-    .upload-box {
-      border: 1px dashed rgba(255, 255, 255, 0.20);
-      border-radius: 18px;
-      padding: 14px;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .upload-title {
-      text-align: center;
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 10px;
-      line-height: 1.8;
-    }
-
-    input[type="file"] {
-      border: none;
-      background: transparent;
-      min-height: auto;
-      padding: 0;
-    }
-
-    .preview-wrap {
-      display: none;
-      margin-top: 12px;
-    }
-
-    .preview-wrap img {
-      width: 100%;
-      max-height: 180px;
-      object-fit: cover;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-    }
-
-    .mini {
-      margin-top: 8px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.60);
-      line-height: 1.7;
-      text-align: center;
-    }
-
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 18px;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
-      cursor: pointer;
-      background: linear-gradient(135deg, var(--primary1), var(--primary2));
-      box-shadow: 0 10px 24px rgba(29, 78, 216, 0.28);
-      margin-top: 6px;
-    }
-
-    .btn:disabled {
-      opacity: 0.72;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .subtext {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.62);
-      line-height: 1.8;
-    }
-
-    .hidden-field {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-      width: 1px;
-      height: 1px;
-    }
-
-    .bottom-space {
-      height: 110px;
-    }
-
-    @media (max-width: 380px) {
-      body {
-        padding: 10px 8px 145px;
-      }
-
-      .card {
-        border-radius: 20px;
-        padding: 16px 12px 20px;
-      }
-
-      h1 {
-        font-size: 20px;
-      }
-
-      .desc {
-        font-size: 13px;
-      }
-
-      input,
-      textarea {
-        font-size: 14px;
-      }
-    }
-  </style>
+.nav button{
+  background:none;
+  color:white;
+  border:none;
+}
+</style>
 </head>
+
 <body>
-  <div class="page">
-    <div class="card">
-      <div class="badge">داواکاری ڤیزا</div>
-      <h1>فۆرمی زانیاری</h1>
-      <div class="desc">
-        تکایە زانیاریەکان بە وردی پڕبکەرەوە، وێنەی پاسپۆرت باربکە و پاشان ناردن بکە.
-      </div>
 
-      <form
-        id="visaForm"
-        action="https://formspree.io/f/mqedjear"
-        method="POST"
-        enctype="multipart/form-data"
-      >
-        <div id="successBox" class="message success">
-          ناردرا بە سەرکەوتوویی.
-        </div>
+<header>🕋 سیواک</header>
 
-        <div id="errorBox" class="message error">
-          هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدەوە.
-        </div>
-
-        <input type="hidden" name="_subject" value="داواکاری نوێی ڤیزا" />
-        <input type="text" name="_gotcha" class="hidden-field" tabindex="-1" autocomplete="off" />
-
-        <div class="field">
-          <label for="name">ناوی سیانی <span class="required">*</span></label>
-          <input id="name" name="name" type="text" placeholder="ناوی سیانی بنووسە" required />
-        </div>
-
-        <div class="field">
-          <label for="phone">ژمارە مۆبایل <span class="required">*</span></label>
-          <input id="phone" name="phone" type="tel" placeholder="ژمارە مۆبایل بنووسە" required />
-        </div>
-
-        <div class="field">
-          <label for="departure_date">بەرواری دەرچوون <span class="required">*</span></label>
-          <input id="departure_date" name="departure_date" type="date" required />
-        </div>
-
-        <div class="field">
-          <label for="return_date">بەرواری گەڕانەوە <span class="required">*</span></label>
-          <input id="return_date" name="return_date" type="date" required />
-        </div>
-
-        <div class="field">
-          <label for="passport_number">ژمارەی پاسپۆرت</label>
-          <input id="passport_number" name="passport_number" type="text" placeholder="ژمارەی پاسپۆرت" />
-        </div>
-
-        <div class="field">
-          <label for="destination">وڵاتی مەبەست</label>
-          <input id="destination" name="destination" type="text" placeholder="وڵات یان شار" />
-        </div>
-
-        <div class="field">
-          <label for="notes">تێبینی</label>
-          <textarea id="notes" name="notes" placeholder="هەر تێبینییەکی زیاتر لێرە بنووسە"></textarea>
-        </div>
-
-        <div class="field">
-          <label for="passport_image">وێنەی پاسپۆرت</label>
-          <div class="upload-box">
-            <div class="upload-title">وێنەی پاسپۆرت هەڵبژێرە</div>
-            <input
-              id="passport_image"
-              name="passport_image"
-              type="file"
-              accept="image/png, image/jpeg, image/jpg, application/pdf"
-            />
-            <div class="preview-wrap" id="previewWrap">
-              <img id="previewImage" alt="preview" />
-            </div>
-            <div class="mini">JPG / PNG / PDF</div>
-          </div>
-        </div>
-
-        <button id="submitBtn" type="submit" class="btn">ناردنی داواکاری</button>
-        <div class="subtext">زانیاریەکان دەگەن بە Formspree.</div>
-      </form>
-    </div>
-
-    <div class="bottom-space"></div>
+<!-- HOME -->
+<div id="home" class="page active">
+  <div class="card">
+    <h3>📖 زانیاری حەج</h3>
+    <p>هەنگاوەکان و ڕێنمایی.</p>
   </div>
 
-  <script>
-    const form = document.getElementById("visaForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const successBox = document.getElementById("successBox");
-    const errorBox = document.getElementById("errorBox");
-    const passportInput = document.getElementById("passport_image");
-    const previewWrap = document.getElementById("previewWrap");
-    const previewImage = document.getElementById("previewImage");
-    const departureDate = document.getElementById("departure_date");
-    const returnDate = document.getElementById("return_date");
+  <div class="card">
+    <h3>🕌 مزگەوتی نەبەوی</h3>
+    <p>ناسینی مەدینە.</p>
+  </div>
+</div>
 
-    passportInput.addEventListener("change", function () {
-      const file = this.files[0];
+<!-- HAJJ -->
+<div id="hajj" class="page">
+  <div class="card">
+    <h3>📖 هەنگاوەکانی حەج</h3>
+    <p>1. ئحرام<br>2. طواف<br>3. سعی<br>4. عەرەفات</p>
+  </div>
+</div>
 
-      if (!file) {
-        previewWrap.style.display = "none";
-        previewImage.removeAttribute("src");
-        return;
-      }
+<!-- OFFERS -->
+<div id="offers" class="page">
+  <div class="card">
+    <h3>💰 ئۆفەر</h3>
+    <p>حەج: 2000$</p>
+    <p>عومرە: 1200$</p>
+  </div>
+</div>
 
-      if (file.type.startsWith("image/")) {
-        previewImage.src = URL.createObjectURL(file);
-        previewWrap.style.display = "block";
-      } else {
-        previewWrap.style.display = "none";
-        previewImage.removeAttribute("src");
-      }
-    });
+<!-- BOOKING -->
+<div id="booking" class="page">
+  <div class="card">
+    <h3>📩 حجز</h3>
 
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
+    <form action="https://formspree.io/f/mgorjdjr" method="POST">
+      <input type="text" name="name" placeholder="ناو" required><br><br>
+      <input type="email" name="email" placeholder="ئیمەیڵ" required><br><br>
+      <button>ناردن</button>
+    </form>
 
-      successBox.style.display = "none";
-      errorBox.style.display = "none";
+  </div>
+</div>
 
-      const dep = departureDate.value;
-      const ret = returnDate.value;
+<!-- NAV -->
+<div class="nav">
+<button onclick="show('home')">🏠</button>
+<button onclick="show('hajj')">📖</button>
+<button onclick="show('offers')">💰</button>
+<button onclick="show('booking')">📩</button>
+</div>
 
-      if (dep && ret && ret < dep) {
-        errorBox.textContent = "بەرواری گەڕانەوە نابێت پێش بەرواری دەرچوون بێت.";
-        errorBox.style.display = "block";
-        return;
-      }
+<script>
+function show(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+}
+</script>
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "لە ناردن دایە...";
-
-      try {
-        const formData = new FormData(form);
-
-        const response = await fetch(form.action, {
-          method: form.method,
-          body: formData,
-          headers: { "Accept": "application/json" }
-        });
-
-        if (response.ok) {
-          successBox.style.display = "block";
-          form.reset();
-          previewWrap.style.display = "none";
-          previewImage.removeAttribute("src");
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        } else {
-          errorBox.textContent = "هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵ بدەوە.";
-          errorBox.style.display = "block";
-        }
-      } catch (err) {
-        errorBox.textContent = "کێشەی پەیوەندی هەیە. تکایە دووبارە هەوڵ بدەوە.";
-        errorBox.style.display = "block";
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "ناردنی داواکاری";
-      }
-    });
-  </script>
 </body>
 </html>
