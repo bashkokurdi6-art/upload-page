@@ -288,6 +288,22 @@ font-size:28px;
 
 <script>
 
+function formatTime24to12(time){
+
+let [hours, minutes] = time.split(':');
+
+hours = parseInt(hours);
+
+const ampm = hours >= 12 ? 'PM' : 'AM';
+
+hours = hours % 12;
+
+hours = hours ? hours : 12;
+
+return `${hours}:${minutes} ${ampm}`;
+
+}
+
 async function loadPrayerTimes(){
 
 const response = await fetch(
@@ -302,32 +318,32 @@ document.getElementById("prayerList").innerHTML = `
 
 <div class="prayer">
 <div class="name">بەیانی</div>
-<div class="time">${t.Fajr}</div>
+<div class="time">${formatTime24to12(t.Fajr)}</div>
 </div>
 
 <div class="prayer">
 <div class="name">خۆر هەڵاتن</div>
-<div class="time">${t.Sunrise}</div>
+<div class="time">${formatTime24to12(t.Sunrise)}</div>
 </div>
 
 <div class="prayer">
 <div class="name">نیوەڕۆ</div>
-<div class="time">${t.Dhuhr}</div>
+<div class="time">${formatTime24to12(t.Dhuhr)}</div>
 </div>
 
 <div class="prayer">
 <div class="name">عەسر</div>
-<div class="time">${t.Asr}</div>
+<div class="time">${formatTime24to12(t.Asr)}</div>
 </div>
 
 <div class="prayer">
 <div class="name">مەغریب</div>
-<div class="time">${t.Maghrib}</div>
+<div class="time">${formatTime24to12(t.Maghrib)}</div>
 </div>
 
 <div class="prayer">
 <div class="name">عیشا</div>
-<div class="time">${t.Isha}</div>
+<div class="time">${formatTime24to12(t.Isha)}</div>
 </div>
 
 `;
