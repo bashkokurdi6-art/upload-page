@@ -1,0 +1,237 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SIWAK</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+
+background-image:url('bg1.jpg');
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+
+min-height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+padding:20px;
+
+}
+
+.overlay{
+
+width:100%;
+max-width:420px;
+
+background:rgba(255,255,255,0.10);
+
+backdrop-filter:blur(8px);
+
+border-radius:25px;
+
+padding:25px;
+
+box-shadow:0 10px 40px rgba(0,0,0,0.25);
+
+color:white;
+
+}
+
+.dua{
+
+font-size:18px;
+line-height:2;
+text-align:center;
+
+margin-bottom:30px;
+
+text-shadow:0 2px 5px rgba(0,0,0,0.5);
+
+}
+
+.title{
+
+text-align:center;
+
+font-size:30px;
+font-weight:bold;
+
+margin-bottom:25px;
+
+}
+
+.prayer-box{
+
+background:rgba(255,255,255,0.15);
+
+border-radius:20px;
+
+padding:20px;
+
+margin-bottom:25px;
+
+}
+
+.prayer{
+
+display:flex;
+justify-content:space-between;
+
+padding:15px 0;
+
+border-bottom:1px solid rgba(255,255,255,0.2);
+
+font-size:22px;
+
+}
+
+.prayer:last-child{
+border-bottom:none;
+}
+
+.date-box{
+
+text-align:center;
+
+background:rgba(255,255,255,0.15);
+
+padding:20px;
+
+border-radius:20px;
+
+margin-bottom:25px;
+
+font-size:20px;
+
+line-height:2;
+
+}
+
+.footer{
+
+text-align:center;
+
+font-size:32px;
+
+font-weight:bold;
+
+letter-spacing:5px;
+
+text-shadow:0 3px 10px rgba(0,0,0,0.4);
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+<div class="dua">
+
+أَسْـتَغْفِرُ الله، أَسْـتَغْفِرُ الله، أَسْـتَغْفِرُ الله.
+<br><br>
+
+اللّهُـمَّ أَنْـتَ السَّلامُ ، وَمِـنْكَ السَّلام ، تَبارَكْتَ يا ذا الجَـلالِ وَالإِكْـرام .
+
+<br><br>
+
+لا إلهَ إلاّ اللّهُ وحدَهُ لا شريكَ لهُ، لهُ المُـلْكُ ولهُ الحَمْد، وهوَ على كلّ شَيءٍ قَدير، اللّهُـمَّ لا مانِعَ لِما أَعْطَـيْت، وَلا مُعْطِـيَ لِما مَنَـعْت، وَلا يَنْفَـعُ ذا الجَـدِّ مِنْـكَ الجَـد
+
+</div>
+
+<div class="title">
+
+كاتەکانی بانگ
+
+</div>
+
+<div class="prayer-box">
+
+<div class="prayer">
+<span>بەیانی</span>
+<span>04:15</span>
+</div>
+
+<div class="prayer">
+<span>نیوەڕۆ</span>
+<span>12:10</span>
+</div>
+
+<div class="prayer">
+<span>عەسر</span>
+<span>03:45</span>
+</div>
+
+<div class="prayer">
+<span>مەغریب</span>
+<span>06:32</span>
+</div>
+
+<div class="prayer">
+<span>عیشا</span>
+<span>07:55</span>
+</div>
+
+</div>
+
+<div class="date-box">
+
+<div id="time"></div>
+
+<div id="date"></div>
+
+<div>
+١٥ شوال ١٤٤٦ هـ
+</div>
+
+</div>
+
+<div class="footer">
+SIWAK
+</div>
+
+</div>
+
+<script>
+
+function updateTime(){
+
+const now = new Date();
+
+const time = now.toLocaleTimeString('ar-EG');
+
+const date = now.toLocaleDateString('ar-EG');
+
+document.getElementById("time").innerHTML = time;
+
+document.getElementById("date").innerHTML = date;
+
+}
+
+setInterval(updateTime,1000);
+
+updateTime();
+
+</script>
+
+</body>
+</html>
+```
