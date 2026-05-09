@@ -1,9 +1,10 @@
-
+```html id="p7x3nk"
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
 
 <head>
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
@@ -22,7 +23,9 @@ html,body{
 
 width:100%;
 height:100%;
+
 overflow:hidden;
+
 background:#f4f4f4;
 
 }
@@ -54,6 +57,7 @@ height:24%;
 min-height:170px;
 
 background-image:url('bg1.jpg');
+
 background-size:cover;
 background-position:center;
 
@@ -242,11 +246,12 @@ font-size:28px;
 <div class="city">
 
 هەولێر <br>
+
 ١٥ شوال ١٤٤٦ هـ
 
 </div>
 
-<div class="sun">
+<div class="sun" id="sunIcon">
 ☀️
 </div>
 
@@ -256,37 +261,7 @@ font-size:28px;
 
 </div>
 
-<div class="card">
-
-<div class="prayer">
-<div class="name">بەیانی</div>
-<div class="time">4:35 AM</div>
-</div>
-
-<div class="prayer">
-<div class="name">خۆر هەڵاتن</div>
-<div class="time">5:58 AM</div>
-</div>
-
-<div class="prayer">
-<div class="name">نیوەڕۆ</div>
-<div class="time">12:18 PM</div>
-</div>
-
-<div class="prayer">
-<div class="name">عەسر</div>
-<div class="time">3:41 PM</div>
-</div>
-
-<div class="prayer">
-<div class="name">مەغریب</div>
-<div class="time">6:32 PM</div>
-</div>
-
-<div class="prayer">
-<div class="name">عیشا</div>
-<div class="time">7:52 PM</div>
-</div>
+<div class="card" id="prayerList">
 
 </div>
 
@@ -314,18 +289,89 @@ font-size:28px;
 
 <script>
 
+async function loadPrayerTimes(){
+
+const response = await fetch(
+'https://api.aladhan.com/v1/timingsByCity?city=Erbil&country=IQ&method=4'
+);
+
+const data = await response.json();
+
+const t = data.data.timings;
+
+document.getElementById("prayerList").innerHTML = `
+
+<div class="prayer">
+<div class="name">بەیانی</div>
+<div class="time">${t.Fajr}</div>
+</div>
+
+<div class="prayer">
+<div class="name">خۆر هەڵاتن</div>
+<div class="time">${t.Sunrise}</div>
+</div>
+
+<div class="prayer">
+<div class="name">نیوەڕۆ</div>
+<div class="time">${t.Dhuhr}</div>
+</div>
+
+<div class="prayer">
+<div class="name">عەسر</div>
+<div class="time">${t.Asr}</div>
+</div>
+
+<div class="prayer">
+<div class="name">مەغریب</div>
+<div class="time">${t.Maghrib}</div>
+</div>
+
+<div class="prayer">
+<div class="name">عیشا</div>
+<div class="time">${t.Isha}</div>
+</div>
+
+`;
+
+}
+
 function updateClock(){
 
 const now = new Date();
 
 document.getElementById("clock").innerHTML =
+
 now.toLocaleTimeString('en-US',{
+
 hour:'numeric',
 minute:'2-digit',
 hour12:true
+
 });
 
 }
+
+function updateDayNight(){
+
+const hour = new Date().getHours();
+
+const icon = document.getElementById("sunIcon");
+
+if(hour >= 6 && hour < 18){
+
+icon.innerHTML = "☀️";
+
+}else{
+
+icon.innerHTML = "🌙";
+
+}
+
+}
+
+loadPrayerTimes();
+
+updateDayNight();
 
 setInterval(updateClock,1000);
 
@@ -335,3 +381,4 @@ updateClock();
 
 </body>
 </html>
+```
