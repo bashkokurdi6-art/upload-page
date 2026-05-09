@@ -1,4 +1,4 @@
-```html id="5knb3q"
+```html id="m2x7qa"
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -19,53 +19,62 @@ font-family:sans-serif;
 
 body{
 
-height:100vh;
+background:#f5f5f5;
 
 display:flex;
 justify-content:center;
 align-items:center;
 
-background-image:url('bg1.jpg');
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
+min-height:100vh;
 
-overflow:hidden;
-
-padding:15px;
+padding:12px;
 
 }
 
-.card{
+.phone{
 
 width:100%;
-max-width:390px;
+max-width:360px;
 
-background:rgba(0,0,0,0.35);
-
-backdrop-filter:blur(5px);
+background:white;
 
 border-radius:30px;
 
-padding:20px;
+overflow:hidden;
 
-border:1px solid rgba(255,255,255,0.12);
-
-box-shadow:0 10px 35px rgba(0,0,0,0.3);
-
-color:white;
+box-shadow:0 10px 30px rgba(0,0,0,0.15);
 
 }
 
-.dua{
+.header{
 
-font-size:12px;
+background-image:url('bg1.jpg');
 
-line-height:1.9;
+background-size:cover;
+background-position:center;
 
-text-align:center;
+padding:25px 20px;
 
-margin-bottom:18px;
+color:white;
+
+position:relative;
+
+}
+
+.overlay{
+
+background:rgba(0,60,40,0.65);
+
+position:absolute;
+
+inset:0;
+
+}
+
+.header-content{
+
+position:relative;
+z-index:2;
 
 }
 
@@ -73,7 +82,7 @@ margin-bottom:18px;
 
 text-align:center;
 
-font-size:28px;
+font-size:26px;
 
 font-weight:bold;
 
@@ -81,15 +90,43 @@ margin-bottom:18px;
 
 }
 
-.prayer-box{
+.info{
 
-background:rgba(255,255,255,0.08);
+display:flex;
+justify-content:space-between;
+align-items:center;
 
-border-radius:22px;
+}
 
-padding:15px;
+.location{
 
-margin-bottom:18px;
+font-size:16px;
+
+line-height:1.8;
+
+}
+
+.sun{
+
+font-size:38px;
+
+}
+
+.card{
+
+background:white;
+
+margin: -20px 15px 15px;
+
+border-radius:24px;
+
+padding:12px 18px;
+
+position:relative;
+
+z-index:3;
+
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
 
 }
 
@@ -99,9 +136,9 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 
-padding:12px 0;
+padding:18px 0;
 
-border-bottom:1px solid rgba(255,255,255,0.08);
+border-bottom:1px solid #eee;
 
 font-size:20px;
 
@@ -113,45 +150,61 @@ border-bottom:none;
 
 }
 
-.date-box{
+.name{
 
-background:rgba(255,255,255,0.08);
+font-weight:bold;
 
-border-radius:22px;
-
-padding:15px;
-
-text-align:center;
-
-margin-bottom:18px;
-
-line-height:1.8;
+color:#111;
 
 }
 
-#time{
+.time{
 
-font-size:26px;
+color:#0a5c43;
 
 font-weight:bold;
 
 }
 
-#date{
+.bottom{
 
-font-size:17px;
+margin:0 15px 18px;
+
+background:#0a5c43;
+
+border-radius:20px;
+
+padding:16px;
+
+color:white;
+
+display:flex;
+justify-content:space-between;
+align-items:center;
 
 }
 
-.footer{
+.next{
 
-text-align:center;
+font-size:14px;
 
-font-size:30px;
+opacity:0.8;
+
+margin-bottom:6px;
+
+}
+
+.count{
+
+font-size:34px;
 
 font-weight:bold;
 
-letter-spacing:4px;
+}
+
+.sound{
+
+font-size:34px;
 
 }
 
@@ -160,82 +213,108 @@ letter-spacing:4px;
 
 <body>
 
-<div class="card">
+<div class="phone">
 
-<div class="dua">
+<div class="header">
 
-أستغفر الله ×٣ <br>
+<div class="overlay"></div>
 
-اللهم أنت السلام ومنك السلام تباركت يا ذا الجلال والإكرام
-
-</div>
+<div class="header-content">
 
 <div class="title">
-كاتەکانی بانگ
+كاتەکانی نوێژ
 </div>
 
-<div class="prayer-box">
+<div class="info">
+
+<div class="location">
+
+📍 مكة المكرمة <br>
+
+١٥ شوال ١٤٤٦ هـ
+
+</div>
+
+<div class="sun">
+☀️
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
 
 <div class="prayer">
-<span>بەیانی</span>
-<span>04:15</span>
+<div class="name">فجر</div>
+<div class="time">04:35</div>
 </div>
 
 <div class="prayer">
-<span>نیوەڕۆ</span>
-<span>12:10</span>
+<div class="name">شروق</div>
+<div class="time">05:58</div>
 </div>
 
 <div class="prayer">
-<span>عەسر</span>
-<span>03:45</span>
+<div class="name">ظهر</div>
+<div class="time">12:18</div>
 </div>
 
 <div class="prayer">
-<span>مەغریب</span>
-<span>06:32</span>
+<div class="name">عصر</div>
+<div class="time">15:41</div>
 </div>
 
 <div class="prayer">
-<span>عیشا</span>
-<span>07:55</span>
+<div class="name">مغرب</div>
+<div class="time">18:32</div>
+</div>
+
+<div class="prayer">
+<div class="name">عشاء</div>
+<div class="time">19:52</div>
 </div>
 
 </div>
 
-<div class="date-box">
+<div class="bottom">
 
-<div id="time"></div>
+<div>
 
-<div id="date"></div>
+<div class="next">
+بۆ بانگی دواتر
+</div>
 
-<div>١٥ شوال ١٤٤٦ هـ</div>
+<div class="count" id="time">
+01:26:45
+</div>
 
 </div>
 
-<div class="footer">
-SIWAK
+<div class="sound">
+🔊
+</div>
+
 </div>
 
 </div>
 
 <script>
 
-function updateTime(){
+function updateClock(){
 
 const now = new Date();
 
 document.getElementById("time").innerHTML =
 now.toLocaleTimeString('ar-EG');
 
-document.getElementById("date").innerHTML =
-now.toLocaleDateString('ar-EG');
-
 }
 
-setInterval(updateTime,1000);
+setInterval(updateClock,1000);
 
-updateTime();
+updateClock();
 
 </script>
 
