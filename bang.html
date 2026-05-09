@@ -1,6 +1,6 @@
-```html id="m2x7qa"
+```html id="w9t2mq"
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ku" dir="rtl">
 
 <head>
 <meta charset="UTF-8">
@@ -19,55 +19,54 @@ font-family:sans-serif;
 
 body{
 
-background:#f5f5f5;
+width:100%;
+height:100vh;
 
 display:flex;
 justify-content:center;
 align-items:center;
 
-min-height:100vh;
+background:#f3f3f3;
 
-padding:12px;
+overflow:hidden;
 
 }
 
 .phone{
 
-width:100%;
-max-width:360px;
+width:350px;
+height:800px;
 
 background:white;
 
-border-radius:30px;
-
 overflow:hidden;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.15);
-
-}
-
-.header{
-
-background-image:url('bg1.jpg');
-
-background-size:cover;
-background-position:center;
-
-padding:25px 20px;
-
-color:white;
 
 position:relative;
 
 }
 
+.header{
+
+height:220px;
+
+background-image:url('bg1.jpg');
+background-size:cover;
+background-position:center;
+
+position:relative;
+
+padding:28px 20px;
+
+color:white;
+
+}
+
 .overlay{
 
-background:rgba(0,60,40,0.65);
-
 position:absolute;
-
 inset:0;
+
+background:rgba(0,70,50,0.55);
 
 }
 
@@ -82,15 +81,14 @@ z-index:2;
 
 text-align:center;
 
-font-size:26px;
-
+font-size:28px;
 font-weight:bold;
 
-margin-bottom:18px;
+margin-bottom:20px;
 
 }
 
-.info{
+.top{
 
 display:flex;
 justify-content:space-between;
@@ -98,9 +96,9 @@ align-items:center;
 
 }
 
-.location{
+.city{
 
-font-size:16px;
+font-size:17px;
 
 line-height:1.8;
 
@@ -108,25 +106,29 @@ line-height:1.8;
 
 .sun{
 
-font-size:38px;
+font-size:40px;
 
 }
 
 .card{
 
+width:320px;
+
 background:white;
 
-margin: -20px 15px 15px;
+margin:auto;
 
-border-radius:24px;
+margin-top:-35px;
 
-padding:12px 18px;
+border-radius:28px;
+
+padding:10px 18px;
 
 position:relative;
 
-z-index:3;
+z-index:5;
 
-box-shadow:0 5px 20px rgba(0,0,0,0.08);
+box-shadow:0 5px 18px rgba(0,0,0,0.10);
 
 }
 
@@ -136,11 +138,9 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 
-padding:18px 0;
+padding:17px 0;
 
-border-bottom:1px solid #eee;
-
-font-size:20px;
+border-bottom:1px solid #eeeeee;
 
 }
 
@@ -152,6 +152,7 @@ border-bottom:none;
 
 .name{
 
+font-size:20px;
 font-weight:bold;
 
 color:#111;
@@ -160,27 +161,32 @@ color:#111;
 
 .time{
 
-color:#0a5c43;
-
+font-size:20px;
 font-weight:bold;
+
+color:#0b6b4b;
 
 }
 
 .bottom{
 
-margin:0 15px 18px;
+width:320px;
 
-background:#0a5c43;
+margin:auto;
 
-border-radius:20px;
+margin-top:16px;
 
-padding:16px;
+background:#0b6b4b;
 
-color:white;
+border-radius:24px;
+
+padding:18px;
 
 display:flex;
 justify-content:space-between;
 align-items:center;
+
+color:white;
 
 }
 
@@ -190,13 +196,13 @@ font-size:14px;
 
 opacity:0.8;
 
-margin-bottom:6px;
+margin-bottom:8px;
 
 }
 
-.count{
+.clock{
 
-font-size:34px;
+font-size:36px;
 
 font-weight:bold;
 
@@ -225,11 +231,11 @@ font-size:34px;
 كاتەکانی نوێژ
 </div>
 
-<div class="info">
+<div class="top">
 
-<div class="location">
+<div class="city">
 
-📍 مكة المكرمة <br>
+هەولێر <br>
 
 ١٥ شوال ١٤٤٦ هـ
 
@@ -248,33 +254,33 @@ font-size:34px;
 <div class="card">
 
 <div class="prayer">
-<div class="name">فجر</div>
-<div class="time">04:35</div>
+<div class="name">بەیانی</div>
+<div class="time">4:35 AM</div>
 </div>
 
 <div class="prayer">
-<div class="name">شروق</div>
-<div class="time">05:58</div>
+<div class="name">خۆر هەڵاتن</div>
+<div class="time">5:58 AM</div>
 </div>
 
 <div class="prayer">
-<div class="name">ظهر</div>
-<div class="time">12:18</div>
+<div class="name">نیوەڕۆ</div>
+<div class="time">12:18 PM</div>
 </div>
 
 <div class="prayer">
-<div class="name">عصر</div>
-<div class="time">15:41</div>
+<div class="name">عەسر</div>
+<div class="time">3:41 PM</div>
 </div>
 
 <div class="prayer">
-<div class="name">مغرب</div>
-<div class="time">18:32</div>
+<div class="name">مەغریب</div>
+<div class="time">6:32 PM</div>
 </div>
 
 <div class="prayer">
-<div class="name">عشاء</div>
-<div class="time">19:52</div>
+<div class="name">عیشا</div>
+<div class="time">7:52 PM</div>
 </div>
 
 </div>
@@ -287,8 +293,8 @@ font-size:34px;
 بۆ بانگی دواتر
 </div>
 
-<div class="count" id="time">
-01:26:45
+<div class="clock" id="clock">
+6:45 PM
 </div>
 
 </div>
@@ -307,8 +313,12 @@ function updateClock(){
 
 const now = new Date();
 
-document.getElementById("time").innerHTML =
-now.toLocaleTimeString('ar-EG');
+document.getElementById("clock").innerHTML =
+now.toLocaleTimeString('en-US', {
+hour:'numeric',
+minute:'2-digit',
+hour12:true
+});
 
 }
 
