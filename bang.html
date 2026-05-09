@@ -1,4 +1,4 @@
-```html
+```html id="5knb3q"
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -19,38 +19,39 @@ font-family:sans-serif;
 
 body{
 
-background-image:url('bg1.jpg');
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-background-attachment:fixed;
-
-min-height:100vh;
+height:100vh;
 
 display:flex;
 justify-content:center;
 align-items:center;
 
-padding:20px;
+background-image:url('bg1.jpg');
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+
+overflow:hidden;
+
+padding:15px;
 
 }
 
-.overlay{
+.card{
 
 width:100%;
-max-width:420px;
+max-width:390px;
 
 background:rgba(0,0,0,0.35);
 
-backdrop-filter:blur(4px);
+backdrop-filter:blur(5px);
 
 border-radius:30px;
 
-padding:25px;
+padding:20px;
 
-box-shadow:0 10px 40px rgba(0,0,0,0.30);
+border:1px solid rgba(255,255,255,0.12);
 
-border:1px solid rgba(255,255,255,0.10);
+box-shadow:0 10px 35px rgba(0,0,0,0.3);
 
 color:white;
 
@@ -58,15 +59,13 @@ color:white;
 
 .dua{
 
-font-size:15px;
+font-size:12px;
 
-line-height:2.2;
+line-height:1.9;
 
 text-align:center;
 
-margin-bottom:30px;
-
-color:white;
+margin-bottom:18px;
 
 }
 
@@ -74,13 +73,11 @@ color:white;
 
 text-align:center;
 
-font-size:32px;
+font-size:28px;
 
 font-weight:bold;
 
-margin-bottom:25px;
-
-color:white;
+margin-bottom:18px;
 
 }
 
@@ -88,13 +85,11 @@ color:white;
 
 background:rgba(255,255,255,0.08);
 
-border-radius:25px;
+border-radius:22px;
 
-padding:20px;
+padding:15px;
 
-margin-bottom:25px;
-
-border:1px solid rgba(255,255,255,0.08);
+margin-bottom:18px;
 
 }
 
@@ -104,13 +99,11 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 
-padding:16px 0;
+padding:12px 0;
 
-border-bottom:1px solid rgba(255,255,255,0.10);
+border-bottom:1px solid rgba(255,255,255,0.08);
 
-font-size:22px;
-
-color:white;
+font-size:20px;
 
 }
 
@@ -122,23 +115,31 @@ border-bottom:none;
 
 .date-box{
 
-text-align:center;
-
 background:rgba(255,255,255,0.08);
 
-padding:20px;
+border-radius:22px;
 
-border-radius:25px;
+padding:15px;
 
-margin-bottom:25px;
+text-align:center;
 
-border:1px solid rgba(255,255,255,0.08);
+margin-bottom:18px;
 
-font-size:20px;
+line-height:1.8;
 
-line-height:2;
+}
 
-color:white;
+#time{
+
+font-size:26px;
+
+font-weight:bold;
+
+}
+
+#date{
+
+font-size:17px;
 
 }
 
@@ -146,29 +147,11 @@ color:white;
 
 text-align:center;
 
-font-size:34px;
+font-size:30px;
 
 font-weight:bold;
 
-letter-spacing:6px;
-
-color:white;
-
-}
-
-#time{
-
-font-size:28px;
-
-font-weight:bold;
-
-margin-bottom:10px;
-
-}
-
-#date{
-
-font-size:20px;
+letter-spacing:4px;
 
 }
 
@@ -177,26 +160,18 @@ font-size:20px;
 
 <body>
 
-<div class="overlay">
+<div class="card">
 
 <div class="dua">
 
-أَسْـتَغْفِرُ الله، أَسْـتَغْفِرُ الله، أَسْـتَغْفِرُ الله.
+أستغفر الله ×٣ <br>
 
-<br><br>
-
-اللّهُـمَّ أَنْـتَ السَّلامُ ، وَمِـنْكَ السَّلام ، تَبارَكْتَ يا ذا الجَـلالِ وَالإِكْـرام .
-
-<br><br>
-
-لا إلهَ إلاّ اللّهُ وحدَهُ لا شريكَ لهُ، لهُ المُـلْكُ ولهُ الحَمْد، وهوَ على كلّ شَيءٍ قَدير، اللّهُـمَّ لا مانِعَ لِما أَعْطَـيْت، وَلا مُعْطِـيَ لِما مَنَـعْت، وَلا يَنْفَـعُ ذا الجَـدِّ مِنْـكَ الجَـد
+اللهم أنت السلام ومنك السلام تباركت يا ذا الجلال والإكرام
 
 </div>
 
 <div class="title">
-
 كاتەکانی بانگ
-
 </div>
 
 <div class="prayer-box">
@@ -234,9 +209,7 @@ font-size:20px;
 
 <div id="date"></div>
 
-<div>
-١٥ شوال ١٤٤٦ هـ
-</div>
+<div>١٥ شوال ١٤٤٦ هـ</div>
 
 </div>
 
@@ -252,13 +225,11 @@ function updateTime(){
 
 const now = new Date();
 
-const time = now.toLocaleTimeString('ar-EG');
+document.getElementById("time").innerHTML =
+now.toLocaleTimeString('ar-EG');
 
-const date = now.toLocaleDateString('ar-EG');
-
-document.getElementById("time").innerHTML = time;
-
-document.getElementById("date").innerHTML = date;
+document.getElementById("date").innerHTML =
+now.toLocaleDateString('ar-EG');
 
 }
 
