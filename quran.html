@@ -1,1 +1,49 @@
-v
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quran</title>
+
+  <link rel="stylesheet" href="quran.css">
+  <script defer src="quran.js"></script>
+</head>
+<body>
+
+  <div class="container">
+
+    <h1 class="title">قورئانی پیرۆز</h1>
+
+    <!-- Reciters -->
+    <div class="reciters" id="reciters"></div>
+
+    <!-- Surah List -->
+    <div class="surah-list" id="surahList"></div>
+
+  </div>
+
+  <!-- Player -->
+  <div class="player">
+
+    <div class="now-playing" id="nowPlaying">
+      هیچ سورەتێک هەڵنەبژێردراوە
+    </div>
+
+    <audio id="audio"></audio>
+
+    <div class="controls">
+
+      <button id="prev">⏮</button>
+
+      <button id="play">▶</button>
+
+      <button id="pause">⏸</button>
+
+      <button id="next">⏭</button>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
