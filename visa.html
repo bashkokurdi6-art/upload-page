@@ -569,66 +569,6 @@ SUPABASE_KEY
 
 
 // ======================
-// PAYMENT NUMBERS
-// ======================
-
-const paymentNumbers = {
-
-"FastPay":
-"0750XXXXXXX",
-
-"FIB":
-"0770XXXXXXX",
-
-"Qi Card":
-"0780XXXXXXX"
-
-};
-
-
-
-const paymentMethod =
-document.getElementById(
-"paymentMethod"
-);
-
-const paymentBox =
-document.getElementById(
-"paymentNumberBox"
-);
-
-const paymentNumber =
-document.getElementById(
-"paymentNumber"
-);
-
-
-
-function updatePaymentNumber(){
-
-const method =
-paymentMethod.value;
-
-paymentNumber.innerText =
-paymentNumbers[method];
-
-paymentBox.style.display =
-"block";
-
-}
-
-
-
-paymentMethod.addEventListener(
-"change",
-updatePaymentNumber
-);
-
-updatePaymentNumber();
-
-
-
-// ======================
 // LOAD PRICES
 // ======================
 
@@ -656,6 +596,86 @@ data.visa_3months;
 }
 
 loadPrices();
+
+
+
+// ======================
+// PAYMENT NUMBERS
+// ======================
+
+const paymentMethod =
+document.getElementById(
+"paymentMethod"
+);
+
+const paymentBox =
+document.getElementById(
+"paymentNumberBox"
+);
+
+const paymentNumber =
+document.getElementById(
+"paymentNumber"
+);
+
+
+
+async function loadPaymentNumbers(){
+
+const { data } =
+await client
+.from("payment_numbers")
+.select("*")
+.limit(1)
+.single();
+
+if(data){
+
+function updatePaymentNumber(){
+
+const method =
+paymentMethod.value;
+
+if(method === "FastPay"){
+
+paymentNumber.innerText =
+data.fastpay;
+
+}
+
+else if(method === "FIB"){
+
+paymentNumber.innerText =
+data.fib;
+
+}
+
+else{
+
+paymentNumber.innerText =
+data.qi;
+
+}
+
+paymentBox.style.display =
+"block";
+
+}
+
+
+
+paymentMethod.addEventListener(
+"change",
+updatePaymentNumber
+);
+
+updatePaymentNumber();
+
+}
+
+}
+
+loadPaymentNumbers();
 
 
 
