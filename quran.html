@@ -1,49 +1,546 @@
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran</title>
 
-  <link rel="stylesheet" href="quran.css">
-  <script defer src="quran.js"></script>
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0" />
+
+  <title>Quran - SIWAK</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:sans-serif;
+    }
+
+    body{
+      background:
+      linear-gradient(to bottom,#07140c,#0f5132);
+
+      color:white;
+
+      min-height:100vh;
+
+      padding-bottom:140px;
+    }
+
+    .container{
+      padding:20px;
+    }
+
+    .title{
+      text-align:center;
+
+      color:#d4af37;
+
+      font-size:34px;
+
+      margin-top:20px;
+
+      margin-bottom:30px;
+
+      font-weight:bold;
+    }
+
+    .reciters{
+      display:flex;
+
+      gap:18px;
+
+      overflow-x:auto;
+
+      padding-bottom:15px;
+
+      scroll-behavior:smooth;
+    }
+
+    .reciters::-webkit-scrollbar{
+      display:none;
+    }
+
+    .reciter-card{
+
+      min-width:110px;
+
+      text-align:center;
+
+      cursor:pointer;
+
+      transition:.3s;
+    }
+
+    .reciter-card:hover{
+      transform:scale(1.05);
+    }
+
+    .reciter-card img{
+
+      width:90px;
+
+      height:90px;
+
+      border-radius:50%;
+
+      object-fit:cover;
+
+      border:3px solid #d4af37;
+
+      box-shadow:
+      0 0 15px rgba(212,175,55,.5);
+    }
+
+    .reciter-card p{
+
+      margin-top:10px;
+
+      font-size:14px;
+
+      color:#fff;
+    }
+
+    .section-title{
+
+      color:#d4af37;
+
+      margin-top:35px;
+
+      margin-bottom:18px;
+
+      font-size:24px;
+    }
+
+    .surah-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .surah-card{
+
+      background:
+      rgba(255,255,255,.05);
+
+      border:
+      1px solid rgba(212,175,55,.2);
+
+      padding:18px;
+
+      border-radius:16px;
+
+      cursor:pointer;
+
+      transition:.3s;
+
+      backdrop-filter:blur(10px);
+    }
+
+    .surah-card:hover{
+
+      background:#146c43;
+
+      transform:translateY(-2px);
+    }
+
+    .surah-name{
+
+      font-size:18px;
+
+      font-weight:bold;
+    }
+
+    .player{
+
+      position:fixed;
+
+      bottom:0;
+
+      left:0;
+
+      width:100%;
+
+      background:#0b1d13;
+
+      border-top:
+      2px solid #d4af37;
+
+      padding:18px;
+
+      z-index:999;
+    }
+
+    .now-playing{
+
+      text-align:center;
+
+      color:#d4af37;
+
+      margin-bottom:16px;
+
+      font-size:16px;
+    }
+
+    .controls{
+
+      display:flex;
+
+      justify-content:center;
+
+      align-items:center;
+
+      gap:20px;
+    }
+
+    .controls button{
+
+      width:58px;
+
+      height:58px;
+
+      border:none;
+
+      border-radius:50%;
+
+      background:#d4af37;
+
+      color:black;
+
+      font-size:22px;
+
+      cursor:pointer;
+
+      transition:.3s;
+
+      font-weight:bold;
+    }
+
+    .controls button:hover{
+
+      transform:scale(1.1);
+    }
+
+    .progress{
+
+      width:100%;
+
+      height:5px;
+
+      background:
+      rgba(255,255,255,.1);
+
+      border-radius:10px;
+
+      margin-bottom:18px;
+
+      overflow:hidden;
+    }
+
+    .progress-bar{
+
+      width:0%;
+
+      height:100%;
+
+      background:#d4af37;
+    }
+
+  </style>
 </head>
+
 <body>
 
   <div class="container">
 
-    <h1 class="title">قورئانی پیرۆز</h1>
+    <h1 class="title">
+      قورئانی پیرۆز
+    </h1>
 
-    <!-- Reciters -->
-    <div class="reciters" id="reciters"></div>
+    <div class="reciters"
+      id="reciters">
+    </div>
 
-    <!-- Surah List -->
-    <div class="surah-list" id="surahList"></div>
+    <h2 class="section-title">
+      سورەتەکان
+    </h2>
+
+    <div class="surah-list"
+      id="surahList">
+    </div>
 
   </div>
 
-  <!-- Player -->
   <div class="player">
 
-    <div class="now-playing" id="nowPlaying">
+    <div class="progress">
+
+      <div class="progress-bar"
+        id="progressBar">
+      </div>
+
+    </div>
+
+    <div class="now-playing"
+      id="nowPlaying">
+
       هیچ سورەتێک هەڵنەبژێردراوە
+
+    </div>
+
+    <div class="controls">
+
+      <button id="prev">
+        ⏮
+      </button>
+
+      <button id="play">
+        ▶
+      </button>
+
+      <button id="pause">
+        ⏸
+      </button>
+
+      <button id="next">
+        ⏭
+      </button>
+
     </div>
 
     <audio id="audio"></audio>
 
-    <div class="controls">
-
-      <button id="prev">⏮</button>
-
-      <button id="play">▶</button>
-
-      <button id="pause">⏸</button>
-
-      <button id="next">⏭</button>
-
-    </div>
-
   </div>
+
+  <script>
+
+    const reciters = [
+
+      {
+        name:"مشاری راشد",
+
+        image:
+        "https://upload.wikimedia.org/wikipedia/commons/6/6d/Mishary_Rashid_Alafasy.jpg",
+
+        folder:
+        "Alafasy_128kbps"
+      },
+
+      {
+        name:"سودەیس",
+
+        image:
+        "https://upload.wikimedia.org/wikipedia/commons/6/6d/Abdul_Rahman_Al-Sudais.jpg",
+
+        folder:
+        "Abdurrahmaan-As-Sudais_128kbps"
+      },
+
+      {
+        name:"ماهر المعیقلی",
+
+        image:
+        "https://upload.wikimedia.org/wikipedia/commons/5/59/Maher_Al_Muaiqly.jpg",
+
+        folder:
+        "MaherAlMuaiqly128kbps"
+      }
+
+    ];
+
+    const surahs = [
+
+      {id:"001",name:"الفاتحة"},
+      {id:"002",name:"البقرة"},
+      {id:"003",name:"آل عمران"},
+      {id:"004",name:"النساء"},
+      {id:"005",name:"المائدة"},
+      {id:"006",name:"الأنعام"},
+      {id:"007",name:"الأعراف"},
+      {id:"008",name:"الأنفال"},
+      {id:"009",name:"التوبة"},
+      {id:"010",name:"يونس"},
+      {id:"011",name:"هود"},
+      {id:"012",name:"يوسف"},
+      {id:"013",name:"الرعد"},
+      {id:"014",name:"إبراهيم"},
+      {id:"015",name:"الحجر"}
+
+    ];
+
+    const recitersDiv =
+    document.getElementById("reciters");
+
+    const surahList =
+    document.getElementById("surahList");
+
+    const audio =
+    document.getElementById("audio");
+
+    const nowPlaying =
+    document.getElementById("nowPlaying");
+
+    const progressBar =
+    document.getElementById("progressBar");
+
+    const playBtn =
+    document.getElementById("play");
+
+    const pauseBtn =
+    document.getElementById("pause");
+
+    const nextBtn =
+    document.getElementById("next");
+
+    const prevBtn =
+    document.getElementById("prev");
+
+    let currentReciter =
+    reciters[0];
+
+    let currentIndex = 0;
+
+    function loadReciters(){
+
+      recitersDiv.innerHTML = "";
+
+      reciters.forEach((reciter)=>{
+
+        recitersDiv.innerHTML += `
+
+        <div class="reciter-card"
+        onclick="selectReciter('${reciter.folder}')">
+
+          <img src="${reciter.image}">
+
+          <p>${reciter.name}</p>
+
+        </div>
+
+        `;
+      });
+
+    }
+
+    function selectReciter(folder){
+
+      currentReciter =
+      reciters.find(
+      r => r.folder === folder
+      );
+
+      loadSurahs();
+
+    }
+
+    function loadSurahs(){
+
+      surahList.innerHTML = "";
+
+      surahs.forEach((surah,index)=>{
+
+        surahList.innerHTML += `
+
+        <div class="surah-card"
+        onclick="playSurah(${index})">
+
+          <div class="surah-name">
+
+            ${surah.id}
+            -
+            ${surah.name}
+
+          </div>
+
+        </div>
+
+        `;
+      });
+
+    }
+
+    function playSurah(index){
+
+      currentIndex = index;
+
+      const surah =
+      surahs[index];
+
+      const url =
+      `https://everyayah.com/data/${currentReciter.folder}/${surah.id}.mp3`;
+
+      audio.src = url;
+
+      audio.play();
+
+      nowPlaying.innerText =
+      `${surah.name}
+      -
+      ${currentReciter.name}`;
+
+    }
+
+    playBtn.onclick = ()=>{
+
+      audio.play();
+
+    };
+
+    pauseBtn.onclick = ()=>{
+
+      audio.pause();
+
+    };
+
+    nextBtn.onclick = ()=>{
+
+      currentIndex++;
+
+      if(
+      currentIndex >= surahs.length
+      ){
+
+        currentIndex = 0;
+      }
+
+      playSurah(currentIndex);
+
+    };
+
+    prevBtn.onclick = ()=>{
+
+      currentIndex--;
+
+      if(currentIndex < 0){
+
+        currentIndex =
+        surahs.length - 1;
+      }
+
+      playSurah(currentIndex);
+
+    };
+
+    audio.addEventListener(
+    "timeupdate",()=>{
+
+      const progress =
+
+      (audio.currentTime
+      / audio.duration) * 100;
+
+      progressBar.style.width =
+      progress + "%";
+
+    });
+
+    loadReciters();
+
+    loadSurahs();
+
+  </script>
 
 </body>
 </html>
