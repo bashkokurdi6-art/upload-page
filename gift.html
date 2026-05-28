@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0">
+
+<title>دیاری مانگانە</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+
+background:
+linear-gradient(to bottom,
+#07140c,
+#0f5132);
+
+color:white;
+
+padding:20px;
+
+padding-bottom:80px;
+
+min-height:100vh;
+}
+
+.title{
+
+background:
+rgba(255,255,255,.05);
+
+border:
+1px solid rgba(212,175,55,.3);
+
+padding:25px;
+
+border-radius:20px;
+
+text-align:center;
+
+font-size:30px;
+
+font-weight:bold;
+
+color:#d4af37;
+
+margin-bottom:20px;
+
+backdrop-filter:blur(10px);
+}
+
+.board{
+
+background:
+rgba(255,255,255,.05);
+
+border:
+1px solid rgba(212,175,55,.2);
+
+padding:20px;
+
+border-radius:18px;
+
+margin-bottom:20px;
+
+backdrop-filter:blur(10px);
+}
+
+.board h2{
+
+color:#d4af37;
+
+margin-bottom:15px;
+}
+
+input{
+
+width:100%;
+
+padding:15px;
+
+margin-bottom:12px;
+
+border:none;
+
+border-radius:14px;
+
+background:#123524;
+
+color:white;
+
+font-size:16px;
+}
+
+button{
+
+width:100%;
+
+padding:15px;
+
+border:none;
+
+border-radius:14px;
+
+background:#d4af37;
+
+color:black;
+
+font-size:18px;
+
+font-weight:bold;
+
+cursor:pointer;
+}
+
+.user{
+
+background:#123524;
+
+padding:14px;
+
+border-radius:14px;
+
+margin-bottom:10px;
+}
+
+.status{
+
+margin-top:15px;
+
+text-align:center;
+
+color:#d4af37;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="title">
+
+🎁 دیاری مانگانە
+
+</div>
+
+<div class="board">
+
+<h2>
+🏆 دەرچووی مانگانە
+</h2>
+
+<div id="winnerBox">
+
+هیچ براوەیەک نییە
+
+</div>
+
+</div>
+
+<div class="board">
+
+<h2>
+📝 بەشداربوون
+</h2>
+
+<input type="text"
+id="name"
+placeholder="ناوی سیانێت">
+
+<input type="text"
+id="city"
+placeholder="شار">
+
+<input type="number"
+id="age"
+placeholder="تەمەن">
+
+<input type="text"
+id="phone"
+placeholder="ژمارە مۆبایل">
+
+<button onclick="sendGift()">
+
+بەشداربە
+
+</button>
+
+<div class="status"
+id="status"></div>
+
+</div>
+
+<div class="board">
+
+<h2>
+✅ بەشداربووان
+</h2>
+
+<div id="users"></div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+"https://slllcibigutjivauryvc.supabase.co";
+
+const SUPABASE_KEY =
+"YOUR_ANON_KEY";
+
+const client =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+async function sendGift(){
+
+const name =
+document.getElementById("name").value;
+
+const city =
+document.getElementById("city").value;
+
+const age =
+document.getElementById("age").value;
+
+const phone =
+document.getElementById("phone").value;
+
+if(!name || !city || !age){
+
+alert("هەموو خانەکان پڕبکەرەوە");
+
+return;
+}
+
+const { error } =
+await client
+.from("gift_requests")
+.insert([{
+
+full_name:name,
+
+city:city,
+
+age:age,
+
+phone:phone
+
+}]);
+
+if(error){
+
+alert("هەڵەیەک ڕوویدا");
+
+return;
+}
+
+document.getElementById("status")
+.innerHTML =
+"⏳ چاوەڕوانی قبوڵکردنی ئەدمین";
+
+loadUsers();
+
+}
+
+async function loadUsers(){
+
+const { data } =
+await client
+.from("gift_requests")
+.select("*")
+.eq("status","approved");
+
+const users =
+document.getElementById("users");
+
+users.innerHTML = "";
+
+data.forEach(user=>{
+
+users.innerHTML += `
+
+<div class="user">
+
+${user.full_name}
+-
+${user.city}
+-
+${user.age}
+
+</div>
+
+`;
+
+});
+
+}
+
+async function loadWinner(){
+
+const { data } =
+await client
+.from("gift_requests")
+.select("*")
+.eq("status","winner")
+.limit(1);
+
+if(data.length > 0){
+
+document.getElementById("winnerBox")
+.innerHTML = `
+
+<div class="user">
+
+🏆
+${data[0].full_name}
+
+<br><br>
+
+📍
+${data[0].city}
+
+</div>
+
+`;
+
+}
+
+}
+
+loadUsers();
+
+loadWinner();
+
+</script>
+
+</body>
+</html>
