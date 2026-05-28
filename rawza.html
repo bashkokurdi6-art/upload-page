@@ -366,6 +366,34 @@
 
         </select>
 
+
+
+        <div
+        id="paymentNumberBox"
+
+        style="
+        display:none;
+        margin-top:15px;
+        background:#0f3827;
+        padding:15px;
+        border-radius:16px;
+        border:1px solid #d4af37;
+        text-align:center;
+        ">
+
+        <p style="
+        margin-bottom:8px;
+        color:#d4af37;
+        ">
+
+        ژمارەی پارەدان
+
+        </p>
+
+        <h3 id="paymentNumber"></h3>
+
+        </div>
+
       </div>
 
     </div>
@@ -457,6 +485,86 @@ async function loadPrice(){
 }
 
 loadPrice();
+
+
+
+// ======================
+// PAYMENT NUMBERS
+// ======================
+
+const paymentMethod =
+document.getElementById(
+"paradan"
+);
+
+const paymentBox =
+document.getElementById(
+"paymentNumberBox"
+);
+
+const paymentNumber =
+document.getElementById(
+"paymentNumber"
+);
+
+
+
+async function loadPaymentNumbers(){
+
+const { data } =
+await client
+.from("payment_numbers")
+.select("*")
+.limit(1)
+.single();
+
+if(data){
+
+function updatePaymentNumber(){
+
+const method =
+paymentMethod.value;
+
+if(method === "FastPay"){
+
+paymentNumber.innerText =
+data.fastpay;
+
+}
+
+else if(method === "FIB"){
+
+paymentNumber.innerText =
+data.fib;
+
+}
+
+else{
+
+paymentNumber.innerText =
+data.qi;
+
+}
+
+paymentBox.style.display =
+"block";
+
+}
+
+
+
+paymentMethod.addEventListener(
+"change",
+updatePaymentNumber
+);
+
+updatePaymentNumber();
+
+}
+
+}
+
+loadPaymentNumbers();
 
 
 
