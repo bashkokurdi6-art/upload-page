@@ -9,7 +9,7 @@
 content="width=device-width,
 initial-scale=1.0">
 
-<title>دیاری مانگانە</title>
+<title>🎁 دیاری مانگانە</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
@@ -31,11 +31,11 @@ linear-gradient(to bottom,
 
 color:white;
 
+min-height:100vh;
+
 padding:20px;
 
-padding-bottom:80px;
-
-min-height:100vh;
+padding-bottom:100px;
 }
 
 .title{
@@ -52,7 +52,7 @@ border-radius:20px;
 
 text-align:center;
 
-font-size:30px;
+font-size:32px;
 
 font-weight:bold;
 
@@ -61,6 +61,9 @@ color:#d4af37;
 margin-bottom:20px;
 
 backdrop-filter:blur(10px);
+
+box-shadow:
+0 0 20px rgba(212,175,55,.1);
 }
 
 .board{
@@ -85,6 +88,8 @@ backdrop-filter:blur(10px);
 color:#d4af37;
 
 margin-bottom:15px;
+
+font-size:22px;
 }
 
 input{
@@ -104,6 +109,13 @@ background:#123524;
 color:white;
 
 font-size:16px;
+
+outline:none;
+}
+
+input::placeholder{
+
+color:#ccc;
 }
 
 button{
@@ -125,17 +137,27 @@ font-size:18px;
 font-weight:bold;
 
 cursor:pointer;
+
+transition:.3s;
+}
+
+button:hover{
+
+transform:scale(1.02);
 }
 
 .user{
 
 background:#123524;
 
-padding:14px;
+padding:15px;
 
 border-radius:14px;
 
 margin-bottom:10px;
+
+border:
+1px solid rgba(212,175,55,.1);
 }
 
 .status{
@@ -145,6 +167,17 @@ margin-top:15px;
 text-align:center;
 
 color:#d4af37;
+
+font-size:15px;
+}
+
+.winner{
+
+font-size:20px;
+
+text-align:center;
+
+line-height:2;
 }
 
 </style>
@@ -165,7 +198,8 @@ color:#d4af37;
 🏆 دەرچووی مانگانە
 </h2>
 
-<div id="winnerBox">
+<div id="winnerBox"
+class="winner">
 
 هیچ براوەیەک نییە
 
@@ -222,7 +256,7 @@ const SUPABASE_URL =
 "https://slllcibigutjivauryvc.supabase.co";
 
 const SUPABASE_KEY =
-"YOUR_ANON_KEY";
+"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
 
 const client =
 supabase.createClient(
@@ -244,7 +278,7 @@ document.getElementById("age").value;
 const phone =
 document.getElementById("phone").value;
 
-if(!name || !city || !age){
+if(!name || !city || !age || !phone){
 
 alert("هەموو خانەکان پڕبکەرەوە");
 
@@ -262,7 +296,9 @@ city:city,
 
 age:age,
 
-phone:phone
+phone:phone,
+
+status:"pending"
 
 }]);
 
@@ -270,12 +306,19 @@ if(error){
 
 alert("هەڵەیەک ڕوویدا");
 
+console.log(error);
+
 return;
 }
 
 document.getElementById("status")
 .innerHTML =
-"⏳ چاوەڕوانی قبوڵکردنی ئەدمین";
+"⏳ داواکارییەکەت نێردرا، چاوەڕوانی قبوڵکردنی ئەدمین بکە";
+
+document.getElementById("name").value = "";
+document.getElementById("city").value = "";
+document.getElementById("age").value = "";
+document.getElementById("phone").value = "";
 
 loadUsers();
 
@@ -287,12 +330,21 @@ const { data } =
 await client
 .from("gift_requests")
 .select("*")
-.eq("status","approved");
+.eq("status","approved")
+.order("id",{ascending:false});
 
 const users =
 document.getElementById("users");
 
 users.innerHTML = "";
+
+if(data.length === 0){
+
+users.innerHTML =
+"هیچ بەشداربووێک نییە";
+
+return;
+}
 
 data.forEach(user=>{
 
@@ -300,10 +352,17 @@ users.innerHTML += `
 
 <div class="user">
 
+👤
 ${user.full_name}
--
+
+<br><br>
+
+📍
 ${user.city}
--
+
+<br><br>
+
+🎂
 ${user.age}
 
 </div>
@@ -328,17 +387,18 @@ if(data.length > 0){
 document.getElementById("winnerBox")
 .innerHTML = `
 
-<div class="user">
-
 🏆
 ${data[0].full_name}
 
-<br><br>
+<br>
 
 📍
 ${data[0].city}
 
-</div>
+<br>
+
+🎂
+${data[0].age}
 
 `;
 
