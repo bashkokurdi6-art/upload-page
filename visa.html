@@ -234,6 +234,32 @@ border:1px solid #d4af37;
 
 }
 
+.payment-box{
+
+display:none;
+
+margin-top:15px;
+
+background:#0f3827;
+
+padding:15px;
+
+border-radius:16px;
+
+border:1px solid #d4af37;
+
+text-align:center;
+
+}
+
+.payment-box p{
+
+margin-bottom:8px;
+
+color:#d4af37;
+
+}
+
 .submit-btn{
 
 width:100%;
@@ -408,6 +434,22 @@ Qi Card
 
 </select>
 
+
+
+<div
+id="paymentNumberBox"
+class="payment-box">
+
+<p>
+
+ژمارەی پارەدان
+
+</p>
+
+<h3 id="paymentNumber"></h3>
+
+</div>
+
 </div>
 
 
@@ -523,6 +565,66 @@ supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
 );
+
+
+
+// ======================
+// PAYMENT NUMBERS
+// ======================
+
+const paymentNumbers = {
+
+"FastPay":
+"0750XXXXXXX",
+
+"FIB":
+"0770XXXXXXX",
+
+"Qi Card":
+"0780XXXXXXX"
+
+};
+
+
+
+const paymentMethod =
+document.getElementById(
+"paymentMethod"
+);
+
+const paymentBox =
+document.getElementById(
+"paymentNumberBox"
+);
+
+const paymentNumber =
+document.getElementById(
+"paymentNumber"
+);
+
+
+
+function updatePaymentNumber(){
+
+const method =
+paymentMethod.value;
+
+paymentNumber.innerText =
+paymentNumbers[method];
+
+paymentBox.style.display =
+"block";
+
+}
+
+
+
+paymentMethod.addEventListener(
+"change",
+updatePaymentNumber
+);
+
+updatePaymentNumber();
 
 
 
