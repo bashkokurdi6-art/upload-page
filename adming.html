@@ -9,7 +9,7 @@
 content="width=device-width,
 initial-scale=1.0">
 
-<title>Admin Gift</title>
+<title>🎁 Admin Gift</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
@@ -24,9 +24,14 @@ font-family:sans-serif;
 
 body{
 
-background:#07140c;
+background:
+linear-gradient(to bottom,
+#07140c,
+#0f5132);
 
 color:white;
+
+min-height:100vh;
 
 padding:20px;
 }
@@ -35,7 +40,9 @@ padding:20px;
 
 text-align:center;
 
-font-size:30px;
+font-size:32px;
+
+font-weight:bold;
 
 color:#d4af37;
 
@@ -44,47 +51,80 @@ margin-bottom:25px;
 
 .card{
 
-background:#123524;
+background:
+rgba(255,255,255,.05);
 
-padding:18px;
+border:
+1px solid rgba(212,175,55,.2);
+
+padding:20px;
 
 border-radius:18px;
 
 margin-bottom:15px;
 
-border:
-1px solid rgba(212,175,55,.2);
+backdrop-filter:blur(10px);
+
+box-shadow:
+0 0 10px rgba(212,175,55,.08);
 }
 
-.card h3{
+.name{
 
-margin-bottom:10px;
+font-size:22px;
+
+font-weight:bold;
+
+margin-bottom:12px;
+
+color:#d4af37;
 }
 
-.btns{
+.info{
+
+margin-bottom:8px;
+
+font-size:16px;
+}
+
+.status{
+
+margin-top:10px;
+
+margin-bottom:15px;
+
+color:#ccc;
+}
+
+.buttons{
 
 display:flex;
 
 gap:10px;
-
-margin-top:15px;
 }
 
 button{
 
 flex:1;
 
-padding:12px;
+padding:14px;
 
 border:none;
 
-border-radius:12px;
+border-radius:14px;
 
 font-size:16px;
 
 font-weight:bold;
 
 cursor:pointer;
+
+transition:.3s;
+}
+
+button:hover{
+
+transform:scale(1.03);
 }
 
 .approve{
@@ -96,7 +136,14 @@ color:black;
 
 .winner{
 
-background:#0f5132;
+background:#198754;
+
+color:white;
+}
+
+.delete{
+
+background:#dc3545;
 
 color:white;
 }
@@ -121,7 +168,7 @@ const SUPABASE_URL =
 "https://slllcibigutjivauryvc.supabase.co";
 
 const SUPABASE_KEY =
-"YOUR_ANON_KEY";
+"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
 
 const client =
 supabase.createClient(
@@ -131,16 +178,31 @@ SUPABASE_KEY
 
 async function loadRequests(){
 
-const { data } =
+const { data,error } =
 await client
 .from("gift_requests")
 .select("*")
 .order("id",{ascending:false});
 
+if(error){
+
+console.log(error);
+
+return;
+}
+
 const box =
 document.getElementById("requests");
 
 box.innerHTML = "";
+
+if(data.length === 0){
+
+box.innerHTML =
+"هیچ داواکارییەک نییە";
+
+return;
+}
 
 data.forEach(user=>{
 
@@ -148,37 +210,42 @@ box.innerHTML += `
 
 <div class="card">
 
-<h3>
+<div class="name">
 
+👤
 ${user.full_name}
 
-</h3>
+</div>
 
-<p>
+<div class="info">
 
-📍 ${user.city}
+📍 شار:
+${user.city}
 
-</p>
+</div>
 
-<p>
+<div class="info">
 
-🎂 ${user.age}
+🎂 تەمەن:
+${user.age}
 
-</p>
+</div>
 
-<p>
+<div class="info">
 
-📞 ${user.phone}
+📞 مۆبایل:
+${user.phone}
 
-</p>
+</div>
 
-<p>
+<div class="status">
 
-📌 ${user.status}
+📌 دۆخ:
+${user.status}
 
-</p>
+</div>
 
-<div class="btns">
+<div class="buttons">
 
 <button class="approve"
 onclick="approveUser(${user.id})">
@@ -194,6 +261,13 @@ onclick="winnerUser(${user.id})">
 
 </button>
 
+<button class="delete"
+onclick="deleteUser(${user.id})">
+
+سڕینەوە
+
+</button>
+
 </div>
 
 </div>
@@ -206,6 +280,7 @@ onclick="winnerUser(${user.id})">
 
 async function approveUser(id){
 
+const { error } =
 await client
 .from("gift_requests")
 .update({
@@ -214,6 +289,13 @@ status:"approved"
 
 })
 .eq("id",id);
+
+if(error){
+
+alert("هەڵەیەک ڕوویدا");
+
+return;
+}
 
 loadRequests();
 
@@ -228,6 +310,22 @@ await client
 status:"winner"
 
 })
+.eq("id",id);
+
+loadRequests();
+
+}
+
+async function deleteUser(id){
+
+const ok =
+confirm("دڵنیایت لە سڕینەوە؟");
+
+if(!ok) return;
+
+await client
+.from("gift_requests")
+.delete()
 .eq("id",id);
 
 loadRequests();
