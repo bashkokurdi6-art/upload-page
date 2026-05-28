@@ -1,1 +1,103 @@
-v
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
+}
+
+body{
+  background:#07140c;
+  color:white;
+  min-height:100vh;
+  padding-bottom:120px;
+}
+
+.container{
+  padding:20px;
+}
+
+.title{
+  text-align:center;
+  color:#d4af37;
+  margin-bottom:25px;
+  font-size:30px;
+}
+
+.reciters{
+  display:flex;
+  gap:15px;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
+
+.reciter-card{
+  min-width:110px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.reciter-card img{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #d4af37;
+  box-shadow:0 0 15px rgba(212,175,55,.5);
+}
+
+.reciter-card p{
+  margin-top:10px;
+  font-size:14px;
+}
+
+.surah-list{
+  margin-top:30px;
+}
+
+.surah-card{
+  background:#0f5132;
+  margin-bottom:12px;
+  padding:16px;
+  border-radius:14px;
+  cursor:pointer;
+  transition:.3s;
+  border:1px solid rgba(212,175,55,.2);
+}
+
+.surah-card:hover{
+  transform:scale(1.02);
+  background:#146c43;
+}
+
+.player{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#0b1d13;
+  border-top:1px solid #d4af37;
+  padding:15px;
+}
+
+.now-playing{
+  text-align:center;
+  margin-bottom:15px;
+  color:#d4af37;
+}
+
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+}
+
+.controls button{
+  width:55px;
+  height:55px;
+  border:none;
+  border-radius:50%;
+  background:#d4af37;
+  color:black;
+  font-size:22px;
+  cursor:pointer;
+}
