@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SIWAK VISA</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:'Noto Sans Arabic',sans-serif;
+
+background:
+linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.8)),
+url('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?q=80&w=1200');
+
+background-size:cover;
+background-position:center;
+
+min-height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+padding:20px;
+
+color:white;
+
+}
+
+.card{
+
+width:100%;
+max-width:850px;
+
+background:rgba(7,20,15,.94);
+
+border:2px solid #d4af37;
+
+border-radius:28px;
+
+padding:28px;
+
+backdrop-filter:blur(10px);
+
+box-shadow:
+0 0 30px rgba(212,175,55,.2);
+
+}
+
+.title{
+
+text-align:center;
+
+margin-bottom:25px;
+
+}
+
+.title h1{
+
+color:#d4af37;
+
+font-size:32px;
+
+margin-bottom:10px;
+
+}
+
+.title p{
+
+color:#ccc;
+
+font-size:14px;
+
+}
+
+.prices{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:15px;
+
+margin-bottom:25px;
+
+}
+
+.price-box{
+
+background:#0f3827;
+
+padding:18px;
+
+border-radius:20px;
+
+border:1px solid #d4af37;
+
+text-align:center;
+
+}
+
+.price-box h3{
+
+margin-bottom:10px;
+
+color:#d4af37;
+
+}
+
+.price-box span{
+
+font-size:22px;
+
+font-weight:bold;
+
+}
+
+.grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:16px;
+
+}
+
+.group{
+
+margin-bottom:16px;
+
+}
+
+label{
+
+display:block;
+
+margin-bottom:8px;
+
+color:#d4af37;
+
+font-size:14px;
+
+}
+
+input,
+select,
+textarea{
+
+width:100%;
+
+padding:14px;
+
+border:none;
+
+border-radius:16px;
+
+background:#10251c;
+
+color:white;
+
+font-size:15px;
+
+outline:none;
+
+border:1px solid transparent;
+
+transition:.3s;
+
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+
+border-color:#d4af37;
+
+box-shadow:0 0 10px rgba(212,175,55,.4);
+
+}
+
+textarea{
+
+resize:none;
+
+height:120px;
+
+}
+
+.upload{
+
+background:#10251c;
+
+border:1px dashed #d4af37;
+
+border-radius:16px;
+
+padding:15px;
+
+}
+
+.submit-btn{
+
+width:100%;
+
+padding:16px;
+
+border:none;
+
+border-radius:18px;
+
+background:linear-gradient(135deg,#d4af37,#f5d67a);
+
+color:#062015;
+
+font-size:17px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+margin-top:10px;
+
+}
+
+.loading,
+.success{
+
+margin-top:15px;
+
+text-align:center;
+
+display:none;
+
+}
+
+.loading{
+
+color:#d4af37;
+
+}
+
+.success{
+
+color:#79ffb0;
+
+}
+
+@media(max-width:768px){
+
+.grid,
+.prices{
+
+grid-template-columns:1fr;
+
+}
+
+.card{
+
+padding:20px;
+
+}
+
+.title h1{
+
+font-size:26px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="title">
+
+<h1>خزمەتگوزاری ڤیزە</h1>
+
+<p>SIWAK VISA SERVICE</p>
+
+</div>
+
+
+
+<div class="prices">
+
+<div class="price-box">
+
+<h3>ڤیزەی ساڵێک</h3>
+
+<span id="yearPrice">...</span>
+
+</div>
+
+<div class="price-box">
+
+<h3>ڤیزەی سێ مانگ</h3>
+
+<span id="monthPrice">...</span>
+
+</div>
+
+</div>
+
+
+
+<form id="visaForm">
+
+<div class="grid">
+
+<div class="group">
+
+<label>ناوی تەواو</label>
+
+<input type="text" id="name" required>
+
+</div>
+
+<div class="group">
+
+<label>ژمارەی مۆبایل</label>
+
+<input type="text" id="mobile" required>
+
+</div>
+
+</div>
+
+
+
+<div class="group">
+
+<label>جۆری ڤیزە</label>
+
+<select id="visaType">
+
+<option value="1 Year Visa">
+ڤیزەی ساڵێک
+</option>
+
+<option value="3 Months Visa">
+ڤیزەی سێ مانگ
+</option>
+
+</select>
+
+</div>
+
+
+
+<div class="group upload">
+
+<label>وێنەی پاسپۆرت</label>
+
+<input
+type="file"
+id="passport"
+accept="image/*"
+required>
+
+</div>
+
+<br>
+
+
+
+<div class="group upload">
+
+<label>وێنەی کەسی</label>
+
+<input
+type="file"
+id="personal"
+accept="image/*"
+required>
+
+</div>
+
+<br>
+
+
+
+<div class="group upload">
+
+<label>وێنەی پارەدان</label>
+
+<input
+type="file"
+id="payment"
+accept="image/*"
+required>
+
+</div>
+
+<br>
+
+
+
+<div class="group">
+
+<label>تێبینی</label>
+
+<textarea id="notes"></textarea>
+
+</div>
+
+
+
+<button
+class="submit-btn"
+type="submit">
+
+ناردنی داواکاری
+
+</button>
+
+
+
+<div class="loading" id="loading">
+
+تکایە چاوەڕێ بکە...
+
+</div>
+
+
+
+<div class="success" id="success">
+
+داواکاریەکەت نێردرا ✨
+
+</div>
+
+</form>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+"https://slllcibigutjivauryvc.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
+
+const client =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+
+// ======================
+// LOAD PRICES
+// ======================
+
+async function loadPrices(){
+
+const { data } =
+await client
+.from("visa_prices")
+.select("*")
+.limit(1)
+.single();
+
+if(data){
+
+document.getElementById("yearPrice")
+.innerText =
+data.visa_1year;
+
+document.getElementById("monthPrice")
+.innerText =
+data.visa_3months;
+
+}
+
+}
+
+loadPrices();
+
+
+
+// ======================
+// IMAGE UPLOAD
+// ======================
+
+async function uploadImage(file){
+
+const fileName =
+Date.now() + "-" + file.name;
+
+const { error } =
+await client
+.storage
+.from("visa-images")
+.upload(fileName,file);
+
+if(error){
+
+alert("Upload Failed");
+
+return null;
+
+}
+
+const { data } =
+client
+.storage
+.from("visa-images")
+.getPublicUrl(fileName);
+
+return data.publicUrl;
+
+}
+
+
+
+// ======================
+// SUBMIT
+// ======================
+
+const form =
+document.getElementById("visaForm");
+
+form.addEventListener(
+"submit",
+
+async(e)=>{
+
+e.preventDefault();
+
+document.getElementById("loading")
+.style.display = "block";
+
+
+
+const trackingCode =
+
+"SIWAK-" +
+
+Math.floor(
+10000 + Math.random() * 90000
+);
+
+
+
+// upload images
+
+const passportUrl =
+await uploadImage(
+document.getElementById("passport")
+.files[0]
+);
+
+const personalUrl =
+await uploadImage(
+document.getElementById("personal")
+.files[0]
+);
+
+const paymentUrl =
+await uploadImage(
+document.getElementById("payment")
+.files[0]
+);
+
+
+
+// insert
+
+const { error } =
+await client
+.from("visa_requests")
+.insert([{
+
+full_name:
+document.getElementById("name").value,
+
+mobile:
+document.getElementById("mobile").value,
+
+visa_type:
+document.getElementById("visaType").value,
+
+passport_image:
+passportUrl,
+
+personal_image:
+personalUrl,
+
+payment_image:
+paymentUrl,
+
+notes:
+document.getElementById("notes").value,
+
+tracking_code:
+trackingCode
+
+}]);
+
+
+
+document.getElementById("loading")
+.style.display = "none";
+
+
+
+if(error){
+
+alert("هەڵەیەک ڕوویدا");
+
+console.log(error);
+
+return;
+
+}
+
+
+
+document.getElementById("success")
+.style.display = "block";
+
+
+
+alert(
+
+"Tracking Code: " +
+
+trackingCode
+
+);
+
+
+
+form.reset();
+
+});
+
+</script>
+
+</body>
+</html>
