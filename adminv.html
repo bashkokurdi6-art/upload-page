@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SIWAK VISA ADMIN</title>
+<title>SIWAK VISA</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -26,13 +26,17 @@ body{
 font-family:'Noto Sans Arabic',sans-serif;
 
 background:
-linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.85)),
-url('https://images.unsplash.com/photo-1542816417-0983670d7f62?q=80&w=1200');
+linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.8)),
+url('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?q=80&w=1200');
 
 background-size:cover;
 background-position:center;
 
 min-height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
 
 padding:20px;
 
@@ -40,12 +44,10 @@ color:white;
 
 }
 
-.login-box,
-.dashboard{
+.card{
 
-max-width:1300px;
-
-margin:auto;
+width:100%;
+max-width:850px;
 
 background:rgba(7,20,15,.94);
 
@@ -53,7 +55,7 @@ border:2px solid #d4af37;
 
 border-radius:28px;
 
-padding:25px;
+padding:28px;
 
 backdrop-filter:blur(10px);
 
@@ -62,97 +64,105 @@ box-shadow:
 
 }
 
-.dashboard{
-display:none;
-}
-
-h1{
+.title{
 
 text-align:center;
-
-color:#d4af37;
 
 margin-bottom:25px;
 
 }
 
-.login-input{
+.title h1{
 
-width:100%;
+color:#d4af37;
 
-padding:15px;
+font-size:32px;
 
-border:none;
-
-border-radius:16px;
-
-background:#10251c;
-
-color:white;
-
-font-size:16px;
-
-margin-bottom:15px;
-
-outline:none;
+margin-bottom:10px;
 
 }
 
-.login-btn{
+.title p{
 
-width:100%;
+color:#ccc;
 
-padding:15px;
-
-border:none;
-
-border-radius:16px;
-
-background:linear-gradient(135deg,#d4af37,#f5d67a);
-
-color:#062015;
-
-font-weight:bold;
-
-font-size:16px;
-
-cursor:pointer;
+font-size:14px;
 
 }
 
-.top-box{
+.prices{
 
 display:grid;
 
 grid-template-columns:1fr 1fr;
 
-gap:20px;
+gap:15px;
 
 margin-bottom:25px;
 
 }
 
-.card-box{
+.price-box{
 
 background:#0f3827;
 
-padding:20px;
+padding:18px;
 
 border-radius:20px;
 
 border:1px solid #d4af37;
 
+text-align:center;
+
 }
 
-.card-box h3{
+.price-box h3{
 
-margin-bottom:15px;
+margin-bottom:10px;
 
 color:#d4af37;
 
 }
 
-.input{
+.price-box span{
+
+font-size:22px;
+
+font-weight:bold;
+
+}
+
+.grid{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:16px;
+
+}
+
+.group{
+
+margin-bottom:16px;
+
+}
+
+label{
+
+display:block;
+
+margin-bottom:8px;
+
+color:#d4af37;
+
+font-size:14px;
+
+}
+
+input,
+select,
+textarea{
 
 width:100%;
 
@@ -160,129 +170,161 @@ padding:14px;
 
 border:none;
 
-border-radius:14px;
+border-radius:16px;
 
 background:#10251c;
 
 color:white;
 
-margin-bottom:10px;
+font-size:15px;
+
+outline:none;
+
+border:1px solid transparent;
+
+transition:.3s;
 
 }
 
-.save-btn{
+input:focus,
+select:focus,
+textarea:focus{
 
-padding:12px 20px;
+border-color:#d4af37;
 
-border:none;
+box-shadow:0 0 10px rgba(212,175,55,.4);
 
-border-radius:14px;
+}
 
-background:#d4af37;
+textarea{
 
-color:#062015;
+resize:none;
 
-font-weight:bold;
+height:120px;
 
-cursor:pointer;
+}
+
+.upload{
+
+background:#10251c;
+
+border:1px dashed #d4af37;
+
+border-radius:16px;
+
+padding:15px;
+
+}
+
+.preview{
 
 width:100%;
 
-}
-
-.requests{
-
-display:grid;
-
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-
-gap:20px;
-
-}
-
-.card{
-
-background:#0f241b;
-
-border:1px solid rgba(212,175,55,.25);
-
-border-radius:24px;
-
-padding:18px;
-
-}
-
-.card h3{
-
-color:#d4af37;
-
-margin-bottom:15px;
-
-}
-
-.item{
-
-margin-bottom:10px;
-
-font-size:14px;
-
-line-height:1.8;
-
-}
-
-.images{
-
-display:flex;
-
-gap:10px;
-
-margin-top:15px;
-
-flex-wrap:wrap;
-
-}
-
-.images img{
-
-width:100px;
-
-height:100px;
+max-height:220px;
 
 object-fit:cover;
 
-border-radius:14px;
+border-radius:18px;
+
+margin-top:12px;
+
+display:none;
 
 border:1px solid #d4af37;
 
 }
 
-.delete-btn{
+.payment-box{
+
+display:none;
 
 margin-top:15px;
 
+background:#0f3827;
+
+padding:15px;
+
+border-radius:16px;
+
+border:1px solid #d4af37;
+
+text-align:center;
+
+}
+
+.payment-box p{
+
+margin-bottom:8px;
+
+color:#d4af37;
+
+}
+
+.submit-btn{
+
 width:100%;
 
-padding:13px;
+padding:16px;
 
 border:none;
 
-border-radius:14px;
+border-radius:18px;
 
-background:#b3261e;
+background:linear-gradient(135deg,#d4af37,#f5d67a);
 
-color:white;
+color:#062015;
+
+font-size:17px;
 
 font-weight:bold;
 
 cursor:pointer;
 
+margin-top:10px;
+
+}
+
+.loading,
+.success{
+
+margin-top:15px;
+
+text-align:center;
+
+display:none;
+
+}
+
+.loading{
+
+color:#d4af37;
+
+}
+
+.success{
+
+color:#79ffb0;
+
 }
 
 @media(max-width:768px){
 
-.top-box{
+.grid,
+.prices{
 
 grid-template-columns:1fr;
+
+}
+
+.card{
+
+padding:20px;
+
+}
+
+.title h1{
+
+font-size:26px;
 
 }
 
@@ -294,150 +336,223 @@ grid-template-columns:1fr;
 
 <body>
 
+<div class="card">
+
+<div class="title">
+
+<h1>خزمەتگوزاری ڤیزە</h1>
+
+<p>SIWAK VISA SERVICE</p>
+
+</div>
 
 
-<div class="login-box" id="loginBox">
 
-<h1>SIWAK VISA ADMIN</h1>
+<div class="prices">
+
+<div class="price-box">
+
+<h3>ڤیزەی ساڵێک</h3>
+
+<span id="yearPrice">...</span>
+
+</div>
+
+<div class="price-box">
+
+<h3>ڤیزەی سێ مانگ</h3>
+
+<span id="monthPrice">...</span>
+
+</div>
+
+</div>
+
+
+
+<form id="visaForm">
+
+<div class="grid">
+
+<div class="group">
+
+<label>ناوی تەواو</label>
+
+<input type="text" id="name" required>
+
+</div>
+
+<div class="group">
+
+<label>ژمارەی مۆبایل</label>
+
+<input type="text" id="mobile" required>
+
+</div>
+
+</div>
+
+
+
+<div class="group">
+
+<label>جۆری ڤیزە</label>
+
+<select id="visaType">
+
+<option value="1 Year Visa">
+ڤیزەی ساڵێک
+</option>
+
+<option value="3 Months Visa">
+ڤیزەی سێ مانگ
+</option>
+
+</select>
+
+</div>
+
+
+
+<div class="group">
+
+<label>شێوازی پارەدان</label>
+
+<select id="paymentMethod">
+
+<option value="FastPay">
+FastPay
+</option>
+
+<option value="FIB">
+FIB
+</option>
+
+<option value="Qi Card">
+Qi Card
+</option>
+
+</select>
+
+
+
+<div
+id="paymentNumberBox"
+class="payment-box">
+
+<p>
+
+ژمارەی پارەدان
+
+</p>
+
+<h3 id="paymentNumber"></h3>
+
+</div>
+
+</div>
+
+
+
+<div class="group upload">
+
+<label>وێنەی پاسپۆرت</label>
 
 <input
-type="password"
-id="password"
-class="login-input"
-placeholder="وشەی نهێنی">
+type="file"
+id="passport"
+accept="image/*"
+required>
+
+<img
+id="passportPreview"
+class="preview">
+
+</div>
+
+<br>
+
+
+
+<div class="group upload">
+
+<label>وێنەی کەسی</label>
+
+<input
+type="file"
+id="personal"
+accept="image/*"
+required>
+
+<img
+id="personalPreview"
+class="preview">
+
+</div>
+
+<br>
+
+
+
+<div class="group upload">
+
+<label>وێنەی پارەدان</label>
+
+<input
+type="file"
+id="payment"
+accept="image/*"
+required>
+
+<img
+id="paymentPreview"
+class="preview">
+
+</div>
+
+<br>
+
+
+
+<div class="group">
+
+<label>تێبینی</label>
+
+<textarea id="notes"></textarea>
+
+</div>
+
+
 
 <button
-class="login-btn"
-onclick="login()">
+class="submit-btn"
+type="submit">
 
-چوونە ژوورەوە
+ناردنی داواکاری
 
 </button>
 
-</div>
 
 
+<div class="loading" id="loading">
 
-<div class="dashboard" id="dashboard">
-
-<h1>بەڕێوەبردنی ڤیزە</h1>
-
-
-
-<div class="top-box">
-
-
-
-<div class="card-box">
-
-<h3>نرخەکانی ڤیزە</h3>
-
-<input
-type="text"
-id="yearVisa"
-class="input"
-placeholder="1 Year Visa">
-
-<input
-type="text"
-id="monthVisa"
-class="input"
-placeholder="3 Months Visa">
-
-<button
-class="save-btn"
-onclick="updatePrices()">
-
-پاشەکەوتکردن
-
-</button>
+تکایە چاوەڕێ بکە...
 
 </div>
 
 
 
-<div class="card-box">
+<div class="success" id="success">
 
-<h3>ژمارەکانی پارەدان</h3>
-
-<input
-type="text"
-id="fastpay"
-class="input"
-placeholder="FastPay">
-
-<input
-type="text"
-id="fib"
-class="input"
-placeholder="FIB">
-
-<input
-type="text"
-id="qi"
-class="input"
-placeholder="Qi Card">
-
-<button
-class="save-btn"
-onclick="saveNumbers()">
-
-پاشەکەوتکردن
-
-</button>
+داواکاریەکەت نێردرا ✨
 
 </div>
 
-
-
-</div>
-
-
-
-<div class="requests" id="requests"></div>
+</form>
 
 </div>
-
-
 
 <script>
-
-const ADMIN_PASSWORD = "SIWAK2026";
-
-
-
-function login(){
-
-const pass =
-document.getElementById("password").value;
-
-if(pass === ADMIN_PASSWORD){
-
-document.getElementById("loginBox").style.display = "none";
-
-document.getElementById("dashboard").style.display = "block";
-
-
-
-loadRequests();
-
-loadPrices();
-
-loadNumbers();
-
-}else{
-
-alert("وشەی نهێنی هەڵەیە");
-
-}
-
-}
-
-
-
-// ======================
-// SUPABASE
-// ======================
 
 const SUPABASE_URL =
 "https://slllcibigutjivauryvc.supabase.co";
@@ -468,48 +583,44 @@ await client
 
 if(data){
 
-document.getElementById("yearVisa").value =
+document.getElementById("yearPrice")
+.innerText =
 data.visa_1year;
 
-document.getElementById("monthVisa").value =
+document.getElementById("monthPrice")
+.innerText =
 data.visa_3months;
 
 }
 
 }
 
-
-
-// ======================
-// UPDATE PRICES
-// ======================
-
-async function updatePrices(){
-
-await client
-.from("visa_prices")
-.update({
-
-visa_1year:
-document.getElementById("yearVisa").value,
-
-visa_3months:
-document.getElementById("monthVisa").value
-
-})
-.eq("id",1);
-
-alert("نرخەکان نوێکرانەوە");
-
-}
+loadPrices();
 
 
 
 // ======================
-// LOAD PAYMENT NUMBERS
+// PAYMENT NUMBERS
 // ======================
 
-async function loadNumbers(){
+const paymentMethod =
+document.getElementById(
+"paymentMethod"
+);
+
+const paymentBox =
+document.getElementById(
+"paymentNumberBox"
+);
+
+const paymentNumber =
+document.getElementById(
+"paymentNumber"
+);
+
+
+
+async function loadPaymentNumbers(){
 
 const { data } =
 await client
@@ -520,129 +631,114 @@ await client
 
 if(data){
 
-document.getElementById("fastpay").value =
+function updatePaymentNumber(){
+
+const method =
+paymentMethod.value;
+
+if(method === "FastPay"){
+
+paymentNumber.innerText =
 data.fastpay;
 
-document.getElementById("fib").value =
+}
+
+else if(method === "FIB"){
+
+paymentNumber.innerText =
 data.fib;
 
-document.getElementById("qi").value =
+}
+
+else{
+
+paymentNumber.innerText =
 data.qi;
 
 }
 
+paymentBox.style.display =
+"block";
+
 }
 
 
 
+paymentMethod.addEventListener(
+"change",
+updatePaymentNumber
+);
+
+updatePaymentNumber();
+
+}
+
+}
+
+loadPaymentNumbers();
+
+
+
 // ======================
-// SAVE PAYMENT NUMBERS
+// IMAGE UPLOAD
 // ======================
 
-async function saveNumbers(){
+async function uploadImage(file){
 
+const fileName =
+Date.now() + "-" + file.name;
+
+const { error } =
 await client
-.from("payment_numbers")
-.update({
+.storage
+.from("visa-images")
+.upload(fileName,file);
 
-fastpay:
-document.getElementById("fastpay").value,
+if(error){
 
-fib:
-document.getElementById("fib").value,
+alert("Upload Failed");
 
-qi:
-document.getElementById("qi").value
-
-})
-.eq("id",1);
-
-alert("ژمارەکان نوێکرانەوە");
+return null;
 
 }
-
-
-
-// ======================
-// LOAD REQUESTS
-// ======================
-
-async function loadRequests(){
 
 const { data } =
-await client
-.from("visa_requests")
-.select("*")
-.order("id",{ascending:false});
+client
+.storage
+.from("visa-images")
+.getPublicUrl(fileName);
 
-const requests =
-document.getElementById("requests");
+return data.publicUrl;
 
-requests.innerHTML = "";
-
+}
 
 
-data.forEach(item=>{
 
-requests.innerHTML += `
+// ======================
+// IMAGE PREVIEW
+// ======================
 
-<div class="card">
+function previewImage(inputId, previewId){
 
-<h3>${item.full_name}</h3>
+const input =
+document.getElementById(inputId);
 
-<div class="item">
-📱 ${item.mobile}
-</div>
+const preview =
+document.getElementById(previewId);
 
-<div class="item">
-🛂 ${item.visa_type}
-</div>
+input.addEventListener("change",()=>{
 
-<div class="item">
-💳 ${item.payment_method}
-</div>
+const file =
+input.files[0];
 
-<div class="item">
-📝 ${item.notes || "-"}
-</div>
+if(file){
 
-<div class="item">
-🎫 ${item.tracking_code}
-</div>
+preview.src =
+URL.createObjectURL(file);
 
-<div class="images">
+preview.style.display = "block";
 
-<a href="${item.passport_image}" target="_blank">
-
-<img src="${item.passport_image}">
-
-</a>
-
-<a href="${item.personal_image}" target="_blank">
-
-<img src="${item.personal_image}">
-
-</a>
-
-<a href="${item.payment_image}" target="_blank">
-
-<img src="${item.payment_image}">
-
-</a>
-
-</div>
-
-<button
-class="delete-btn"
-onclick="deleteRequest(${item.id})">
-
-سڕینەوە
-
-</button>
-
-</div>
-
-`;
+}
 
 });
 
@@ -650,25 +746,147 @@ onclick="deleteRequest(${item.id})">
 
 
 
+previewImage(
+"passport",
+"passportPreview"
+);
+
+previewImage(
+"personal",
+"personalPreview"
+);
+
+previewImage(
+"payment",
+"paymentPreview"
+);
+
+
+
 // ======================
-// DELETE
+// SUBMIT
 // ======================
 
-async function deleteRequest(id){
+const form =
+document.getElementById("visaForm");
 
-const ok =
-confirm("دڵنیایت؟");
+form.addEventListener(
+"submit",
 
-if(!ok) return;
+async(e)=>{
 
+e.preventDefault();
+
+document.getElementById("loading")
+.style.display = "block";
+
+
+
+const trackingCode =
+
+"SIWAK-" +
+
+Math.floor(
+10000 + Math.random() * 90000
+);
+
+
+
+// upload images
+
+const passportUrl =
+await uploadImage(
+document.getElementById("passport")
+.files[0]
+);
+
+const personalUrl =
+await uploadImage(
+document.getElementById("personal")
+.files[0]
+);
+
+const paymentUrl =
+await uploadImage(
+document.getElementById("payment")
+.files[0]
+);
+
+
+
+// insert
+
+const { error } =
 await client
 .from("visa_requests")
-.delete()
-.eq("id",id);
+.insert([{
 
-loadRequests();
+full_name:
+document.getElementById("name").value,
+
+mobile:
+document.getElementById("mobile").value,
+
+visa_type:
+document.getElementById("visaType").value,
+
+payment_method:
+document.getElementById("paymentMethod").value,
+
+passport_image:
+passportUrl,
+
+personal_image:
+personalUrl,
+
+payment_image:
+paymentUrl,
+
+notes:
+document.getElementById("notes").value,
+
+tracking_code:
+trackingCode
+
+}]);
+
+
+
+document.getElementById("loading")
+.style.display = "none";
+
+
+
+if(error){
+
+alert("هەڵەیەک ڕوویدا");
+
+console.log(error);
+
+return;
 
 }
+
+
+
+document.getElementById("success")
+.style.display = "block";
+
+
+
+alert(
+
+"Tracking Code: " +
+
+trackingCode
+
+);
+
+
+
+form.reset();
+
+});
 
 </script>
 
