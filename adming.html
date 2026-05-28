@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0">
+
+<title>Admin Gift</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+
+background:#07140c;
+
+color:white;
+
+padding:20px;
+}
+
+.title{
+
+text-align:center;
+
+font-size:30px;
+
+color:#d4af37;
+
+margin-bottom:25px;
+}
+
+.card{
+
+background:#123524;
+
+padding:18px;
+
+border-radius:18px;
+
+margin-bottom:15px;
+
+border:
+1px solid rgba(212,175,55,.2);
+}
+
+.card h3{
+
+margin-bottom:10px;
+}
+
+.btns{
+
+display:flex;
+
+gap:10px;
+
+margin-top:15px;
+}
+
+button{
+
+flex:1;
+
+padding:12px;
+
+border:none;
+
+border-radius:12px;
+
+font-size:16px;
+
+font-weight:bold;
+
+cursor:pointer;
+}
+
+.approve{
+
+background:#d4af37;
+
+color:black;
+}
+
+.winner{
+
+background:#0f5132;
+
+color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="title">
+
+🎁 ئەدمینی دیاری مانگانە
+
+</div>
+
+<div id="requests"></div>
+
+<script>
+
+const SUPABASE_URL =
+"https://slllcibigutjivauryvc.supabase.co";
+
+const SUPABASE_KEY =
+"YOUR_ANON_KEY";
+
+const client =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+async function loadRequests(){
+
+const { data } =
+await client
+.from("gift_requests")
+.select("*")
+.order("id",{ascending:false});
+
+const box =
+document.getElementById("requests");
+
+box.innerHTML = "";
+
+data.forEach(user=>{
+
+box.innerHTML += `
+
+<div class="card">
+
+<h3>
+
+${user.full_name}
+
+</h3>
+
+<p>
+
+📍 ${user.city}
+
+</p>
+
+<p>
+
+🎂 ${user.age}
+
+</p>
+
+<p>
+
+📞 ${user.phone}
+
+</p>
+
+<p>
+
+📌 ${user.status}
+
+</p>
+
+<div class="btns">
+
+<button class="approve"
+onclick="approveUser(${user.id})">
+
+قبوڵکردن
+
+</button>
+
+<button class="winner"
+onclick="winnerUser(${user.id})">
+
+براوە
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+async function approveUser(id){
+
+await client
+.from("gift_requests")
+.update({
+
+status:"approved"
+
+})
+.eq("id",id);
+
+loadRequests();
+
+}
+
+async function winnerUser(id){
+
+await client
+.from("gift_requests")
+.update({
+
+status:"winner"
+
+})
+.eq("id",id);
+
+loadRequests();
+
+}
+
+loadRequests();
+
+</script>
+
+</body>
+</html>
