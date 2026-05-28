@@ -1,727 +1,557 @@
 <!DOCTYPE html>
-<html lang="ku">
+<html lang="ckb" dir="rtl">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIWAK - Admin Panel</title>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root{
-      --text: #f5f2e9;
-      --muted: #a8adba;
-      --gold: #d4af37;
-      --border: rgba(212,175,55,.16);
-      --shadow: 0 20px 50px rgba(0,0,0,.45);
-      --radius: 22px;
-    }
+<meta charset="UTF-8">
 
-    body{
-      font-family: Arial, sans-serif;
-      min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(212,175,55,.10), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(21,96,189,.14), transparent 32%),
-        linear-gradient(135deg, #050505, #0b0d10 40%, #050505 100%);
-      padding: 22px;
-    }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .container{
-      max-width: 1320px;
-      margin: 0 auto;
-    }
+<title>SIWAK ADMIN</title>
 
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    .hidden{ display: none !important; }
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    .btn{
-      border: none;
-      border-radius: 16px;
-      padding: 14px 16px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: .2s ease;
-    }
+<style>
 
-    .btn-primary{
-      color: #081018;
-      background: linear-gradient(135deg, #f2d57a, #caa12a 50%, #0f4c81 120%);
-      box-shadow: 0 16px 30px rgba(212,175,55,.16);
-    }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-    .btn-dark{
-      background: #12161f;
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.08);
-    }
+body{
 
-    .btn:hover{
-      transform: translateY(-2px);
-    }
+font-family:'Noto Sans Arabic',sans-serif;
 
-    .topbar{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
-      padding: 20px 22px;
-    }
+background:
+linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.85)),
+url('https://images.unsplash.com/photo-1542816417-0983670d7f62?q=80&w=1200');
 
-    .topbar h2{
-      font-size: 24px;
-      color: var(--gold);
-      margin-bottom: 4px;
-    }
+background-size:cover;
+background-position:center;
 
-    .topbar p{
-      color: var(--muted);
-      font-size: 14px;
-    }
+min-height:100vh;
 
-    .stats{
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 18px;
-    }
+padding:20px;
 
-    .stat{
-      padding: 20px;
-    }
+color:white;
 
-    .stat small{
-      color: var(--muted);
-      display: block;
-      margin-bottom: 8px;
-    }
+}
 
-    .stat strong{
-      font-size: 28px;
-      color: var(--gold);
-    }
+.login-box,
+.dashboard{
 
-    .layout{
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 18px;
-      align-items: start;
-    }
+max-width:1200px;
 
-    .side{
-      padding: 22px;
-      position: sticky;
-      top: 20px;
-    }
+margin:auto;
 
-    .side h3, .content h3{
-      color: var(--gold);
-      margin-bottom: 6px;
-      font-size: 22px;
-    }
+background:rgba(7,20,15,.94);
 
-    .side p, .content p{
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 18px;
-    }
+border:2px solid #d4af37;
 
-    .content{
-      padding: 22px;
-    }
+border-radius:28px;
 
-    .grid-2{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+padding:25px;
 
-    .price-box{
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.02);
-      border: 1px solid rgba(255,255,255,.05);
-      margin-bottom: 16px;
-    }
+backdrop-filter:blur(10px);
 
-    .actions{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
+box-shadow:
+0 0 30px rgba(212,175,55,.2);
 
-    .field{
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+}
 
-    label{
-      font-size: 14px;
-      color: #d8dbe3;
-    }
+.dashboard{
+display:none;
+}
 
-    input, select{
-      width: 100%;
-      border: 1px solid rgba(212,175,55,.18);
-      background: rgba(9,11,15,.95);
-      color: var(--text);
-      border-radius: 16px;
-      padding: 14px 14px;
-      outline: none;
-      transition: .25s ease;
-      font-size: 15px;
-    }
+h1{
 
-    input:focus, select:focus{
-      border-color: rgba(212,175,55,.7);
-      box-shadow: 0 0 0 4px rgba(212,175,55,.10);
-    }
+text-align:center;
 
-    .toolbar{
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-      align-items: center;
-    }
+color:#d4af37;
 
-    .toolbar .field{
-      margin-bottom: 0;
-      min-width: 180px;
-      flex: 1;
-    }
+margin-bottom:25px;
 
-    .request-list{
-      display: grid;
-      gap: 14px;
-    }
+}
 
-    .request-card{
-      padding: 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.02);
-      border: 1px solid rgba(255,255,255,.05);
-    }
+.login-input{
 
-    .request-top{
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
+width:100%;
 
-    .request-name{
-      font-size: 19px;
-      color: var(--gold);
-      margin-bottom: 4px;
-    }
+padding:15px;
 
-    .meta{
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-    }
+border:none;
 
-    .pill{
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-      border: 1px solid transparent;
-      height: fit-content;
-    }
+border-radius:16px;
 
-    .pill-new{
-      color: #f3d37c;
-      background: rgba(201,155,43,.14);
-      border-color: rgba(201,155,43,.24);
-    }
+background:#10251c;
 
-    .pill-reviewing{
-      color: #8ec5ff;
-      background: rgba(15,76,129,.18);
-      border-color: rgba(15,76,129,.28);
-    }
+color:white;
 
-    .pill-done{
-      color: #7ce0ae;
-      background: rgba(47,183,121,.14);
-      border-color: rgba(47,183,121,.24);
-    }
+font-size:16px;
 
-    .pill-rejected{
-      color: #ff9e9e;
-      background: rgba(226,85,85,.12);
-      border-color: rgba(226,85,85,.22);
-    }
+margin-bottom:15px;
 
-    .request-grid{
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 14px;
-    }
+outline:none;
 
-    .request-item{
-      padding: 12px;
-      border-radius: 14px;
-      background: #0b0f16;
-      border: 1px solid rgba(255,255,255,.04);
-    }
+}
 
-    .request-item small{
-      display: block;
-      color: var(--muted);
-      margin-bottom: 6px;
-      font-size: 12px;
-    }
+.login-btn{
 
-    .request-item strong{
-      color: #f0f1f6;
-      font-size: 14px;
-      word-break: break-word;
-    }
+width:100%;
 
-    .req-actions{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+padding:15px;
 
-    .req-actions select{
-      max-width: 170px;
-    }
+border:none;
 
-    a.preview-link{
-      color: #8fc5ff;
-      text-decoration: none;
-      font-weight: bold;
-    }
+border-radius:16px;
 
-    .empty{
-      text-align: center;
-      color: var(--muted);
-      padding: 28px;
-      border: 1px dashed rgba(255,255,255,.08);
-      border-radius: 18px;
-    }
+background:linear-gradient(135deg,#d4af37,#f5d67a);
 
-    .toast{
-      position: fixed;
-      left: 50%;
-      bottom: 24px;
-      transform: translateX(-50%) translateY(30px);
-      background: #0f1115;
-      color: #fff;
-      border: 1px solid rgba(212,175,55,.25);
-      border-radius: 16px;
-      padding: 14px 18px;
-      opacity: 0;
-      pointer-events: none;
-      transition: .3s ease;
-      z-index: 9999;
-      box-shadow: var(--shadow);
-    }
+color:#062015;
 
-    .toast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+font-weight:bold;
 
-    @media (max-width: 1100px){
-      .layout{
-        grid-template-columns: 1fr;
-      }
-      .side{
-        position: static;
-      }
-      .stats{
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
+font-size:16px;
 
-    @media (max-width: 720px){
-      .stats, .grid-2, .request-grid{
-        grid-template-columns: 1fr;
-      }
-      .topbar{
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-  </style>
+cursor:pointer;
+
+}
+
+.top-box{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:20px;
+
+margin-bottom:25px;
+
+}
+
+.price-card{
+
+background:#0f3827;
+
+padding:20px;
+
+border-radius:20px;
+
+border:1px solid #d4af37;
+
+}
+
+.price-card h3{
+
+margin-bottom:15px;
+
+color:#d4af37;
+
+}
+
+.price-input{
+
+width:100%;
+
+padding:14px;
+
+border:none;
+
+border-radius:14px;
+
+background:#10251c;
+
+color:white;
+
+margin-bottom:10px;
+
+}
+
+.save-btn{
+
+padding:12px 20px;
+
+border:none;
+
+border-radius:14px;
+
+background:#d4af37;
+
+color:#062015;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+.requests{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+gap:20px;
+
+}
+
+.card{
+
+background:#0f241b;
+
+border:1px solid rgba(212,175,55,.25);
+
+border-radius:24px;
+
+padding:18px;
+
+}
+
+.card h3{
+
+color:#d4af37;
+
+margin-bottom:15px;
+
+}
+
+.item{
+
+margin-bottom:10px;
+
+font-size:14px;
+
+line-height:1.8;
+
+}
+
+.images{
+
+display:flex;
+
+gap:10px;
+
+margin-top:15px;
+
+}
+
+.images img{
+
+width:100px;
+
+height:100px;
+
+object-fit:cover;
+
+border-radius:14px;
+
+border:1px solid #d4af37;
+
+}
+
+.delete-btn{
+
+margin-top:15px;
+
+width:100%;
+
+padding:13px;
+
+border:none;
+
+border-radius:14px;
+
+background:#b3261e;
+
+color:white;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+@media(max-width:768px){
+
+.top-box{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+</style>
+
 </head>
+
 <body>
-  <div class="container">
-    <div id="dashboardView">
-      <div class="card topbar">
-        <div>
-          <h2>SIWAK Dashboard</h2>
-          <p>بەڕێوەبردنی نرخ، ژمارەی پارەدان و داواکارییەکان</p>
-        </div>
-        <div class="actions">
-          <button class="btn btn-dark" id="refreshBtn">نوێکردنەوە</button>
-          <button class="btn btn-primary" id="logoutBtn">چوونەدەرەوە</button>
-        </div>
-      </div>
 
-      <div class="stats">
-        <div class="card stat">
-          <small>کۆی داواکارییەکان</small>
-          <strong id="statTotal">0</strong>
-        </div>
-        <div class="card stat">
-          <small>نوێ</small>
-          <strong id="statNew">0</strong>
-        </div>
-        <div class="card stat">
-          <small>لە پشکنین</small>
-          <strong id="statReviewing">0</strong>
-        </div>
-        <div class="card stat">
-          <small>تەواوبوو</small>
-          <strong id="statDone">0</strong>
-        </div>
-      </div>
 
-      <div class="layout">
-        <div class="card side">
-          <h3>ڕێکخستنەکان</h3>
-          <p>لێرە دەتوانیت نرخ و ژمارەی پارەدان ڕۆژانە بگۆڕیت.</p>
 
-          <div class="price-box">
-            <div class="grid-2">
-              <div class="field">
-                <label for="visaPriceInput">نرخی ڤیزە</label>
-                <input type="number" id="visaPriceInput" placeholder="0" />
-              </div>
-              <div class="field">
-                <label for="rawzaPriceInput">نرخی ڕەوزە</label>
-                <input type="number" id="rawzaPriceInput" placeholder="0" />
-              </div>
-            </div>
-          </div>
+<div class="login-box" id="loginBox">
 
-          <div class="field">
-            <label for="fibNumberInput">ژمارەی FIB</label>
-            <input type="text" id="fibNumberInput" placeholder="FIB Number" />
-          </div>
+<h1>SIWAK ADMIN</h1>
 
-          <div class="field">
-            <label for="fastpayNumberInput">ژمارەی FastPay</label>
-            <input type="text" id="fastpayNumberInput" placeholder="FastPay Number" />
-          </div>
+<input
+type="password"
+id="password"
+class="login-input"
+placeholder="وشەی نهێنی">
 
-          <div class="field">
-            <label for="qicardNumberInput">ژمارەی Qi Card</label>
-            <input type="text" id="qicardNumberInput" placeholder="Qi Card Number" />
-          </div>
+<button
+class="login-btn"
+onclick="login()">
 
-          <div class="actions">
-            <button class="btn btn-primary" id="saveSettingsBtn" style="width:100%;">پاشەکەوتکردنی ڕێکخستنەکان</button>
-          </div>
-        </div>
+چوونە ژوورەوە
 
-        <div class="card content">
-          <h3>داواکارییەکان</h3>
-          <p>هەموو داواکارییەکان لێرە دەبینیت و دەتوانیت بارودۆخەکەیان بگۆڕیت.</p>
+</button>
 
-          <div class="toolbar">
-            <div class="field">
-              <label for="filterType">فلتەری جۆر</label>
-              <select id="filterType">
-                <option value="all">هەموو</option>
-                <option value="visa">ڤیزە</option>
-                <option value="rawza">ڕەوزە</option>
-              </select>
-            </div>
+</div>
 
-            <div class="field">
-              <label for="filterStatus">فلتەری بارودۆخ</label>
-              <select id="filterStatus">
-                <option value="all">هەموو</option>
-                <option value="new">نوێ</option>
-                <option value="reviewing">لە پشکنین</option>
-                <option value="done">تەواوبوو</option>
-                <option value="rejected">ڕەتکراوە</option>
-              </select>
-            </div>
-          </div>
 
-          <div class="request-list" id="requestList"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="toast" id="toast"></div>
+<div class="dashboard" id="dashboard">
 
-  <script>
-    const SUPABASE_URL = "https://igydtqampcfbvyymlmxg.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_lOotJfG-w3GgpDpD8446qA_Ba1nKV4k";
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<h1>بەڕێوەبردنی ڕەوزە</h1>
 
-    const dashboardView = document.getElementById("dashboardView");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const refreshBtn = document.getElementById("refreshBtn");
-    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
-    const requestList = document.getElementById("requestList");
-    const filterTypeEl = document.getElementById("filterType");
-    const filterStatusEl = document.getElementById("filterStatus");
-    const toastEl = document.getElementById("toast");
 
-    let allRequests = [];
 
-    function showToast(message, isError = false){
-      toastEl.textContent = message;
-      toastEl.style.borderColor = isError ? "rgba(255,80,80,.35)" : "rgba(212,175,55,.25)";
-      toastEl.classList.add("show");
-      setTimeout(() => toastEl.classList.remove("show"), 3200);
-    }
+<div class="top-box">
 
-    function formatMoney(value){
-      return Number(value || 0).toLocaleString() + " IQD";
-    }
+<div class="price-card">
 
-    function formatDate(dateString){
-      if(!dateString) return "-";
-      const d = new Date(dateString);
-      if (isNaN(d.getTime())) return dateString;
-      return d.toLocaleString();
-    }
+<h3>گۆڕینی نرخ</h3>
 
-    function statusClass(status){
-      if(status === "new") return "pill-new";
-      if(status === "reviewing") return "pill-reviewing";
-      if(status === "done") return "pill-done";
-      return "pill-rejected";
-    }
+<input
+type="text"
+id="priceInput"
+class="price-input">
 
-    function statusLabel(status){
-      if(status === "new") return "نوێ";
-      if(status === "reviewing") return "لە پشکنین";
-      if(status === "done") return "تەواوبوو";
-      return "ڕەتکراوە";
-    }
+<button
+class="save-btn"
+onclick="updatePrice()">
 
-    function escapeHtml(str){
-      return String(str ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+پاشەکەوتکردن
 
-    async function initializeDashboard(){
-      dashboardView.classList.remove("hidden");
-      await Promise.all([loadSettings(), loadRequests()]);
-      renderRequests();
-    }
+</button>
 
-    async function loadSettings(){
-      try{
-        const { data, error } = await sb
-          .from("app_settings")
-          .select("*")
-          .eq("id", 1)
-          .single();
+</div>
 
-        if(error) throw error;
+</div>
 
-        document.getElementById("visaPriceInput").value = data?.visa_price ?? 0;
-        document.getElementById("rawzaPriceInput").value = data?.rawza_price ?? 0;
-        document.getElementById("fibNumberInput").value = data?.fib_number ?? "";
-        document.getElementById("fastpayNumberInput").value = data?.fastpay_number ?? "";
-        document.getElementById("qicardNumberInput").value = data?.qicard_number ?? "";
-      }catch(error){
-        console.error("loadSettings error:", error);
-        showToast("هەڵە لە هێنانی ڕێکخستنەکان", true);
-      }
-    }
 
-    async function loadRequests(){
-      try{
-        const [
-          { data: visaData, error: visaError },
-          { data: rawzaData, error: rawzaError }
-        ] = await Promise.all([
-          sb.from("visa_requests").select("*").order("created_at", { ascending: false }),
-          sb.from("rawza_requests").select("*").order("created_at", { ascending: false })
-        ]);
 
-        if(visaError) throw visaError;
-        if(rawzaError) throw rawzaError;
+<div class="requests" id="requests"></div>
 
-        const visaRequests = (visaData || []).map(item => ({ ...item, request_type: "visa" }));
-        const rawzaRequests = (rawzaData || []).map(item => ({ ...item, request_type: "rawza" }));
+</div>
 
-        allRequests = [...visaRequests, ...rawzaRequests].sort((a, b) => {
-          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-        });
 
-        updateStats();
-      }catch(error){
-        console.error("loadRequests error:", error);
-        showToast("هەڵە لە هێنانی داواکارییەکان", true);
-      }
-    }
 
-    function updateStats(){
-      document.getElementById("statTotal").textContent = allRequests.length;
-      document.getElementById("statNew").textContent = allRequests.filter(x => x.status === "new").length;
-      document.getElementById("statReviewing").textContent = allRequests.filter(x => x.status === "reviewing").length;
-      document.getElementById("statDone").textContent = allRequests.filter(x => x.status === "done").length;
-    }
+<script>
 
-    function renderRequests(){
-      const typeFilter = filterTypeEl.value;
-      const statusFilter = filterStatusEl.value;
+const ADMIN_PASSWORD = "SIWAK2026";
 
-      const filtered = allRequests.filter(item => {
-        const okType = typeFilter === "all" || item.request_type === typeFilter;
-        const okStatus = statusFilter === "all" || item.status === statusFilter;
-        return okType && okStatus;
-      });
 
-      if(!filtered.length){
-        requestList.innerHTML = `<div class="empty">هیچ داواکارییەک نەدۆزرایەوە</div>`;
-        return;
-      }
 
-      requestList.innerHTML = filtered.map(item => `
-        <div class="request-card">
-          <div class="request-top">
-            <div>
-              <div class="request-name">${escapeHtml(item.customer_name || "بێ ناو")}</div>
-              <div class="meta">
-                ${item.request_type === "visa" ? "جۆر: ڤیزە" : "جۆر: ڕەوزە"}<br>
-                کات: ${formatDate(item.created_at)}
-              </div>
-            </div>
-            <div class="pill ${statusClass(item.status)}">${statusLabel(item.status)}</div>
-          </div>
+function login(){
 
-          <div class="request-grid">
-            <div class="request-item">
-              <small>ژمارەی مۆبایل</small>
-              <strong>${escapeHtml(item.mobile || "-")}</strong>
-            </div>
+const pass =
+document.getElementById("password").value;
 
-            <div class="request-item">
-              <small>شێوازی پارەدان</small>
-              <strong>${escapeHtml((item.payment_method || "-").toString().toUpperCase())}</strong>
-            </div>
+if(pass === ADMIN_PASSWORD){
 
-            <div class="request-item">
-              <small>ژمارەی پارەدان</small>
-              <strong>${escapeHtml(item.payment_number || "-")}</strong>
-            </div>
+document.getElementById("loginBox").style.display = "none";
 
-            <div class="request-item">
-              <small>بڕی پارە</small>
-              <strong>${formatMoney(item.amount)}</strong>
-            </div>
+document.getElementById("dashboard").style.display = "block";
 
-            <div class="request-item" style="grid-column:1/-1;">
-              <small>تێبینی</small>
-              <strong>${escapeHtml(item.note || "-")}</strong>
-            </div>
+loadRequests();
 
-            <div class="request-item" style="grid-column:1/-1;">
-              <small>وێنەی پارەدان</small>
-              <strong>${item.payment_image_url ? `<a class="preview-link" href="${escapeHtml(item.payment_image_url)}" target="_blank">بینینی وێنە</a>` : "-"}</strong>
-            </div>
-          </div>
+loadPrice();
 
-          <div class="req-actions">
-            <select onchange="updateRequestStatus('${item.request_type}', '${item.id}', this.value)">
-              <option value="new" ${item.status === "new" ? "selected" : ""}>نوێ</option>
-              <option value="reviewing" ${item.status === "reviewing" ? "selected" : ""}>لە پشکنین</option>
-              <option value="done" ${item.status === "done" ? "selected" : ""}>تەواوبوو</option>
-              <option value="rejected" ${item.status === "rejected" ? "selected" : ""}>ڕەتکراوە</option>
-            </select>
-          </div>
-        </div>
-      `).join("");
-    }
+}else{
 
-    async function saveSettings(){
-      try{
-        const payload = {
-          visa_price: Number(document.getElementById("visaPriceInput").value || 0),
-          rawza_price: Number(document.getElementById("rawzaPriceInput").value || 0),
-          fib_number: document.getElementById("fibNumberInput").value.trim(),
-          fastpay_number: document.getElementById("fastpayNumberInput").value.trim(),
-          qicard_number: document.getElementById("qicardNumberInput").value.trim()
-        };
+alert("وشەی نهێنی هەڵەیە");
 
-        const { error } = await sb
-          .from("app_settings")
-          .update(payload)
-          .eq("id", 1);
+}
 
-        if(error) throw error;
+}
 
-        showToast("ڕێکخستنەکان پاشەکەوت کران");
-        await loadSettings();
-      }catch(error){
-        console.error("saveSettings error:", error);
-        showToast("هەڵە لە پاشەکەوتکردنی ڕێکخستنەکان", true);
-      }
-    }
 
-    window.updateRequestStatus = async function(requestType, id, status){
-      try{
-        const tableName = requestType === "visa" ? "visa_requests" : "rawza_requests";
 
-        const { error } = await sb
-          .from(tableName)
-          .update({ status })
-          .eq("id", id);
+// ======================
+// SUPABASE
+// ======================
 
-        if(error) throw error;
+const SUPABASE_URL =
+"https://slllcibigutjivauryvc.supabase.co";
 
-        showToast("بارودۆخ نوێ کرایەوە");
-        await loadRequests();
-        renderRequests();
-      }catch(error){
-        console.error("updateRequestStatus error:", error);
-        showToast("هەڵە لە گۆڕینی بارودۆخ", true);
-      }
-    };
+const SUPABASE_KEY =
+"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
 
-    logoutBtn.addEventListener("click", () => {
-      showToast("login لادراوە");
-    });
+const client =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
-    refreshBtn.addEventListener("click", async () => {
-      await initializeDashboard();
-      showToast("نوێ کرایەوە");
-    });
 
-    saveSettingsBtn.addEventListener("click", saveSettings);
-    filterTypeEl.addEventListener("change", renderRequests);
-    filterStatusEl.addEventListener("change", renderRequests);
 
-    initializeDashboard();
-  </script>
+// ======================
+// LOAD PRICE
+// ======================
+
+async function loadPrice(){
+
+const { data } =
+await client
+.from("rawda_prices")
+.select("*")
+.limit(1)
+.single();
+
+if(data){
+
+document.getElementById("priceInput").value =
+data.price;
+
+}
+
+}
+
+
+
+// ======================
+// UPDATE PRICE
+// ======================
+
+async function updatePrice(){
+
+const newPrice =
+document.getElementById("priceInput").value;
+
+await client
+.from("rawda_prices")
+.update({
+price:newPrice
+})
+.eq("id",1);
+
+alert("نرخ نوێ کرایەوە");
+
+}
+
+
+
+// ======================
+// LOAD REQUESTS
+// ======================
+
+async function loadRequests(){
+
+const { data } =
+await client
+.from("rawda_requests")
+.select("*")
+.order("id",{ascending:false});
+
+const requests =
+document.getElementById("requests");
+
+requests.innerHTML = "";
+
+
+
+data.forEach(item=>{
+
+requests.innerHTML += `
+
+<div class="card">
+
+<h3>${item.naw_syani}</h3>
+
+<div class="item">
+📱 ${item.mobile}
+</div>
+
+<div class="item">
+⏰ ${item.katzhmer}
+</div>
+
+<div class="item">
+📅 ${item.roj}
+</div>
+
+<div class="item">
+👤 ${item.gender}
+</div>
+
+<div class="item">
+💳 ${item.paradan}
+</div>
+
+<div class="item">
+📝 ${item.tebini || "-"}
+</div>
+
+<div class="images">
+
+<a href="${item.passport_image}" target="_blank">
+
+<img src="${item.passport_image}">
+
+</a>
+
+<a href="${item.payment_image}" target="_blank">
+
+<img src="${item.payment_image}">
+
+</a>
+
+</div>
+
+<button
+class="delete-btn"
+onclick="deleteRequest(${item.id})">
+
+سڕینەوە
+
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+
+// ======================
+// DELETE
+// ======================
+
+async function deleteRequest(id){
+
+const ok =
+confirm("دڵنیایت؟");
+
+if(!ok) return;
+
+await client
+.from("rawda_requests")
+.delete()
+.eq("id",id);
+
+loadRequests();
+
+}
+
+</script>
+
 </body>
 </html>
