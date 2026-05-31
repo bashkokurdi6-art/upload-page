@@ -98,10 +98,15 @@ const supabase = window.supabase.createClient(
 
 async function loadCompanies(){
 
-const {data}=await supabase
+const {data,error}=await supabase
 .from("companies")
 .select("*")
 .order("id");
+
+if(error){
+console.log(error);
+return;
+}
 
 let html="";
 
@@ -123,12 +128,20 @@ document.getElementById("companies").innerHTML=html;
 
 async function loadParticipants(){
 
-const {data}=await supabase
+const {data,error}=await supabase
 .from("participants")
 .select("*")
 .order("id");
 
+if(error){
+console.log(error);
+document.getElementById("participants").innerHTML="";
+return;
+}
+
 let html="";
+
+if(data && data.length){
 
 data.forEach(x=>{
 
@@ -139,6 +152,8 @@ ${x.full_name}
 `;
 
 });
+
+}
 
 document.getElementById("participants").innerHTML=html;
 
@@ -156,24 +171,34 @@ return;
 
 }
 
-const {data:existing}=await supabase
+const {data:existing,error:checkError}=await supabase
 .from("participants")
 .select("id")
 .eq("phone",phone);
 
-if(existing.length>0){
+if(checkError){
+alert("هەڵەیەک ڕوویدا");
+return;
+}
+
+if(existing && existing.length>0){
 
 alert("ئەم ژمارەیە پێشتر تۆمارکراوە");
 return;
 
 }
 
-await supabase
+const {error}=await supabase
 .from("participants")
 .insert([{
 full_name:name,
 phone:phone
 }]);
+
+if(error){
+alert(error.message);
+return;
+}
 
 alert("بە سەرکەوتوویی تۆمارکرا");
 
