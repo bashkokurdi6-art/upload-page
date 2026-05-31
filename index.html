@@ -98,29 +98,31 @@ const supabase = window.supabase.createClient(
 
 async function loadCompanies(){
 
-const {data,error}=await supabase
+const { data, error } = await supabase
 .from("companies")
 .select("*")
 .order("id");
 
 if(error){
-console.log(error);
+console.log("companies error:", error);
 return;
 }
 
 let html="";
 
+if(data && data.length){
 data.forEach(x=>{
-
 html+=`
 <div class="item">
-<b>${x.company_name}</b><br>
-🎁 ${x.umrah_count} عمرەی هدیە<br>
-📞 ${x.phone}
+<b>${x.company_name ?? ""}</b><br>
+🎁 ${x.umrah_count ?? 0} عمرەی هدیە<br>
+📞 ${x.phone ?? ""}
 </div>
 `;
-
 });
+}else{
+html = `<div class="item">هیچ کۆمپانیایەک نییە</div>`;
+}
 
 document.getElementById("companies").innerHTML=html;
 
@@ -128,13 +130,13 @@ document.getElementById("companies").innerHTML=html;
 
 async function loadParticipants(){
 
-const {data,error}=await supabase
+const { data, error } = await supabase
 .from("participants")
-.select("*")
+.select("id, full_name, phone, created_at")
 .order("id");
 
 if(error){
-console.log(error);
+console.log("participants error:", error);
 document.getElementById("participants").innerHTML="";
 return;
 }
@@ -142,17 +144,15 @@ return;
 let html="";
 
 if(data && data.length){
-
 data.forEach(x=>{
-
 html+=`
 <div class="item">
-${x.full_name}
+${x.full_name ?? ""}
 </div>
 `;
-
 });
-
+}else{
+html = `<div class="item">هیچ ناوێک تۆمار نەکراوە</div>`;
 }
 
 document.getElementById("participants").innerHTML=html;
@@ -171,12 +171,13 @@ return;
 
 }
 
-const {data:existing,error:checkError}=await supabase
+const { data: existing, error: checkError } = await supabase
 .from("participants")
 .select("id")
-.eq("phone",phone);
+.eq("phone", phone);
 
 if(checkError){
+console.log("check error:", checkError);
 alert("هەڵەیەک ڕوویدا");
 return;
 }
@@ -188,7 +189,7 @@ return;
 
 }
 
-const {error}=await supabase
+const { error } = await supabase
 .from("participants")
 .insert([{
 full_name:name,
@@ -196,6 +197,7 @@ phone:phone
 }]);
 
 if(error){
+console.log("insert error:", error);
 alert(error.message);
 return;
 }
