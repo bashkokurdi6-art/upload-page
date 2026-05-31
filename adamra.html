@@ -38,13 +38,18 @@ const supabase = window.supabase.createClient(
 
 async function addCompany(){
 
-await supabase
+const { error } = await supabase
 .from("companies")
 .insert([{
-company_name:document.getElementById("company").value,
-umrah_count:document.getElementById("count").value,
-phone:document.getElementById("phone").value
+company_name: document.getElementById("company").value,
+umrah_count: Number(document.getElementById("count").value),
+phone: document.getElementById("phone").value
 }]);
+
+if(error){
+alert(error.message);
+return;
+}
 
 alert("زیادکرا");
 
@@ -52,12 +57,17 @@ alert("زیادکرا");
 
 async function addPerson(){
 
-await supabase
+const { error } = await supabase
 .from("participants")
 .insert([{
-full_name:document.getElementById("personName").value,
-phone:document.getElementById("personPhone").value
+full_name: document.getElementById("personName").value,
+phone: document.getElementById("personPhone").value
 }]);
+
+if(error){
+alert(error.message);
+return;
+}
 
 alert("زیادکرا");
 
