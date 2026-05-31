@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+<meta charset="UTF-8">
+<title>Admin</title>
+</head>
+<body dir="rtl">
+
+<h2>زیادکردنی کۆمپانیا</h2>
+
+<input id="company">
+<input id="count">
+<input id="phone">
+
+<button onclick="addCompany()">
+زیادکردن
+</button>
+
+<hr>
+
+<h2>زیادکردنی ناو</h2>
+
+<input id="personName">
+<input id="personPhone">
+
+<button onclick="addPerson()">
+زیادکردن
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const supabase = window.supabase.createClient(
+"https://slllcibigutjivauryvc.supabase.co",
+"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH"
+);
+
+async function addCompany(){
+
+await supabase
+.from("companies")
+.insert([{
+company_name:document.getElementById("company").value,
+umrah_count:document.getElementById("count").value,
+phone:document.getElementById("phone").value
+}]);
+
+alert("زیادکرا");
+
+}
+
+async function addPerson(){
+
+await supabase
+.from("participants")
+.insert([{
+full_name:document.getElementById("personName").value,
+phone:document.getElementById("personPhone").value
+}]);
+
+alert("زیادکرا");
+
+}
+
+</script>
+
+</body>
+</html>
