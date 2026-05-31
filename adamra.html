@@ -3,145 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adamra Admin</title>
+
+<title>پڕۆژەی دیاری عمرە حاجی کاروان ستونی</title>
 
 <style>
 
-body{
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 font-family:sans-serif;
+}
+
+body{
 background:#f5f7fa;
 padding:15px;
 }
 
 .card{
 background:#fff;
-padding:20px;
 border-radius:15px;
+padding:20px;
 margin-bottom:15px;
 box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.title{
+font-size:24px;
+font-weight:bold;
+text-align:center;
+color:#0f766e;
+}
+
+.subtitle{
+margin-top:8px;
+text-align:center;
+color:#666;
+font-size:14px;
+}
+
+h3{
+margin-bottom:15px;
+color:#0f766e;
 }
 
 input{
 width:100%;
 padding:12px;
-margin-top:10px;
 border:1px solid #ddd;
 border-radius:10px;
-box-sizing:border-box;
+margin-bottom:10px;
+font-size:16px;
 }
 
 button{
 width:100%;
 padding:12px;
-margin-top:10px;
 border:none;
 border-radius:10px;
 background:#0f766e;
-color:white;
-font-size:16px;
+color:#fff;
+font-size:17px;
 cursor:pointer;
 }
 
-.item{
+button:hover{
+opacity:.9;
+}
+
+.company-item{
+padding:12px;
+border-bottom:1px solid #eee;
+line-height:1.8;
+}
+
+.participant-item{
 padding:10px;
 border-bottom:1px solid #eee;
 }
 
-.hidden{
-display:none;
+.counter{
+background:#ecfeff;
+border:1px solid #a5f3fc;
+padding:12px;
+border-radius:10px;
+margin-bottom:15px;
+text-align:center;
+font-weight:bold;
+color:#0f766e;
+}
+
+.empty{
+text-align:center;
+color:#888;
+padding:15px;
 }
 
 </style>
-
 </head>
+
 <body>
 
-<div id="loginBox" class="card">
+<div class="card">
 
-<h2>چوونە ژوورەوە</h2>
+<div class="title">
+پڕۆژەی دیاری عمرە حاجی کاروان ستونی
+</div>
+
+<div class="subtitle">
+تۆمارکردنی بەشداربووانی دیاری عمرە
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+کۆمپانیا بەشداربووەکان
+</h3>
+
+<div id="companies">
+
+<div class="empty">
+چاوەڕێی داتا...
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+فۆڕمی تۆمارکردن
+</h3>
 
 <input
-type="password"
-id="password"
-placeholder="پاسوورد"
+type="text"
+id="name"
+placeholder="ناوی سیانی"
 />
 
-<button onclick="login()">
-چوونە ژوورەوە
-</button>
+<input
+type="text"
+id="phone"
+placeholder="ژمارە مۆبایل"
+/>
 
-</div>
-
-<div id="adminPanel" class="hidden">
-
-<div class="card">
-
-<h2>زیادکردنی کۆمپانیا</h2>
-
-<input id="companyName" placeholder="ناوی کۆمپانیا">
-<input id="companyCount" placeholder="ژمارەی عمرە">
-<input id="companyPhone" placeholder="ژمارەی مۆبایل">
-
-<button onclick="addCompany()">
-زیادکردن
+<button onclick="saveParticipant()">
+ناردن
 </button>
 
 </div>
 
 <div class="card">
 
-<h2>زیادکردنی بەشدار</h2>
+<div class="counter">
 
-<input id="personName" placeholder="ناو">
-<input id="personPhone" placeholder="ژمارەی مۆبایل">
-
-<button onclick="addParticipant()">
-زیادکردن
-</button>
+کۆی بەشداربووان:
+<span id="participantsCount">
+0
+</span>
 
 </div>
 
-<div class="card">
+<h3>
+ناوە تۆمارکراوەکان
+</h3>
 
-<h2>سڕینەوەی کۆمپانیا</h2>
+<div id="participants">
 
-<input id="deleteCompanyId" placeholder="ID">
-
-<button onclick="deleteCompany()">
-سڕینەوە
-</button>
-
+<div class="empty">
+چاوەڕێی داتا...
 </div>
-
-<div class="card">
-
-<h2>سڕینەوەی بەشدار</h2>
-
-<input id="deleteParticipantId" placeholder="ID">
-
-<button onclick="deleteParticipant()">
-سڕینەوە
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>کۆمپانیاکان</h2>
-
-<div id="companies"></div>
-
-</div>
-
-<div class="card">
-
-<h2>بەشدارەکان</h2>
-
-<div id="participants"></div>
 
 </div>
 
 </div>
+
+</body>
+</html>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -152,174 +193,155 @@ const supabase = window.supabase.createClient(
 "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH"
 );
 
-function login(){
-
-const pass =
-document.getElementById("password").value;
-
-if(pass !== "karwan123"){
-
-alert("پاسوورد هەڵەیە");
-return;
-
-}
-
-document.getElementById("loginBox").style.display="none";
-document.getElementById("adminPanel").classList.remove("hidden");
-
-loadCompanies();
-loadParticipants();
-
-}
-
-async function addCompany(){
-
-const { error } = await supabase
-.from("companies")
-.insert([{
-company_name:
-document.getElementById("companyName").value,
-
-umrah_count:
-Number(document.getElementById("companyCount").value),
-
-phone:
-document.getElementById("companyPhone").value
-}]);
-
-if(error){
-
-alert(error.message);
-return;
-
-}
-
-alert("زیادکرا");
-
-loadCompanies();
-
-}
-
-async function addParticipant(){
-
-const { error } = await supabase
-.from("participants")
-.insert([{
-full_name:
-document.getElementById("personName").value,
-
-phone:
-document.getElementById("personPhone").value
-}]);
-
-if(error){
-
-alert(error.message);
-return;
-
-}
-
-alert("زیادکرا");
-
-loadParticipants();
-
-}
-
-async function deleteCompany(){
-
-const id =
-document.getElementById("deleteCompanyId").value;
-
-const { error } = await supabase
-.from("companies")
-.delete()
-.eq("id", id);
-
-if(error){
-
-alert(error.message);
-return;
-
-}
-
-alert("سڕایەوە");
-
-loadCompanies();
-
-}
-
-async function deleteParticipant(){
-
-const id =
-document.getElementById("deleteParticipantId").value;
-
-const { error } = await supabase
-.from("participants")
-.delete()
-.eq("id", id);
-
-if(error){
-
-alert(error.message);
-return;
-
-}
-
-alert("سڕایەوە");
-
-loadParticipants();
-
-}
-
 async function loadCompanies(){
 
-const { data } = await supabase
+const { data, error } = await supabase
 .from("companies")
 .select("*")
 .order("id");
 
-let html="";
+if(error){
+document.getElementById("companies").innerHTML =
+'<div class="empty">هەڵە لە وەرگرتنی داتا</div>';
+return;
+}
 
-data.forEach(x=>{
+let html = "";
+
+if(data && data.length){
+
+data.forEach(item=>{
 
 html += `
-<div class="item">
-ID: ${x.id}
+<div class="company-item">
+
+<b>${item.company_name || ""}</b>
 <br>
-${x.company_name}
+
+🎁 ${item.umrah_count || 0} عمرە
+
+<br>
+
+📞 ${item.phone || ""}
+
 </div>
 `;
 
 });
 
-document.getElementById("companies").innerHTML=html;
+}else{
+
+html = `
+<div class="empty">
+هیچ کۆمپانیایەک تۆمار نەکراوە
+</div>
+`;
+
+}
+
+document.getElementById("companies").innerHTML = html;
 
 }
 
 async function loadParticipants(){
 
-const { data } = await supabase
+const { data, error } = await supabase
 .from("participants")
 .select("*")
 .order("id");
 
-let html="";
+if(error){
 
-data.forEach(x=>{
+document.getElementById("participants").innerHTML =
+'<div class="empty">هەڵە لە وەرگرتنی داتا</div>';
+
+return;
+
+}
+
+document.getElementById("participantsCount").innerText =
+data ? data.length : 0;
+
+let html = "";
+
+if(data && data.length){
+
+data.forEach(item=>{
 
 html += `
-<div class="item">
-ID: ${x.id}
-<br>
-${x.full_name}
+<div class="participant-item">
+${item.full_name || ""}
 </div>
 `;
 
 });
 
-document.getElementById("participants").innerHTML=html;
+}else{
+
+html = `
+<div class="empty">
+هیچ ناوێک تۆمار نەکراوە
+</div>
+`;
 
 }
+
+document.getElementById("participants").innerHTML = html;
+
+}
+
+async function saveParticipant(){
+
+const name =
+document.getElementById("name").value.trim();
+
+const phone =
+document.getElementById("phone").value.trim();
+
+if(!name || !phone){
+
+alert("هەموو خانەکان پڕ بکە");
+return;
+
+}
+
+const { data: existing } = await supabase
+.from("participants")
+.select("id")
+.eq("phone", phone);
+
+if(existing && existing.length > 0){
+
+alert("ئەم ژمارەیە پێشتر تۆمارکراوە");
+return;
+
+}
+
+const { error } = await supabase
+.from("participants")
+.insert([{
+full_name:name,
+phone:phone
+}]);
+
+if(error){
+
+alert(error.message);
+return;
+
+}
+
+document.getElementById("name").value = "";
+document.getElementById("phone").value = "";
+
+alert("بە سەرکەوتوویی تۆمارکرا");
+
+loadParticipants();
+
+}
+
+loadCompanies();
+loadParticipants();
 
 </script>
 
