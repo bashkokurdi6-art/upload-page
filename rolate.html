@@ -1,0 +1,28 @@
+<script type="module">
+import { createClient }
+from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  "https://slllcibigutjivauryvc.supabase.co",
+  "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH"
+);
+
+async function loadNames() {
+
+  const { data, error } = await supabase
+    .from("registrations")
+    .select("id,full_name");
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const names = data.map(x => x.full_name);
+
+  console.log(names);
+
+}
+
+loadNames();
+</script>
