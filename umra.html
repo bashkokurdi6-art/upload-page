@@ -1,13 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="ku" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پڕۆژەی دیاری عومرە حاجی کاروان ستونی</title>
 
-<title>پڕۆژەی دیاری عمرە حاجی کاروان ستونی</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
 *{
 margin:0;
 padding:0;
@@ -16,330 +17,217 @@ font-family:sans-serif;
 }
 
 body{
-background:#f5f7fa;
-padding:15px;
+background:#0f1115;
+color:white;
+padding:20px;
 }
 
-.card{
-background:#fff;
-border-radius:15px;
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.box{
+background:#161b22;
+border:2px solid #0ea35a;
+border-radius:18px;
 padding:20px;
-margin-bottom:15px;
-box-shadow:0 2px 10px rgba(0,0,0,.08);
+margin-bottom:20px;
+box-shadow:0 0 15px rgba(14,163,90,.25);
 }
 
 .title{
-font-size:24px;
-font-weight:bold;
 text-align:center;
-color:#0f766e;
+font-size:28px;
+font-weight:bold;
+color:#fff;
 }
 
 .subtitle{
-margin-top:8px;
 text-align:center;
-color:#666;
-font-size:14px;
-}
-
-h3{
-margin-bottom:15px;
-color:#0f766e;
+margin-top:10px;
+color:#8be0b4;
 }
 
 input{
 width:100%;
 padding:12px;
-border:1px solid #ddd;
+margin-top:10px;
+border:none;
 border-radius:10px;
-margin-bottom:10px;
 font-size:16px;
 }
 
 button{
 width:100%;
-padding:12px;
+padding:14px;
+margin-top:12px;
+background:#0ea35a;
 border:none;
+color:white;
+font-size:18px;
 border-radius:10px;
-background:#0f766e;
-color:#fff;
-font-size:17px;
 cursor:pointer;
 }
 
-button:hover{
-opacity:.9;
-}
-
-.company-item{
-padding:12px;
-border-bottom:1px solid #eee;
-line-height:1.8;
-}
-
-.participant-item{
-padding:10px;
-border-bottom:1px solid #eee;
-}
-
 .counter{
-background:#ecfeff;
-border:1px solid #a5f3fc;
-padding:12px;
-border-radius:10px;
-margin-bottom:15px;
-text-align:center;
+font-size:34px;
 font-weight:bold;
-color:#0f766e;
-}
-
-.empty{
 text-align:center;
-color:#888;
-padding:15px;
+color:#8be0b4;
 }
 
+#participantsList div{
+padding:8px;
+border-bottom:1px solid rgba(255,255,255,.1);
+}
 </style>
+
 </head>
 
 <body>
 
-<div class="card">
+<div class="container">
 
+<div class="box">
 <div class="title">
-پڕۆژەی دیاری عمرە حاجی کاروان ستونی
+پڕۆژەی دیاری عومرە حاجی کاروان ستونی
 </div>
-
 <div class="subtitle">
-تۆمارکردنی بەشداربووانی دیاری عمرە
+بەخێربێن بۆ تۆمارکردنی بەژداربووان
+</div>
 </div>
 
+<div class="box">
+<h2>زانیاری کۆمپانیا</h2>
+<br>
+<p><strong>ناوی کۆمپانیا:</strong> <span id="companyName">...</span></p>
+<p><strong>ژمارەی هەدیە:</strong> <span id="giftCount">...</span></p>
+<p><strong>ژمارەی مۆبایل:</strong> <span id="companyPhone">...</span></p>
 </div>
 
-<div class="card">
-
-<h3>
-کۆمپانیا بەشداربووەکان
-</h3>
-
-<div id="companies">
-
-<div class="empty">
-چاوەڕێی داتا...
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>
-فۆڕمی تۆمارکردن
-</h3>
+<div class="box">
+<h2>فۆڕمی تۆمارکردن</h2>
 
 <input
 type="text"
-id="name"
+id="fullName"
 placeholder="ناوی سیانی"
 />
 
 <input
 type="text"
 id="phone"
-placeholder="ژمارە مۆبایل"
+placeholder="ژمارەی مۆبایل"
 />
 
 <button onclick="saveParticipant()">
-ناردن
+تۆمارکردن
 </button>
-
 </div>
 
-<div class="card">
-
-<div class="counter">
-
-کۆی بەشداربووان:
-<span id="participantsCount">
-0
-</span>
-
+<div class="box">
+<h2 style="text-align:center;">ژمارەی بەژداربووان</h2>
+<div class="counter" id="count">0</div>
 </div>
 
-<h3>
-ناوە تۆمارکراوەکان
-</h3>
-
-<div id="participants">
-
-<div class="empty">
-چاوەڕێی داتا...
+<div class="box">
+<h2>ناوی تۆمارکراوەکان</h2>
+<br>
+<div id="participantsList"></div>
 </div>
 
 </div>
-
-</div>
-
-</body>
-</html>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-  alert("JS STARTED");
-
 const supabase = window.supabase.createClient(
-"https://slllcibigutjivauryvc.supabase.co",
-"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH"
+'https://slllcibigutjivauryvc.supabase.co',
+'sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH'
 );
 
 async function loadCompanies(){
-
-const { data, error } = await supabase
-.from("companies")
-.select("*")
-.order("id");
-
-if(error){
-document.getElementById("companies").innerHTML =
-'<div class="empty">هەڵە لە وەرگرتنی داتا</div>';
-return;
-}
-
-let html = "";
+const {data} = await supabase
+.from('companies')
+.select('*')
+.limit(1);
 
 if(data && data.length){
 
-data.forEach(item=>{
+document.getElementById('companyName').textContent =
+data[0].company_name || '';
 
-html += `
-<div class="company-item">
+document.getElementById('giftCount').textContent =
+data[0].umrah_count || '';
 
-<b>${item.company_name || ""}</b>
-<br>
-
-🎁 ${item.umrah_count || 0} عمرە
-
-<br>
-
-📞 ${item.phone || ""}
-
-</div>
-`;
-
-});
-
-}else{
-
-html = `
-<div class="empty">
-هیچ کۆمپانیایەک تۆمار نەکراوە
-</div>
-`;
-
+document.getElementById('companyPhone').textContent =
+data[0].phone || '';
 }
-
-document.getElementById("companies").innerHTML = html;
-
 }
 
 async function loadParticipants(){
 
-const { data, error } = await supabase
-.from("participants")
-.select("*")
-.order("id");
+const {data} = await supabase
+.from('participants')
+.select('*')
+.order('id',{ascending:true});
 
-if(error){
+const list =
+document.getElementById('participantsList');
 
-document.getElementById("participants").innerHTML =
-'<div class="empty">هەڵە لە وەرگرتنی داتا</div>';
+list.innerHTML='';
 
-return;
-
-}
-
-document.getElementById("participantsCount").innerText =
+document.getElementById('count').innerText =
 data ? data.length : 0;
 
-let html = "";
+if(data){
 
-if(data && data.length){
+data.forEach((item,index)=>{
 
-data.forEach(item=>{
-
-html += `
-<div class="participant-item">
-${item.full_name || ""}
+list.innerHTML += `
+<div>
+${index+1} - ${item.full_name}
 </div>
 `;
 
 });
 
-}else{
-
-html = `
-<div class="empty">
-هیچ ناوێک تۆمار نەکراوە
-</div>
-`;
-
 }
-
-document.getElementById("participants").innerHTML = html;
-
 }
 
 async function saveParticipant(){
 
-const name =
-document.getElementById("name").value.trim();
+const full_name =
+document.getElementById('fullName').value.trim();
 
 const phone =
-document.getElementById("phone").value.trim();
+document.getElementById('phone').value.trim();
 
-if(!name || !phone){
-
-alert("هەموو خانەکان پڕ بکە");
+if(!full_name || !phone){
+alert('تکایە هەموو خانەکان پڕ بکەرەوە');
 return;
-
 }
 
-const { data: existing } = await supabase
-.from("participants")
-.select("id")
-.eq("phone", phone);
-
-if(existing && existing.length > 0){
-
-alert("ئەم ژمارەیە پێشتر تۆمارکراوە");
-return;
-
+const {error} = await supabase
+.from('participants')
+.insert([
+{
+full_name,
+phone
 }
-
-const { error } = await supabase
-.from("participants")
-.insert([{
-full_name:name,
-phone:phone
-}]);
+]);
 
 if(error){
-
-alert(error.message);
+alert('هەڵەیەک ڕوویدا');
 return;
-
 }
 
-document.getElementById("name").value = "";
-document.getElementById("phone").value = "";
+alert('بە سەرکەوتوویی تۆمار کرا');
 
-alert("بە سەرکەوتوویی تۆمارکرا");
+document.getElementById('fullName').value='';
+document.getElementById('phone').value='';
 
 loadParticipants();
-
 }
 
 loadCompanies();
