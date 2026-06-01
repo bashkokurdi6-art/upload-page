@@ -1,28 +1,88 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دیاری عمرە - براوەکان</title>
+<style>
+body{margin:0;font-family:sans-serif;background:url('https://images.unsplash.com/photo-1512632578888-169bbbc64f33?q=80&w=1600&auto=format&fit=crop') center/cover fixed;color:#fff}
+.overlay{min-height:100vh;background:rgba(0,0,0,.65);padding:20px}
+.card{max-width:900px;margin:auto;background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border-radius:24px;padding:20px;border:1px solid rgba(255,255,255,.2)}
+h1{text-align:center;color:#7CFC98}
+#winner{font-size:40px;text-align:center;margin:25px 0;color:#ff5757;font-weight:bold}
+button{padding:12px 20px;border:none;border-radius:12px;cursor:pointer}
+.primary{background:#16a34a;color:#fff}
+.list{margin-top:20px;background:rgba(0,0,0,.25);padding:15px;border-radius:16px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+<div class="overlay">
+<div class="card">
+<h1>🕋 دیاری عمرە</h1>
+<div id="winner">کرتە لە هەڵبژاردنی براوە بکە</div>
+<button class="primary" onclick="pickWinner()">هەڵبژاردنی براوەی داهاتوو</button>
+<div class="list">
+<h3>مێژووی براوەکان</h3>
+<div id="history"></div>
+</div>
+</div>
+</div>
+
 <script type="module">
-import { createClient }
-from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase = createClient(
-  "https://slllcibigutjivauryvc.supabase.co",
-  "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH"
+'https://slllcibigutjivauryvc.supabase.co',
+'sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH'
 );
 
-async function loadNames() {
+let participants=[];
+let winners=JSON.parse(localStorage.getItem('umrah_winners')||'[]');
 
-  const { data, error } = await supabase
-    .from("registrations")
-    .select("id,full_name");
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  const names = data.map(x => x.full_name);
-
-  console.log(names);
-
+function renderHistory(){
+ const el=document.getElementById('history');
+ el.innerHTML='';
+ winners.forEach((name,i)=>{
+   const row=document.createElement('div');
+   row.className='row';
+   row.innerHTML=`<span>${i+1}- ${name}</span>
+   <button onclick="removeWinner(${i})">🗑️</button>`;
+   el.appendChild(row);
+ });
+}
+window.removeWinner=function(i){
+ winners.splice(i,1);
+ localStorage.setItem('umrah_winners',JSON.stringify(winners));
+ renderHistory();
 }
 
-loadNames();
+async function loadNames(){
+ const {data,error}=await supabase.from('registrations').select('full_name');
+ if(error){document.getElementById('winner').textContent='هەڵە لە Supabase'; return;}
+ participants=data.map(x=>x.full_name).filter(Boolean);
+}
+await loadNames();
+renderHistory();
+
+window.pickWinner=function(){
+ const available=participants.filter(x=>!winners.includes(x));
+ if(!available.length){alert('هیچ بەشدارێک نەماوە');return;}
+ let c=0;
+ const box=document.getElementById('winner');
+ const t=setInterval(()=>{
+   box.textContent=available[Math.floor(Math.random()*available.length)];
+   c++;
+ },80);
+ setTimeout(()=>{
+   clearInterval(t);
+   const winner=available[Math.floor(Math.random()*available.length)];
+   box.innerHTML='🎉 پیرۆزە 🎉<br>'+winner;
+   winners.push(winner);
+   localStorage.setItem('umrah_winners',JSON.stringify(winners));
+   renderHistory();
+ },4000);
+}
 </script>
+</body>
+</html>
