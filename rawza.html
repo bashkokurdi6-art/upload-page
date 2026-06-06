@@ -1,693 +1,294 @@
+
 <!DOCTYPE html>
-<html lang="ckb" dir="rtl">
-
+<html lang="ku" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>خزمەتگوزاری ڕەوزە | SIWAK</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-  <style>
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
-
-    body{
-
-      font-family:'Noto Sans Arabic', sans-serif;
-
-      background:
-      linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.75)),
-      url('https://images.unsplash.com/photo-1564769625905-50e93615e769?q=80&w=1200');
-
-      background-size:cover;
-      background-position:center;
-
-      min-height:100vh;
-
-      display:flex;
-      justify-content:center;
-      align-items:center;
-
-      padding:20px;
-
-      color:white;
-    }
-
-    .card{
-
-      width:100%;
-      max-width:800px;
-
-      background:rgba(8,25,18,0.92);
-
-      border:2px solid #d4af37;
-
-      border-radius:28px;
-
-      padding:28px;
-
-      backdrop-filter:blur(10px);
-
-      box-shadow:
-      0 0 30px rgba(212,175,55,0.25),
-      0 0 80px rgba(0,0,0,0.5);
-
-    }
-
-    .title{
-
-      text-align:center;
-      margin-bottom:25px;
-
-    }
-
-    .title h1{
-
-      color:#d4af37;
-      font-size:32px;
-      margin-bottom:8px;
-
-    }
-
-    .title p{
-
-      color:#ccc;
-      font-size:14px;
-
-    }
-
-    .price-box{
-
-      background:#0f3827;
-
-      border:1px solid #d4af37;
-
-      border-radius:18px;
-
-      padding:14px;
-
-      text-align:center;
-
-      margin-bottom:25px;
-
-    }
-
-    .price-box span{
-
-      color:#d4af37;
-      font-size:24px;
-      font-weight:bold;
-
-    }
-
-    .grid{
-
-      display:grid;
-
-      grid-template-columns:1fr 1fr;
-
-      gap:16px;
-
-    }
-
-    .group{
-
-      margin-bottom:16px;
-
-    }
-
-    label{
-
-      display:block;
-
-      margin-bottom:8px;
-
-      color:#d4af37;
-
-      font-size:14px;
-
-    }
-
-    input,
-    select,
-    textarea{
-
-      width:100%;
-
-      padding:14px;
-
-      border:none;
-
-      border-radius:16px;
-
-      background:#10251c;
-
-      color:white;
-
-      font-size:15px;
-
-      border:1px solid transparent;
-
-      outline:none;
-
-      transition:.3s;
-
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus{
-
-      border-color:#d4af37;
-
-      box-shadow:0 0 10px rgba(212,175,55,0.4);
-
-    }
-
-    textarea{
-
-      resize:none;
-      height:120px;
-
-    }
-
-    .upload{
-
-      background:#10251c;
-
-      border:1px dashed #d4af37;
-
-      border-radius:16px;
-
-      padding:15px;
-
-    }
-
-    .submit-btn{
-
-      width:100%;
-
-      padding:16px;
-
-      border:none;
-
-      border-radius:18px;
-
-      background:linear-gradient(135deg,#d4af37,#f7d978);
-
-      color:#062015;
-
-      font-size:17px;
-
-      font-weight:bold;
-
-      cursor:pointer;
-
-      margin-top:10px;
-
-      transition:.3s;
-
-    }
-
-    .submit-btn:hover{
-
-      transform:translateY(-2px);
-
-    }
-
-    .success{
-
-      margin-top:15px;
-
-      text-align:center;
-
-      color:#79ffb0;
-
-      display:none;
-
-    }
-
-    .loading{
-
-      display:none;
-
-      text-align:center;
-
-      margin-top:12px;
-
-      color:#d4af37;
-
-    }
-
-    @media(max-width:768px){
-
-      .grid{
-
-        grid-template-columns:1fr;
-
-      }
-
-      .card{
-
-        padding:20px;
-
-      }
-
-      .title h1{
-
-        font-size:26px;
-
-      }
-
-    }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خزمەتگوزاری ڕەوزە</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Tahoma,Arial,sans-serif}
+body{
+  background:#fff;
+  color:#123;
+  padding:18px;
+}
+.container{max-width:520px;margin:auto}
+.card{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(0,120,70,.18);
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+.title{
+  text-align:center;
+  color:#0b6b3a;
+  font-size:24px;
+  font-weight:bold;
+  border:2px solid #d4af37;
+}
+.price{
+  text-align:center;
+  font-size:22px;
+  color:#b00000;
+  font-weight:bold;
+}
+label{
+  display:block;
+  margin:12px 0 6px;
+  font-weight:bold;
+  color:#0b6b3a;
+}
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  outline:none;
+  background:#fff;
+  font-size:15px;
+}
+textarea{min-height:95px;resize:none}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.payments{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.pay{
+  padding:14px 6px;
+  border-radius:16px;
+  color:white;
+  font-weight:bold;
+  text-align:center;
+  cursor:pointer;
+  border:3px solid transparent;
+}
+.fastpay{background:#c90000}
+.fib{background:#00884a}
+.qicard{background:#d4a900;color:#111}
+.pay.active{border-color:#111;transform:scale(.97)}
+.pay-number{
+  margin-top:12px;
+  background:#f7f7f7;
+  border:1px dashed #0b6b3a;
+  border-radius:14px;
+  padding:13px;
+  text-align:center;
+  font-weight:bold;
+}
+.preview{
+  width:100%;
+  max-height:210px;
+  object-fit:cover;
+  border-radius:16px;
+  margin-top:10px;
+  display:none;
+  border:1px solid #ddd;
+}
+button{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:18px;
+  background:linear-gradient(135deg,#0b6b3a,#d4af37);
+  color:white;
+  font-size:18px;
+  font-weight:bold;
+  margin-top:18px;
+  cursor:pointer;
+}
+button:disabled{opacity:.6}
+.msg{text-align:center;margin-top:12px;font-weight:bold}
+</style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="container">
 
-  <div class="title">
+  <div class="card title">خزمەتگوزاری ڕەوزە</div>
 
-    <h1>خزمەتگوزاری ڕەوزە</h1>
-
-    <p>SIWAK | حج و عومرە</p>
-
+  <div class="card">
+    <div style="text-align:center;color:#0b6b3a;font-weight:bold">نرخی خزمەتگوزاری</div>
+    <div class="price" id="priceBox">...</div>
   </div>
 
-  <div class="price-box">
+  <div class="card">
+    <h3 style="text-align:center;color:#b00000;margin-bottom:10px">فۆڕمی پڕکردنەوەی زانیاری</h3>
 
-    نرخی ئەمڕۆ
+    <label>ناوی سیانی</label>
+    <input id="fullName" type="text" placeholder="ناوی سیانی بنووسە">
 
-    <br><br>
+    <label>ژمارەی مۆبایل</label>
+    <input id="mobile" type="tel" placeholder="07xxxxxxxxx">
 
-    <span id="price">...</span>
+    <label>ساڵ و مانگ و ڕۆژ</label>
+    <input id="dateGo" type="date">
 
+    <label>کاتژمێر</label>
+    <div class="row">
+      <select id="hour"></select>
+      <select id="minute"></select>
+      <select id="ampm">
+        <option value="AM">بەیانی</option>
+        <option value="PM">شەو</option>
+      </select>
+    </div>
+
+    <label>جۆر</label>
+    <select id="gender">
+      <option value="">هەڵبژێرە</option>
+      <option value="پیاو">پیاو</option>
+      <option value="ئافرەت">ئافرەت</option>
+    </select>
+
+    <label>وێنەی ڤیزە</label>
+    <input id="visaImg" type="file" accept="image/*">
+    <img id="visaPreview" class="preview">
+
+    <label>وێنەی کەسی</label>
+    <input id="personImg" type="file" accept="image/*">
+    <img id="personPreview" class="preview">
+
+    <label>پارەدان</label>
+    <div class="payments">
+      <div class="pay fastpay" onclick="selectPay('fastpay',this)">FastPay</div>
+      <div class="pay fib" onclick="selectPay('fib',this)">FIB</div>
+      <div class="pay qicard" onclick="selectPay('qicard',this)">QiCard</div>
+    </div>
+
+    <div class="pay-number" id="payNumber">ژمارەی پارەدان لێرە دەردەکەوێت</div>
+
+    <label>وێنەی پارەدان</label>
+    <input id="paymentImg" type="file" accept="image/*">
+    <img id="paymentPreview" class="preview">
+
+    <label>تێبینی</label>
+    <textarea id="note" placeholder="تێبینی بنووسە..."></textarea>
+
+    <button id="sendBtn" onclick="sendRequest()">ناردن</button>
+    <div class="msg" id="msg"></div>
   </div>
-
-  <form id="form">
-
-    <div class="grid">
-
-      <div class="group">
-
-        <label>ناوی سیانی</label>
-
-        <input type="text" id="naw" required>
-
-      </div>
-
-      <div class="group">
-
-        <label>ژمارەی مۆبایل</label>
-
-        <input type="text" id="mobile" required>
-
-      </div>
-
-    </div>
-
-    <div class="grid">
-
-      <div class="group">
-
-        <label>کاتژمێر</label>
-
-        <input type="time" id="katzhmer">
-
-      </div>
-
-      <div class="group">
-
-        <label>ڕۆژ / مانگ / ساڵ</label>
-
-        <input type="date" id="roj">
-
-      </div>
-
-    </div>
-
-    <div class="grid">
-
-      <div class="group">
-
-        <label>ڕەگەز</label>
-
-        <select id="gender">
-
-          <option value="پیاو">پیاو</option>
-
-          <option value="ئافرەت">ئافرەت</option>
-
-        </select>
-
-      </div>
-
-      <div class="group">
-
-        <label>پارەدان</label>
-
-        <select id="paradan">
-
-          <option value="FastPay">FastPay</option>
-
-          <option value="FIB">FIB</option>
-
-          <option value="Qi Card">Qi Card</option>
-
-        </select>
-
-
-
-        <div
-        id="paymentNumberBox"
-
-        style="
-        display:none;
-        margin-top:15px;
-        background:#0f3827;
-        padding:15px;
-        border-radius:16px;
-        border:1px solid #d4af37;
-        text-align:center;
-        ">
-
-        <p style="
-        margin-bottom:8px;
-        color:#d4af37;
-        ">
-
-        ژمارەی پارەدان
-
-        </p>
-
-        <h3 id="paymentNumber"></h3>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <div class="group upload">
-
-      <label>وێنەی پاسپۆرت</label>
-
-      <input type="file" id="passport" accept="image/*" required>
-
-    </div>
-
-    <br>
-
-    <div class="group upload">
-
-      <label>وێنەی پارەدان</label>
-
-      <input type="file" id="payment" accept="image/*" required>
-
-    </div>
-
-    <br>
-
-    <div class="group">
-
-      <label>تێبینی</label>
-
-      <textarea id="tebini"></textarea>
-
-    </div>
-
-    <button class="submit-btn" type="submit">
-
-      ناردنی داواکاری
-
-    </button>
-
-    <div class="loading" id="loading">
-
-      تکایە چاوەڕێ بکە...
-
-    </div>
-
-    <div class="success" id="success">
-
-      داواکاریەکەت بەسەرکەوتوویی نێردرا ✨
-
-    </div>
-
-  </form>
 
 </div>
 
 <script>
+const SUPABASE_URL = "https://slllcibigutjivauryvc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_URL =
-"https://slllcibigutjivauryvc.supabase.co";
+let paymentNumbers = {};
+let selectedPay = "";
 
-const SUPABASE_KEY =
-"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
-
-const client = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-
-
-// ======================
-// GET PRICE
-// ======================
-
-async function loadPrice(){
-
-  const { data } = await client
-  .from('rawda_prices')
-  .select('*')
-  .limit(1)
-  .single();
-
-  if(data){
-
-    document.getElementById('price').innerText =
-    data.price;
-
-  }
-
+for(let i=1;i<=12;i++){
+  hour.innerHTML += `<option value="${i}">${i}</option>`;
+}
+for(let i=0;i<60;i++){
+  let v = String(i).padStart(2,"0");
+  minute.innerHTML += `<option value="${v}">${v}</option>`;
 }
 
-loadPrice();
+function preview(input,img){
+  input.addEventListener("change",()=>{
+    const file=input.files[0];
+    if(file){
+      img.src=URL.createObjectURL(file);
+      img.style.display="block";
+    }
+  });
+}
+preview(visaImg,visaPreview);
+preview(personImg,personPreview);
+preview(paymentImg,paymentPreview);
 
+async function loadData(){
+  const {data:priceData} = await db.from("rawda_prices").select("*").limit(1).single();
+  priceBox.innerText = priceData?.price || "نرخ دانەنراوە";
 
+  const {data:payData} = await db.from("payment_numbers").select("*").limit(1).single();
+  paymentNumbers = payData || {};
+}
+loadData();
 
-// ======================
-// PAYMENT NUMBERS
-// ======================
+function selectPay(type,el){
+  selectedPay = type;
+  document.querySelectorAll(".pay").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
 
-const paymentMethod =
-document.getElementById(
-"paradan"
-);
-
-const paymentBox =
-document.getElementById(
-"paymentNumberBox"
-);
-
-const paymentNumber =
-document.getElementById(
-"paymentNumber"
-);
-
-
-
-async function loadPaymentNumbers(){
-
-const { data } =
-await client
-.from("payment_numbers")
-.select("*")
-.limit(1)
-.single();
-
-if(data){
-
-function updatePaymentNumber(){
-
-const method =
-paymentMethod.value;
-
-if(method === "FastPay"){
-
-paymentNumber.innerText =
-data.fastpay;
-
+  if(type==="fastpay") payNumber.innerText = paymentNumbers.fastpay || "ژمارەی FastPay دانەنراوە";
+  if(type==="fib") payNumber.innerText = paymentNumbers.fib || "ژمارەی FIB دانەنراوە";
+  if(type==="qicard") payNumber.innerText = paymentNumbers.qicard || "ژمارەی QiCard دانەنراوە";
 }
 
-else if(method === "FIB"){
-
-paymentNumber.innerText =
-data.fib;
-
-}
-
-else{
-
-paymentNumber.innerText =
-data.qi;
-
-}
-
-paymentBox.style.display =
-"block";
-
-}
-
-
-
-paymentMethod.addEventListener(
-"change",
-updatePaymentNumber
-);
-
-updatePaymentNumber();
-
-}
-
-}
-
-loadPaymentNumbers();
-
-
-
-// ======================
-// IMAGE UPLOAD
-// ======================
-
-async function uploadImage(file){
-
-  const fileName =
-  Date.now() + "-" + file.name;
-
-  const { error } = await client
-  .storage
-  .from('rawda-images')
-  .upload(fileName,file);
-
-  if(error){
-
-    alert("هەڵە لە upload");
-
-    return null;
-
-  }
-
-  const { data } = client
-  .storage
-  .from('rawda-images')
-  .getPublicUrl(fileName);
-
+async function uploadImage(file,folder){
+  if(!file) return "";
+  const name = folder + "/" + Date.now() + "-" + file.name;
+  const {error} = await db.storage.from("rawda-images").upload(name,file);
+  if(error) throw error;
+  const {data} = db.storage.from("rawda-images").getPublicUrl(name);
   return data.publicUrl;
-
 }
 
+async function sendRequest(){
+  msg.innerText="";
+  sendBtn.disabled=true;
+  sendBtn.innerText="چاوەڕوان بە...";
 
+  try{
+    const full_name = fullName.value.trim();
+    const phone = mobile.value.trim();
+    const date_go = dateGo.value;
+    const time_go = `${hour.value}:${minute.value} ${ampm.value}`;
+    const genderVal = gender.value;
+    const noteVal = note.value.trim();
 
-// ======================
-// FORM SUBMIT
-// ======================
+    if(!full_name || !phone || !date_go || !genderVal || !selectedPay){
+      throw new Error("تکایە هەموو خانە پێویستەکان پڕبکەوە");
+    }
 
-const form = document.getElementById("form");
+    const visa_url = await uploadImage(visaImg.files[0],"visa");
+    const person_url = await uploadImage(personImg.files[0],"person");
+    const payment_url = await uploadImage(paymentImg.files[0],"payment");
 
-form.addEventListener("submit", async(e)=>{
+    const {error} = await db.from("rawda_requests").insert([{
+      naw_syani: full_name,
+      mobile: phone,
+      katzhmer: time_go,
+      date_go: date_go,
+      jor: genderVal,
+      payment_method: selectedPay,
+      visa_image: visa_url,
+      personal_image: person_url,
+      payment_image: payment_url,
+      tebini: noteVal
+    }]);
 
-  e.preventDefault();
+    if(error) throw error;
 
-  document.getElementById("loading").style.display = "block";
+    msg.style.color="green";
+    msg.innerText="داواکارییەکەت بەسەرکەوتوویی نێردرا ✅";
+    document.querySelectorAll("input,textarea,select").forEach(e=>e.value="");
+    document.querySelectorAll(".preview").forEach(e=>e.style.display="none");
+    document.querySelectorAll(".pay").forEach(e=>e.classList.remove("active"));
+    payNumber.innerText="ژمارەی پارەدان لێرە دەردەکەوێت";
+    selectedPay="";
 
-
-
-  const passportFile =
-  document.getElementById("passport").files[0];
-
-  const paymentFile =
-  document.getElementById("payment").files[0];
-
-
-
-  const passportUrl =
-  await uploadImage(passportFile);
-
-  const paymentUrl =
-  await uploadImage(paymentFile);
-
-
-
-  const { error } = await client
-  .from("rawda_requests")
-  .insert([{
-
-    naw_syani:
-    document.getElementById("naw").value,
-
-    mobile:
-    document.getElementById("mobile").value,
-
-    katzhmer:
-    document.getElementById("katzhmer").value,
-
-    roj:
-    document.getElementById("roj").value,
-
-    gender:
-    document.getElementById("gender").value,
-
-    paradan:
-    document.getElementById("paradan").value,
-
-    passport_image:
-    passportUrl,
-
-    payment_image:
-    paymentUrl,
-
-    tebini:
-    document.getElementById("tebini").value
-
-  }]);
-
-
-
-  document.getElementById("loading").style.display = "none";
-
-
-
-  if(error){
-
-    alert("هەڵەیەک ڕوویدا");
-
-    console.log(error);
-
-    return;
-
+  }catch(err){
+    msg.style.color="red";
+    msg.innerText=err.message;
   }
 
-
-
-  document.getElementById("success").style.display = "block";
-
-  form.reset();
-
-});
-
+  sendBtn.disabled=false;
+  sendBtn.innerText="ناردن";
+}
 </script>
 
 </body>
