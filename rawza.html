@@ -9,41 +9,77 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Tahoma,Arial,sans-serif}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Noto Sans Arabic', Tahoma, Arial, sans-serif !important;
+}
+
 body{
   background:#fff;
-  color:#123;
+  color:#17453a;
   padding:18px;
+  direction:rtl;
 }
-.container{max-width:520px;margin:auto}
+
+.container{
+  max-width:520px;
+  margin:auto;
+}
+
 .card{
-  background:rgba(255,255,255,.75);
+  background:rgba(255,255,255,.78);
   backdrop-filter:blur(14px);
-  border:1px solid rgba(0,120,70,.18);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(0,120,70,.16);
   border-radius:22px;
   padding:18px;
   margin-bottom:16px;
   box-shadow:0 8px 25px rgba(0,0,0,.08);
 }
+
 .title{
   text-align:center;
   color:#0b6b3a;
-  font-size:24px;
-  font-weight:bold;
+  font-size:26px;
+  font-weight:800;
   border:2px solid #d4af37;
 }
+
+.price-title{
+  text-align:center;
+  color:#0b6b3a;
+  font-weight:700;
+  font-size:17px;
+}
+
 .price{
   text-align:center;
-  font-size:22px;
+  font-size:25px;
   color:#b00000;
-  font-weight:bold;
+  font-weight:800;
+  margin-top:5px;
 }
+
+h3{
+  text-align:center;
+  color:#b00000;
+  margin-bottom:14px;
+  font-size:21px;
+  font-weight:800;
+}
+
 label{
   display:block;
   margin:12px 0 6px;
-  font-weight:bold;
-  color:#0b6b3a;
+  font-size:17px;
+  font-weight:700;
+  color:#2f6f67;
 }
+
 input,select,textarea{
   width:100%;
   padding:13px;
@@ -51,30 +87,59 @@ input,select,textarea{
   border:1px solid #ddd;
   outline:none;
   background:#fff;
-  font-size:15px;
+  font-size:16px;
+  font-weight:500;
+  direction:rtl;
+  text-align:right;
 }
-textarea{min-height:95px;resize:none}
-.row{display:flex;gap:8px}
-.row>*{flex:1}
+
+input::placeholder,
+textarea::placeholder{
+  color:#999;
+  font-size:14px;
+}
+
+textarea{
+  min-height:95px;
+  resize:none;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+}
+
+.row>*{
+  flex:1;
+}
+
 .payments{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:10px;
   margin-top:10px;
 }
+
 .pay{
   padding:14px 6px;
   border-radius:16px;
   color:white;
-  font-weight:bold;
+  font-weight:800;
   text-align:center;
   cursor:pointer;
   border:3px solid transparent;
+  font-size:15px;
 }
+
 .fastpay{background:#c90000}
 .fib{background:#00884a}
 .qicard{background:#d4a900;color:#111}
-.pay.active{border-color:#111;transform:scale(.97)}
+
+.pay.active{
+  border-color:#111;
+  transform:scale(.97);
+}
+
 .pay-number{
   margin-top:12px;
   background:#f7f7f7;
@@ -82,8 +147,10 @@ textarea{min-height:95px;resize:none}
   border-radius:14px;
   padding:13px;
   text-align:center;
-  font-weight:bold;
+  font-weight:800;
+  color:#b00000;
 }
+
 .preview{
   width:100%;
   max-height:210px;
@@ -93,6 +160,7 @@ textarea{min-height:95px;resize:none}
   display:none;
   border:1px solid #ddd;
 }
+
 button{
   width:100%;
   padding:15px;
@@ -101,12 +169,20 @@ button{
   background:linear-gradient(135deg,#0b6b3a,#d4af37);
   color:white;
   font-size:18px;
-  font-weight:bold;
+  font-weight:800;
   margin-top:18px;
   cursor:pointer;
 }
-button:disabled{opacity:.6}
-.msg{text-align:center;margin-top:12px;font-weight:bold}
+
+button:disabled{
+  opacity:.6;
+}
+
+.msg{
+  text-align:center;
+  margin-top:12px;
+  font-weight:800;
+}
 </style>
 </head>
 
@@ -117,12 +193,12 @@ button:disabled{opacity:.6}
   <div class="card title">خزمەتگوزاری ڕەوزە</div>
 
   <div class="card">
-    <div style="text-align:center;color:#0b6b3a;font-weight:bold">نرخی خزمەتگوزاری</div>
+    <div class="price-title">نرخی خزمەتگوزاری</div>
     <div class="price" id="priceBox">...</div>
   </div>
 
   <div class="card">
-    <h3 style="text-align:center;color:#b00000;margin-bottom:10px">فۆڕمی پڕکردنەوەی زانیاری</h3>
+    <h3>فۆڕمی پڕکردنەوەی زانیاری</h3>
 
     <label>ناوی سیانی</label>
     <input id="fullName" type="text" placeholder="ناوی سیانی بنووسە">
@@ -189,11 +265,12 @@ let paymentNumbers = {};
 let selectedPay = "";
 
 for(let i=1;i<=12;i++){
-  hour.innerHTML += `<option value="${i}">${i}</option>`;
+  document.getElementById("hour").innerHTML += `<option value="${i}">${i}</option>`;
 }
+
 for(let i=0;i<60;i++){
   let v = String(i).padStart(2,"0");
-  minute.innerHTML += `<option value="${v}">${v}</option>`;
+  document.getElementById("minute").innerHTML += `<option value="${v}">${v}</option>`;
 }
 
 function preview(input,img){
@@ -205,17 +282,19 @@ function preview(input,img){
     }
   });
 }
+
 preview(visaImg,visaPreview);
 preview(personImg,personPreview);
 preview(paymentImg,paymentPreview);
 
 async function loadData(){
   const {data:priceData} = await db.from("rawda_prices").select("*").limit(1).single();
-  priceBox.innerText = priceData?.price || "نرخ دانەنراوە";
+  priceBox.innerText = priceData?.price || "3500 دینار";
 
   const {data:payData} = await db.from("payment_numbers").select("*").limit(1).single();
   paymentNumbers = payData || {};
 }
+
 loadData();
 
 function selectPay(type,el){
@@ -261,25 +340,13 @@ async function sendRequest(){
     const {error} = await db.from("rawda_requests").insert([{
       naw_syani: full_name,
       mobile: phone,
-      katzhmer: time_go,
-      date_go: date_go,
-      jor: genderVal,
-      payment_method: selectedPay,
-      visa_image: visa_url,
-      personal_image: person_url,
-      payment_image: payment_url,
-      tebini: noteVal
+      katzhmer: time_go
     }]);
 
     if(error) throw error;
 
     msg.style.color="green";
     msg.innerText="داواکارییەکەت بەسەرکەوتوویی نێردرا ✅";
-    document.querySelectorAll("input,textarea,select").forEach(e=>e.value="");
-    document.querySelectorAll(".preview").forEach(e=>e.style.display="none");
-    document.querySelectorAll(".pay").forEach(e=>e.classList.remove("active"));
-    payNumber.innerText="ژمارەی پارەدان لێرە دەردەکەوێت";
-    selectedPay="";
 
   }catch(err){
     msg.style.color="red";
