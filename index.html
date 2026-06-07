@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>کاروان ستونی -گەشتی ‌عومرەی بە خۆرای بۆ کەسانی هەژار و کەم دەرامەت</title>
+<title>پڕۆژەی دیاری عمرە حاجی کاروان ستونی</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 
@@ -87,7 +87,8 @@ margin-bottom:8px;
 font-size:15px;
 }
 
-input{
+input,
+select{
 width:100%;
 padding:14px;
 border:none;
@@ -97,6 +98,10 @@ background:rgba(255,255,255,.1);
 color:white;
 font-size:16px;
 border:1px solid rgba(255,255,255,.15);
+}
+
+select option{
+color:black;
 }
 
 input::placeholder{
@@ -198,94 +203,63 @@ font-size:28px;
 <div class="container">
 
 <div class="glass hero">
-<h1>🕋 دیاری -حاجی کاروان ستونی</h1>
-<p>کاروان ستونی -گەشتی ‌عومرەی بە خۆرای بۆ کەسانی هەژار و کەم دەرامەت  </p>
+<h1>🕋  دیاری - حاجی کاروان ستونی</h1>
+<p>‌‌حاجی کاروان ستونی - گەشتی عومرەی بەخۆرای بۆ کەسانی هەژار و کەم دەرامەت </p>
 </div>
 
 <div class="grid">
 
 <div class="glass card">
 
-<div class="card-title">
-📋 فۆڕمی تۆمارکردن
-</div>
+<div class="card-title">📋 فۆڕمی تۆمارکردن</div>
 
-<div id="success" class="success">
-تۆمارکردن بە سەرکەوتوویی ئەنجامدرا
-</div>
-
-<div id="error" class="error">
-هەڵەیەک ڕوویدا
-</div>
+<div id="success" class="success">تۆمارکردن بە سەرکەوتوویی ئەنجامدرا</div>
+<div id="error" class="error">هەڵەیەک ڕوویدا</div>
 
 <form id="registerForm">
 
 <div class="form-group">
 <label>ناوی سیانی</label>
-<input
-type="text"
-id="fullName"
-placeholder="ناوی تەواو"
-required>
+<input type="text" id="fullName" placeholder="ناوی تەواو" required>
 </div>
 
 <div class="form-group">
 <label>ژمارەی مۆبایل</label>
-<input
-type="tel"
-id="phone"
-placeholder="0750xxxxxxx"
-required>
+<input type="tel" id="phone" placeholder="0750xxxxxxx" required>
 </div>
 
-<button type="submit">
-تۆمارکردن
-</button>
+<div class="form-group">
+<label>شار</label>
+<select id="city" required>
+<option value="">شار هەڵبژێرە</option>
+<option value="هەولێر">هەولێر</option>
+<option value="سلێمانی">سلێمانی</option>
+<option value="دهۆک">دهۆک</option>
+<option value="کەرکوک">کەرکوک</option>
+<option value="هەڵبجە">هەڵبجە</option>
+</select>
+</div>
+
+<button type="submit">تۆمارکردن</button>
 
 </form>
 
 </div>
 
 <div class="glass card">
-
 <div class="stats">
-<div id="totalCount" class="stats-number">
-0
+<div id="totalCount" class="stats-number">0</div>
+<div class="stats-text">ڕێژەی تۆمارکراوەکان</div>
 </div>
-
-<div class="stats-text">
-ڕێژەی تۆمارکراوەکان
-</div>
-</div>
-
 </div>
 
 </div>
 
 <div class="glass card" style="margin-top:20px;">
 
-<div class="card-title">
-👥 لیستی تۆمارکراوەکان
-</div>
+<div class="card-title">👥 لیستی تۆمارکراوەکان</div>
 
-<div id="namesList" class="names-box">
-
-<div class="name-item">
-<span>1</span>
-شعبان قادر
-</div>
-
-<div class="name-item">
-<span>2</span>
-سلێمان بێغڵی
-</div>
-
-<div class="name-item">
-<span>3</span>
-کوردستان تەسە
-</div>
-
-</div>
+<div id="namesList" class="names-box"></div>
 
 </div>
 
@@ -360,13 +334,17 @@ document.getElementById('fullName').value
 const phone =
 document.getElementById('phone').value
 
+const city =
+document.getElementById('city').value
+
 const { error } =
 await supabase
 .from('registrations')
 .insert([
 {
 full_name:fullName,
-phone:phone
+phone:phone,
+city:city
 }
 ])
 
