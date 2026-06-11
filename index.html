@@ -297,19 +297,43 @@ document.getElementById('totalCount')
 
 async function loadRegistrations(){
 
-const { data,error } =
+const { count, error: countError } =
+await supabase
+.from('registrations')
+.select('*', {
+count:'exact',
+head:true
+})
+
+if(!countError){
+totalCount.innerText = count || 0
+}
+
+let allData = []
+let from = 0
+const pageSize = 1000
+
+while(true){
+
+const { data, error } =
 await supabase
 .from('registrations')
 .select('*')
 .order('id',{ascending:false})
+.range(from, from + pageSize - 1)
 
 if(error) return
 
-totalCount.innerText = data.length
+allData = allData.concat(data)
+
+if(data.length < pageSize) break
+
+from += pageSize
+}
 
 namesList.innerHTML=''
 
-data.forEach((item,index)=>{
+allData.forEach((item,index)=>{
 
 namesList.innerHTML += `
 <div class="name-item">
@@ -374,6 +398,6 @@ loadRegistrations()
 loadRegistrations()
 
 </script>
-
+  
 </body>
 </html>
