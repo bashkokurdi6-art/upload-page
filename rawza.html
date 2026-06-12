@@ -19,7 +19,10 @@
 }
 
 body{
-  background:#fff;
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(0,50,25,.55),rgba(0,50,25,.65)),
+    url("Rawdah.png") center/cover fixed no-repeat;
   color:#17453a;
   padding:18px;
   direction:rtl;
@@ -31,27 +34,30 @@ body{
 }
 
 .card{
-  background:rgba(255,255,255,.78);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  border:1px solid rgba(0,120,70,.16);
-  border-radius:22px;
+  background:rgba(255,255,255,.18);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border:2px solid rgba(212,175,55,.75);
+  border-radius:24px;
   padding:18px;
   margin-bottom:16px;
-  box-shadow:0 8px 25px rgba(0,0,0,.08);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.25),
+    inset 0 0 18px rgba(255,255,255,.18);
 }
 
 .title{
   text-align:center;
-  color:#0b6b3a;
+  color:#ffd86b;
   font-size:26px;
   font-weight:800;
   border:2px solid #d4af37;
+  text-shadow:0 2px 6px rgba(0,0,0,.5);
 }
 
 .price-title{
   text-align:center;
-  color:#0b6b3a;
+  color:#fff3b0;
   font-weight:700;
   font-size:17px;
 }
@@ -59,14 +65,15 @@ body{
 .price{
   text-align:center;
   font-size:25px;
-  color:#b00000;
+  color:#ff2b2b;
   font-weight:800;
   margin-top:5px;
+  text-shadow:0 1px 4px rgba(0,0,0,.45);
 }
 
 h3{
   text-align:center;
-  color:#b00000;
+  color:#ff2b2b;
   margin-bottom:14px;
   font-size:21px;
   font-weight:800;
@@ -77,26 +84,21 @@ label{
   margin:12px 0 6px;
   font-size:17px;
   font-weight:700;
-  color:#2f6f67;
+  color:#ffe27a;
 }
 
 input,select,textarea{
   width:100%;
   padding:13px;
-  border-radius:14px;
-  border:1px solid #ddd;
+  border-radius:15px;
+  border:1.5px solid rgba(212,175,55,.85);
   outline:none;
-  background:#fff;
+  background:rgba(255,255,255,.82);
   font-size:16px;
-  font-weight:500;
+  font-weight:600;
   direction:rtl;
   text-align:right;
-}
-
-input::placeholder,
-textarea::placeholder{
-  color:#999;
-  font-size:14px;
+  color:#064225;
 }
 
 textarea{
@@ -122,29 +124,29 @@ textarea{
 
 .pay{
   padding:14px 6px;
-  border-radius:16px;
-  color:white;
+  border-radius:17px;
   font-weight:800;
   text-align:center;
   cursor:pointer;
-  border:3px solid transparent;
+  border:2px solid #d4af37;
   font-size:15px;
+  box-shadow:0 6px 15px rgba(0,0,0,.22);
 }
 
-.fastpay{background:#c90000}
-.fib{background:#00884a}
-.qicard{background:#d4a900;color:#111}
+.fastpay{background:#b00000;color:white}
+.fib{background:#006b3a;color:white}
+.qicard{background:#d4af37;color:#111}
 
 .pay.active{
-  border-color:#111;
+  border-color:#fff;
   transform:scale(.97);
 }
 
 .pay-number{
   margin-top:12px;
-  background:#f7f7f7;
-  border:1px dashed #0b6b3a;
-  border-radius:14px;
+  background:rgba(255,255,255,.75);
+  border:2px dashed #d4af37;
+  border-radius:15px;
   padding:13px;
   text-align:center;
   font-weight:800;
@@ -158,20 +160,21 @@ textarea{
   border-radius:16px;
   margin-top:10px;
   display:none;
-  border:1px solid #ddd;
+  border:2px solid #d4af37;
 }
 
 button{
   width:100%;
   padding:15px;
-  border:0;
-  border-radius:18px;
-  background:linear-gradient(135deg,#0b6b3a,#d4af37);
+  border:2px solid #d4af37;
+  border-radius:20px;
+  background:linear-gradient(135deg,#004d2b,#008f4c);
   color:white;
   font-size:18px;
   font-weight:800;
   margin-top:18px;
   cursor:pointer;
+  box-shadow:0 8px 22px rgba(0,0,0,.28);
 }
 
 button:disabled{
@@ -182,6 +185,7 @@ button:disabled{
   text-align:center;
   margin-top:12px;
   font-weight:800;
+  color:white;
 }
 </style>
 </head>
