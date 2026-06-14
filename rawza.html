@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
 <head>
@@ -24,7 +23,7 @@ body{
     linear-gradient(rgba(0,50,25,.55),rgba(0,50,25,.65)),
     url("Rawdah.png") center/cover fixed no-repeat;
   color:#17453a;
-  padding:18px;
+  padding:14px;
   direction:rtl;
 }
 
@@ -34,13 +33,13 @@ body{
 }
 
 .card{
-  background:rgba(255,255,255,.18);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border:2px solid rgba(212,175,55,.75);
+  background:rgba(255,255,255,.16);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:2px solid rgba(212,175,55,.7);
   border-radius:24px;
-  padding:18px;
-  margin-bottom:16px;
+  padding:15px;
+  margin-bottom:13px;
   box-shadow:
     0 8px 30px rgba(0,0,0,.25),
     inset 0 0 18px rgba(255,255,255,.18);
@@ -49,7 +48,7 @@ body{
 .title{
   text-align:center;
   color:#ffd86b;
-  font-size:26px;
+  font-size:24px;
   font-weight:800;
   border:2px solid #d4af37;
   text-shadow:0 2px 6px rgba(0,0,0,.5);
@@ -59,51 +58,58 @@ body{
   text-align:center;
   color:#fff3b0;
   font-weight:700;
-  font-size:17px;
+  font-size:16px;
 }
 
 .price{
   text-align:center;
-  font-size:25px;
-  color:#ff2b2b;
+  font-size:28px;
+  color:#ff3030;
   font-weight:800;
-  margin-top:5px;
+  margin-top:3px;
   text-shadow:0 1px 4px rgba(0,0,0,.45);
 }
 
 h3{
   text-align:center;
-  color:#ff2b2b;
-  margin-bottom:14px;
-  font-size:21px;
+  color:#ff3030;
+  margin-bottom:12px;
+  font-size:20px;
   font-weight:800;
 }
 
 label{
   display:block;
-  margin:12px 0 6px;
-  font-size:17px;
-  font-weight:700;
+  margin:8px 0 5px;
+  font-size:14px;
+  font-weight:800;
   color:#ffe27a;
 }
 
 input,select,textarea{
   width:100%;
-  padding:13px;
-  border-radius:15px;
+  min-height:43px;
+  padding:10px;
+  border-radius:14px;
   border:1.5px solid rgba(212,175,55,.85);
   outline:none;
-  background:rgba(255,255,255,.82);
-  font-size:16px;
-  font-weight:600;
+  background:rgba(255,255,255,.88);
+  font-size:14px;
+  font-weight:700;
   direction:rtl;
   text-align:right;
   color:#064225;
 }
 
 textarea{
-  min-height:95px;
+  min-height:58px;
   resize:none;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
 }
 
 .row{
@@ -115,21 +121,38 @@ textarea{
   flex:1;
 }
 
-.payments{
+.upload-grid{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
   margin-top:10px;
 }
 
+.upload-box,
+.payment-glass{
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1.5px solid rgba(212,175,55,.55);
+  border-radius:18px;
+  padding:10px;
+}
+
+.payments{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:9px;
+  margin-top:8px;
+}
+
 .pay{
-  padding:14px 6px;
-  border-radius:17px;
+  padding:12px 5px;
+  border-radius:16px;
   font-weight:800;
   text-align:center;
   cursor:pointer;
   border:2px solid #d4af37;
-  font-size:15px;
+  font-size:13px;
   box-shadow:0 6px 15px rgba(0,0,0,.22);
 }
 
@@ -139,40 +162,42 @@ textarea{
 
 .pay.active{
   border-color:#fff;
-  transform:scale(.97);
+  transform:scale(.96);
+  box-shadow:0 0 0 3px rgba(255,255,255,.25);
 }
 
 .pay-number{
-  margin-top:12px;
+  margin:10px 0;
   background:rgba(255,255,255,.75);
   border:2px dashed #d4af37;
-  border-radius:15px;
-  padding:13px;
+  border-radius:14px;
+  padding:11px;
   text-align:center;
   font-weight:800;
   color:#b00000;
+  font-size:14px;
 }
 
 .preview{
   width:100%;
-  max-height:210px;
+  max-height:120px;
   object-fit:cover;
-  border-radius:16px;
-  margin-top:10px;
+  border-radius:14px;
+  margin-top:8px;
   display:none;
   border:2px solid #d4af37;
 }
 
 button{
   width:100%;
-  padding:15px;
+  padding:14px;
   border:2px solid #d4af37;
   border-radius:20px;
   background:linear-gradient(135deg,#004d2b,#008f4c);
   color:white;
   font-size:18px;
   font-weight:800;
-  margin-top:18px;
+  margin-top:13px;
   cursor:pointer;
   box-shadow:0 8px 22px rgba(0,0,0,.28);
 }
@@ -186,6 +211,15 @@ button:disabled{
   margin-top:12px;
   font-weight:800;
   color:white;
+}
+
+@media(max-width:430px){
+  body{padding:10px}
+  .card{padding:13px;border-radius:20px}
+  .title{font-size:22px}
+  .grid{grid-template-columns:1fr;gap:3px}
+  .upload-grid{grid-template-columns:1fr 1fr}
+  .pay{font-size:12px;padding:10px 3px}
 }
 </style>
 </head>
@@ -204,14 +238,31 @@ button:disabled{
   <div class="card">
     <h3>فۆڕمی پڕکردنەوەی زانیاری</h3>
 
-    <label>ناوی سیانی</label>
-    <input id="fullName" type="text" placeholder="ناوی سیانی بنووسە">
+    <div class="grid">
+      <div>
+        <label>ناوی سیانی</label>
+        <input id="fullName" type="text" placeholder="ناوی سیانی بنووسە">
+      </div>
 
-    <label>ژمارەی مۆبایل</label>
-    <input id="mobile" type="tel" placeholder="07xxxxxxxxx">
+      <div>
+        <label>ژمارەی مۆبایل</label>
+        <input id="mobile" type="tel" placeholder="07xxxxxxxxx">
+      </div>
 
-    <label>ساڵ و مانگ و ڕۆژ</label>
-    <input id="dateGo" type="date">
+      <div>
+        <label>ساڵ و مانگ و ڕۆژ</label>
+        <input id="dateGo" type="date">
+      </div>
+
+      <div>
+        <label>جۆر</label>
+        <select id="gender">
+          <option value="">هەڵبژێرە</option>
+          <option value="پیاو">پیاو</option>
+          <option value="ئافرەت">ئافرەت</option>
+        </select>
+      </div>
+    </div>
 
     <label>کاتژمێر</label>
     <div class="row">
@@ -223,38 +274,39 @@ button:disabled{
       </select>
     </div>
 
-    <label>جۆر</label>
-    <select id="gender">
-      <option value="">هەڵبژێرە</option>
-      <option value="پیاو">پیاو</option>
-      <option value="ئافرەت">ئافرەت</option>
-    </select>
+    <div class="upload-grid">
+      <div class="upload-box">
+        <label>وێنەی ڤیزە</label>
+        <input id="visaImg" type="file" accept="image/*">
+        <img id="visaPreview" class="preview">
+      </div>
 
-    <label>وێنەی ڤیزە</label>
-    <input id="visaImg" type="file" accept="image/*">
-    <img id="visaPreview" class="preview">
+      <div class="upload-box">
+        <label>وێنەی پاسپۆرت</label>
+        <input id="passportImg" type="file" accept="image/*">
+        <img id="passportPreview" class="preview">
+      </div>
+    </div>
 
-    <label>وێنەی کەسی</label>
-    <input id="personImg" type="file" accept="image/*">
-    <img id="personPreview" class="preview">
-
-    <label>پارەدان</label>
+    <label>شێوازی پارەدان</label>
     <div class="payments">
       <div class="pay fastpay" onclick="selectPay('fastpay',this)">FastPay</div>
       <div class="pay fib" onclick="selectPay('fib',this)">FIB</div>
       <div class="pay qicard" onclick="selectPay('qicard',this)">QiCard</div>
     </div>
 
-    <div class="pay-number" id="payNumber">ژمارەی پارەدان لێرە دەردەکەوێت</div>
+    <div class="payment-glass">
+      <div class="pay-number" id="payNumber">ژمارەی پارەدان لێرە دەردەکەوێت</div>
 
-    <label>وێنەی پارەدان</label>
-    <input id="paymentImg" type="file" accept="image/*">
-    <img id="paymentPreview" class="preview">
+      <label>وێنەی پارەدان</label>
+      <input id="paymentImg" type="file" accept="image/*">
+      <img id="paymentPreview" class="preview">
+    </div>
 
     <label>تێبینی</label>
     <textarea id="note" placeholder="تێبینی بنووسە..."></textarea>
 
-    <button id="sendBtn" onclick="sendRequest()">ناردن</button>
+    <button id="sendBtn" onclick="sendRequest()">ناردنی داواکاری</button>
     <div class="msg" id="msg"></div>
   </div>
 
@@ -269,12 +321,12 @@ let paymentNumbers = {};
 let selectedPay = "";
 
 for(let i=1;i<=12;i++){
-  document.getElementById("hour").innerHTML += `<option value="${i}">${i}</option>`;
+  hour.innerHTML += `<option value="${i}">${i}</option>`;
 }
 
 for(let i=0;i<60;i++){
   let v = String(i).padStart(2,"0");
-  document.getElementById("minute").innerHTML += `<option value="${v}">${v}</option>`;
+  minute.innerHTML += `<option value="${v}">${v}</option>`;
 }
 
 function preview(input,img){
@@ -288,7 +340,7 @@ function preview(input,img){
 }
 
 preview(visaImg,visaPreview);
-preview(personImg,personPreview);
+preview(passportImg,passportPreview);
 preview(paymentImg,paymentPreview);
 
 async function loadData(){
@@ -313,9 +365,12 @@ function selectPay(type,el){
 
 async function uploadImage(file,folder){
   if(!file) return "";
-  const name = folder + "/" + Date.now() + "-" + file.name;
+  const safeName = file.name.replaceAll(" ","-");
+  const name = folder + "/" + Date.now() + "-" + safeName;
+
   const {error} = await db.storage.from("rawda-images").upload(name,file);
   if(error) throw error;
+
   const {data} = db.storage.from("rawda-images").getPublicUrl(name);
   return data.publicUrl;
 }
@@ -338,27 +393,50 @@ async function sendRequest(){
     }
 
     const visa_url = await uploadImage(visaImg.files[0],"visa");
-    const person_url = await uploadImage(personImg.files[0],"person");
+    const passport_url = await uploadImage(passportImg.files[0],"passport");
     const payment_url = await uploadImage(paymentImg.files[0],"payment");
 
     const {error} = await db.from("rawda_requests").insert([{
       naw_syani: full_name,
       mobile: phone,
-      katzhmer: time_go
+      katzhmer: time_go,
+
+      date_go: date_go,
+      gender: genderVal,
+      payment_method: selectedPay,
+      visa_url: visa_url,
+      passport_url: passport_url,
+      payment_url: payment_url,
+      note: noteVal
     }]);
 
     if(error) throw error;
 
-    msg.style.color="green";
+    msg.style.color="#00ff8a";
     msg.innerText="داواکارییەکەت بەسەرکەوتوویی نێردرا ✅";
 
+    fullName.value="";
+    mobile.value="";
+    dateGo.value="";
+    gender.value="";
+    note.value="";
+    visaImg.value="";
+    passportImg.value="";
+    paymentImg.value="";
+    visaPreview.style.display="none";
+    passportPreview.style.display="none";
+    paymentPreview.style.display="none";
+    payNumber.innerText="ژمارەی پارەدان لێرە دەردەکەوێت";
+    selectedPay="";
+    document.querySelectorAll(".pay").forEach(x=>x.classList.remove("active"));
+
   }catch(err){
-    msg.style.color="red";
+    msg.style.color="#ffdddd";
     msg.innerText=err.message;
   }
 
   sendBtn.disabled=false;
-  sendBtn.innerText="ناردن";
+  sendBtn.innerText="ناردنی داواکاری";
 }
 </script>
 
