@@ -8,22 +8,22 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800;900&display=swap');
 
 *{
   box-sizing:border-box;
   margin:0;
   padding:0;
-  font-family:'Noto Sans Arabic', Tahoma, Arial, sans-serif !important;
+  font-family:'Noto Sans Arabic',Tahoma,Arial,sans-serif!important;
 }
 
 body{
   min-height:100vh;
   background:
-    linear-gradient(rgba(0,50,25,.55),rgba(0,50,25,.65)),
+    linear-gradient(rgba(0,35,18,.72),rgba(0,45,22,.78)),
     url("Rawdah.png") center/cover fixed no-repeat;
   color:#17453a;
-  padding:18px;
+  padding:14px;
   direction:rtl;
 }
 
@@ -33,147 +33,186 @@ body{
 }
 
 .card{
-  background:rgba(255,255,255,.18);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border:2px solid rgba(212,175,55,.75);
-  border-radius:24px;
-  padding:18px;
-  margin-bottom:16px;
+  background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(255,255,255,.10));
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border:2px solid rgba(255,215,95,.85);
+  border-radius:28px;
+  padding:16px;
+  margin-bottom:14px;
   box-shadow:
-    0 8px 30px rgba(0,0,0,.25),
-    inset 0 0 18px rgba(255,255,255,.18);
+    0 14px 40px rgba(0,0,0,.35),
+    inset 0 0 20px rgba(255,255,255,.18);
 }
 
 .title{
   text-align:center;
-  color:#ffd86b;
-  font-size:26px;
-  font-weight:800;
-  border:2px solid #d4af37;
-  text-shadow:0 2px 6px rgba(0,0,0,.5);
+  color:#ffe27a;
+  font-size:28px;
+  font-weight:900;
+  text-shadow:0 3px 10px rgba(0,0,0,.6);
 }
 
 .price-title{
   text-align:center;
-  color:#fff3b0;
-  font-weight:700;
+  color:#fff7c7;
+  font-weight:800;
   font-size:17px;
 }
 
 .price{
   text-align:center;
-  font-size:25px;
-  color:#ff2b2b;
-  font-weight:800;
+  font-size:30px;
+  color:#ffd86b;
+  font-weight:900;
   margin-top:5px;
-  text-shadow:0 1px 4px rgba(0,0,0,.45);
+  text-shadow:0 3px 10px rgba(0,0,0,.55);
 }
 
 h3{
   text-align:center;
-  color:#ff2b2b;
-  margin-bottom:14px;
+  color:#ffe27a;
+  margin-bottom:12px;
   font-size:21px;
-  font-weight:800;
+  font-weight:900;
 }
 
 label{
   display:block;
-  margin:12px 0 6px;
-  font-size:17px;
-  font-weight:700;
+  margin:10px 0 5px;
+  font-size:16px;
+  font-weight:800;
   color:#ffe27a;
 }
 
-input,select,textarea{
+input,select,textarea,.fake-input{
   width:100%;
-  padding:13px;
-  border-radius:15px;
-  border:1.5px solid rgba(212,175,55,.85);
+  padding:12px;
+  border-radius:16px;
+  border:1.8px solid rgba(255,215,95,.95);
   outline:none;
-  background:rgba(255,255,255,.82);
+  background:rgba(255,255,255,.88);
   font-size:16px;
-  font-weight:600;
+  font-weight:700;
   direction:rtl;
   text-align:right;
   color:#064225;
 }
 
 textarea{
-  min-height:95px;
+  min-height:75px;
   resize:none;
 }
 
-.row{
-  display:flex;
-  gap:8px;
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 
-.row>*{
-  flex:1;
+.full{
+  grid-column:1/-1;
+}
+
+.fake-input{
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:#075334;
+  box-shadow:inset 0 0 12px rgba(212,175,55,.18);
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
 }
 
 .payments{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
-  margin-top:10px;
+  gap:8px;
+  margin-top:8px;
 }
 
 .pay{
-  padding:14px 6px;
-  border-radius:17px;
-  font-weight:800;
+  padding:13px 5px;
+  border-radius:18px;
+  font-weight:900;
   text-align:center;
   cursor:pointer;
-  border:2px solid #d4af37;
-  font-size:15px;
-  box-shadow:0 6px 15px rgba(0,0,0,.22);
+  border:2px solid #ffd86b;
+  font-size:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.28);
 }
 
-.fastpay{background:#b00000;color:white}
-.fib{background:#006b3a;color:white}
+.fastpay{background:#a40000;color:white}
+.fib{background:#007a43;color:white}
 .qicard{background:#d4af37;color:#111}
 
 .pay.active{
   border-color:#fff;
-  transform:scale(.97);
+  transform:scale(.96);
+  box-shadow:0 0 18px rgba(255,216,107,.75);
 }
 
 .pay-number{
-  margin-top:12px;
-  background:rgba(255,255,255,.75);
-  border:2px dashed #d4af37;
-  border-radius:15px;
-  padding:13px;
+  margin-top:10px;
+  background:rgba(255,255,255,.82);
+  border:2px dashed #ffd86b;
+  border-radius:16px;
+  padding:12px;
   text-align:center;
-  font-weight:800;
-  color:#b00000;
+  font-weight:900;
+  color:#006b3a;
+}
+
+.file-box input{
+  display:none;
+}
+
+.file-label{
+  width:100%;
+  min-height:52px;
+  border-radius:16px;
+  border:1.8px solid rgba(255,215,95,.95);
+  background:rgba(255,255,255,.88);
+  color:#075334;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
 }
 
 .preview{
   width:100%;
-  max-height:210px;
+  max-height:185px;
   object-fit:cover;
   border-radius:16px;
-  margin-top:10px;
+  margin-top:8px;
   display:none;
-  border:2px solid #d4af37;
+  border:2px solid #ffd86b;
 }
 
 button{
   width:100%;
-  padding:15px;
-  border:2px solid #d4af37;
-  border-radius:20px;
-  background:linear-gradient(135deg,#004d2b,#008f4c);
+  padding:14px;
+  border:2px solid #ffd86b;
+  border-radius:22px;
+  background:linear-gradient(135deg,#004d2b,#00a85a,#0b6b3c);
   color:white;
   font-size:18px;
-  font-weight:800;
-  margin-top:18px;
+  font-weight:900;
+  margin-top:16px;
   cursor:pointer;
-  box-shadow:0 8px 22px rgba(0,0,0,.28);
+  box-shadow:0 10px 28px rgba(0,0,0,.35);
+}
+
+button:active{
+  transform:scale(.98);
 }
 
 button:disabled{
@@ -183,8 +222,61 @@ button:disabled{
 .msg{
   text-align:center;
   margin-top:12px;
-  font-weight:800;
+  font-weight:900;
   color:white;
+}
+
+.popup{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.62);
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.popup-card{
+  width:100%;
+  max-width:370px;
+  background:linear-gradient(145deg,rgba(15,90,55,.96),rgba(5,45,28,.96));
+  border:2px solid #ffd86b;
+  border-radius:30px;
+  padding:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.55);
+  text-align:center;
+}
+
+.popup-card h3{
+  color:#ffd86b;
+}
+
+.popup-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+
+.popup-grid select{
+  height:55px;
+  text-align:center;
+  font-size:17px;
+  font-weight:900;
+}
+
+.close-btn{
+  background:linear-gradient(135deg,#b00000,#e14b4b);
+  margin-top:8px;
+}
+
+@media(max-width:380px){
+  body{padding:10px}
+  .card{padding:13px}
+  .title{font-size:24px}
+  input,select,textarea,.fake-input{font-size:14px;padding:10px}
+  label{font-size:14px}
 }
 </style>
 </head>
@@ -193,7 +285,7 @@ button:disabled{
 
 <div class="container">
 
-  <div class="card title">خزمەتگوزاری ڕەوزە</div>
+  <div class="card title">🕌 خزمەتگوزاری ڕەوزە</div>
 
   <div class="card">
     <div class="price-title">نرخی خزمەتگوزاری</div>
@@ -203,39 +295,45 @@ button:disabled{
   <div class="card">
     <h3>فۆڕمی پڕکردنەوەی زانیاری</h3>
 
-    <label>ناوی سیانی</label>
-    <input id="fullName" type="text" placeholder="ناوی سیانی بنووسە">
+    <div class="form-grid">
 
-    <label>ژمارەی مۆبایل</label>
-    <input id="mobile" type="tel" placeholder="07xxxxxxxxx">
+      <div>
+        <label>ناوی سیانی</label>
+        <input id="fullName" type="text" placeholder="ناوی سیانی">
+      </div>
 
-    <label>ساڵ و مانگ و ڕۆژ</label>
-    <input id="dateGo" type="date">
+      <div>
+        <label>ژمارەی مۆبایل</label>
+        <input id="mobile" type="tel" placeholder="07xxxxxxxxx">
+      </div>
 
-    <label>کاتژمێر</label>
-    <div class="row">
-      <select id="hour"></select>
-      <select id="minute"></select>
-      <select id="ampm">
-        <option value="AM">بەیانی</option>
-        <option value="PM">شەو</option>
-      </select>
+      <div>
+        <label>بەروار</label>
+        <div class="fake-input" onclick="openDatePopup()" id="dateText">بەروار هەڵبژێرە</div>
+      </div>
+
+      <div>
+        <label>کاتژمێر</label>
+        <div class="fake-input" onclick="openTimePopup()" id="timeText">کاتژمێر هەڵبژێرە</div>
+      </div>
+
+      <div class="full">
+        <label>جۆر</label>
+        <select id="gender">
+          <option value="">هەڵبژێرە</option>
+          <option value="پیاو">👨 پیاو</option>
+          <option value="ئافرەت">👩 ئافرەت</option>
+        </select>
+      </div>
+
+      <div class="full file-box">
+        <label>وێنەی ڤیزە</label>
+        <label class="file-label" for="visaImg" id="visaLabel">📷 وێنە باربکە</label>
+        <input id="visaImg" type="file" accept="image/*">
+        <img id="visaPreview" class="preview">
+      </div>
+
     </div>
-
-    <label>جۆر</label>
-    <select id="gender">
-      <option value="">هەڵبژێرە</option>
-      <option value="پیاو">پیاو</option>
-      <option value="ئافرەت">ئافرەت</option>
-    </select>
-
-    <label>وێنەی ڤیزە</label>
-    <input id="visaImg" type="file" accept="image/*">
-    <img id="visaPreview" class="preview">
-
-    <label>وێنەی کەسی</label>
-    <input id="personImg" type="file" accept="image/*">
-    <img id="personPreview" class="preview">
 
     <label>پارەدان</label>
     <div class="payments">
@@ -246,9 +344,12 @@ button:disabled{
 
     <div class="pay-number" id="payNumber">ژمارەی پارەدان لێرە دەردەکەوێت</div>
 
-    <label>وێنەی پارەدان</label>
-    <input id="paymentImg" type="file" accept="image/*">
-    <img id="paymentPreview" class="preview">
+    <div class="file-box">
+      <label>وێنەی پارەدان</label>
+      <label class="file-label" for="paymentImg" id="paymentLabel">📷 وێنە باربکە</label>
+      <input id="paymentImg" type="file" accept="image/*">
+      <img id="paymentPreview" class="preview">
+    </div>
 
     <label>تێبینی</label>
     <textarea id="note" placeholder="تێبینی بنووسە..."></textarea>
@@ -259,6 +360,35 @@ button:disabled{
 
 </div>
 
+<div class="popup" id="datePopup">
+  <div class="popup-card">
+    <h3>بەروار هەڵبژێرە</h3>
+    <div class="popup-grid">
+      <select id="day"></select>
+      <select id="month"></select>
+      <select id="year"></select>
+    </div>
+    <button onclick="saveDate()">هەڵبژاردن</button>
+    <button class="close-btn" onclick="closePopups()">داخستن</button>
+  </div>
+</div>
+
+<div class="popup" id="timePopup">
+  <div class="popup-card">
+    <h3>کاتژمێر هەڵبژێرە</h3>
+    <div class="popup-grid">
+      <select id="hour"></select>
+      <select id="minute"></select>
+      <select id="ampm">
+        <option value="AM">بەیانی</option>
+        <option value="PM">شەو</option>
+      </select>
+    </div>
+    <button onclick="saveTime()">هەڵبژاردن</button>
+    <button class="close-btn" onclick="closePopups()">داخستن</button>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://slllcibigutjivauryvc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
@@ -266,29 +396,73 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let paymentNumbers = {};
 let selectedPay = "";
+let selectedDate = "";
+let selectedTime = "";
+
+const monthsKu = [
+  "کانوونی دووەم","شوبات","ئازار","نیسان","ئایار","حوزەیران",
+  "تەمموز","ئاب","ئەیلوول","تشرینی یەکەم","تشرینی دووەم","کانوونی یەکەم"
+];
+
+for(let i=1;i<=31;i++){
+  day.innerHTML += `<option value="${String(i).padStart(2,"0")}">${i}</option>`;
+}
+
+monthsKu.forEach((m,i)=>{
+  month.innerHTML += `<option value="${String(i+1).padStart(2,"0")}">${m}</option>`;
+});
+
+for(let y=2026;y<=2032;y++){
+  year.innerHTML += `<option value="${y}">${y}</option>`;
+}
 
 for(let i=1;i<=12;i++){
-  document.getElementById("hour").innerHTML += `<option value="${i}">${i}</option>`;
+  hour.innerHTML += `<option value="${i}">${i}</option>`;
 }
 
 for(let i=0;i<60;i++){
   let v = String(i).padStart(2,"0");
-  document.getElementById("minute").innerHTML += `<option value="${v}">${v}</option>`;
+  minute.innerHTML += `<option value="${v}">${v}</option>`;
 }
 
-function preview(input,img){
+function openDatePopup(){
+  datePopup.style.display = "flex";
+}
+
+function openTimePopup(){
+  timePopup.style.display = "flex";
+}
+
+function closePopups(){
+  datePopup.style.display = "none";
+  timePopup.style.display = "none";
+}
+
+function saveDate(){
+  selectedDate = `${year.value}-${month.value}-${day.value}`;
+  dateText.innerText = `${day.value} / ${monthsKu[Number(month.value)-1]} / ${year.value}`;
+  closePopups();
+}
+
+function saveTime(){
+  selectedTime = `${hour.value}:${minute.value} ${ampm.value}`;
+  timeText.innerText = `${hour.value}:${minute.value} ${ampm.options[ampm.selectedIndex].text}`;
+  closePopups();
+}
+
+function preview(input,img,label){
   input.addEventListener("change",()=>{
     const file=input.files[0];
     if(file){
       img.src=URL.createObjectURL(file);
       img.style.display="block";
+      label.innerText="✅ وێنە بارکرا";
     }
   });
 }
 
-preview(visaImg,visaPreview);
-preview(personImg,personPreview);
-preview(paymentImg,paymentPreview);
+preview(visaImg,visaPreview,visaLabel);
+preview(paymentImg,paymentPreview,paymentLabel);
 
 async function loadData(){
   const {data:priceData} = await db.from("rawda_prices").select("*").limit(1).single();
@@ -312,7 +486,8 @@ function selectPay(type,el){
 
 async function uploadImage(file,folder){
   if(!file) return "";
-  const name = folder + "/" + Date.now() + "-" + file.name;
+  const safeName = file.name.replace(/\s+/g,"-");
+  const name = folder + "/" + Date.now() + "-" + safeName;
   const {error} = await db.storage.from("rawda-images").upload(name,file);
   if(error) throw error;
   const {data} = db.storage.from("rawda-images").getPublicUrl(name);
@@ -327,32 +502,41 @@ async function sendRequest(){
   try{
     const full_name = fullName.value.trim();
     const phone = mobile.value.trim();
-    const date_go = dateGo.value;
-    const time_go = `${hour.value}:${minute.value} ${ampm.value}`;
     const genderVal = gender.value;
     const noteVal = note.value.trim();
 
-    if(!full_name || !phone || !date_go || !genderVal || !selectedPay){
+    if(!full_name || !phone || !selectedDate || !selectedTime || !genderVal || !selectedPay){
       throw new Error("تکایە هەموو خانە پێویستەکان پڕبکەوە");
     }
 
     const visa_url = await uploadImage(visaImg.files[0],"visa");
-    const person_url = await uploadImage(personImg.files[0],"person");
     const payment_url = await uploadImage(paymentImg.files[0],"payment");
 
     const {error} = await db.from("rawda_requests").insert([{
       naw_syani: full_name,
       mobile: phone,
-      katzhmer: time_go
+      katzhmer: selectedTime
     }]);
 
     if(error) throw error;
 
-    msg.style.color="green";
+    msg.style.color="#00ff9d";
     msg.innerText="داواکارییەکەت بەسەرکەوتوویی نێردرا ✅";
 
+    fullName.value="";
+    mobile.value="";
+    gender.value="";
+    note.value="";
+    selectedDate="";
+    selectedTime="";
+    selectedPay="";
+    dateText.innerText="بەروار هەڵبژێرە";
+    timeText.innerText="کاتژمێر هەڵبژێرە";
+    payNumber.innerText="ژمارەی پارەدان لێرە دەردەکەوێت";
+    document.querySelectorAll(".pay").forEach(x=>x.classList.remove("active"));
+
   }catch(err){
-    msg.style.color="red";
+    msg.style.color="#ff4d4d";
     msg.innerText=err.message;
   }
 
