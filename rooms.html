@@ -8,116 +8,559 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Tahoma,Arial,sans-serif}
-body{background:#eef3f8;color:#0b1f3a;padding:15px}
-.header{background:#003b2f;color:white;padding:18px;border-radius:16px;margin-bottom:15px;text-align:center}
-.header h1{font-size:22px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}
-.card{background:white;padding:15px;border-radius:14px;box-shadow:0 4px 12px #0001}
-.card b{font-size:24px;color:#007b55}
-.controls{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
-input,select,button,textarea{
-padding:12px;border:1px solid #ccd6e0;border-radius:10px;font-size:15px
-}
-button{background:#007b55;color:white;border:0;cursor:pointer;font-weight:bold}
-button.red{background:#d62828}
-button.blue{background:#1d4ed8}
-button.gold{background:#c89422}
-.main{display:grid;grid-template-columns:2fr 1fr;gap:15px}
-.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-.room{background:white;border-radius:14px;padding:15px;box-shadow:0 4px 12px #0001;cursor:pointer;border:2px solid transparent}
-.room:hover{border-color:#007b55}
-.room h2{font-size:28px;margin-bottom:8px}
-.full{color:#16a34a;font-weight:bold}
-.mid{color:#f59e0b;font-weight:bold}
-.empty{color:#64748b;font-weight:bold}
-.panel{background:white;border-radius:14px;padding:15px;box-shadow:0 4px 12px #0001}
-.guest{padding:10px;border-bottom:1px solid #eee}
-.form{display:grid;gap:8px;margin-top:12px}
-.print-area{display:none}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800;900&display=swap');
 
-@media(max-width:800px){
-.main{grid-template-columns:1fr}
-.stats{grid-template-columns:1fr}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Noto Sans Arabic',Tahoma,Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  direction:rtl;
+  color:#fff;
+  padding:18px;
+  background:
+    linear-gradient(135deg,rgba(3,20,38,.92),rgba(3,70,55,.72)),
+    radial-gradient(circle at top right,rgba(255,193,7,.22),transparent 35%),
+    radial-gradient(circle at bottom left,rgba(0,200,120,.22),transparent 40%),
+    #071c2f;
+}
+
+.app{
+  max-width:1400px;
+  margin:auto;
+}
+
+.glass{
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 18px 45px rgba(0,0,0,.25);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.header{
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  background:
+    linear-gradient(135deg,rgba(0,90,70,.75),rgba(6,34,70,.65));
+}
+
+.title h1{
+  font-size:26px;
+  font-weight:900;
+}
+
+.title p{
+  opacity:.9;
+  margin-top:4px;
+}
+
+.kaaba{
+  font-size:46px;
+  width:82px;
+  height:82px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:24px;
+  background:rgba(255,255,255,.16);
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:16px;
+}
+
+.stat{
+  border-radius:22px;
+  padding:18px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.stat .icon{
+  width:58px;
+  height:58px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  background:linear-gradient(135deg,#10b981,#0ea5e9);
+}
+
+.stat b{
+  font-size:30px;
+  display:block;
+}
+
+.stat span{
+  opacity:.9;
+}
+
+.controls{
+  border-radius:22px;
+  padding:14px;
+  margin-bottom:16px;
+  display:grid;
+  grid-template-columns:1fr 1fr 140px 140px 140px 150px 150px;
+  gap:10px;
+}
+
+input,select,textarea,button{
+  border:0;
+  outline:0;
+  border-radius:15px;
+  padding:13px 14px;
+  font-size:15px;
+}
+
+input,select,textarea{
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.18);
+}
+
+input::placeholder,textarea::placeholder{
+  color:rgba(255,255,255,.72);
+}
+
+select option{
+  color:#111;
+}
+
+button{
+  cursor:pointer;
+  font-weight:900;
+  color:white;
+  background:linear-gradient(135deg,#10b981,#047857);
+}
+
+button.blue{
+  background:linear-gradient(135deg,#2563eb,#1e40af);
+}
+
+button.red{
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+}
+
+button.gold{
+  background:linear-gradient(135deg,#f59e0b,#b45309);
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:16px;
+}
+
+.rooms-panel,.info-panel{
+  border-radius:24px;
+  padding:16px;
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.section-title h2{
+  font-size:24px;
+}
+
+.filters{
+  display:grid;
+  grid-template-columns:1fr 150px 150px 150px;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.rooms{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:14px;
+}
+
+.room{
+  position:relative;
+  overflow:hidden;
+  min-height:185px;
+  border-radius:22px;
+  padding:16px;
+  cursor:pointer;
+  transition:.25s;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.2);
+}
+
+.room:hover{
+  transform:translateY(-4px);
+  border-color:rgba(255,215,120,.7);
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
+}
+
+.room.empty{
+  background:linear-gradient(135deg,rgba(16,185,129,.24),rgba(255,255,255,.10));
+}
+
+.room.mid{
+  background:linear-gradient(135deg,rgba(245,158,11,.26),rgba(255,255,255,.10));
+}
+
+.room.full{
+  background:linear-gradient(135deg,rgba(239,68,68,.28),rgba(255,255,255,.10));
+}
+
+.room h3{
+  font-size:34px;
+  font-weight:900;
+  color:#f8fafc;
+}
+
+.room .emoji{
+  position:absolute;
+  top:18px;
+  left:16px;
+  font-size:42px;
+}
+
+.badge{
+  display:inline-block;
+  margin-top:8px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:900;
+}
+
+.badge.empty{background:#10b981}
+.badge.mid{background:#f59e0b}
+.badge.full{background:#ef4444}
+
+.room p{
+  margin-top:8px;
+  font-size:14px;
+  opacity:.92;
+}
+
+.beds{
+  margin-top:14px;
+  padding:10px;
+  border-radius:15px;
+  background:rgba(0,0,0,.17);
+  font-size:18px;
+  font-weight:900;
+}
+
+.info-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.info-icon{
+  width:54px;
+  height:54px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  background:linear-gradient(135deg,#6366f1,#0ea5e9);
+}
+  .guest-list{
+  max-height:420px;
+  overflow:auto;
+  margin-top:12px;
+}
+
+.guest{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px;
+  margin-bottom:8px;
+  border-radius:14px;
+  background:rgba(255,255,255,.08);
+}
+
+.guest-name{
+  font-weight:800;
+}
+
+.form{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+
+.form h3{
+  margin-bottom:4px;
+}
+
+.print-area{
+  display:none;
+}
+
+@media(max-width:1100px){
+  .layout{
+    grid-template-columns:1fr;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .controls{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .filters{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:700px){
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .controls{
+    grid-template-columns:1fr;
+  }
+
+  .filters{
+    grid-template-columns:1fr;
+  }
 }
 
 @media print{
-body{background:white;padding:0}
-.header,.stats,.controls,.main{display:none}
-.print-area{display:block}
-.print-title{text-align:center;margin-bottom:20px}
-.print-room{border:1px solid #333;margin-bottom:12px;padding:10px;border-radius:8px}
-.print-room h3{margin-bottom:8px}
-table{width:100%;border-collapse:collapse;margin-top:8px}
-td,th{border:1px solid #333;padding:7px;text-align:center}
+
+body{
+  background:white;
+  color:black;
+}
+
+.app>*{
+  display:none;
+}
+
+.print-area{
+  display:block;
+}
+
+.print-title{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.print-room{
+  border:1px solid #000;
+  margin-bottom:12px;
+  padding:10px;
+  border-radius:8px;
+}
+
+.print-room h3{
+  margin-bottom:10px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  border:1px solid #000;
+  padding:7px;
+  text-align:center;
+}
+
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <h1>سیستەمی دابەشکردنی ژورەکانی هوتێل</h1>
-  <p>حەج و عومرە - سیواک</p>
+<div class="app">
+
+<div class="header glass">
+
+<div class="title">
+<h1>🕋 سیستەمی دابەشکردنی ژورەکانی هوتێل</h1>
+<p>حەج و عومرە - سیواک</p>
+</div>
+
+<div class="kaaba">🕋</div>
+
 </div>
 
 <div class="stats">
-  <div class="card">کۆی ژورەکان<br><b id="totalRooms">0</b></div>
-  <div class="card">کۆی گەشتیار<br><b id="totalGuests">0</b></div>
-  <div class="card">شوێنی بەتاڵ<br><b id="emptyBeds">0</b></div>
+
+<div class="stat glass">
+<div class="icon">🏨</div>
+<div>
+<span>کۆی ژورەکان</span>
+<b id="totalRooms">0</b>
+</div>
 </div>
 
-<div class="controls">
-  <input id="roomNumber" placeholder="ژمارەی ژور">
-  <input id="hotelName" placeholder="ناوی هوتێل">
-  <select id="city">
-    <option value="مەککە">مەککە</option>
-    <option value="مەدینە">مەدینە</option>
-  </select>
-  <select id="capacity">
-    <option value="2">٢ کەسی</option>
-    <option value="3">٣ کەسی</option>
-    <option value="4" selected>٤ کەسی</option>
-    <option value="5">٥ کەسی</option>
-  </select>
-  <select id="gender">
-    <option value="پیاو">پیاو</option>
-    <option value="ئافرەت">ئافرەت</option>
-  </select>
-  <button onclick="addRoom()">زیادکردنی ژور</button>
-  <button class="blue" onclick="window.print()">چاپکردنی لیست</button>
+<div class="stat glass">
+<div class="icon">👥</div>
+<div>
+<span>کۆی گەشتیاران</span>
+<b id="totalGuests">0</b>
+</div>
 </div>
 
-<div class="main">
-  <div>
-    <h2 style="margin-bottom:10px">ژورەکان</h2>
-    <div class="rooms" id="roomsBox"></div>
-  </div>
+<div class="stat glass">
+<div class="icon">🛏️</div>
+<div>
+<span>شوێنی بەتاڵ</span>
+<b id="emptyBeds">0</b>
+</div>
+</div>
 
-  <div class="panel">
-    <h2>زانیاری ژور</h2>
-    <div id="roomInfo">ژورێک هەڵبژێرە</div>
+<div class="stat glass">
+<div class="icon">🕋</div>
+<div>
+<span>هوتێلەکان</span>
+<b id="hotelCount">0</b>
+</div>
+</div>
 
-    <div class="form" id="guestForm" style="display:none">
-      <input id="guestName" placeholder="ناوی گەشتیار">
-      <input id="guestMobile" placeholder="ژمارە مۆبایل">
-      <input id="guestCity" placeholder="شار">
-      <textarea id="guestNotes" placeholder="تێبینی"></textarea>
-      <button onclick="addGuest()">زیادکردنی گەشتیار</button>
-      <button class="red" onclick="deleteRoom()">سڕینەوەی ژور</button>
-    </div>
-  </div>
+</div>
+
+<div class="controls glass">
+
+<input id="roomNumber" placeholder="🏨 ژمارەی ژور">
+
+<input id="hotelName" placeholder="🕋 ناوی هوتێل">
+
+<select id="city">
+<option value="مەککە">🕋 مەککە</option>
+<option value="مەدینە">🕌 مەدینە</option>
+</select>
+
+<select id="capacity">
+<option value="2">🛏️ ٢ کەسی</option>
+<option value="3">🛏️ ٣ کەسی</option>
+<option value="4">🛏️ ٤ کەسی</option>
+<option value="5">🛏️ ٥ کەسی</option>
+</select>
+
+<select id="gender">
+<option value="پیاو">👳 پیاو</option>
+<option value="ئافرەت">🧕 ئافرەت</option>
+</select>
+
+<button onclick="addRoom()">➕ زیادکردنی ژور</button>
+
+<button class="blue" onclick="window.print()">🖨 چاپکردنی لیست</button>
+
+</div>
+
+<div class="layout">
+
+<div class="rooms-panel glass">
+
+<div class="section-title">
+<h2>🛏️ ژورەکان</h2>
+</div>
+
+<div class="filters">
+
+<input id="searchRoom" placeholder="🔍 گەڕان">
+
+<select id="filterCity">
+<option value="">هەموو شارەکان</option>
+<option value="مەککە">مەککە</option>
+<option value="مەدینە">مەدینە</option>
+</select>
+
+<select id="filterGender">
+<option value="">هەموو جۆرەکان</option>
+<option value="پیاو">پیاو</option>
+<option value="ئافرەت">ئافرەت</option>
+</select>
+
+<select id="filterStatus">
+<option value="">هەموو</option>
+<option value="empty">بەتاڵ</option>
+<option value="mid">نیوە پڕ</option>
+<option value="full">پڕ</option>
+</select>
+
+</div>
+
+<div id="roomsBox" class="rooms"></div>
+
+</div>
+
+<div class="info-panel glass">
+
+<div id="roomInfo">
+
+<div class="info-head">
+<div class="info-icon">🛏️</div>
+<div>
+<h2>زانیاری ژور</h2>
+<p>ژورێک هەڵبژێرە</p>
+</div>
+</div>
+
+</div>
+
+<div id="guestForm" class="form" style="display:none">
+
+<h3>👥 زیادکردنی گەشتیار</h3>
+
+<input id="guestName" placeholder="👤 ناوی گەشتیار">
+
+<input id="guestMobile" placeholder="📱 مۆبایل">
+
+<input id="guestCity" placeholder="🏙 شار">
+
+<textarea id="guestNotes" placeholder="📝 تێبینی"></textarea>
+
+<button onclick="addGuest()">➕ زیادکردنی گەشتیار</button>
+
+<button class="red" onclick="deleteRoom()">🗑 سڕینەوەی ژور</button>
+
+</div>
+
+</div>
+
 </div>
 
 <div class="print-area">
-  <div class="print-title">
-    <h1>لیستی دابەشکردنی ژورەکانی هوتێل</h1>
-    <p>سیواک - حەج و عومرە</p>
-  </div>
-  <div id="printBox"></div>
+
+<div class="print-title">
+<h1>لیستی ژورەکان</h1>
+<p>سیواک - حەج و عومرە</p>
 </div>
 
-<script>
+<div id="printBox"></div>
+
+</div>
+
+</div
+  <script>
 const SUPABASE_URL = "https://gnatnabbjmvxmigtugtv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_EB6K4oP-AK16XPPLREGAXA_FxMbIGN7";
 
@@ -146,68 +589,120 @@ async function loadData(){
   rooms = roomData || [];
   guests = guestData || [];
 
-  renderRooms();
   renderStats();
+  renderRooms();
   renderPrint();
 }
 
+function getRoomStatus(room){
+  const count = guests.filter(g => g.room_id === room.id).length;
+  const cap = Number(room.capacity || 0);
+
+  if(count === 0) return "empty";
+  if(count >= cap) return "full";
+  return "mid";
+}
+
+function roomEmoji(room){
+  if(room.gender === "ئافرەت") return "🧕";
+  if(room.gender === "پیاو") return "👳";
+  return "🛏️";
+}
+
 function renderStats(){
-  let totalCapacity = rooms.reduce((sum,r)=>sum + Number(r.capacity || 0),0);
+  const totalCapacity = rooms.reduce((sum,r)=>sum + Number(r.capacity || 0),0);
+  const hotels = [...new Set(rooms.map(r=>r.hotel_name).filter(Boolean))];
+
   document.getElementById("totalRooms").innerText = rooms.length;
   document.getElementById("totalGuests").innerText = guests.length;
   document.getElementById("emptyBeds").innerText = totalCapacity - guests.length;
+  document.getElementById("hotelCount").innerText = hotels.length;
 }
 
 function renderRooms(){
   const box = document.getElementById("roomsBox");
+  const search = document.getElementById("searchRoom").value.trim();
+  const city = document.getElementById("filterCity").value;
+  const gender = document.getElementById("filterGender").value;
+  const status = document.getElementById("filterStatus").value;
+
   box.innerHTML = "";
 
-  rooms.forEach(room=>{
-    const count = guests.filter(g=>g.room_id === room.id).length;
-    const cap = Number(room.capacity);
-    let cls = count === 0 ? "empty" : count >= cap ? "full" : "mid";
-    let text = count === 0 ? "بەتاڵ" : count >= cap ? "پڕ" : "بەشێکی پڕ";
+  rooms
+    .filter(room=>{
+      const count = guests.filter(g=>g.room_id === room.id).length;
+      const st = getRoomStatus(room);
 
-    box.innerHTML += `
-      <div class="room" onclick="selectRoom(${room.id})">
-        <h2>${room.room_number}</h2>
-        <p class="${cls}">${count}/${cap} - ${text}</p>
-        <p>${room.hotel_name || ""}</p>
-        <p>${room.city || ""} - ${room.gender || ""}</p>
-      </div>
-    `;
-  });
+      if(search && !String(room.room_number).includes(search) && !(room.hotel_name || "").includes(search)) return false;
+      if(city && room.city !== city) return false;
+      if(gender && room.gender !== gender) return false;
+      if(status && st !== status) return false;
+
+      return true;
+    })
+    .forEach(room=>{
+      const count = guests.filter(g=>g.room_id === room.id).length;
+      const cap = Number(room.capacity || 0);
+      const st = getRoomStatus(room);
+
+      let statusText = "بەتاڵ";
+      if(st === "mid") statusText = "نیوە پڕ";
+      if(st === "full") statusText = "پڕ";
+
+      box.innerHTML += `
+        <div class="room ${st}" onclick="selectRoom(${room.id})">
+          <div class="emoji">${roomEmoji(room)}</div>
+          <h3>${room.room_number}</h3>
+          <div class="beds">🛏️ ${count}/${cap} شوێن</div>
+          <span class="badge ${st}">${statusText}</span>
+          <p>🏨 ${room.hotel_name || "-"}</p>
+          <p>📍 ${room.city || "-"}</p>
+          <p>${room.gender === "ئافرەت" ? "🧕" : "👳"} ${room.gender || "-"}</p>
+        </div>
+      `;
+    });
 }
 
 function selectRoom(id){
   selectedRoom = rooms.find(r=>r.id === id);
   const roomGuests = guests.filter(g=>g.room_id === id);
-  const cap = Number(selectedRoom.capacity);
+  const cap = Number(selectedRoom.capacity || 0);
 
   let html = `
-    <h2>ژور ${selectedRoom.room_number}</h2>
-    <p>هوتێل: ${selectedRoom.hotel_name || "-"}</p>
-    <p>شار: ${selectedRoom.city || "-"}</p>
-    <p>جۆر: ${selectedRoom.gender || "-"}</p>
-    <p>شوێن: ${roomGuests.length}/${cap}</p>
-    <hr style="margin:10px 0">
-    <h3>گەشتیارەکان</h3>
+    <div class="info-head">
+      <div class="info-icon">🛏️</div>
+      <div>
+        <h2>ژور ${selectedRoom.room_number}</h2>
+        <p>${selectedRoom.hotel_name || "-"}</p>
+      </div>
+    </div>
+
+    <p>🏨 هوتێل: ${selectedRoom.hotel_name || "-"}</p>
+    <p>📍 شار: ${selectedRoom.city || "-"}</p>
+    <p>${selectedRoom.gender === "ئافرەت" ? "🧕" : "👳"} جۆر: ${selectedRoom.gender || "-"}</p>
+    <p>🛏️ شوێنی نوستن: ${roomGuests.length}/${cap}</p>
+
+    <div class="guest-list">
   `;
 
   if(roomGuests.length === 0){
-    html += `<p>هیچ گەشتیارێک نیە</p>`;
+    html += `<p style="opacity:.8;margin-top:12px">هیچ گەشتیارێک لەم ژورە نیە</p>`;
   }
 
   roomGuests.forEach(g=>{
     html += `
       <div class="guest">
-        <b>${g.guest_name}</b><br>
-        ${g.mobile || ""}<br>
-        ${g.city || ""}<br>
-        <button class="red" onclick="deleteGuest(${g.id})">سڕینەوە</button>
+        <div>
+          <div class="guest-name">👤 ${g.guest_name}</div>
+          <div>📱 ${g.mobile || "-"}</div>
+          <div>🏙 ${g.city || "-"}</div>
+        </div>
+        <button class="red" onclick="deleteGuest(${g.id})">🗑</button>
       </div>
     `;
   });
+
+  html += `</div>`;
 
   document.getElementById("roomInfo").innerHTML = html;
   document.getElementById("guestForm").style.display = "grid";
@@ -240,6 +735,7 @@ async function addRoom(){
 
   document.getElementById("roomNumber").value = "";
   document.getElementById("hotelName").value = "";
+
   await loadData();
 }
 
@@ -250,6 +746,7 @@ async function addGuest(){
   }
 
   const roomGuests = guests.filter(g=>g.room_id === selectedRoom.id);
+
   if(roomGuests.length >= Number(selectedRoom.capacity)){
     alert("ئەم ژورە پڕە");
     return;
@@ -291,10 +788,13 @@ async function addGuest(){
 async function deleteGuest(id){
   if(!confirm("دڵنیایت لە سڕینەوەی ئەم گەشتیارە؟")) return;
 
-  const { error } = await db.from("room_guests").delete().eq("id", id);
+  const { error } = await db
+    .from("room_guests")
+    .delete()
+    .eq("id", id);
 
   if(error){
-    alert("نەتوانرا بسڕدرێتەوە");
+    alert("نەتوانرا گەشتیار بسڕدرێتەوە");
     return;
   }
 
@@ -304,9 +804,13 @@ async function deleteGuest(id){
 
 async function deleteRoom(){
   if(!selectedRoom) return;
-  if(!confirm("دڵنیایت لە سڕینەوەی ئەم ژورە؟ هەموو گەشتیارەکانی ناویش دەسڕدرێنەوە")) return;
 
-  const { error } = await db.from("hotel_rooms").delete().eq("id", selectedRoom.id);
+  if(!confirm("دڵنیایت لە سڕینەوەی ئەم ژورە؟")) return;
+
+  const { error } = await db
+    .from("hotel_rooms")
+    .delete()
+    .eq("id", selectedRoom.id);
 
   if(error){
     alert("ژورەکە نەسڕدرایەوە");
@@ -314,8 +818,17 @@ async function deleteRoom(){
   }
 
   selectedRoom = null;
-  document.getElementById("roomInfo").innerHTML = "ژورێک هەڵبژێرە";
+  document.getElementById("roomInfo").innerHTML = `
+    <div class="info-head">
+      <div class="info-icon">🛏️</div>
+      <div>
+        <h2>زانیاری ژور</h2>
+        <p>ژورێک هەڵبژێرە</p>
+      </div>
+    </div>
+  `;
   document.getElementById("guestForm").style.display = "none";
+
   await loadData();
 }
 
@@ -327,8 +840,9 @@ function renderPrint(){
     const roomGuests = guests.filter(g=>g.room_id === room.id);
 
     let rows = "";
+
     if(roomGuests.length === 0){
-      rows = `<tr><td colspan="4">بەتاڵە</td></tr>`;
+      rows = `<tr><td colspan="5">بەتاڵە</td></tr>`;
     }else{
       roomGuests.forEach((g,i)=>{
         rows += `
@@ -337,6 +851,7 @@ function renderPrint(){
             <td>${g.guest_name}</td>
             <td>${g.mobile || ""}</td>
             <td>${g.city || ""}</td>
+            <td>${g.notes || ""}</td>
           </tr>
         `;
       });
@@ -344,8 +859,9 @@ function renderPrint(){
 
     printBox.innerHTML += `
       <div class="print-room">
-        <h3>ژور ${room.room_number} - ${room.hotel_name || ""} - ${room.city || ""}</h3>
-        <p>جۆر: ${room.gender || ""} | شوێن: ${roomGuests.length}/${room.capacity}</p>
+        <h3>ژور ${room.room_number} - ${room.hotel_name || ""}</h3>
+        <p>شار: ${room.city || ""} | جۆر: ${room.gender || ""} | شوێن: ${roomGuests.length}/${room.capacity}</p>
+
         <table>
           <thead>
             <tr>
@@ -353,6 +869,7 @@ function renderPrint(){
               <th>ناوی گەشتیار</th>
               <th>مۆبایل</th>
               <th>شار</th>
+              <th>تێبینی</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -361,6 +878,11 @@ function renderPrint(){
     `;
   });
 }
+
+document.getElementById("searchRoom").addEventListener("input", renderRooms);
+document.getElementById("filterCity").addEventListener("change", renderRooms);
+document.getElementById("filterGender").addEventListener("change", renderRooms);
+document.getElementById("filterStatus").addEventListener("change", renderRooms);
 
 loadData();
 </script>
