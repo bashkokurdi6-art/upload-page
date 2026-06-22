@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سیستەمی دابەشکردنی ژورەکان</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Tahoma,Arial,sans-serif}
+body{background:#eef3f8;color:#0b1f3a;padding:15px}
+.header{background:#003b2f;color:white;padding:18px;border-radius:16px;margin-bottom:15px;text-align:center}
+.header h1{font-size:22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:15px}
+.card{background:white;padding:15px;border-radius:14px;box-shadow:0 4px 12px #0001}
+.card b{font-size:24px;color:#007b55}
+.controls{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+input,select,button,textarea{
+padding:12px;border:1px solid #ccd6e0;border-radius:10px;font-size:15px
+}
+button{background:#007b55;color:white;border:0;cursor:pointer;font-weight:bold}
+button.red{background:#d62828}
+button.blue{background:#1d4ed8}
+button.gold{background:#c89422}
+.main{display:grid;grid-template-columns:2fr 1fr;gap:15px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.room{background:white;border-radius:14px;padding:15px;box-shadow:0 4px 12px #0001;cursor:pointer;border:2px solid transparent}
+.room:hover{border-color:#007b55}
+.room h2{font-size:28px;margin-bottom:8px}
+.full{color:#16a34a;font-weight:bold}
+.mid{color:#f59e0b;font-weight:bold}
+.empty{color:#64748b;font-weight:bold}
+.panel{background:white;border-radius:14px;padding:15px;box-shadow:0 4px 12px #0001}
+.guest{padding:10px;border-bottom:1px solid #eee}
+.form{display:grid;gap:8px;margin-top:12px}
+.print-area{display:none}
+
+@media(max-width:800px){
+.main{grid-template-columns:1fr}
+.stats{grid-template-columns:1fr}
+}
+
+@media print{
+body{background:white;padding:0}
+.header,.stats,.controls,.main{display:none}
+.print-area{display:block}
+.print-title{text-align:center;margin-bottom:20px}
+.print-room{border:1px solid #333;margin-bottom:12px;padding:10px;border-radius:8px}
+.print-room h3{margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+td,th{border:1px solid #333;padding:7px;text-align:center}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>سیستەمی دابەشکردنی ژورەکانی هوتێل</h1>
+  <p>حەج و عومرە - سیواک</p>
+</div>
+
+<div class="stats">
+  <div class="card">کۆی ژورەکان<br><b id="totalRooms">0</b></div>
+  <div class="card">کۆی گەشتیار<br><b id="totalGuests">0</b></div>
+  <div class="card">شوێنی بەتاڵ<br><b id="emptyBeds">0</b></div>
+</div>
+
+<div class="controls">
+  <input id="roomNumber" placeholder="ژمارەی ژور">
+  <input id="hotelName" placeholder="ناوی هوتێل">
+  <select id="city">
+    <option value="مەککە">مەککە</option>
+    <option value="مەدینە">مەدینە</option>
+  </select>
+  <select id="capacity">
+    <option value="2">٢ کەسی</option>
+    <option value="3">٣ کەسی</option>
+    <option value="4" selected>٤ کەسی</option>
+    <option value="5">٥ کەسی</option>
+  </select>
+  <select id="gender">
+    <option value="پیاو">پیاو</option>
+    <option value="ئافرەت">ئافرەت</option>
+  </select>
+  <button onclick="addRoom()">زیادکردنی ژور</button>
+  <button class="blue" onclick="window.print()">چاپکردنی لیست</button>
+</div>
+
+<div class="main">
+  <div>
+    <h2 style="margin-bottom:10px">ژورەکان</h2>
+    <div class="rooms" id="roomsBox"></div>
+  </div>
+
+  <div class="panel">
+    <h2>زانیاری ژور</h2>
+    <div id="roomInfo">ژورێک هەڵبژێرە</div>
+
+    <div class="form" id="guestForm" style="display:none">
+      <input id="guestName" placeholder="ناوی گەشتیار">
+      <input id="guestMobile" placeholder="ژمارە مۆبایل">
+      <input id="guestCity" placeholder="شار">
+      <textarea id="guestNotes" placeholder="تێبینی"></textarea>
+      <button onclick="addGuest()">زیادکردنی گەشتیار</button>
+      <button class="red" onclick="deleteRoom()">سڕینەوەی ژور</button>
+    </div>
+  </div>
+</div>
+
+<div class="print-area">
+  <div class="print-title">
+    <h1>لیستی دابەشکردنی ژورەکانی هوتێل</h1>
+    <p>سیواک - حەج و عومرە</p>
+  </div>
+  <div id="printBox"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://gnatnabbjmvxmigtugtv.supabase.co";
+const SUPABASE_KEY = "sb_publishable_EB6K4oP-AK16XPPLREGAXA_FxMbIGN7";
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let rooms = [];
+let guests = [];
+let selectedRoom = null;
+
+async function loadData(){
+  const { data: roomData, error: roomErr } = await db
+    .from("hotel_rooms")
+    .select("*")
+    .order("room_number");
+
+  const { data: guestData, error: guestErr } = await db
+    .from("room_guests")
+    .select("*")
+    .order("created_at");
+
+  if(roomErr || guestErr){
+    alert("کێشە هەیە لە هێنانی داتا");
+    return;
+  }
+
+  rooms = roomData || [];
+  guests = guestData || [];
+
+  renderRooms();
+  renderStats();
+  renderPrint();
+}
+
+function renderStats(){
+  let totalCapacity = rooms.reduce((sum,r)=>sum + Number(r.capacity || 0),0);
+  document.getElementById("totalRooms").innerText = rooms.length;
+  document.getElementById("totalGuests").innerText = guests.length;
+  document.getElementById("emptyBeds").innerText = totalCapacity - guests.length;
+}
+
+function renderRooms(){
+  const box = document.getElementById("roomsBox");
+  box.innerHTML = "";
+
+  rooms.forEach(room=>{
+    const count = guests.filter(g=>g.room_id === room.id).length;
+    const cap = Number(room.capacity);
+    let cls = count === 0 ? "empty" : count >= cap ? "full" : "mid";
+    let text = count === 0 ? "بەتاڵ" : count >= cap ? "پڕ" : "بەشێکی پڕ";
+
+    box.innerHTML += `
+      <div class="room" onclick="selectRoom(${room.id})">
+        <h2>${room.room_number}</h2>
+        <p class="${cls}">${count}/${cap} - ${text}</p>
+        <p>${room.hotel_name || ""}</p>
+        <p>${room.city || ""} - ${room.gender || ""}</p>
+      </div>
+    `;
+  });
+}
+
+function selectRoom(id){
+  selectedRoom = rooms.find(r=>r.id === id);
+  const roomGuests = guests.filter(g=>g.room_id === id);
+  const cap = Number(selectedRoom.capacity);
+
+  let html = `
+    <h2>ژور ${selectedRoom.room_number}</h2>
+    <p>هوتێل: ${selectedRoom.hotel_name || "-"}</p>
+    <p>شار: ${selectedRoom.city || "-"}</p>
+    <p>جۆر: ${selectedRoom.gender || "-"}</p>
+    <p>شوێن: ${roomGuests.length}/${cap}</p>
+    <hr style="margin:10px 0">
+    <h3>گەشتیارەکان</h3>
+  `;
+
+  if(roomGuests.length === 0){
+    html += `<p>هیچ گەشتیارێک نیە</p>`;
+  }
+
+  roomGuests.forEach(g=>{
+    html += `
+      <div class="guest">
+        <b>${g.guest_name}</b><br>
+        ${g.mobile || ""}<br>
+        ${g.city || ""}<br>
+        <button class="red" onclick="deleteGuest(${g.id})">سڕینەوە</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("roomInfo").innerHTML = html;
+  document.getElementById("guestForm").style.display = "grid";
+}
+
+async function addRoom(){
+  const room_number = document.getElementById("roomNumber").value.trim();
+  const hotel_name = document.getElementById("hotelName").value.trim();
+  const city = document.getElementById("city").value;
+  const capacity = document.getElementById("capacity").value;
+  const gender = document.getElementById("gender").value;
+
+  if(!room_number){
+    alert("ژمارەی ژور بنوسە");
+    return;
+  }
+
+  const { error } = await db.from("hotel_rooms").insert({
+    room_number,
+    hotel_name,
+    city,
+    capacity,
+    gender
+  });
+
+  if(error){
+    alert("ژور زیاد نەکرا");
+    return;
+  }
+
+  document.getElementById("roomNumber").value = "";
+  document.getElementById("hotelName").value = "";
+  await loadData();
+}
+
+async function addGuest(){
+  if(!selectedRoom){
+    alert("یەکەم ژور هەڵبژێرە");
+    return;
+  }
+
+  const roomGuests = guests.filter(g=>g.room_id === selectedRoom.id);
+  if(roomGuests.length >= Number(selectedRoom.capacity)){
+    alert("ئەم ژورە پڕە");
+    return;
+  }
+
+  const guest_name = document.getElementById("guestName").value.trim();
+  const mobile = document.getElementById("guestMobile").value.trim();
+  const city = document.getElementById("guestCity").value.trim();
+  const notes = document.getElementById("guestNotes").value.trim();
+
+  if(!guest_name){
+    alert("ناوی گەشتیار بنوسە");
+    return;
+  }
+
+  const { error } = await db.from("room_guests").insert({
+    room_id: selectedRoom.id,
+    guest_name,
+    mobile,
+    city,
+    gender: selectedRoom.gender,
+    notes
+  });
+
+  if(error){
+    alert("گەشتیار زیاد نەکرا");
+    return;
+  }
+
+  document.getElementById("guestName").value = "";
+  document.getElementById("guestMobile").value = "";
+  document.getElementById("guestCity").value = "";
+  document.getElementById("guestNotes").value = "";
+
+  await loadData();
+  selectRoom(selectedRoom.id);
+}
+
+async function deleteGuest(id){
+  if(!confirm("دڵنیایت لە سڕینەوەی ئەم گەشتیارە؟")) return;
+
+  const { error } = await db.from("room_guests").delete().eq("id", id);
+
+  if(error){
+    alert("نەتوانرا بسڕدرێتەوە");
+    return;
+  }
+
+  await loadData();
+  selectRoom(selectedRoom.id);
+}
+
+async function deleteRoom(){
+  if(!selectedRoom) return;
+  if(!confirm("دڵنیایت لە سڕینەوەی ئەم ژورە؟ هەموو گەشتیارەکانی ناویش دەسڕدرێنەوە")) return;
+
+  const { error } = await db.from("hotel_rooms").delete().eq("id", selectedRoom.id);
+
+  if(error){
+    alert("ژورەکە نەسڕدرایەوە");
+    return;
+  }
+
+  selectedRoom = null;
+  document.getElementById("roomInfo").innerHTML = "ژورێک هەڵبژێرە";
+  document.getElementById("guestForm").style.display = "none";
+  await loadData();
+}
+
+function renderPrint(){
+  const printBox = document.getElementById("printBox");
+  printBox.innerHTML = "";
+
+  rooms.forEach(room=>{
+    const roomGuests = guests.filter(g=>g.room_id === room.id);
+
+    let rows = "";
+    if(roomGuests.length === 0){
+      rows = `<tr><td colspan="4">بەتاڵە</td></tr>`;
+    }else{
+      roomGuests.forEach((g,i)=>{
+        rows += `
+          <tr>
+            <td>${i+1}</td>
+            <td>${g.guest_name}</td>
+            <td>${g.mobile || ""}</td>
+            <td>${g.city || ""}</td>
+          </tr>
+        `;
+      });
+    }
+
+    printBox.innerHTML += `
+      <div class="print-room">
+        <h3>ژور ${room.room_number} - ${room.hotel_name || ""} - ${room.city || ""}</h3>
+        <p>جۆر: ${room.gender || ""} | شوێن: ${roomGuests.length}/${room.capacity}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ناوی گەشتیار</th>
+              <th>مۆبایل</th>
+              <th>شار</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  });
+}
+
+loadData();
+</script>
+
+</body>
+</html>
