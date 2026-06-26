@@ -126,9 +126,9 @@ async function runOCR(){
     formData.append("apikey", OCR_API_KEY);
     formData.append("file", file);
     formData.append("language", "ara"); 
-    formData.append("OCREngine", "2"); 
-    formData.append("isTable", "true"); // گرنگە بۆ پاراستنی ڕیزبەندی خشتەکە
+    formData.append("OCREngine", "1"); // لێرەدا گۆڕدرا بۆ بزوێنەری 1 بۆ چارەسەری زمانەکە
     formData.append("scale", "true");
+    formData.append("detectOrientation", "true");
 
     if(file.type === "application/pdf") formData.append("filetype", "PDF");
     else formData.append("filetype", "JPG");
@@ -142,6 +142,12 @@ async function runOCR(){
 
     if(data.IsErroredOnProcessing){
       status.innerText = "هەڵە لە OCR: " + JSON.stringify(data.ErrorMessage);
+      btn.disabled = false;
+      return;
+    }
+
+    if(!data.ParsedResults || data.ParsedResults.length === 0){
+      status.innerText = "هیچ دەقێک نەخوێندرایەوە، دڵنیابەرەوە لە ڕوونی وێنەکە.";
       btn.disabled = false;
       return;
     }
@@ -167,31 +173,31 @@ function parseMinistryTable(text){
   for(let i = 0; i < lines.length; i++){
     let line = lines[i].replace(/[||\t]+/g, " ").replace(/\s+/g, " ").trim();
 
-    // ١. دۆزینەوەی ژمارەی پاسپۆرت (پیتێک و حەوت ژمارە)
+    // ١. دۆزینەوەی ژمارەی پاسپۆرت
     const passportMatch = line.match(/\b[A-Z][0-9]{7,8}\b/i);
-    if(!passportMatch) continue; // ئەگەر ژمارەی پاسپۆرتی تێدا نەبێت دێڕەکە پشتگوێ دەخات
+    if(!passportMatch) continue; 
     const passport = passportMatch[0].toUpperCase();
 
-    // ٢. دۆزینەوەی ڕێکەوتی لەدایکبوون (نموونە: 1-Jun-86 یان 27-Jan-87 یان 01-Jul-61)
+    // ٢. ڕێکەوتی لەدایکبوون
     const birthMatch = line.match(/\b\d{1,2}[-\/ ][A-Za-z]{3}[-\/ ]\d{2,4}\b/) || 
                        line.match(/\b\d{1,2}[-\/ ]\d{1,2}[-\/ ]\d{2,4}\b/);
     const birth = birthMatch ? birthMatch[0] : "";
 
-    // ٣. دۆزینەوەی ڕەگەز (نکر یان انثى)
+    // ٣. ڕەگەز
     let gender = "";
-    if(/\b(نکر|ذكر|ذكر|M|Male)\b/i.test(line)) gender = "نكر";
+    if(/\b(نکر|نکر|ذكر|ذكر|M|Male)\b/i.test(line)) gender = "نكر";
     else if(/\b(انثى|أنثى|مێ|F|Female)\b/i.test(line)) gender = "أنثى";
 
-    // ٤. دۆزینەوەی سیفەت (معتمر، سائق، متعهد)
-    let role = "معتمر"; // بە شێوازی بنەڕەتی
+    // ٤. سیفەت
+    let role = "معتمر"; 
     if(/سائق|سایق/i.test(line)) role = "سائق";
     else if(/متعهد/i.test(line)) role = "متعهد";
 
-    // ٥. دۆزینەوەی ناوی ئینگلیزی (کۆمەڵە پیتێکی گەورەی پاڵ یەک)
+    // ٥. ناوی ئینگلیزی
     const enMatch = line.match(/[A-Z]{3,}(?:\s+[A-Z]{2,}){2,6}/);
     const nameEn = enMatch ? enMatch[0].trim() : "";
 
-    // ٦. دۆزینەوەی ناوی کوردی/عەرەبی (سڕینەوەی هەموو شتەکانی تر بۆ ئەوەی تەنها ناوەکە بمێنێتەوە)
+    // ٦. ناوی کوردی/عەرەبی
     let arabicName = line
       .replace(passport, "")
       .replace(birth, "")
@@ -199,11 +205,10 @@ function parseMinistryTable(text){
       .replace(/(نکر|انثى|أنثى|معتمر|سائق|متعهد|سایق)/g, "")
       .replace(/[0-9]/g, "")
       .replace(/[A-Za-z]/g, "")
-      .replace(/[^\u0600-\u06FF\s]/g, "") // تەنها پیتە عەرەبی و کوردییەکان دەهێڵێتەوە
+      .replace(/[^\u0600-\u06FF\s]/g, "") 
       .replace(/\s+/g, " ")
       .trim();
 
-    // لادانی ژمارەی ڕێزبەندی سەرەتای دێڕەکە ئەگەر مابێتەوە
     if(/^\d+\s/.test(arabicName)){
       arabicName = arabicName.replace(/^\d+\s/, "");
     }
@@ -266,7 +271,7 @@ function downloadExcel(){
   }));
 
   const ws = XLSX.utils.json_to_sheet(finalRows);
-  ws['!views'] = [{RTL: true}]; // بۆ ئەوەی لاپەڕەی ئێکسڵەکە لە ڕاستەوە بۆ چەپ بێت
+  ws['!views'] = [{RTL: true}]; 
 
   ws["!cols"] = [
     {wch:5}, {wch:30}, {wch:15}, {wch:12}, {wch:12}, {wch:18}, {wch:35}
