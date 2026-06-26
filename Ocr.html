@@ -21,10 +21,7 @@ body{
   border-radius:14px;
   box-shadow:0 5px 20px #0002;
 }
-h2{
-  color:#075c3b;
-  text-align:center;
-}
+h2{text-align:center;color:#075c3b}
 input,button,textarea{
   width:100%;
   padding:12px;
@@ -39,9 +36,7 @@ button{
   border:0;
   font-weight:bold;
 }
-button:disabled{
-  background:#888;
-}
+button:disabled{background:#888}
 textarea{
   height:180px;
   direction:ltr;
@@ -50,7 +45,6 @@ table{
   width:100%;
   border-collapse:collapse;
   margin-top:15px;
-  background:white;
 }
 th,td{
   border:1px solid #ccc;
@@ -64,13 +58,12 @@ th{
 }
 td input{
   border:0;
-  margin:0;
   padding:6px;
   text-align:center;
 }
 .status{
-  font-weight:bold;
   color:#075c3b;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -80,18 +73,17 @@ td input{
 <div class="card">
   <h2>نظام OCR لاستمارة وزارة الأوقاف - العمرة</h2>
 
-  <input type="file" id="fileInput" accept="image/*,.pdf">
+  <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf">
 
   <button id="ocrBtn" onclick="runOCR()">قراءة الملف OCR</button>
   <button onclick="downloadExcel()">تحميل Excel</button>
 
-  <p class="status" id="status">اختر صورة أو PDF...</p>
+  <p class="status" id="status">اختر PDF أو JPG...</p>
 
-  <h3>النص المستخرج من OCR</h3>
+  <h3>النص المستخرج</h3>
   <textarea id="rawText"></textarea>
 
-  <h3>النتيجة قبل التحميل</h3>
-
+  <h3>النتيجة</h3>
   <table>
     <thead>
       <tr>
@@ -118,7 +110,7 @@ async function runOCR(){
   const btn = document.getElementById("ocrBtn");
 
   if(!file){
-    alert("يرجى اختيار ملف");
+    alert("يرجى اختيار PDF أو JPG");
     return;
   }
 
@@ -130,6 +122,8 @@ async function runOCR(){
 
   try{
     const formData = new FormData();
+
+    formData.append("apikey", OCR_API_KEY);
     formData.append("file", file);
     formData.append("language", "ara");
     formData.append("OCREngine", "2");
@@ -138,19 +132,36 @@ async function runOCR(){
     formData.append("detectOrientation", "true");
     formData.append("isOverlayRequired", "false");
 
+    if(file.type === "application/pdf"){
+      formData.append("filetype", "PDF");
+    }else{
+      formData.append("filetype", "JPG");
+    }
+
     const res = await fetch("https://api.ocr.space/parse/image", {
       method: "POST",
-      headers: { "apikey": OCR_API_KEY },
       body: formData
     });
 
     const data = await res.json();
+    console.log(data);
 
     if(data.IsErroredOnProcessing){
-      throw new Error(data.ErrorMessage || "OCR Error");
+      status.innerText = "هەڵەی OCR: " + JSON.stringify(data.ErrorMessage);
+      btn.disabled = false;
+      return;
     }
 
-    const text = data.ParsedResults.map(x => x.ParsedText || "").join("\n");
+    if(!data.ParsedResults || data.ParsedResults.length === 0){
+      status.innerText = "هیچ دەقێک نەخوێندرایەوە";
+      btn.disabled = false;
+      return;
+    }
+
+    const text = data.ParsedResults
+      .map(x => x.ParsedText || "")
+      .join("\n");
+
     document.getElementById("rawText").value = text;
 
     rows = parseMinistryForm(text);
@@ -160,7 +171,7 @@ async function runOCR(){
 
   }catch(e){
     console.error(e);
-    status.innerText = "حدث خطأ: " + e.message;
+    status.innerText = "کێشە لە خوێندنەوەی فایل: " + e.message;
   }
 
   btn.disabled = false;
@@ -171,17 +182,21 @@ function parseMinistryForm(text){
     .replace(/\r/g,"\n")
     .split("\n")
     .map(x => x.trim())
-    .filter(x => x.length > 3);
+    .filter(x => x.length > 2);
 
   const result = [];
 
   for(let i=0; i<lines.length; i++){
     let line = lines[i]
       .replace(/[|]+/g, " ")
+      .replace(/\t/g, " ")
       .replace(/\s+/g, " ")
       .trim();
 
-    const passportMatch = line.match(/\b[A-Z][0-9]{7,9}\b/i);
+    const passportMatch =
+      line.match(/\b[A-Z][0-9]{7,10}\b/i) ||
+      line.match(/\b[A-Z]{1,2}[0-9]{6,10}\b/i);
+
     if(!passportMatch) continue;
 
     const passport = passportMatch[0].toUpperCase();
@@ -194,13 +209,13 @@ function parseMinistryForm(text){
     const birth = birthMatch ? birthMatch[0] : "";
 
     let gender = "";
-    if(/ذكر|نر|male|M\b/i.test(line)) gender = "ذكر";
-    if(/انثى|أنثى|مێ|female|F\b/i.test(line)) gender = "أنثى";
+    if(/ذكر|نر|male|\bM\b/i.test(line)) gender = "ذكر";
+    if(/انثى|أنثى|مێ|female|\bF\b/i.test(line)) gender = "أنثى";
 
-    const enMatch = line.match(/[A-Z]{2,}(?:\s+[A-Z]{2,}){1,5}/);
+    const enMatch = line.match(/[A-Z]{2,}(?:\s+[A-Z]{2,}){1,6}/);
     const nameEn = enMatch ? enMatch[0].trim() : "";
 
-    let arabicPart = line
+    let arabicName = line
       .replace(passport, " ")
       .replace(birth, " ")
       .replace(nameEn, " ")
@@ -211,13 +226,13 @@ function parseMinistryForm(text){
       .replace(/\s+/g, " ")
       .trim();
 
-    if(arabicPart.length < 3){
-      arabicPart = findArabicNear(lines, i);
+    if(arabicName.length < 3){
+      arabicName = findArabicNear(lines, i);
     }
 
     result.push({
       "#": result.length + 1,
-      "الاسم": arabicPart,
+      "الاسم": arabicName,
       "التولد": birth,
       "الجنس": gender,
       "رقم الجواز": passport,
@@ -230,7 +245,7 @@ function parseMinistryForm(text){
 
 function findArabicNear(lines, index){
   for(let j=index; j>=Math.max(0,index-2); j--){
-    const m = lines[j].match(/[\u0600-\u06FF]+(?:\s+[\u0600-\u06FF]+){1,5}/);
+    const m = lines[j].match(/[\u0600-\u06FF]+(?:\s+[\u0600-\u06FF]+){1,6}/);
     if(m) return m[0].trim();
   }
   return "";
@@ -255,7 +270,11 @@ function renderTable(){
 }
 
 function safe(v){
-  return String(v || "").replace(/"/g, "&quot;");
+  return String(v || "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 function downloadExcel(){
@@ -279,11 +298,11 @@ function downloadExcel(){
 
   ws["!cols"] = [
     {wch:5},
-    {wch:30},
-    {wch:15},
+    {wch:32},
+    {wch:16},
     {wch:10},
     {wch:18},
-    {wch:30}
+    {wch:35}
   ];
 
   const wb = XLSX.utils.book_new();
