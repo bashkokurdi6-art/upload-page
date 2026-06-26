@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>قێنەری پاسپۆرت بۆ ئێکسڵ - OCR</title>
+<title>سیستەمی OCR فۆرمی عەمرە</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
 body{
   font-family: Tahoma, Arial, sans-serif;
-  background:#f0f4f8;
+  background:#eef3f0;
   padding:15px;
 }
 .card{
-  max-width:1100px;
+  max-width:1200px;
   margin:auto;
   background:white;
-  padding:20px;
+  padding:18px;
   border-radius:14px;
-  box-shadow:0 5px 20px #0001;
+  box-shadow:0 5px 20px #0002;
 }
-h2{text-align:center;color:#1e3a8a}
+h2{text-align:center;color:#075c3b}
 input,button,textarea{
   width:100%;
   padding:12px;
@@ -31,15 +31,15 @@ input,button,textarea{
   border:1px solid #ccc;
 }
 button{
-  background:#2563eb;
+  background:#087046;
   color:white;
   border:0;
   font-weight:bold;
   cursor: pointer;
 }
-button:disabled{background:#888; cursor: not-allowed;}
+button:disabled{background:#888; cursor:not-allowed;}
 textarea{
-  height:150px;
+  height:120px;
   direction:ltr;
 }
 table{
@@ -49,23 +49,22 @@ table{
 }
 th,td{
   border:1px solid #ccc;
-  padding:10px;
+  padding:8px;
   text-align:center;
   font-size:14px;
 }
 th{
-  background:#1e3a8a;
+  background:#087046;
   color:white;
 }
 td input{
   border:0;
   padding:6px;
   text-align:center;
-  width: 90%;
-  font-size: 14px;
+  width:95%;
 }
 .status{
-  color:#2563eb;
+  color:#075c3b;
   font-weight:bold;
 }
 </style>
@@ -74,28 +73,29 @@ td input{
 <body>
 
 <div class="card">
-  <h2>سیستەمی OCR بۆ خوێندنەوەی پاسپۆرت و گۆڕینی بۆ Excel</h2>
+  <h2>نظام OCR خوێندنەوەی لیستی عەمرەکاران</h2>
 
   <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf">
 
-  <button id="ocrBtn" onclick="runOCR()">قراءەی پاسپۆرت OCR</button>
+  <button id="ocrBtn" onclick="runOCR()">قۆناغی خوێندنەوە (OCR)</button>
   <button onclick="downloadExcel()">داونلۆدکردنی Excel</button>
 
-  <p class="status" id="status">وێنەی پاسپۆرتەکە دیاری بکە (JPG یان PDF)...</p>
+  <p class="status" id="status">وێنەی خشتەکە یان فایلی PDF دیاری بکە...</p>
 
   <h3>دەقی خاو (Raw Text)</h3>
   <textarea id="rawText"></textarea>
 
-  <h3>زانیارییە دۆزراوەکان</h3>
+  <h3>النتيجة / خشتەی کۆتایی</h3>
   <table>
     <thead>
       <tr>
         <th>#</th>
-        <th>ناو (عەرەبی/کوردی)</th>
-        <th>Name (En)</th>
-        <th>رقم الجواز (Passport No)</th>
-        <th>التولد (DOB)</th>
-        <th>الجنس (Sex)</th>
+        <th>ناو / الاسم</th>
+        <th>ساڵا / التولد</th>
+        <th>ڕەگەز / الجنس</th>
+        <th>سیفەت / الصفة</th>
+        <th>رقم الجواز</th>
+        <th>Name En - ئینگلیزی</th>
       </tr>
     </thead>
     <tbody id="resultBody"></tbody>
@@ -112,24 +112,23 @@ async function runOCR(){
   const btn = document.getElementById("ocrBtn");
 
   if(!file){
-    alert("تکایه وێنەیەک یان فایلی پاسپۆرت دیاری بکە");
+    alert("تکایە سەرەتا فایلێک دیاری بکە");
     return;
   }
 
   rows = [];
   renderTable();
-
-  status.innerText = "جاری خوێندنەوەی پاسپۆرت...";
+  status.innerText = "جاری خوێندنەوە و شیکردنەوەی خشتەکە...";
   btn.disabled = true;
 
   try{
     const formData = new FormData();
     formData.append("apikey", OCR_API_KEY);
     formData.append("file", file);
-    formData.append("language", "ara"); // بۆ ئەوەی ناوی عەرەبیش بخوێنێتەوە
-    formData.append("OCREngine", "2");
+    formData.append("language", "ara"); 
+    formData.append("OCREngine", "2"); 
+    formData.append("isTable", "true"); // گرنگە بۆ پاراستنی ڕیزبەندی خشتەکە
     formData.append("scale", "true");
-    formData.append("detectOrientation", "true");
 
     if(file.type === "application/pdf") formData.append("filetype", "PDF");
     else formData.append("filetype", "JPG");
@@ -142,7 +141,7 @@ async function runOCR(){
     const data = await res.json();
 
     if(data.IsErroredOnProcessing){
-      status.innerText = "هەڵە لە سیستەم: " + JSON.stringify(data.ErrorMessage);
+      status.innerText = "هەڵە لە OCR: " + JSON.stringify(data.ErrorMessage);
       btn.disabled = false;
       return;
     }
@@ -150,72 +149,75 @@ async function runOCR(){
     const text = data.ParsedResults.map(x => x.ParsedText || "").join("\n");
     document.getElementById("rawText").value = text;
 
-    // لێرەدا پرۆسەی دەرهێنانی زانیاری پاسپۆرتەکە دەکەین
-    const passportData = parsePassport(text);
-    if(passportData) {
-      rows.push(passportData);
-      renderTable();
-      status.innerText = "پاسپۆرتەکە بە سەرکەوتوویی خوێندرایەوە! ✅";
-    } else {
-      status.innerText = "هیچ زانیارییەک نەدۆزرایەوە، دڵنیابەرەوە لە ڕوونی وێنەکە.";
-    }
+    rows = parseMinistryTable(text);
+    renderTable();
+    status.innerText = "سەرکەوتوو بوو! " + rows.length + " دێڕ دۆزرایەوە. ✅";
 
   }catch(e){
     console.error(e);
-    status.innerText = "کێشەیەک ڕوویدا: " + e.message;
+    status.innerText = "کێشە لە خوێندنەوەی فایل: " + e.message;
   }
   btn.disabled = false;
 }
 
-function parsePassport(text){
-  const lines = text.split("\n").map(x => x.trim());
-  let fullText = lines.join(" ");
+function parseMinistryTable(text){
+  const lines = text.split("\n").map(x => x.trim()).filter(x => x.length > 5);
+  const result = [];
 
-  // ١. دۆزینەوەی ژمارەی پاسپۆرت (پاسپۆرتی عێراقی بە گشتی بە A یان G دەستپێدەکات لەگەڵ ٧ ژمارە)
-  const passportMatch = fullText.match(/\b([A-Z][0-9]{7})\b/i);
-  const passportNo = passportMatch ? passportMatch[0].toUpperCase() : "";
+  for(let i = 0; i < lines.length; i++){
+    let line = lines[i].replace(/[||\t]+/g, " ").replace(/\s+/g, " ").trim();
 
-  // ٢. دۆزینەوەی ناوی ئینگلیزی لە ڕێگەی دێڕی MRZ (دێڕی خوارەوەی پاسپۆرت کە << تێدایە)
-  let nameEn = "";
-  const mrzLine = lines.find(l => l.includes("<<") && (l.startsWith("P<") || l.length > 20));
-  if(mrzLine){
-    // لادانی نیشانە زیادەکان بۆ دەرهێنانی ناوەکە
-    let cleanMrz = mrzLine.replace(/^P<[A-Z]{3}/, ""); // لادانی جۆری پاسپۆرت و کۆدی دەوڵەت
-    let parts = cleanMrz.split("<<")[0].split("<").filter(x => x.length > 0);
-    if(parts.length >= 2){
-      nameEn = parts[0] + " " + parts.slice(1).join(" ");
+    // ١. دۆزینەوەی ژمارەی پاسپۆرت (پیتێک و حەوت ژمارە)
+    const passportMatch = line.match(/\b[A-Z][0-9]{7,8}\b/i);
+    if(!passportMatch) continue; // ئەگەر ژمارەی پاسپۆرتی تێدا نەبێت دێڕەکە پشتگوێ دەخات
+    const passport = passportMatch[0].toUpperCase();
+
+    // ٢. دۆزینەوەی ڕێکەوتی لەدایکبوون (نموونە: 1-Jun-86 یان 27-Jan-87 یان 01-Jul-61)
+    const birthMatch = line.match(/\b\d{1,2}[-\/ ][A-Za-z]{3}[-\/ ]\d{2,4}\b/) || 
+                       line.match(/\b\d{1,2}[-\/ ]\d{1,2}[-\/ ]\d{2,4}\b/);
+    const birth = birthMatch ? birthMatch[0] : "";
+
+    // ٣. دۆزینەوەی ڕەگەز (نکر یان انثى)
+    let gender = "";
+    if(/\b(نکر|ذكر|ذكر|M|Male)\b/i.test(line)) gender = "نكر";
+    else if(/\b(انثى|أنثى|مێ|F|Female)\b/i.test(line)) gender = "أنثى";
+
+    // ٤. دۆزینەوەی سیفەت (معتمر، سائق، متعهد)
+    let role = "معتمر"; // بە شێوازی بنەڕەتی
+    if(/سائق|سایق/i.test(line)) role = "سائق";
+    else if(/متعهد/i.test(line)) role = "متعهد";
+
+    // ٥. دۆزینەوەی ناوی ئینگلیزی (کۆمەڵە پیتێکی گەورەی پاڵ یەک)
+    const enMatch = line.match(/[A-Z]{3,}(?:\s+[A-Z]{2,}){2,6}/);
+    const nameEn = enMatch ? enMatch[0].trim() : "";
+
+    // ٦. دۆزینەوەی ناوی کوردی/عەرەبی (سڕینەوەی هەموو شتەکانی تر بۆ ئەوەی تەنها ناوەکە بمێنێتەوە)
+    let arabicName = line
+      .replace(passport, "")
+      .replace(birth, "")
+      .replace(nameEn, "")
+      .replace(/(نکر|انثى|أنثى|معتمر|سائق|متعهد|سایق)/g, "")
+      .replace(/[0-9]/g, "")
+      .replace(/[A-Za-z]/g, "")
+      .replace(/[^\u0600-\u06FF\s]/g, "") // تەنها پیتە عەرەبی و کوردییەکان دەهێڵێتەوە
+      .replace(/\s+/g, " ")
+      .trim();
+
+    // لادانی ژمارەی ڕێزبەندی سەرەتای دێڕەکە ئەگەر مابێتەوە
+    if(/^\d+\s/.test(arabicName)){
+      arabicName = arabicName.replace(/^\d+\s/, "");
     }
+
+    result.push({
+      "الاسم": arabicName,
+      "التولد": birth,
+      "الجنس": gender,
+      "الصفة": role,
+      "رقم الجواز": passport,
+      "Name En": nameEn
+    });
   }
-
-  // ئەگەر لە رێگەی MRZ نەدۆزرایەوە، بە شێوازی ئاسایی دەیدۆزینەوە
-  if(!nameEn){
-    const enMatch = fullText.match(/[A-Z]{3,}(?:\s+[A-Z]{3,}){2,5}/g);
-    if(enMatch) nameEn = enMatch[0];
-  }
-
-  // ٣. دۆزینەوەی ناوی عەرەبی (گەڕان بەدوای ٣ یان ٤ ناوی عەرەبی یەکتری بڕاو)
-  const arabicMatch = fullText.match(/[\u0600-\u06FF]{3,}(?:\s+[\u0600-\u06FF]{3,}){2,5}/);
-  const nameAr = arabicMatch ? arabicMatch[0].trim() : "";
-
-  // ٤. ڕێکەوتی لەدایکبوون (DOB) - گەڕان بەدوای فۆرماتی ڕێکەوتی پاسپۆرت
-  const dobMatch = fullText.match(/\b\d{2}[-\/ ]\d{2}[-\/ ]\d{4}\b/) || 
-                   fullText.match(/\b\d{2}[A-Za-z]{3}[-\/ ]\d{4}\b/);
-  const dob = dobMatch ? dobMatch[0] : "";
-
-  // ٥. دیاریکردنی ڕەگەز
-  let gender = "";
-  if(/\b(M|MALE|ذكر|نير)\b/i.test(fullText)) gender = "ذكر";
-  else if(/\b(F|FEMALE|أنثى|انثى|مێ)\b/i.test(fullText)) gender = "أنثى";
-
-  if(!passportNo && !nameAr && !nameEn) return null;
-
-  return {
-    "الاسم": nameAr,
-    "Name En": nameEn,
-    "رقم الجواز": passportNo,
-    "التولد": dob,
-    "الجنس": gender
-  };
+  return result;
 }
 
 function updateCell(index, field, value) {
@@ -233,10 +235,11 @@ function renderTable(){
     tr.innerHTML = `
         <td>${index + 1}</td>
         <td><input type="text" value="${safe(r["الاسم"])}" oninput="updateCell(${index}, 'الاسم', this.value)"></td>
-        <td><input type="text" value="${safe(r["Name En"])}" oninput="updateCell(${index}, 'Name En', this.value)"></td>
-        <td><input type="text" value="${safe(r["رقم الجواز"])}" oninput="updateCell(${index}, 'رقم الجواز', this.value)"></td>
         <td><input type="text" value="${safe(r["التولد"])}" oninput="updateCell(${index}, 'التولد', this.value)"></td>
         <td><input type="text" value="${safe(r["الجنس"])}" oninput="updateCell(${index}, 'الجنس', this.value)"></td>
+        <td><input type="text" value="${safe(r["الصفة"])}" oninput="updateCell(${index}, 'الصفة', this.value)"></td>
+        <td><input type="text" value="${safe(r["رقم الجواز"])}" oninput="updateCell(${index}, 'رقم الجواز', this.value)"></td>
+        <td><input type="text" value="${safe(r["Name En"])}" oninput="updateCell(${index}, 'Name En', this.value)" style="direction:ltr; text-align:left;"></td>
     `;
     body.appendChild(tr);
   });
@@ -248,25 +251,30 @@ function safe(v){
 
 function downloadExcel(){
   if(rows.length === 0){
-    alert("تکایە سەرەتا پاسپۆرتێک لۆد بکە");
+    alert("تکایە سەرەتا پرۆسەی OCR بکە");
     return;
   }
 
   const finalRows = rows.map((r, i)=>({
     "#": i + 1,
-    "الاسم العربي": r["الاسم"],
-    "English Name": r["Name En"],
-    "رقم الجواز": r["رقم الجواز"],
-    "التولد": r["التولد"],
-    "الجنس": r["الجنس"]
+    "ناو / الاسم": r["الاسم"],
+    "ساڵا / التولد": r["التولد"],
+    "ڕەگەز / الجنس": r["الجنس"],
+    "سیفەت / الصفة": r["الصفة"],
+    "ژمارەی پاسپۆرت / رقم الجواز": r["رقم الجواز"],
+    "Name En": r["Name En"]
   }));
 
   const ws = XLSX.utils.json_to_sheet(finalRows);
-  ws['!views'] = [{RTL: true}]; // پاڵپشتی ڕاست بۆ چەپ
+  ws['!views'] = [{RTL: true}]; // بۆ ئەوەی لاپەڕەی ئێکسڵەکە لە ڕاستەوە بۆ چەپ بێت
+
+  ws["!cols"] = [
+    {wch:5}, {wch:30}, {wch:15}, {wch:12}, {wch:12}, {wch:18}, {wch:35}
+  ];
 
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Passport Data");
-  XLSX.writeFile(wb, "passport-data.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "Umrah List");
+  XLSX.writeFile(wb, "umrah_list.xlsx");
 }
 </script>
 
