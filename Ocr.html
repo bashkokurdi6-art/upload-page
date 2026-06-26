@@ -73,7 +73,7 @@ td input{
 <body>
 
 <div class="card">
-  <h2>نظام OCR خوێندنەوەی پاسپۆرت و دابەشکردنی سەر خشتە (نوێکراوە)</h2>
+  <h2>نظام OCR خوێندنەوەی پاسپۆرت و دابەشکردنی سەر خشتە</h2>
 
   <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png">
 
@@ -104,14 +104,18 @@ td input{
 
 <script>
 const OCR_API_KEY = "K88841321188957"; 
-let rows = []; // لێرەدا هەموو پاسپۆرتەکان یەک لە دوای یەک خەزن دەبن و ڕیز دەبن
+let rows = [];
 
-// فانکشن بۆ گۆڕینی فایل بۆ جۆری Base64 تا سێرڤەر بە ۱۰۰٪ بیخوێنێتەوە
+// چاککردنی فانکشنی Base64 بۆ سڕینەوەی پێشگرە زیادەکان کە کێشەکەیان دروست دەکرد
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => {
+      // لادانی بەشی داتای پێشگر (وەک data:image/jpeg;base64,) کە دەبێتە هۆی بەتاڵ مانەوەی سندوقەکە
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
     reader.onerror = error => reject(error);
   });
 }
@@ -130,38 +134,37 @@ async function processPassport(){
   status.style.color = "#075c3b";
   
   try {
-    status.innerText = "ئامادەکردنی فایل و گۆڕینی فۆرمات...";
-    const base64Data = await fileToBase64(file);
+    status.innerText = "پرۆسێس کردنی فۆرماتی وێنەکە...";
+    const base64Raw = await fileToBase64(file);
 
-    // قۆناغی ١: خوێندنەوە بە زمانی ئینگلیزی (بۆ ناوی ئینگلیزی، پاسپۆرت، تەمەن)
-    status.innerText = "قۆناغی ١: خوێندنەوەی دەقە ئینگلیزییەکانی پاسپۆرت...";
-    const engText = await callOCR(base64Data, "eng", "2");
+    // ناردنی دەق بۆ زمانەکان بە جیاوازی بزوێنەرەکان بۆ کلیلە پڕۆکەت
+    status.innerText = "خوێندنەوەی زانیارییە ئینگلیزییەکانی پاسپۆرت...";
+    const engText = await callOCR(base64Raw, "eng", "2");
 
-    // قۆناغی ٢: خوێندنەوە بە زمانی عەرەبی (بۆ ناوی عەرەبی)
-    status.innerText = "قۆناغی ٢: خوێندنەوەی ناوی عەرەبی...";
-    const araText = await callOCR(base64Data, "ara", "1");
+    status.innerText = "خوێندنەوەی زانیارییە عەرەبییەکانی پاسپۆرت...";
+    const araText = await callOCR(base64Raw, "ara", "1");
 
     document.getElementById("rawText").value = "--- ENGLISH DATA ---\n" + engText + "\n\n--- ARABIC DATA ---\n" + araText;
 
-    // لێکدانەوەی دەقەکان و زیادکردنی بۆ خشتەکە بەبێ سڕینەوەی دێڕەکانی پێشوو
     extractAndAddPassport(engText, araText);
     renderTable();
     
-    status.innerText = "پاسپۆرتەکە بە سەرکەوتوویی خوێندرایەوە و زیادکرا بۆ خشتەکە! ✅";
-    document.getElementById("fileInput").value = ""; // خاوێنکردنەوەی شوێنی فایل بۆ پاسپۆرتی داهاتوو
+    status.innerText = "پاسپۆرتەکە بە سەرکەوتوویی خوێندرایەوە و زانیارییەکان جیاکرانەوە! ✅";
+    document.getElementById("fileInput").value = ""; 
 
   } catch(e) {
     console.error(e);
     status.style.color = "red";
-    status.innerText = "هەڵەیەک ڕوویدا: " + e.message;
+    status.innerText = "هەڵەیەک لە سێرڤەر یان هێڵ ڕوویدا: " + e.message;
   }
   btn.disabled = false;
 }
 
-async function callOCR(base64Data, lang, engine) {
+async function callOCR(base64Raw, lang, engine) {
   const formData = new FormData();
   formData.append("apikey", OCR_API_KEY);
-  formData.append("base64Image", base64Data); // بەکارهێنانی مۆدێلی پارێزراوی Base64
+  // بەکارهێنانی فۆرماتی دروستی سەرەکی سێرڤەرەکە
+  formData.append("base64Image", "data:image/jpg;base64," + base64Raw); 
   formData.append("language", lang);
   formData.append("OCREngine", engine);
   formData.append("scale", "true");
@@ -178,23 +181,23 @@ async function callOCR(base64Data, lang, engine) {
 }
 
 function extractAndAddPassport(engText, araText) {
-  // ١. دۆزینەوەی ژمارەی پاسپۆرت
-  const passportMatch = engText.match(/\b[A-Z][0-9]{7,8}\b/i);
+  // ١. ژمارەی پاسپۆرت
+  const passportMatch = engText.match(/[A-Z][0-9]{7,8}/i);
   const passport = passportMatch ? passportMatch[0].toUpperCase() : "";
 
-  // ٢. دۆزینەوەی ساڵی لەدایکبوون لەسەر بنەمای کۆدی نێودەوڵەتی پاسپۆرت (MRZ)
+  // ٢. تەمەن و لەدایکبوون
   const birthMatch = engText.match(/\b\d{2}[01]\d[0-3]\d\b/); 
   let birth = "";
   if(birthMatch) {
       let rawBirth = birthMatch[0];
-      let yearPrefix = parseInt(rawBirth.substring(0,2)) > 26 ? "19" : "20"; // بۆ دیاریکردنی سەدە
+      let yearPrefix = parseInt(rawBirth.substring(0,2)) > 26 ? "19" : "20";
       birth = rawBirth.substring(4,6) + "/" + rawBirth.substring(2,4) + "/" + yearPrefix + rawBirth.substring(0,2);
   } else {
       const altBirth = engText.match(/\b\d{1,2}[-\/ ]\d{1,2}[-\/ ]\d{2,4}\b/);
       birth = altBirth ? altBirth[0] : "";
   }
 
-  // ٣. دەرهێنانی ناوی ئینگلیزی سیانی یان چواری لە هێڵەکانی خوارەوەی پاسپۆرت
+  // ٣. ناوی ئینگلیزی
   let nameEn = "";
   const mrzLines = engText.split("\n").filter(l => l.includes("<<"));
   if(mrzLines.length > 0) {
@@ -204,7 +207,7 @@ function extractAndAddPassport(engText, araText) {
       nameEn = altEn ? altEn[0] : "";
   }
 
-  // ٤. دەرهێنانی ناوی عەرەبی لە بەشە عەرەبییەکەوە
+  // ٤. ناوی عەرەبی
   let nameAr = "";
   const araLines = araText.split("\n").map(x => x.trim());
   for(let line of araLines) {
@@ -214,20 +217,19 @@ function extractAndAddPassport(engText, araText) {
       }
   }
 
-  // ٥. دیاریکردنی ڕەگەز
+  // ٥. ڕەگەز
   let gender = "نكر";
   if (engText.includes("<F<") || engText.includes(" F ") || araText.includes("أنثى") || araText.includes("انثى")) {
       gender = "أنثى";
   }
 
-  // زانیارییەکان دەخرێنە ناو خشتەکەوە
   rows.push({
-    "الاسم": nameAr || "پێویستی بە نووسینە ✏️",
-    "التولد": birth || "پێویستی بە نووسینە ✏️",
+    "الاسم": nameAr || "پێویستی بە چاککردنە ✏️",
+    "التولد": birth || "پێویستی بە چاککردنە ✏️",
     "الجنس": gender,
     "الصفة": "معتمر",
-    "رقم الجواز": passport || "پێویستی بە نووسینە ✏️",
-    "Name En": nameEn || "پێویستی بە نووسینە ✏️"
+    "رقم الجواز": passport || "پێویستی بە چاککردنە ✏️",
+    "Name En": nameEn || "پێویستی بە چاککردنە ✏️"
   });
 }
 
@@ -260,6 +262,7 @@ function safe(v){
   return String(v || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// دابەزاندنی لیستی نوێی کۆکراوە
 function downloadExcel(){
   if(rows.length === 0){
     alert("هیچ زانیارییەک لە خشتەکەدا نییە بۆ داونلۆدکردن");
