@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام OCR خوێندنەوەی پاسپۆرت بۆ خشتە</title>
+<title>Mindee Passport OCR بۆ Excel</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
@@ -38,13 +38,14 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
-button:disabled{
-  background:#888;
-  cursor:not-allowed;
-}
+button:disabled{background:#888;cursor:not-allowed}
 textarea{
-  height:130px;
+  height:170px;
   direction:ltr;
+}
+.status{
+  color:#075c3b;
+  font-weight:bold;
 }
 .table-wrap{
   overflow-x:auto;
@@ -71,27 +72,23 @@ td input{
   text-align:center;
   width:95%;
 }
-.status{
-  color:#075c3b;
-  font-weight:bold;
-}
 </style>
 </head>
 
 <body>
 
 <div class="card">
-  <h2>نظام OCR خوێندنەوەی پاسپۆرت و دابەشکردنی سەر خشتە</h2>
+  <h2>نظام OCR خوێندنەوەی پاسپۆرت بە Mindee و دابەشکردن بۆ Excel</h2>
 
   <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png">
 
   <button id="ocrBtn" onclick="processPassport()">خوێندنەوەی پاسپۆرت و زیادکردن بۆ خشتە</button>
   <button onclick="downloadExcel()">داونلۆدکردنی Excel</button>
 
-  <p class="status" id="status">وێنەی پاسپۆرت JPG/PNG یان فایلی PDF دیاری بکە...</p>
+  <p class="status" id="status">پاسپۆرت JPG/PNG یان PDF دیاری بکە...</p>
 
-  <h3>دەقی خاوێنکراوەی پاسپۆرتی کۆتا کەس</h3>
-  <textarea id="rawText" placeholder="دەقی دۆزراوە لێرە پیشان دەدرێت..."></textarea>
+  <h3>JSON / زانیارییەکانی Mindee</h3>
+  <textarea id="rawText" placeholder="JSON لێرە دەردەکەوێت..."></textarea>
 
   <h3>النتيجة / خشتەی کۆکراوەی حاجیان</h3>
 
@@ -100,7 +97,7 @@ td input{
       <thead>
         <tr>
           <th>#</th>
-          <th>ناو / الاسم عەرەبی</th>
+          <th>ناو / الاسم</th>
           <th>ساڵا / التولد</th>
           <th>ڕەگەز / الجنس</th>
           <th>سیفەت / الصفة</th>
@@ -114,20 +111,10 @@ td input{
 </div>
 
 <script>
-const OCR_API_KEY = "K88841321188957";
-let rows = [];
+const MINDEE_API_KEY = "md_mmyB-FkHjLYtqwr-";
+const MINDEE_ENDPOINT = "https://api.mindee.net/v1/products/mindee/passport/v1/predict";
 
-function fileToBase64(file){
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = ()=>{
-      const base64String = reader.result.split(",")[1];
-      resolve(base64String);
-    };
-    reader.onerror = error => reject(error);
-  });
-}
+let rows = [];
 
 async function processPassport(){
   const file = document.getElementById("fileInput").files[0];
@@ -135,176 +122,152 @@ async function processPassport(){
   const btn = document.getElementById("ocrBtn");
 
   if(!file){
-    alert("تکایە سەرەتا وێنە یان PDF دیاری بکە");
+    alert("تکایە پاسپۆرت JPG/PNG یان PDF دیاری بکە");
+    return;
+  }
+
+  if(MINDEE_API_KEY === "API_KEY_md_mmyB-FkHjLYtqwr-"){
+    alert("AiTWoA7VEKc7wPlo6EBGOj7yv2k");
     return;
   }
 
   btn.disabled = true;
   status.style.color = "#075c3b";
+  status.innerText = "Mindee OCR کار دەکات... چاوەڕێ بکە";
 
   try{
-    status.innerText = "پرۆسێس کردنی فایل...";
-    const base64Raw = await fileToBase64(file);
+    const data = await callMindee(file);
 
-    status.innerText = "خوێندنەوەی زانیارییە ئینگلیزییەکان...";
-    const engText = await callOCR(base64Raw, "eng", "2", file.type);
+    document.getElementById("rawText").value = JSON.stringify(data, null, 2);
 
-    status.innerText = "خوێندنەوەی زانیارییە عەرەبییەکان...";
-    const araText = await callOCR(base64Raw, "ara", "1", file.type);
+    const fields = getFields(data);
 
-    document.getElementById("rawText").value =
-      "--- ENGLISH DATA ---\n" + engText +
-      "\n\n--- ARABIC DATA ---\n" + araText;
+    const givenNames = getValue(fields.given_names);
+    const surnames = getValue(fields.surnames);
+    const passportNumber = getValue(fields.passport_number);
+    const dateOfBirth = formatDate(getValue(fields.date_of_birth));
+    const sexRaw = getValue(fields.sex);
+    const gender = convertGender(sexRaw);
 
-    extractAndAddPassport(engText, araText);
+    const nameEn = cleanSpaces((givenNames + " " + surnames).trim());
+
+    rows.push({
+      "الاسم": "پێویستی بە چاککردنە ✏️",
+      "التولد": dateOfBirth || "پێویستی بە چاککردنە ✏️",
+      "الجنس": gender || "پێویستی بە چاککردنە ✏️",
+      "الصفة": "معتمر",
+      "رقم الجواز": passportNumber || "پێویستی بە چاککردنە ✏️",
+      "Name En": nameEn || "پێویستی بە چاککردنە ✏️"
+    });
+
     renderTable();
 
-    status.innerText = "پاسپۆرت/PDF بە سەرکەوتوویی خوێندرایەوە ✅";
+    status.innerText = "پاسپۆرت بە سەرکەوتوویی خوێندرایەوە ✅";
     document.getElementById("fileInput").value = "";
 
-  }catch(e){
-    console.error(e);
+  }catch(err){
+    console.error(err);
     status.style.color = "red";
-    status.innerText = "هەڵە ڕوویدا: " + e.message;
+    status.innerText = "هەڵە ڕوویدا: " + err.message;
   }
 
   btn.disabled = false;
 }
 
-async function callOCR(base64Raw, lang, engine, fileType){
+async function callMindee(file){
   const formData = new FormData();
+  formData.append("document", file);
 
-  let mime = "image/jpeg";
-  if(fileType === "application/pdf") mime = "application/pdf";
-  if(fileType === "image/png") mime = "image/png";
-  if(fileType === "image/jpeg" || fileType === "image/jpg") mime = "image/jpeg";
-
-  formData.append("apikey", OCR_API_KEY);
-  formData.append("base64Image", `data:${mime};base64,${base64Raw}`);
-  formData.append("language", lang);
-  formData.append("OCREngine", engine);
-  formData.append("scale", "true");
-  formData.append("isTable", "false");
-
-  const res = await fetch("https://api.ocr.space/parse/image", {
+  const res = await fetch(MINDEE_ENDPOINT, {
     method: "POST",
+    headers: {
+      "Authorization": "Token " + MINDEE_API_KEY
+    },
     body: formData
   });
 
-  const data = await res.json();
+  const text = await res.text();
 
-  if(data.IsErroredOnProcessing){
-    let msg = data.ErrorMessage || data.ErrorDetails || "OCR API Error";
-    if(Array.isArray(msg)) msg = msg.join(" - ");
-    throw new Error(msg);
+  let data;
+  try{
+    data = JSON.parse(text);
+  }catch(e){
+    throw new Error(text);
   }
 
-  return data.ParsedResults && data.ParsedResults.length > 0
-    ? data.ParsedResults[0].ParsedText
-    : "";
+  if(!res.ok){
+    throw new Error(data.message || data.error || "Mindee API Error");
+  }
+
+  return data;
 }
 
-function extractAndAddPassport(engText, araText){
-
-  const allText = engText + "\n" + araText;
-
-  let passport = "";
-  const passportMatch = allText.match(/\b[A-Z][0-9]{7,8}\b/i);
-  if(passportMatch){
-    passport = passportMatch[0].toUpperCase();
-  }
-
-  let birth = "";
-  const mrzDateMatch = engText.match(/\b\d{6}\b/g);
-
-  if(mrzDateMatch && mrzDateMatch.length > 0){
-    for(let d of mrzDateMatch){
-      const yy = parseInt(d.substring(0,2));
-      const mm = parseInt(d.substring(2,4));
-      const dd = parseInt(d.substring(4,6));
-
-      if(mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31){
-        const yearPrefix = yy > 26 ? "19" : "20";
-        birth =
-          String(dd).padStart(2,"0") + "/" +
-          String(mm).padStart(2,"0") + "/" +
-          yearPrefix + String(yy).padStart(2,"0");
-        break;
-      }
-    }
-  }
-
-  if(!birth){
-    const altBirth = allText.match(/\b\d{1,2}[-\/ ]\d{1,2}[-\/ ]\d{2,4}\b/);
-    birth = altBirth ? altBirth[0] : "";
-  }
-
-  let nameEn = "";
-  const lines = engText.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
-  const mrzLine = lines.find(l => l.includes("<<"));
-
-  if(mrzLine){
-    nameEn = mrzLine
-      .replace(/^P<+[A-Z]{3}/, "")
-      .replace(/</g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-
-  if(!nameEn){
-    const altEn = engText.match(/[A-Z]{3,}(?:\s+[A-Z]{2,}){1,5}/);
-    nameEn = altEn ? altEn[0].trim() : "";
-  }
-
-  let nameAr = "";
-  const araLines = araText.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
-
-  for(let line of araLines){
-    if(
-      /[\u0600-\u06FF]/.test(line) &&
-      line.split(/\s+/).length >= 2 &&
-      !line.includes("جمهورية") &&
-      !line.includes("جواز") &&
-      !line.includes("العراق") &&
-      !line.includes("Passport") &&
-      !line.includes("تاريخ") &&
-      !line.includes("مكان") &&
-      !line.includes("الجنس")
-    ){
-      nameAr = line.replace(/[^\u0600-\u06FF\s]/g, "").replace(/\s+/g," ").trim();
-      break;
-    }
-  }
-
-  let gender = "ذكر";
+function getFields(data){
+  if(data.fields) return data.fields;
 
   if(
-    engText.includes("<F<") ||
-    engText.includes(" F ") ||
-    engText.includes("FEMALE") ||
-    araText.includes("أنثى") ||
-    araText.includes("انثى")
+    data.document &&
+    data.document.inference &&
+    data.document.inference.prediction
   ){
-    gender = "أنثى";
+    return data.document.inference.prediction;
   }
 
   if(
-    engText.includes("<M<") ||
-    engText.includes(" M ") ||
-    engText.includes("MALE") ||
-    araText.includes("ذكر")
+    data.inference &&
+    data.inference.prediction
   ){
-    gender = "ذكر";
+    return data.inference.prediction;
   }
 
-  rows.push({
-    "الاسم": nameAr || "پێویستی بە چاککردنە ✏️",
-    "التولد": birth || "پێویستی بە چاککردنە ✏️",
-    "الجنس": gender,
-    "الصفة": "معتمر",
-    "رقم الجواز": passport || "پێویستی بە چاککردنە ✏️",
-    "Name En": nameEn || "پێویستی بە چاککردنە ✏️"
-  });
+  return {};
+}
+
+function getValue(field){
+  if(!field) return "";
+
+  if(typeof field === "string") return field;
+
+  if(field.value !== undefined && field.value !== null){
+    return String(field.value);
+  }
+
+  if(Array.isArray(field.values)){
+    return field.values.map(x => x.value || "").join(" ");
+  }
+
+  return "";
+}
+
+function formatDate(date){
+  if(!date) return "";
+
+  if(date.includes("-")){
+    const parts = date.split("-");
+    if(parts.length === 3){
+      return parts[2] + "/" + parts[1] + "/" + parts[0];
+    }
+  }
+
+  return date;
+}
+
+function convertGender(sex){
+  sex = String(sex || "").toLowerCase();
+
+  if(sex.includes("female") || sex === "f"){
+    return "أنثى";
+  }
+
+  if(sex.includes("male") || sex === "m"){
+    return "ذكر";
+  }
+
+  return sex || "";
+}
+
+function cleanSpaces(text){
+  return String(text || "").replace(/\s+/g, " ").trim();
 }
 
 function updateCell(index, field, value){
