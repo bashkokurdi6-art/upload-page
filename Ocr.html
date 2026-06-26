@@ -126,12 +126,11 @@ async function runOCR(){
     formData.append("apikey", OCR_API_KEY);
     formData.append("file", file);
     
-    // لێرەدا کێشەکە بە تەواوی چارەسەر کراوە بە بەکارهێنانی Engine 3 ی گونجاو بۆ عەرەبی
+    // بەکارهێنانی Engine 1 کە باشترە بۆ جیاکردنەوەی هێڵەکانی نێوان خشتەی جۆری سکرینشۆت
     formData.append("language", "ara"); 
-    formData.append("OCREngine", "3"); 
-    
+    formData.append("OCREngine", "1"); 
+    formData.append("isTable", "true");
     formData.append("scale", "true");
-    formData.append("detectOrientation", "true");
 
     const res = await fetch("https://api.ocr.space/parse/image", {
       method: "POST",
@@ -147,7 +146,7 @@ async function runOCR(){
     }
 
     if(!data.ParsedResults || data.ParsedResults.length === 0){
-      status.innerText = "هیچ دەقێک نەخوێندرایەوە، دڵنیابەرەوە لە ڕوونی وێنەکە.";
+      status.innerText = "هیچ دەقێک نەخوێندرایەوە. دڵنیابەرەوە لە ڕوونی وێنەکە.";
       btn.disabled = false;
       return;
     }
@@ -167,15 +166,16 @@ async function runOCR(){
 }
 
 function parseMinistryTable(text){
-  const lines = text.split("\n").map(x => x.trim()).filter(x => x.length > 5);
+  const lines = text.split("\n").map(x => x.trim());
   const result = [];
 
   for(let i = 0; i < lines.length; i++){
     let line = lines[i].replace(/[||\t]+/g, " ").replace(/\s+/g, " ").trim();
 
-    // ١. دۆزینەوەی ژمارەی پاسپۆرت
+    // ١. پشکنینی پاسپۆرت (فلتەرێکی توندتر بۆ ڕێگری لە کۆدی تری سەر شاشە وەک کاتژمێر یان نیشانەی هێڵ)
     const passportMatch = line.match(/\b[A-Z][0-9]{7,8}\b/i);
-    if(!passportMatch) continue; 
+    if(!passportMatch) continue; // ئەگەر دێڕەکە پاسپۆرتی فەرمی تێدا نەبێت، پشتگوێی دەخات (بەمە نووسینەکانی سەر شاشەی مۆبایلەکە لادەبرێن)
+    
     const passport = passportMatch[0].toUpperCase();
 
     // ٢. ڕێکەوتی لەدایکبوون
@@ -185,8 +185,8 @@ function parseMinistryTable(text){
 
     // ٣. ڕەگەز
     let gender = "";
-    if(/\b(نکر|نكر|ذكر|ذكر|M|Male)\b/i.test(line)) gender = "نكر";
-    else if(/\b(انثى|أنثى|مێ|F|Female)\b/i.test(line)) gender = "أنثى";
+    if(/\b(نکر|نكر|ذكر|ذكر)\b/i.test(line)) gender = "نكر";
+    else if(/\b(انثى|أنثى|مێ)\b/i.test(line)) gender = "أنثى";
 
     // ٤. سیفەت
     let role = "معتمر"; 
@@ -194,7 +194,7 @@ function parseMinistryTable(text){
     else if(/متعهد/i.test(line)) role = "متعهد";
 
     // ٥. ناوی ئینگلیزی
-    const enMatch = line.match(/[A-Z]{3,}(?:\s+[A-Z]{2,}){2,6}/);
+    const enMatch = line.match(/[A-Z]{3,}(?:\s+[A-Z]{2,}){1,5}/);
     const nameEn = enMatch ? enMatch[0].trim() : "";
 
     // ٦. ناوی کوردی/عەرەبی
