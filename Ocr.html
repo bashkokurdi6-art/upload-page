@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OCR خوێندنەوەی سکان</title>
+<title>OCR بۆ Excel</title>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
 body{
@@ -15,18 +15,18 @@ body{
   direction:rtl;
 }
 .box{
-  max-width:700px;
+  max-width:900px;
   margin:auto;
   background:white;
   padding:20px;
-  border-radius:16px;
+  border-radius:15px;
   box-shadow:0 4px 15px #0002;
 }
-button,input{
+input,button,textarea{
   width:100%;
-  padding:14px;
-  margin:10px 0;
-  font-size:18px;
+  padding:12px;
+  margin:8px 0;
+  font-size:16px;
 }
 button{
   background:#0b6b3a;
@@ -34,75 +34,185 @@ button{
   border:0;
   border-radius:10px;
 }
-#preview{
-  width:100%;
-  max-height:400px;
-  object-fit:contain;
-  border:1px solid #ddd;
-  margin-top:10px;
-}
 textarea{
-  width:100%;
-  height:300px;
-  margin-top:15px;
-  font-size:16px;
+  height:220px;
   direction:ltr;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+  direction:rtl;
+}
+th,td{
+  border:1px solid #999;
+  padding:8px;
+  text-align:center;
+}
+th{
+  background:#e9e1c5;
 }
 </style>
 </head>
-
 <body>
 
 <div class="box">
-  <h2>خوێندنەوەی سکان بە OCR</h2>
+  <h2>خوێندنەوەی سکان و گۆڕین بۆ Excel</h2>
 
-  <input type="file" id="imageInput" accept="image/*">
-  <img id="preview" style="display:none">
+  <input type="file" id="fileInput" accept="image/*,.pdf">
 
-  <button onclick="readImage()">دەقەکە دەربهێنە</button>
+  <button onclick="runOCR()">١- دەقەکە دەربهێنە</button>
 
   <p id="status">ئامادەیە</p>
 
-  <textarea id="result" placeholder="دەقەکە لێرە دەردەکەوێت..."></textarea>
+  <textarea id="ocrText" placeholder="دەقی OCR لێرە دەردەکەوێت..."></textarea>
+
+  <button onclick="extractData()">٢- جیاکردنەوەی زانیارییەکان</button>
+  <button onclick="downloadExcel()">٣- دابەزاندنی Excel</button>
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>ناوی عەرەبی</th>
+        <th>ناوی ئینگلیزی</th>
+        <th>پاسپۆرت</th>
+        <th>ڕەگەز</th>
+        <th>بەرواری لەدایکبوون</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </div>
 
 <script>
-let selectedImage = null;
+const API_KEY = "K88841321188957";
+let extractedRows = [];
 
-document.getElementById("imageInput").addEventListener("change", function(e){
-  selectedImage = e.target.files[0];
-
-  if(selectedImage){
-    const url = URL.createObjectURL(selectedImage);
-    const preview = document.getElementById("preview");
-    preview.src = url;
-    preview.style.display = "block";
-  }
-});
-
-async function readImage(){
-  if(!selectedImage){
-    alert("تکایە وێنەیەک هەڵبژێرە");
+async function runOCR(){
+  const file = document.getElementById("fileInput").files[0];
+  if(!file){
+    alert("تکایە وێنە یان PDF هەڵبژێرە");
     return;
   }
 
   document.getElementById("status").innerText = "چاوەڕێ بکە... OCR کاردەکات";
-  document.getElementById("result").value = "";
+
+  const formData = new FormData();
+  formData.append("apikey", API_KEY);
+  formData.append("language", "ara");
+  formData.append("isOverlayRequired", "false");
+  formData.append("OCREngine", "2");
+  formData.append("file", file);
 
   try{
-    const worker = await Tesseract.createWorker(["eng","ara"]);
+    const res = await fetch("https://api.ocr.space/parse/image", {
+      method: "POST",
+      body: formData
+    });
 
-    const ret = await worker.recognize(selectedImage);
+    const data = await res.json();
 
-    document.getElementById("result").value = ret.data.text;
-    document.getElementById("status").innerText = "تەواو بوو ✅";
+    if(data.IsErroredOnProcessing){
+      alert("هەڵە: " + data.ErrorMessage);
+      document.getElementById("status").innerText = "هەڵە ڕوویدا";
+      return;
+    }
 
-    await worker.terminate();
+    const text = data.ParsedResults[0].ParsedText;
+    document.getElementById("ocrText").value = text;
+    document.getElementById("status").innerText = "OCR تەواو بوو ✅";
+
   }catch(err){
     console.error(err);
-    document.getElementById("status").innerText = "هەڵە ڕوویدا";
-    alert("کێشەیەک ڕوویدا، وێنەکە ڕوونتر بکە یان دوبارە هەوڵبدە");
+    alert("کێشەیەک ڕوویدا");
+    document.getElementById("status").innerText = "هەڵە";
   }
+}
+
+function extractData(){
+  const text = document.getElementById("ocrText").value;
+  const lines = text.split(/\n/).map(x => x.trim()).filter(x => x);
+
+  extractedRows = [];
+
+  let passportRegex = /[A-Z][0-9]{7,9}/g;
+  let dateRegex = /\d{1,2}[-\/][A-Za-z]{3}[-\/]\d{2,4}|\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}/g;
+
+  for(let i = 0; i < lines.length; i++){
+    let line = lines[i];
+
+    let passportMatch = line.match(passportRegex);
+    let dateMatch = line.match(dateRegex);
+
+    if(passportMatch){
+      let passport = passportMatch[0];
+      let birth = dateMatch ? dateMatch[0] : "";
+
+      let englishName = "";
+      let arabicName = "";
+      let gender = "";
+
+      for(let j = Math.max(0, i-3); j <= Math.min(lines.length-1, i+3); j++){
+        if(/[A-Z]{3,}/.test(lines[j]) && !lines[j].match(passportRegex)){
+          englishName = lines[j];
+        }
+        if(/[\u0600-\u06FF]/.test(lines[j])){
+          arabicName = lines[j];
+        }
+      }
+
+      if(line.includes("ذكر") || line.includes("نكر")) gender = "ذكر";
+      if(line.includes("انثى") || line.includes("أنثى")) gender = "أنثى";
+
+      extractedRows.push({
+        "#": extractedRows.length + 1,
+        "ناوی عەرەبی": arabicName,
+        "ناوی ئینگلیزی": englishName,
+        "پاسپۆرت": passport,
+        "ڕەگەز": gender,
+        "بەرواری لەدایکبوون": birth
+      });
+    }
+  }
+
+  renderTable();
+}
+
+function renderTable(){
+  const tbody = document.querySelector("#dataTable tbody");
+  tbody.innerHTML = "";
+
+  extractedRows.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row["#"]}</td>
+      <td>${row["ناوی عەرەبی"]}</td>
+      <td>${row["ناوی ئینگلیزی"]}</td>
+      <td>${row["پاسپۆرت"]}</td>
+      <td>${row["ڕەگەز"]}</td>
+      <td>${row["بەرواری لەدایکبوون"]}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if(extractedRows.length === 0){
+    alert("هیچ زانیارییەک جیا نەکرایەوە. دەقی OCR پێویستی بە چاککردنەوە هەیە.");
+  }
+}
+
+function downloadExcel(){
+  if(extractedRows.length === 0){
+    alert("سەرەتا زانیارییەکان جیا بکەوە");
+    return;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(extractedRows);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Manifest");
+
+  XLSX.writeFile(wb, "manifest.xlsx");
 }
 </script>
 
