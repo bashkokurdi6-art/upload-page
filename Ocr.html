@@ -125,13 +125,13 @@ async function runOCR(){
     const formData = new FormData();
     formData.append("apikey", OCR_API_KEY);
     formData.append("file", file);
+    
+    // لێرەدا کێشەکە بە تەواوی چارەسەر کراوە بە بەکارهێنانی Engine 3 ی گونجاو بۆ عەرەبی
     formData.append("language", "ara"); 
-    formData.append("OCREngine", "1"); // لێرەدا گۆڕدرا بۆ بزوێنەری 1 بۆ چارەسەری زمانەکە
+    formData.append("OCREngine", "3"); 
+    
     formData.append("scale", "true");
     formData.append("detectOrientation", "true");
-
-    if(file.type === "application/pdf") formData.append("filetype", "PDF");
-    else formData.append("filetype", "JPG");
 
     const res = await fetch("https://api.ocr.space/parse/image", {
       method: "POST",
@@ -185,7 +185,7 @@ function parseMinistryTable(text){
 
     // ٣. ڕەگەز
     let gender = "";
-    if(/\b(نکر|نکر|ذكر|ذكر|M|Male)\b/i.test(line)) gender = "نكر";
+    if(/\b(نکر|نكر|ذكر|ذكر|M|Male)\b/i.test(line)) gender = "نكر";
     else if(/\b(انثى|أنثى|مێ|F|Female)\b/i.test(line)) gender = "أنثى";
 
     // ٤. سیفەت
@@ -202,7 +202,7 @@ function parseMinistryTable(text){
       .replace(passport, "")
       .replace(birth, "")
       .replace(nameEn, "")
-      .replace(/(نکر|انثى|أنثى|معتمر|سائق|متعهد|سایق)/g, "")
+      .replace(/(نکر|نكر|انثى|أنثى|معتمر|سائق|متعهد|سایق)/g, "")
       .replace(/[0-9]/g, "")
       .replace(/[A-Za-z]/g, "")
       .replace(/[^\u0600-\u06FF\s]/g, "") 
