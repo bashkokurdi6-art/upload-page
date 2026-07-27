@@ -1,340 +1,173 @@
 <!DOCTYPE html>
 <html lang="ku" dir="rtl">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,
-initial-scale=1.0">
-
-<title>🎁 Admin Gift</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:sans-serif;
-}
-
-body{
-
-background:
-linear-gradient(to bottom,
-#07140c,
-#0f5132);
-
-color:white;
-
-min-height:100vh;
-
-padding:20px;
-}
-
-.title{
-
-text-align:center;
-
-font-size:32px;
-
-font-weight:bold;
-
-color:#d4af37;
-
-margin-bottom:25px;
-}
-
-.card{
-
-background:
-rgba(255,255,255,.05);
-
-border:
-1px solid rgba(212,175,55,.2);
-
-padding:20px;
-
-border-radius:18px;
-
-margin-bottom:15px;
-
-backdrop-filter:blur(10px);
-
-box-shadow:
-0 0 10px rgba(212,175,55,.08);
-}
-
-.name{
-
-font-size:22px;
-
-font-weight:bold;
-
-margin-bottom:12px;
-
-color:#d4af37;
-}
-
-.info{
-
-margin-bottom:8px;
-
-font-size:16px;
-}
-
-.status{
-
-margin-top:10px;
-
-margin-bottom:15px;
-
-color:#ccc;
-}
-
-.buttons{
-
-display:flex;
-
-gap:10px;
-}
-
-button{
-
-flex:1;
-
-padding:14px;
-
-border:none;
-
-border-radius:14px;
-
-font-size:16px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-transition:.3s;
-}
-
-button:hover{
-
-transform:scale(1.03);
-}
-
-.approve{
-
-background:#d4af37;
-
-color:black;
-}
-
-.winner{
-
-background:#198754;
-
-color:white;
-}
-
-.delete{
-
-background:#dc3545;
-
-color:white;
-}
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07110b">
+  <title>ئەدمین - VERO FARM</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700;800;900&display=swap');
+    *{box-sizing:border-box}
+    body{margin:0;background:#050a07;color:#f5fff8;font-family:'Noto Sans Arabic',Tahoma,Arial,sans-serif}
+    .app{width:min(100%,960px);margin:auto;padding:18px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+    h1{margin:0;font-size:23px}.sub{color:#a8c2b1;font-size:12px}
+    .btn{border:0;border-radius:14px;padding:11px 15px;font:inherit;font-weight:900;cursor:pointer;background:#48f08b;color:#07110b}
+    .danger{background:#ff7f7f}.gold{background:#ffd166}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .card{padding:17px;border:1px solid rgba(135,255,177,.16);border-radius:22px;background:rgba(17,35,24,.78)}
+    .card h3{margin:0 0 14px}
+    label{display:block;color:#a8c2b1;font-size:12px;margin:9px 0 6px}
+    input{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:#fff;font:inherit;outline:none}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);text-align:right}
+    .full{grid-column:1/-1;overflow:auto}
+    .status{padding:6px 9px;border-radius:999px;background:#163d25;color:#75f2a6;font-size:11px}
+    .msg{margin-top:10px;color:#ff9b9b;min-height:22px}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+  </style>
 </head>
-
 <body>
+<div class="app">
+  <header class="top">
+    <div>
+      <h1>👑 داشبۆردی ئەدمین</h1>
+      <div class="sub">کۆنترۆڵی نرخ و بەکارهێنەران</div>
+    </div>
+    <button class="btn danger" onclick="logout()">چوونەدەرەوە</button>
+  </header>
 
-<div class="title">
+  <main class="grid">
+    <section class="card">
+      <h3>⚙️ ڕێکخستنەکانی یاری</h3>
 
-🎁 ئەدمینی دیاری مانگانە
+      <label>نرخی هەر مریشک بە پۆینت</label>
+      <input id="chickenPrice" type="number" min="1">
 
+      <label>ژمارەی هێلکە بۆ هەر مریشک</label>
+      <input id="eggsPerChicken" type="number" min="1">
+
+      <label>ماوەی خول بە کاتژمێر</label>
+      <input id="cycleHours" type="number" min="1">
+
+      <label>چەند هێلکە = ١ پۆینت</label>
+      <input id="eggsPerPoint" type="number" min="1">
+
+      <div class="actions">
+        <button class="btn gold" onclick="saveSettings()">پاشەکەوتکردن</button>
+      </div>
+      <div id="settingsMsg" class="msg"></div>
+    </section>
+
+    <section class="card">
+      <h3>📊 ئاماری گشتی</h3>
+      <p>بەکارهێنەر: <b id="usersCount">0</b></p>
+      <p>کۆی پۆینت: <b id="pointsTotal">0</b></p>
+      <p>کۆی هێلکە: <b id="eggsTotal">0</b></p>
+      <p>کۆی مریشک: <b id="chickensTotal">0</b></p>
+      <div class="actions">
+        <button class="btn" onclick="loadAll()">نوێکردنەوە</button>
+      </div>
+    </section>
+
+    <section class="card full">
+      <h3>👥 بەکارهێنەران</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ناو</th>
+            <th>پۆینت</th>
+            <th>هێلکە</th>
+            <th>ئەدمین</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </section>
+  </main>
 </div>
-
-<div id="requests"></div>
 
 <script>
+const SUPABASE_URL="https://vhxafelyesuhpivopcni.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_fMc3VhlhSEnyoCAf0DcJWQ_zTsl5tRv";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let user=null;
 
-const SUPABASE_URL =
-"https://slllcibigutjivauryvc.supabase.co";
+async function guard(){
+  const {data}=await db.auth.getSession();
+  user=data.session?.user||null;
+  if(!user){location.href="login.html";return false;}
 
-const SUPABASE_KEY =
-"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
-
-const client =
-supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
-
-async function loadRequests(){
-
-const { data,error } =
-await client
-.from("gift_requests")
-.select("*")
-.order("id",{ascending:false});
-
-if(error){
-
-console.log(error);
-
-return;
+  const {data:profile,error}=await db.from("profiles").select("is_admin").eq("id",user.id).single();
+  if(error||!profile?.is_admin){location.href="Vero.html";return false;}
+  return true;
 }
 
-const box =
-document.getElementById("requests");
-
-box.innerHTML = "";
-
-if(data.length === 0){
-
-box.innerHTML =
-"هیچ داواکارییەک نییە";
-
-return;
+async function loadSettings(){
+  const {data,error}=await db.from("game_settings").select("*").eq("id",1).single();
+  if(error)return;
+  document.getElementById("chickenPrice").value=data.chicken_price_points;
+  document.getElementById("eggsPerChicken").value=data.eggs_per_chicken;
+  document.getElementById("cycleHours").value=data.egg_cycle_hours;
+  document.getElementById("eggsPerPoint").value=data.eggs_per_point;
 }
 
-data.forEach(user=>{
+async function saveSettings(){
+  const payload={
+    chicken_price_points:Number(document.getElementById("chickenPrice").value),
+    eggs_per_chicken:Number(document.getElementById("eggsPerChicken").value),
+    egg_cycle_hours:Number(document.getElementById("cycleHours").value),
+    eggs_per_point:Number(document.getElementById("eggsPerPoint").value),
+    updated_at:new Date().toISOString()
+  };
 
-box.innerHTML += `
-
-<div class="card">
-
-<div class="name">
-
-👤
-${user.full_name}
-
-</div>
-
-<div class="info">
-
-📍 شار:
-${user.city}
-
-</div>
-
-<div class="info">
-
-🎂 تەمەن:
-${user.age}
-
-</div>
-
-<div class="info">
-
-📞 مۆبایل:
-${user.phone}
-
-</div>
-
-<div class="status">
-
-📌 دۆخ:
-${user.status}
-
-</div>
-
-<div class="buttons">
-
-<button class="approve"
-onclick="approveUser(${user.id})">
-
-قبوڵکردن
-
-</button>
-
-<button class="winner"
-onclick="winnerUser(${user.id})">
-
-براوە
-
-</button>
-
-<button class="delete"
-onclick="deleteUser(${user.id})">
-
-سڕینەوە
-
-</button>
-
-</div>
-
-</div>
-
-`;
-
-});
-
+  const msg=document.getElementById("settingsMsg");
+  const {error}=await db.from("game_settings").update(payload).eq("id",1);
+  msg.style.color=error?"#ff9b9b":"#75f2a6";
+  msg.textContent=error?error.message:"ڕێکخستنەکان پاشەکەوتکران.";
 }
 
-async function approveUser(id){
+async function loadAll(){
+  const [{data:profiles},{data:wallets},{data:chickens}]=await Promise.all([
+    db.from("profiles").select("id,full_name,is_admin").order("created_at",{ascending:false}),
+    db.from("wallets").select("user_id,points,eggs"),
+    db.from("user_chickens").select("quantity")
+  ]);
 
-const { error } =
-await client
-.from("gift_requests")
-.update({
+  const walletMap=new Map((wallets||[]).map(w=>[w.user_id,w]));
+  document.getElementById("usersCount").textContent=(profiles||[]).length.toLocaleString("en-US");
+  document.getElementById("pointsTotal").textContent=(wallets||[]).reduce((s,w)=>s+Number(w.points),0).toLocaleString("en-US");
+  document.getElementById("eggsTotal").textContent=(wallets||[]).reduce((s,w)=>s+Number(w.eggs),0).toLocaleString("en-US");
+  document.getElementById("chickensTotal").textContent=(chickens||[]).reduce((s,c)=>s+Number(c.quantity),0).toLocaleString("en-US");
 
-status:"approved"
-
-})
-.eq("id",id);
-
-if(error){
-
-alert("هەڵەیەک ڕوویدا");
-
-return;
+  document.getElementById("usersTable").innerHTML=(profiles||[]).map(p=>{
+    const w=walletMap.get(p.id)||{points:0,eggs:0};
+    return `<tr>
+      <td>${escapeHtml(p.full_name||"بێ ناو")}</td>
+      <td>${Number(w.points).toLocaleString("en-US")}</td>
+      <td>${Number(w.eggs).toLocaleString("en-US")}</td>
+      <td>${p.is_admin?'<span class="status">بەڵێ</span>':'نەخێر'}</td>
+    </tr>`;
+  }).join("");
 }
 
-loadRequests();
-
+function escapeHtml(v){
+  return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
 
-async function winnerUser(id){
-
-await client
-.from("gift_requests")
-.update({
-
-status:"winner"
-
-})
-.eq("id",id);
-
-loadRequests();
-
+async function logout(){
+  await db.auth.signOut();
+  location.href="login.html";
 }
 
-async function deleteUser(id){
-
-const ok =
-confirm("دڵنیایت لە سڕینەوە؟");
-
-if(!ok) return;
-
-await client
-.from("gift_requests")
-.delete()
-.eq("id",id);
-
-loadRequests();
-
-}
-
-loadRequests();
-
+(async()=>{
+  if(await guard()){
+    await loadSettings();
+    await loadAll();
+  }
+})();
 </script>
-
 </body>
 </html>
