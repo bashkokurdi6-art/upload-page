@@ -8,7 +8,21 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@600;700;900&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --emerald-950:#0a2e24;
+  --emerald-800:#0f4a38;
+  --emerald-700:#146349;
+  --gold-500:#c9a24a;
+  --gold-300:#e6cd8a;
+  --cream-50:#faf6ea;
+  --cream-100:#f3ecd8;
+  --ink:#17332a;
+  --muted:#6b7a72;
+  --danger:#c14545;
+  --ok:#1f9d63;
+}
 
 *{
   box-sizing:border-box;
@@ -20,212 +34,287 @@
 body{
   min-height:100vh;
   background:
-    linear-gradient(rgba(0,35,18,.72),rgba(0,45,22,.78)),
+    linear-gradient(rgba(8,38,28,.86),rgba(8,38,28,.90)),
     url("Rawdah.png") center/cover fixed no-repeat;
-  color:#17453a;
-  padding:14px;
+  background-color:var(--emerald-950);
+  color:var(--ink);
+  padding:16px 14px 40px;
   direction:rtl;
 }
 
 .container{
-  max-width:520px;
+  max-width:480px;
   margin:auto;
 }
 
-.card{
-  background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(255,255,255,.10));
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
-  border:2px solid rgba(255,215,95,.85);
-  border-radius:28px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:
-    0 14px 40px rgba(0,0,0,.35),
-    inset 0 0 20px rgba(255,255,255,.18);
-}
-
-.title{
+/* ---------- header ---------- */
+.header{
   text-align:center;
-  color:#ffe27a;
-  font-size:28px;
-  font-weight:900;
-  text-shadow:0 3px 10px rgba(0,0,0,.6);
+  padding:6px 0 20px;
 }
-
-.price-title{
-  text-align:center;
-  color:#fff7c7;
-  font-weight:800;
-  font-size:17px;
-}
-
-.price{
-  text-align:center;
-  font-size:30px;
-  color:#ffd86b;
-  font-weight:900;
-  margin-top:5px;
-  text-shadow:0 3px 10px rgba(0,0,0,.55);
-}
-
-h3{
-  text-align:center;
-  color:#ffe27a;
-  margin-bottom:12px;
+.header .dome{ font-size:34px; }
+.header h1{
+  font-family:'Noto Kufi Arabic',sans-serif;
+  color:var(--cream-50);
   font-size:21px;
   font-weight:900;
+  margin-top:6px;
+}
+.header p{
+  color:var(--gold-300);
+  font-size:12.5px;
+  font-weight:600;
+  margin-top:5px;
 }
 
-label{
-  display:block;
-  margin:10px 0 5px;
-  font-size:16px;
-  font-weight:800;
-  color:#ffe27a;
+/* ---------- stepper ---------- */
+.stepper{
+  display:flex; align-items:flex-start; justify-content:center;
+  gap:4px; margin-bottom:18px;
+}
+.step{ display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; max-width:110px; }
+.step-circle{
+  width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800;
+  border:2px solid var(--gold-500);
+  background:rgba(255,255,255,.08); color:var(--gold-300);
+}
+.step.active .step-circle{ background:var(--gold-500); color:var(--emerald-950); }
+.step-label{ font-size:10.5px; color:var(--gold-300); font-weight:600; opacity:.85; }
+.step-line{ height:2px; flex:1; background:rgba(230,205,138,.35); margin-top:12px; }
+
+/* ---------- cards ---------- */
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.05));
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1.5px solid rgba(230,205,138,.55);
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 12px 32px rgba(0,0,0,.30);
 }
 
+.card-title{
+  display:flex; align-items:center; gap:8px;
+  font-size:15px; font-weight:800; color:var(--gold-300);
+  margin-bottom:14px;
+}
+.card-title .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold-500); }
+
+/* ---------- price ---------- */
+.price-card{ text-align:center; }
+.price-title{ color:var(--gold-300); font-weight:700; font-size:13.5px; }
+.price{
+  font-size:32px; color:#fff; font-weight:900; margin-top:6px;
+  text-shadow:0 3px 10px rgba(0,0,0,.4);
+}
+.price-note{
+  font-size:11px; color:rgba(250,246,234,.75); margin-top:8px; line-height:1.7;
+}
+
+.spinner{
+  display:inline-block;
+  width:22px; height:22px;
+  border:3px solid rgba(230,205,138,.3);
+  border-top-color:var(--gold-300);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  vertical-align:middle;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.pay-number.loading{
+  color:rgba(15,74,56,.6);
+  font-style:italic;
+}
+
+/* ---------- fields ---------- */
+.field{ margin-bottom:12px; }
+.field label{
+  display:block; font-size:12.5px; font-weight:800;
+  color:var(--gold-300); margin-bottom:6px;
+}
 input,select,textarea,.fake-input{
   width:100%;
-  padding:12px;
-  border-radius:16px;
-  border:1.8px solid rgba(255,215,95,.95);
+  padding:12px 14px;
+  border-radius:14px;
+  border:1.5px solid rgba(230,205,138,.6);
   outline:none;
-  background:rgba(255,255,255,.88);
-  font-size:16px;
-  font-weight:700;
+  background:rgba(250,246,234,.95);
+  font-size:14px;
+  font-weight:600;
   direction:rtl;
   text-align:right;
-  color:#064225;
+  color:var(--ink);
+  transition:border-color .15s, box-shadow .15s;
 }
+input:focus,select:focus,textarea:focus{
+  border-color:var(--gold-500);
+  box-shadow:0 0 0 3px rgba(201,162,74,.28);
+  background:#fff;
+}
+textarea{ min-height:70px; resize:none; }
 
-textarea{
-  min-height:75px;
-  resize:none;
+input.invalid{
+  border-color:var(--danger);
+  box-shadow:0 0 0 3px rgba(193,69,69,.22);
 }
+.field-error{
+  display:none;
+  font-size:11px;
+  color:#ffb3b3;
+  font-weight:700;
+  margin-top:5px;
+}
+.field-error.show{ display:block; }
 
 .form-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:12px;
 }
-
-.full{
-  grid-column:1/-1;
-}
+.full{ grid-column:1/-1; }
 
 .fake-input{
-  height:52px;
+  height:48px;
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  color:#075334;
-  box-shadow:inset 0 0 12px rgba(212,175,55,.18);
+  font-weight:700;
+  color:var(--emerald-800);
 }
+.fake-input:active{ transform:scale(.98); }
 
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:8px;
-}
-
+/* ---------- payment ---------- */
 .payments{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:8px;
-  margin-top:8px;
 }
-
 .pay{
-  padding:13px 5px;
-  border-radius:18px;
-  font-weight:900;
+  padding:12px 5px;
+  border-radius:14px;
+  font-weight:800;
   text-align:center;
   cursor:pointer;
-  border:2px solid #ffd86b;
-  font-size:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.28);
+  border:2px solid transparent;
+  font-size:12.5px;
+  color:#fff;
+  position:relative;
+  box-shadow:0 6px 14px rgba(0,0,0,.22);
+  transition:transform .1s, border-color .15s;
 }
-
-.fastpay{background:#a40000;color:white}
-.fib{background:#007a43;color:white}
-.qicard{background:#d4af37;color:#111}
-
+.pay:active{ transform:scale(.96); }
+.fastpay{background:#c14545}
+.fib{background:#0e7a4d}
+.qicard{background:#c9962b}
 .pay.active{
-  border-color:#fff;
-  transform:scale(.96);
-  box-shadow:0 0 18px rgba(255,216,107,.75);
+  border-color:var(--gold-300);
+  box-shadow:0 0 0 3px rgba(230,205,138,.35);
+}
+.pay.active::after{
+  content:"✓";
+  position:absolute; top:-8px; left:-8px;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--gold-300); color:var(--emerald-950);
+  font-size:11px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
 }
 
 .pay-number{
   margin-top:10px;
-  background:rgba(255,255,255,.82);
-  border:2px dashed #ffd86b;
-  border-radius:16px;
+  background:rgba(250,246,234,.95);
+  border:1.5px dashed var(--gold-500);
+  border-radius:14px;
   padding:12px;
   text-align:center;
-  font-weight:900;
-  color:#006b3a;
+  font-weight:800;
+  font-size:13px;
+  color:var(--emerald-800);
 }
 
-.file-box input{
-  display:none;
-}
-
+/* ---------- uploads ---------- */
+.file-box input{ display:none; }
 .file-label{
   width:100%;
-  min-height:52px;
-  border-radius:16px;
-  border:1.8px solid rgba(255,215,95,.95);
-  background:rgba(255,255,255,.88);
-  color:#075334;
-  font-weight:900;
+  min-height:48px;
+  border-radius:14px;
+  border:1.5px dashed rgba(230,205,138,.7);
+  background:rgba(250,246,234,.12);
+  color:var(--gold-300);
+  font-weight:700;
+  font-size:13px;
   display:flex;
   align-items:center;
   justify-content:center;
+  gap:6px;
   cursor:pointer;
+  transition:background .15s, border-color .15s;
 }
-
+.file-label:hover{ background:rgba(250,246,234,.2); border-color:var(--gold-500); }
+.file-label.done{
+  color:var(--emerald-800);
+  background:rgba(250,246,234,.95);
+  border-style:solid;
+  border-color:var(--ok);
+}
 .preview{
   width:100%;
-  max-height:185px;
+  max-height:170px;
   object-fit:cover;
-  border-radius:16px;
+  border-radius:14px;
   margin-top:8px;
   display:none;
-  border:2px solid #ffd86b;
+  border:2px solid var(--gold-500);
 }
 
-button{
+/* ---------- trust row ---------- */
+.trust-row{
+  display:flex; align-items:center; gap:10px;
+  margin-top:6px; padding:11px 13px;
+  background:rgba(250,246,234,.10);
+  border:1px solid rgba(230,205,138,.35);
+  border-radius:14px;
+}
+.trust-row .ic{ font-size:16px; }
+.trust-row .txt{ font-size:11px; color:rgba(250,246,234,.85); font-weight:600; line-height:1.6; }
+
+/* ---------- submit ---------- */
+button.submit{
   width:100%;
-  padding:14px;
-  border:2px solid #ffd86b;
-  border-radius:22px;
-  background:linear-gradient(135deg,#004d2b,#00a85a,#0b6b3c);
-  color:white;
-  font-size:18px;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--gold-500),#a9822f);
+  color:var(--emerald-950);
+  font-size:15.5px;
   font-weight:900;
   margin-top:16px;
   cursor:pointer;
-  box-shadow:0 10px 28px rgba(0,0,0,.35);
+  box-shadow:0 10px 24px rgba(201,162,74,.35);
+  transition:transform .12s;
 }
-
-button:active{
-  transform:scale(.98);
-}
-
-button:disabled{
-  opacity:.6;
-}
+button.submit:hover{ transform:translateY(-2px); }
+button.submit:active{ transform:scale(.98); }
+button.submit:disabled{ opacity:.6; cursor:default; transform:none; }
 
 .msg{
   text-align:center;
   margin-top:12px;
-  font-weight:900;
-  color:white;
+  font-weight:800;
+  font-size:13px;
+  color:#fff;
 }
 
+.footer-note{
+  text-align:center; font-size:11px; color:rgba(250,246,234,.6);
+  margin-top:8px; line-height:1.8;
+}
+
+/* ---------- popup ---------- */
 .popup{
   display:none;
   position:fixed;
@@ -236,47 +325,47 @@ button:disabled{
   justify-content:center;
   padding:18px;
 }
-
 .popup-card{
   width:100%;
-  max-width:370px;
-  background:linear-gradient(145deg,rgba(15,90,55,.96),rgba(5,45,28,.96));
-  border:2px solid #ffd86b;
-  border-radius:30px;
+  max-width:360px;
+  background:linear-gradient(155deg,var(--emerald-800),var(--emerald-950));
+  border:1.5px solid var(--gold-500);
+  border-radius:24px;
   padding:20px;
   box-shadow:0 20px 60px rgba(0,0,0,.55);
   text-align:center;
 }
-
 .popup-card h3{
-  color:#ffd86b;
+  font-family:'Noto Kufi Arabic',sans-serif;
+  color:var(--gold-300);
+  font-size:16px;
+  margin-bottom:14px;
 }
-
 .popup-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:8px;
-  margin-top:12px;
 }
-
 .popup-grid select{
-  height:55px;
+  height:50px;
   text-align:center;
-  font-size:17px;
-  font-weight:900;
+  font-size:14px;
+  font-weight:700;
+  padding:6px;
 }
-
-.close-btn{
-  background:linear-gradient(135deg,#b00000,#e14b4b);
+button.close-btn{
+  background:transparent;
+  border:1.5px solid rgba(255,255,255,.3);
+  color:rgba(255,255,255,.8);
   margin-top:8px;
+  box-shadow:none;
 }
 
 @media(max-width:380px){
-  body{padding:10px}
-  .card{padding:13px}
-  .title{font-size:24px}
-  input,select,textarea,.fake-input{font-size:14px;padding:10px}
-  label{font-size:14px}
+  body{padding:12px}
+  .card{padding:14px}
+  .header h1{font-size:18px}
+  input,select,textarea,.fake-input{font-size:13px;padding:10px}
 }
 </style>
 </head>
@@ -285,39 +374,62 @@ button:disabled{
 
 <div class="container">
 
-  <div class="card title">🕌 خزمەتگوزاری ڕەوزە</div>
+  <div class="header">
+    <div class="dome">🕌</div>
+    <h1>خزمەتگوزاری تۆمارکردنی سەردانی ڕەوزە</h1>
+    <p>پڕۆسەیەکی سادە و دڵنیا بۆ تۆمارکردنی داواکاریت</p>
+  </div>
 
-  <div class="card">
+  <div class="stepper">
+    <div class="step active">
+      <div class="step-circle">١</div>
+      <div class="step-label">زانیاری</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">٢</div>
+      <div class="step-label">پارەدان</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">٣</div>
+      <div class="step-label">پشتڕاستکردنەوە</div>
+    </div>
+  </div>
+
+  <div class="card price-card">
     <div class="price-title">نرخی خزمەتگوزاری</div>
-    <div class="price" id="priceBox">...</div>
+    <div class="price" id="priceBox"><span class="spinner"></span></div>
+    <div class="price-note">ئەم نرخە بۆ خزمەتگوزاری تۆمارکردن و ڕێکخستنی کاتی سەردانە. دوای پشتڕاستکردنەوەی پارەدان، پەیامی دڵنیایی بۆت دەنێردرێت.</div>
   </div>
 
   <div class="card">
-    <h3>فۆڕمی پڕکردنەوەی زانیاری</h3>
+    <div class="card-title"><span class="dot"></span> فۆڕمی پڕکردنەوەی زانیاری</div>
 
     <div class="form-grid">
 
-      <div>
+      <div class="field">
         <label>ناوی سیانی</label>
-        <input id="fullName" type="text" placeholder="ناوی سیانی">
+        <input id="fullName" type="text" placeholder="ناوی تەواو بنووسە">
       </div>
 
-      <div>
+      <div class="field">
         <label>ژمارەی مۆبایل</label>
-        <input id="mobile" type="tel" placeholder="07xxxxxxxxx">
+        <input id="mobile" type="tel" placeholder="07xxxxxxxxx" maxlength="11" inputmode="numeric">
+        <div class="field-error" id="mobileError">ژمارەی مۆبایل نادروستە (نموونە: 07701234567)</div>
       </div>
 
-      <div>
+      <div class="field">
         <label>بەروار</label>
         <div class="fake-input" onclick="openDatePopup()" id="dateText">بەروار هەڵبژێرە</div>
       </div>
 
-      <div>
+      <div class="field">
         <label>کاتژمێر</label>
         <div class="fake-input" onclick="openTimePopup()" id="timeText">کاتژمێر هەڵبژێرە</div>
       </div>
 
-      <div class="full">
+      <div class="field full">
         <label>جۆر</label>
         <select id="gender">
           <option value="">هەڵبژێرە</option>
@@ -326,7 +438,7 @@ button:disabled{
         </select>
       </div>
 
-      <div class="full file-box">
+      <div class="field full file-box">
         <label>وێنەی ڤیزە</label>
         <label class="file-label" for="visaImg" id="visaLabel">📷 وێنە باربکە</label>
         <input id="visaImg" type="file" accept="image/*">
@@ -334,28 +446,41 @@ button:disabled{
       </div>
 
     </div>
+  </div>
 
-    <label>پارەدان</label>
-    <div class="payments">
-      <div class="pay fastpay" onclick="selectPay('fastpay',this)">FastPay</div>
-      <div class="pay fib" onclick="selectPay('fib',this)">FIB</div>
-      <div class="pay qicard" onclick="selectPay('qicard',this)">QiCard</div>
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> پارەدان</div>
+
+    <div class="field">
+      <label>شێوازی پارەدان هەڵبژێرە</label>
+      <div class="payments">
+        <div class="pay fastpay" onclick="selectPay('fastpay',this)">FastPay</div>
+        <div class="pay fib" onclick="selectPay('fib',this)">FIB</div>
+        <div class="pay qicard" onclick="selectPay('qicard',this)">QiCard</div>
+      </div>
+      <div class="pay-number" id="payNumber">ژمارەی پارەدان لێرە دەردەکەوێت</div>
     </div>
 
-    <div class="pay-number" id="payNumber">ژمارەی پارەدان لێرە دەردەکەوێت</div>
-
-    <div class="file-box">
+    <div class="field file-box">
       <label>وێنەی پارەدان</label>
       <label class="file-label" for="paymentImg" id="paymentLabel">📷 وێنە باربکە</label>
       <input id="paymentImg" type="file" accept="image/*">
       <img id="paymentPreview" class="preview">
     </div>
 
-    <label>تێبینی</label>
-    <textarea id="note" placeholder="تێبینی بنووسە..."></textarea>
+    <div class="field">
+      <label>تێبینی (ئارەزوومەندانە)</label>
+      <textarea id="note" placeholder="تێبینی بنووسە..."></textarea>
+    </div>
 
-    <button id="sendBtn" onclick="sendRequest()">ناردن</button>
+    <div class="trust-row">
+      <div class="ic">🔒</div>
+      <div class="txt">زانیاریەکانت بە پارێزراوی تۆمار دەکرێن. بۆ هەر پرسیارێک لە ڕێگەی واتساپ پەیوەندیمان پێوە بکە.</div>
+    </div>
+
+    <button class="submit" id="sendBtn" onclick="sendRequest()">🕌 ناردنی داواکاری</button>
     <div class="msg" id="msg"></div>
+    <div class="footer-note">پشتگیری: ٠٧٥٠xxxxxxx (واتساپ)</div>
   </div>
 
 </div>
@@ -368,7 +493,7 @@ button:disabled{
       <select id="month"></select>
       <select id="year"></select>
     </div>
-    <button onclick="saveDate()">هەڵبژاردن</button>
+    <button class="submit" onclick="saveDate()">هەڵبژاردن</button>
     <button class="close-btn" onclick="closePopups()">داخستن</button>
   </div>
 </div>
@@ -384,7 +509,7 @@ button:disabled{
         <option value="PM">شەو</option>
       </select>
     </div>
-    <button onclick="saveTime()">هەڵبژاردن</button>
+    <button class="submit" onclick="saveTime()">هەڵبژاردن</button>
     <button class="close-btn" onclick="closePopups()">داخستن</button>
   </div>
 </div>
@@ -457,6 +582,7 @@ function preview(input,img,label){
       img.src=URL.createObjectURL(file);
       img.style.display="block";
       label.innerText="✅ وێنە بارکرا";
+      label.classList.add("done");
     }
   });
 }
@@ -464,12 +590,39 @@ function preview(input,img,label){
 preview(visaImg,visaPreview,visaLabel);
 preview(paymentImg,paymentPreview,paymentLabel);
 
-async function loadData(){
-  const {data:priceData} = await db.from("rawda_prices").select("*").limit(1).single();
-  priceBox.innerText = priceData?.price || "3500 دینار";
+function isValidMobile(value){
+  return /^07[3-9][0-9]{8}$/.test(value.trim());
+}
 
-  const {data:payData} = await db.from("payment_numbers").select("*").limit(1).single();
-  paymentNumbers = payData || {};
+mobile.addEventListener("input",()=>{
+  mobile.value = mobile.value.replace(/[^0-9]/g,"");
+});
+
+mobile.addEventListener("blur",()=>{
+  if(mobile.value.trim() === ""){
+    mobile.classList.remove("invalid");
+    mobileError.classList.remove("show");
+    return;
+  }
+  const ok = isValidMobile(mobile.value);
+  mobile.classList.toggle("invalid", !ok);
+  mobileError.classList.toggle("show", !ok);
+});
+
+async function loadData(){
+  try{
+    const {data:priceData} = await db.from("rawda_prices").select("*").limit(1).single();
+    priceBox.innerText = priceData?.price || "3500 دینار";
+  }catch(err){
+    priceBox.innerText = "3500 دینار";
+  }
+
+  try{
+    const {data:payData} = await db.from("payment_numbers").select("*").limit(1).single();
+    paymentNumbers = payData || {};
+  }catch(err){
+    paymentNumbers = {};
+  }
 }
 
 loadData();
@@ -509,6 +662,12 @@ async function sendRequest(){
       throw new Error("تکایە هەموو خانە پێویستەکان پڕبکەوە");
     }
 
+    if(!isValidMobile(phone)){
+      mobile.classList.add("invalid");
+      mobileError.classList.add("show");
+      throw new Error("ژمارەی مۆبایل نادروستە، تکایە دووبارە پشکنینی بکەوە");
+    }
+
     const visa_url = await uploadImage(visaImg.files[0],"visa");
     const payment_url = await uploadImage(paymentImg.files[0],"payment");
 
@@ -520,7 +679,7 @@ async function sendRequest(){
 
     if(error) throw error;
 
-    msg.style.color="#00ff9d";
+    msg.style.color="#8fe3b0";
     msg.innerText="داواکارییەکەت بەسەرکەوتوویی نێردرا ✅";
 
     fullName.value="";
@@ -534,14 +693,22 @@ async function sendRequest(){
     timeText.innerText="کاتژمێر هەڵبژێرە";
     payNumber.innerText="ژمارەی پارەدان لێرە دەردەکەوێت";
     document.querySelectorAll(".pay").forEach(x=>x.classList.remove("active"));
+    visaPreview.style.display="none";
+    paymentPreview.style.display="none";
+    visaLabel.innerText="📷 وێنە باربکە";
+    paymentLabel.innerText="📷 وێنە باربکە";
+    visaLabel.classList.remove("done");
+    paymentLabel.classList.remove("done");
+    mobile.classList.remove("invalid");
+    mobileError.classList.remove("show");
 
   }catch(err){
-    msg.style.color="#ff4d4d";
+    msg.style.color="#ff8f8f";
     msg.innerText=err.message;
   }
 
   sendBtn.disabled=false;
-  sendBtn.innerText="ناردن";
+  sendBtn.innerText="🕌 ناردنی داواکاری";
 }
 </script>
 
