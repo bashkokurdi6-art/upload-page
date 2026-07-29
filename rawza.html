@@ -641,10 +641,16 @@ async function uploadImage(file,folder){
   if(!file) return "";
   const safeName = file.name.replace(/\s+/g,"-");
   const name = folder + "/" + Date.now() + "-" + safeName;
-  const {error} = await db.storage.from("rawda-images").upload(name,file);
-  if(error) throw error;
-  const {data} = db.storage.from("rawda-images").getPublicUrl(name);
-  return data.publicUrl;
+ const { error } = await db.from("rawda_requests").insert([{
+    naw_syani: full_name,
+    mobile: phone,
+    roj: selectedDate,
+    katzhmer: selectedTime,
+    gender: genderVal,
+    paradan: selectedPay,
+    tebini: noteVal,
+    passport_image: visa_url,
+    payment_image: payment_url
 }
 
 async function sendRequest(){
