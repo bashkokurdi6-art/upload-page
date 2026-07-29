@@ -252,6 +252,29 @@ border:1px solid #d4af37;
 
 }
 
+.image-empty{
+
+width:100px;
+height:100px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+text-align:center;
+
+font-size:12px;
+
+background:#10251c;
+
+border-radius:14px;
+
+border:1px solid #d4af37;
+
+color:#ccc;
+
+}
+
 .delete-btn{
 
 margin-top:15px;
@@ -290,8 +313,6 @@ grid-template-columns:1fr;
 
 <body>
 
-
-
 <div class="login-box" id="loginBox">
 
 <h1>SIWAK ADMIN</h1>
@@ -312,13 +333,9 @@ onclick="login()">
 
 </div>
 
-
-
 <div class="dashboard" id="dashboard">
 
 <h1>بەڕێوەبردنی ڕەوزە</h1>
-
-
 
 <div class="top-box">
 
@@ -343,19 +360,27 @@ onclick="updatePrice()">
 
 </div>
 
-
-
 <div class="requests" id="requests"></div>
 
 </div>
-
-
 
 <script>
 
 const ADMIN_PASSWORD = "SIWAK2026";
 
+const SUPABASE_URL =
+"https://slllcibigutjivauryvc.supabase.co";
 
+const SUPABASE_KEY =
+"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
+
+/* ناوی Bucket ـی وێنەکان */
+const IMAGE_BUCKET = "rawda-images";
+
+const client = supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
 function login(){
 
@@ -369,7 +394,6 @@ document.getElementById("loginBox").style.display = "none";
 document.getElementById("dashboard").style.display = "block";
 
 loadRequests();
-
 loadPrice();
 
 }else{
@@ -380,59 +404,104 @@ alert("وشەی نهێنی هەڵەیە");
 
 }
 
+/* ======================
+   دروستکردنی لینکی وێنە
+====================== */
 
+async function getImageUrl(savedValue){
 
-// ======================
-// SUPABASE
-// ======================
+if(!savedValue){
+return "";
+}
 
-const SUPABASE_URL =
-"https://slllcibigutjivauryvc.supabase.co";
+let imageValue = String(savedValue).trim();
 
-const SUPABASE_KEY =
-"sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
+if(!imageValue){
+return "";
+}
 
-const client =
-supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+/* ئەگەر پێشتر لینکێکی تەواو بوو */
+if(
+imageValue.startsWith("http://") ||
+imageValue.startsWith("https://")
+){
+return imageValue;
+}
 
+/* لابردنی / لە سەرەتای path */
+imageValue = imageValue.replace(/^\/+/, "");
 
+/* ئەگەر ناوی bucket لەگەڵ path هەڵگیرابێت */
+if(imageValue.startsWith(IMAGE_BUCKET + "/")){
 
-// ======================
-// LOAD PRICE
-// ======================
+imageValue =
+imageValue.substring(IMAGE_BUCKET.length + 1);
+
+}
+
+/* یەکەم هەوڵ: Signed URL بۆ Bucket ـی Private */
+const { data: signedData, error: signedError } =
+await client
+.storage
+.from(IMAGE_BUCKET)
+.createSignedUrl(imageValue, 60 * 60);
+
+if(!signedError && signedData?.signedUrl){
+
+return signedData.signedUrl;
+
+}
+
+/* هەوڵی دووەم: Public URL */
+const { data: publicData } =
+client
+.storage
+.from(IMAGE_BUCKET)
+.getPublicUrl(imageValue);
+
+return publicData?.publicUrl || "";
+
+}
+
+/* ======================
+   LOAD PRICE
+====================== */
 
 async function loadPrice(){
 
-const { data } =
+const { data, error } =
 await client
 .from("rawda_prices")
 .select("*")
 .limit(1)
-.single();
+.maybeSingle();
+
+if(error){
+
+console.error("Price error:", error);
+return;
+
+}
 
 if(data){
 
 document.getElementById("priceInput").value =
-data.price;
+data.price ?? "";
 
 }
 
 }
 
-
-
-// ======================
-// UPDATE PRICE
-// ======================
+/* ======================
+   UPDATE PRICE
+====================== */
 
 async function updatePrice(){
 
 const newPrice =
 document.getElementById("priceInput").value;
 
+const { error } =
 await client
 .from("rawda_prices")
 .update({
@@ -440,57 +509,120 @@ price:newPrice
 })
 .eq("id",1);
 
+if(error){
+
+console.error(error);
+alert("هەڵە لە نوێکردنەوەی نرخ");
+return;
+
+}
+
 alert("نرخ نوێ کرایەوە");
 
 }
 
-
-
-// ======================
-// LOAD REQUESTS
-// ======================
+/* ======================
+   LOAD REQUESTS
+====================== */
 
 async function loadRequests(){
 
-const { data } =
+const requests =
+document.getElementById("requests");
+
+requests.innerHTML =
+"<p style='text-align:center'>چاوەڕێ بکە...</p>";
+
+const { data, error } =
 await client
 .from("rawda_requests")
 .select("*")
 .order("id",{ascending:false});
 
-const requests =
-document.getElementById("requests");
+if(error){
+
+console.error("Load requests error:", error);
+
+requests.innerHTML =
+"<p style='text-align:center;color:#ff7676'>هەڵە لە هێنانی داواکارییەکان</p>";
+
+return;
+
+}
 
 requests.innerHTML = "";
 
+if(!data || data.length === 0){
 
+requests.innerHTML =
+"<p style='text-align:center'>هیچ داواکارییەک نییە</p>";
 
-data.forEach(item=>{
+return;
+
+}
+
+for(const item of data){
+
+const passportUrl =
+await getImageUrl(item.passport_image);
+
+const paymentUrl =
+await getImageUrl(item.payment_image);
+
+const passportBox = passportUrl
+? `
+<a href="${passportUrl}" target="_blank">
+<img
+src="${passportUrl}"
+alt="وێنەی پاسپۆرت"
+onerror="this.parentElement.innerHTML='<div class=&quot;image-empty&quot;>وێنەکە نەکرایەوە</div>'">
+</a>
+`
+: `
+<div class="image-empty">
+وێنەی پاسپۆرت نییە
+</div>
+`;
+
+const paymentBox = paymentUrl
+? `
+<a href="${paymentUrl}" target="_blank">
+<img
+src="${paymentUrl}"
+alt="وێنەی پارەدان"
+onerror="this.parentElement.innerHTML='<div class=&quot;image-empty&quot;>وێنەکە نەکرایەوە</div>'">
+</a>
+`
+: `
+<div class="image-empty">
+وێنەی پارەدان نییە
+</div>
+`;
 
 requests.innerHTML += `
 
 <div class="card">
 
-<h3>${item.naw_syani}</h3>
+<h3>${item.naw_syani || "ناو دیاری نەکراوە"}</h3>
 
 <div class="item">
-📱 ${item.mobile}
+📱 ${item.mobile || "-"}
 </div>
 
 <div class="item">
-⏰ ${item.katzhmer}
+⏰ ${item.katzhmer || "-"}
 </div>
 
 <div class="item">
-📅 ${item.roj}
+📅 ${item.roj || "-"}
 </div>
 
 <div class="item">
-👤 ${item.gender}
+👤 ${item.gender || "-"}
 </div>
 
 <div class="item">
-💳 ${item.paradan}
+💳 ${item.paradan || "-"}
 </div>
 
 <div class="item">
@@ -499,17 +631,9 @@ requests.innerHTML += `
 
 <div class="images">
 
-<a href="${item.passport_image}" target="_blank">
+${passportBox}
 
-<img src="${item.passport_image}">
-
-</a>
-
-<a href="${item.payment_image}" target="_blank">
-
-<img src="${item.payment_image}">
-
-</a>
+${paymentBox}
 
 </div>
 
@@ -525,15 +649,13 @@ onclick="deleteRequest(${item.id})">
 
 `;
 
-});
+}
 
 }
 
-
-
-// ======================
-// DELETE
-// ======================
+/* ======================
+   DELETE
+====================== */
 
 async function deleteRequest(id){
 
@@ -542,10 +664,19 @@ confirm("دڵنیایت؟");
 
 if(!ok) return;
 
+const { error } =
 await client
 .from("rawda_requests")
 .delete()
 .eq("id",id);
+
+if(error){
+
+console.error(error);
+alert("داواکارییەکە نەسڕایەوە");
+return;
+
+}
 
 loadRequests();
 
