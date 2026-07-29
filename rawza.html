@@ -671,11 +671,17 @@ async function sendRequest(){
     const visa_url = await uploadImage(visaImg.files[0],"visa");
     const payment_url = await uploadImage(paymentImg.files[0],"payment");
 
-    const {error} = await db.from("rawda_requests").insert([{
-      naw_syani: full_name,
-      mobile: phone,
-      katzhmer: selectedTime
-    }]);
+    const { error } = await db.from("rawda_requests").insert([{
+    naw_syani: full_name,
+    mobile: phone,
+    roj: selectedDate,
+    katzhmer: selectedTime,
+    gender: genderVal,
+    paradan: selectedPay,
+    tebini: noteVal,
+    passport_image: visa_url,
+    payment_image: payment_url
+}]);
 
     if(error) throw error;
 
