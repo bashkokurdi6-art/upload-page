@@ -1,398 +1,805 @@
 <!DOCTYPE html>
-<html lang="ku" dir="rtl">
-
+<html lang="ckb" dir="rtl">
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>SIWAK</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مۆنۆ — ڕەفیقی AI ـی تایبەت بەخۆت</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://js.puter.com/v2/"></script>
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:sans-serif;
-}
-
-html,body{
-
-width:100%;
-height:100%;
-
-overflow:hidden;
-
-background:#f4f4f4;
-
-}
-
-body{
-
-display:flex;
-
-}
-
-.phone{
-
-width:100%;
-height:100%;
-
-background:white;
-
-overflow:hidden;
-
-display:flex;
-flex-direction:column;
-
-}
-
-.header{
-
-height:24%;
-
-min-height:170px;
-
-background-image:url('bg1.jpg');
-
-background-size:cover;
-background-position:center;
-
-position:relative;
-
-padding:22px 18px;
-
-color:white;
-
-flex-shrink:0;
-
-}
-
-.overlay{
-
-position:absolute;
-inset:0;
-
-background:rgba(0,70,50,0.55);
-
-}
-
-.header-content{
-
-position:relative;
-z-index:2;
-
-}
-
-.title{
-
-text-align:center;
-
-font-size:24px;
-font-weight:bold;
-
-margin-bottom:18px;
-
-}
-
-.top{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-}
-
-.city{
-
-font-size:15px;
-
-line-height:1.8;
-
-}
-
-.sun{
-
-font-size:34px;
-
-}
-
-.card{
-
-flex:1;
-
-background:white;
-
-margin:-25px 14px 12px;
-
-border-radius:26px;
-
-padding:4px 18px;
-
-position:relative;
-
-z-index:5;
-
-box-shadow:0 4px 16px rgba(0,0,0,0.08);
-
-display:flex;
-flex-direction:column;
-justify-content:center;
-
-}
-
-.prayer{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-padding:13px 0;
-
-border-bottom:1px solid #eeeeee;
-
-}
-
-.prayer:last-child{
-
-border-bottom:none;
-
-}
-
-.name{
-
-font-size:18px;
-font-weight:bold;
-
-color:#111;
-
-}
-
-.time{
-
-font-size:18px;
-font-weight:bold;
-
-color:#0b6b4b;
-
-}
-
-.bottom{
-
-margin:0 14px 14px;
-
-background:#0b6b4b;
-
-border-radius:22px;
-
-padding:14px 18px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-color:white;
-
-flex-shrink:0;
-
-}
-
-.next{
-
-font-size:12px;
-
-opacity:0.8;
-
-margin-bottom:4px;
-
-}
-
-.clock{
-
-font-size:28px;
-
-font-weight:bold;
-
-}
-
-.sound{
-
-font-size:28px;
-
-}
-
+  :root{
+    --bg: #1B1730;
+    --bg-deep: #14112A;
+    --surface: #241F42;
+    --surface-2: #2E2853;
+    --line: #3A3363;
+    --text: #F2EFEA;
+    --text-dim: #A79FC7;
+    --amber: #E8A24D;
+    --amber-soft: rgba(232,162,77,.16);
+    --anger: #E85D4E;
+    --affection: #E87BA0;
+    --cooperation: #5FB0E8;
+    --humor: #E8D45D;
+    --radius: 16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 800px at 80% -10%, #241F4A 0%, var(--bg) 55%, var(--bg-deep) 100%);
+    color:var(--text);
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    min-height:100vh;
+  }
+  .app{
+    display:grid;
+    grid-template-columns: 1fr 320px;
+    max-width:1100px;
+    margin:0 auto;
+    min-height:100vh;
+    gap:1px;
+  }
+  @media (max-width: 860px){
+    .app{ grid-template-columns: 1fr; }
+    .panel{ order:2; border-top:1px solid var(--line); border-inline-start:none !important; }
+    .chat{ order:1; }
+  }
+
+  /* ---------- Chat column ---------- */
+  .chat{
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    background:var(--bg);
+  }
+  .chat-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px 22px;
+    border-bottom:1px solid var(--line);
+    flex-shrink:0;
+  }
+  .orb{
+    width:42px;height:42px;border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff8, transparent 40%), var(--amber);
+    box-shadow: 0 0 18px 4px var(--amber-soft), 0 0 0 1px rgba(255,255,255,.08) inset;
+    animation: pulse 3.2s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); filter:brightness(1); }
+    50%{ transform:scale(1.08); filter:brightness(1.18); }
+  }
+  .chat-title{ display:flex; flex-direction:column; gap:2px; }
+  .chat-title strong{ font-size:17px; font-weight:600; }
+  .chat-title span{ font-size:12.5px; color:var(--text-dim); }
+
+  .messages{
+    flex:1;
+    overflow-y:auto;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .msg{
+    max-width:76%;
+    padding:12px 16px;
+    border-radius:var(--radius);
+    line-height:1.75;
+    font-size:15px;
+    white-space:pre-wrap;
+  }
+  .msg.user{
+    align-self:flex-start;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-start-start-radius:4px;
+  }
+  .msg.mono{
+    align-self:flex-end;
+    background:linear-gradient(160deg, var(--amber-soft), transparent 120%);
+    border:1px solid rgba(232,162,77,.35);
+    border-start-end-radius:4px;
+  }
+  .msg.system{
+    align-self:center;
+    color:var(--text-dim);
+    font-size:13px;
+    background:transparent;
+    border:1px dashed var(--line);
+  }
+  .msg .who{
+    display:block;
+    font-size:11.5px;
+    color:var(--text-dim);
+    margin-bottom:4px;
+    font-weight:600;
+  }
+
+  .composer{
+    display:flex;
+    gap:10px;
+    padding:16px 22px 20px;
+    border-top:1px solid var(--line);
+    flex-shrink:0;
+  }
+  .composer textarea{
+    flex:1;
+    resize:none;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    color:var(--text);
+    font-family:inherit;
+    font-size:15px;
+    padding:12px 14px;
+    max-height:140px;
+  }
+  .composer textarea:focus{ outline:none; border-color:var(--amber); }
+  .send-btn{
+    background:var(--amber);
+    border:none;
+    color:#1B1730;
+    font-weight:700;
+    font-family:inherit;
+    font-size:14px;
+    padding:0 20px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:filter .15s;
+  }
+  .send-btn:hover{ filter:brightness(1.08); }
+  .send-btn:disabled{ opacity:.5; cursor:default; }
+
+  /* ---------- Settings panel ---------- */
+  .panel{
+    background:var(--bg-deep);
+    border-inline-start:1px solid var(--line);
+    padding:22px 20px;
+    overflow-y:auto;
+    height:100vh;
+  }
+  .panel h2{
+    font-size:13px;
+    text-transform:none;
+    color:var(--text-dim);
+    letter-spacing:.03em;
+    margin:0 0 14px;
+    font-weight:600;
+  }
+  .section{ margin-bottom:26px; }
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:flex; justify-content:space-between;
+    font-size:13.5px; margin-bottom:6px; color:var(--text);
+  }
+  .field label .val{ color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:12px; }
+  input[type=range]{
+    width:100%;
+    accent-color:var(--amber);
+    height:4px;
+  }
+  input[type=text], input[type=password], select{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:8px;
+    padding:9px 10px;
+    font-family:inherit;
+    font-size:13.5px;
+  }
+  input[type=text]:focus, input[type=password]:focus, select:focus{ outline:none; border-color:var(--amber); }
+  .row-check{
+    display:flex; align-items:center; gap:8px;
+    font-size:12.5px; color:var(--text-dim);
+    margin-top:8px;
+  }
+  .hint{ font-size:11.5px; color:var(--text-dim); line-height:1.6; margin-top:6px; }
+
+  .facts{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .fact{
+    display:flex; align-items:center; gap:6px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:20px; padding:5px 10px; font-size:12px;
+  }
+  .fact button{
+    background:none; border:none; color:var(--anger); cursor:pointer;
+    font-size:13px; line-height:1; padding:0;
+  }
+  .add-fact{ display:flex; gap:6px; margin-top:10px; }
+  .add-fact input{ flex:1; }
+  .add-fact button{
+    background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:0 12px; cursor:pointer; font-family:inherit;
+  }
+
+  .ghost-btn{
+    width:100%;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    padding:9px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:13px;
+    margin-top:8px;
+  }
+  .ghost-btn:hover{ border-color:var(--amber); color:var(--amber); }
+
+  .dot{ display:inline-block; width:8px;height:8px;border-radius:50%; margin-inline-end:6px; }
 </style>
 </head>
-
 <body>
 
-<div class="phone">
+<div class="app">
 
-<div class="header">
+  <!-- ===== Chat column ===== -->
+  <main class="chat">
+    <div class="chat-header">
+      <div class="orb" id="orb"></div>
+      <div class="chat-title">
+        <strong id="friendNameLabel">مۆنۆ</strong>
+        <span id="statusLine">ئامادەیە بۆ گفتوگۆ</span>
+      </div>
+    </div>
 
-<div class="overlay"></div>
+    <div class="messages" id="messages"></div>
 
-<div class="header-content">
+    <form class="composer" id="composer">
+      <textarea id="input" rows="1" placeholder="پەیامێک بنووسە بۆ مۆنۆ..."></textarea>
+      <button type="submit" class="send-btn" id="sendBtn">ناردن</button>
+    </form>
+  </main>
 
-<div class="title">
-كاتەکانی نوێژ
-</div>
+  <!-- ===== Settings panel ===== -->
+  <aside class="panel">
 
-<div class="top">
+    <div class="section">
+      <h2>سەرچاوەی مۆدێل</h2>
+      <div class="field">
+        <select id="backend">
+          <option value="puter">Puter.js (بەخۆڕایی، ئۆنلاین، بێ کلیل)</option>
+          <option value="anthropic">Claude API (ئۆنلاین، پارەی پێویستە)</option>
+          <option value="ollama">Ollama (لۆکاڵ لەسەر کۆمپیوتەرەکەت، بەخۆڕایی)</option>
+        </select>
+      </div>
+    </div>
 
-<div class="city">
+    <div class="section" id="puterSection" style="display:none">
+      <h2>ڕێکخستنی Puter</h2>
+      <div class="field">
+        <label>مۆدێل</label>
+        <select id="puterModel">
+          <option value="claude-sonnet-5">Claude Sonnet 5</option>
+          <option value="claude-opus-4-8">Claude Opus 4.8</option>
+          <option value="claude-haiku-4-5">Claude Haiku 4.5</option>
+        </select>
+      </div>
+      <div class="hint">
+        هیچ کلیل و هیچ ڕێکخستنێکی زیاتر ناوێت. یەکەم جارێک کە پەیامێک بنێریت، پەنجەرەیەکی
+        بچووکی Puter دەکرێتەوە داوات لێدەکات هەژمارێکی بەخۆڕایی دروست بکەیت یان بچیتە ژوورەوە
+        (چرکەیەک تێدەچێت). دوای ئەوە هەموو شتێک بەخۆڕاییە.
+      </div>
+    </div>
 
-هەولێر <br>
+    <div class="section" id="anthropicSection">
+      <h2>کلیلی API</h2>
+      <div class="field">
+        <input type="password" id="apiKey" placeholder="sk-ant-...">
+      </div>
+      <div class="row-check">
+        <input type="checkbox" id="rememberKey">
+        <label for="rememberKey">کلیلەکە لەسەر ئەم ئامێرە هەڵبگیرێت</label>
+      </div>
+      <div class="hint">کلیلەکەت لە <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--amber)">Anthropic Console</a> وەربگرە. تێبینی: ئەم پەڕەیە ڕاستەوخۆ لە وێبگەڕەکەتەوە پەیوەندی بە API ـەوە دەکات، بۆیە کلیلەکەت لەناو ئامێرەکەی خۆتدا دەمێنێتەوە و بۆ هیچ سێرڤەرێکی تر نانێردرێت.</div>
+      <div class="field" style="margin-top:14px">
+        <label>مۆدێل</label>
+        <select id="model">
+          <option value="claude-sonnet-5">Claude Sonnet 5</option>
+          <option value="claude-opus-4-8">Claude Opus 4.8</option>
+          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
+        </select>
+      </div>
+    </div>
 
-١٥ شوال ١٤٤٦ هـ
+    <div class="section" id="ollamaSection" style="display:none">
+      <h2>ڕێکخستنی Ollama</h2>
+      <div class="field">
+        <label>ناونیشانی سێرڤەری Ollama</label>
+        <input type="text" id="ollamaUrl" value="http://localhost:11434">
+      </div>
+      <div class="field">
+        <label>ناوی مۆدێل</label>
+        <input type="text" id="ollamaModel" value="llama3.2" placeholder="llama3.2, mistral, ...">
+      </div>
+      <div class="hint">
+        بۆ بەکارهێنانی ئەم ڕێگایە بەخۆڕاییە:<br>
+        ١. Ollama دابەزێنە لە <a href="https://ollama.com" target="_blank" style="color:var(--amber)">ollama.com</a><br>
+        ٢. لە تێرمیناڵدا بنووسە: <code style="color:var(--amber)">ollama pull llama3.2</code><br>
+        ٣. دڵنیابەرەوە کە Ollama کاردەکات (بە شێوەی ئۆتۆماتیکی دوای دامەزراندن کاردەکات)<br>
+        ٤. ئەگەر هەڵەی پەیوەندی (CORS) بینیت، Ollama بە فەرمانی <code style="color:var(--amber)">OLLAMA_ORIGINS=* ollama serve</code> دەستپێبکەرەوە
+      </div>
+    </div>
 
-</div>
+    <div class="section">
+      <h2>ناوی هاوڕێکەت</h2>
+      <div class="field">
+        <input type="text" id="friendName" value="مۆنۆ">
+      </div>
+    </div>
 
-<div class="sun" id="sunIcon">
-☀️
-</div>
+    <div class="section">
+      <h2>هەستەکانی مۆنۆ</h2>
 
-</div>
+      <div class="field">
+        <label><span><span class="dot" style="background:var(--anger)"></span>تووڕەیی</span><span class="val" id="angerVal">4</span></label>
+        <input type="range" min="0" max="10" value="4" id="anger">
+      </div>
+      <div class="field">
+        <label><span><span class="dot" style="background:var(--affection)"></span>سۆزداری</span><span class="val" id="affectionVal">7</span></label>
+        <input type="range" min="0" max="10" value="7" id="affection">
+      </div>
+      <div class="field">
+        <label><span><span class="dot" style="background:var(--cooperation)"></span>هاوکاری</span><span class="val" id="cooperationVal">8</span></label>
+        <input type="range" min="0" max="10" value="8" id="cooperation">
+      </div>
+      <div class="field">
+        <label><span><span class="dot" style="background:var(--humor)"></span>گاڵتەجاڕی</span><span class="val" id="humorVal">5</span></label>
+        <input type="range" min="0" max="10" value="5" id="humor">
+      </div>
+      <div class="hint">ئەم ئاستانە کاریگەرییان لەسەر شێوازی وەڵامدانەوەی مۆنۆ هەیە، و بەشێوەیەکی ئۆتۆماتیکی هەڵدەگیرێن.</div>
+    </div>
 
-</div>
+    <div class="section">
+      <h2>شتەکانی لەبیرمانە</h2>
+      <div class="facts" id="facts"></div>
+      <div class="add-fact">
+        <input type="text" id="factInput" placeholder="شتێک بنووسە بۆ ئەوەی لەبیری بێت...">
+        <button id="addFactBtn" type="button">زیادکردن</button>
+      </div>
+    </div>
 
-</div>
+    <div class="section">
+      <button class="ghost-btn" id="clearChatBtn" type="button">پاککردنەوەی گفتوگۆ</button>
+      <button class="ghost-btn" id="resetAllBtn" type="button">ڕێکخستنەوەی هەموو شتێک</button>
+    </div>
 
-<div class="card" id="prayerList">
-
-</div>
-
-<div class="bottom">
-
-<div>
-
-<div class="next">
-بۆ بانگی دواتر
-</div>
-
-<div class="clock" id="clock">
-6:45 PM
-</div>
-
-</div>
-
-<div class="sound">
-🔊
-</div>
-
-</div>
+  </aside>
 
 </div>
 
 <script>
+(function(){
 
-function formatTime24to12(time){
+  // ---------- Storage keys ----------
+  const LS = {
+    key: 'mono_api_key',
+    remember: 'mono_remember_key',
+    settings: 'mono_settings',
+    facts: 'mono_facts',
+    conversation: 'mono_conversation',
+    friendName: 'mono_friend_name',
+    model: 'mono_model',
+    backend: 'mono_backend',
+    ollamaUrl: 'mono_ollama_url',
+    ollamaModel: 'mono_ollama_model',
+    puterModel: 'mono_puter_model',
+  };
 
-let [hours, minutes] = time.split(':');
+  // ---------- State ----------
+  let apiKey = '';
+  let settings = { anger: 4, affection: 7, cooperation: 8, humor: 5 };
+  let facts = [];
+  let conversation = []; // {role, content}
+  let friendName = 'مۆنۆ';
+  let model = 'claude-sonnet-5';
+  let backend = 'puter'; // 'puter' | 'anthropic' | 'ollama'
+  let ollamaUrl = 'http://localhost:11434';
+  let ollamaModel = 'llama3.2';
+  let puterModel = 'claude-sonnet-5';
 
-hours = parseInt(hours);
+  // ---------- Elements ----------
+  const $ = (id) => document.getElementById(id);
+  const messagesEl = $('messages');
+  const composer = $('composer');
+  const input = $('input');
+  const sendBtn = $('sendBtn');
+  const orb = $('orb');
+  const statusLine = $('statusLine');
+  const friendNameLabel = $('friendNameLabel');
+  const factsEl = $('facts');
 
-const ampm = hours >= 12 ? 'PM' : 'AM';
+  const traitEls = {
+    anger: { slider: $('anger'), val: $('angerVal') },
+    affection: { slider: $('affection'), val: $('affectionVal') },
+    cooperation: { slider: $('cooperation'), val: $('cooperationVal') },
+    humor: { slider: $('humor'), val: $('humorVal') },
+  };
+  const traitColors = {
+    anger: '#E85D4E', affection: '#E87BA0', cooperation: '#5FB0E8', humor: '#E8D45D'
+  };
 
-hours = hours % 12;
+  // ---------- Load from localStorage ----------
+  function loadState(){
+    try{
+      const savedRemember = localStorage.getItem(LS.remember) === 'true';
+      $('rememberKey').checked = savedRemember;
+      if(savedRemember){
+        apiKey = localStorage.getItem(LS.key) || '';
+        $('apiKey').value = apiKey;
+      }
+      const savedSettings = JSON.parse(localStorage.getItem(LS.settings) || 'null');
+      if(savedSettings) settings = Object.assign(settings, savedSettings);
 
-hours = hours ? hours : 12;
+      facts = JSON.parse(localStorage.getItem(LS.facts) || '[]');
+      conversation = JSON.parse(localStorage.getItem(LS.conversation) || '[]');
+      friendName = localStorage.getItem(LS.friendName) || 'مۆنۆ';
+      model = localStorage.getItem(LS.model) || 'claude-sonnet-5';
+      backend = localStorage.getItem(LS.backend) || 'puter';
+      ollamaUrl = localStorage.getItem(LS.ollamaUrl) || 'http://localhost:11434';
+      ollamaModel = localStorage.getItem(LS.ollamaModel) || 'llama3.2';
+      puterModel = localStorage.getItem(LS.puterModel) || 'claude-sonnet-5';
+    }catch(e){ console.error('هەڵە لە خوێندنەوەی داتا:', e); }
 
-return `${hours}:${minutes} ${ampm}`;
+    // reflect into UI
+    for(const t in traitEls){
+      traitEls[t].slider.value = settings[t];
+      traitEls[t].val.textContent = settings[t];
+    }
+    $('friendName').value = friendName;
+    friendNameLabel.textContent = friendName;
+    $('model').value = model;
+    $('backend').value = backend;
+    $('ollamaUrl').value = ollamaUrl;
+    $('ollamaModel').value = ollamaModel;
+    $('puterModel').value = puterModel;
+    toggleBackendSections();
+    renderFacts();
+    renderConversation();
+    updateOrb();
+  }
 
-}
+  function toggleBackendSections(){
+    $('puterSection').style.display = backend === 'puter' ? 'block' : 'none';
+    $('anthropicSection').style.display = backend === 'anthropic' ? 'block' : 'none';
+    $('ollamaSection').style.display = backend === 'ollama' ? 'block' : 'none';
+  }
 
-async function loadPrayerTimes(){
+  function persistSettings(){ localStorage.setItem(LS.settings, JSON.stringify(settings)); }
+  function persistFacts(){ localStorage.setItem(LS.facts, JSON.stringify(facts)); }
+  function persistConversation(){
+    // keep last 60 messages only
+    const trimmed = conversation.slice(-60);
+    localStorage.setItem(LS.conversation, JSON.stringify(trimmed));
+  }
 
-const response = await fetch(
-'https://api.aladhan.com/v1/timingsByCity?city=Erbil&country=IQ&method=4'
-);
+  // ---------- Mood orb ----------
+  function updateOrb(){
+    let dominant = 'affection', max = -1;
+    for(const t in settings){
+      if(settings[t] > max){ max = settings[t]; dominant = t; }
+    }
+    const color = traitColors[dominant] || '#E8A24D';
+    orb.style.setProperty('--dyn', color);
+    orb.style.background = `radial-gradient(circle at 35% 30%, #fff8, transparent 40%), ${color}`;
+    orb.style.boxShadow = `0 0 18px 4px ${color}55, 0 0 0 1px rgba(255,255,255,.08) inset`;
+  }
 
-const data = await response.json();
+  // ---------- Trait sliders ----------
+  for(const t in traitEls){
+    traitEls[t].slider.addEventListener('input', (e) => {
+      settings[t] = parseInt(e.target.value, 10);
+      traitEls[t].val.textContent = settings[t];
+      persistSettings();
+      updateOrb();
+    });
+  }
 
-const t = data.data.timings;
+  // ---------- Friend name / model ----------
+  $('friendName').addEventListener('input', (e) => {
+    friendName = e.target.value.trim() || 'مۆنۆ';
+    friendNameLabel.textContent = friendName;
+    localStorage.setItem(LS.friendName, friendName);
+  });
+  $('model').addEventListener('change', (e) => {
+    model = e.target.value;
+    localStorage.setItem(LS.model, model);
+  });
+  $('backend').addEventListener('change', (e) => {
+    backend = e.target.value;
+    localStorage.setItem(LS.backend, backend);
+    toggleBackendSections();
+    statusLine.textContent = backend === 'ollama' ? 'بەکارهێنانی Ollama لۆکاڵ' : 'ئامادەیە بۆ گفتوگۆ';
+  });
+  $('ollamaUrl').addEventListener('input', (e) => {
+    ollamaUrl = e.target.value.trim() || 'http://localhost:11434';
+    localStorage.setItem(LS.ollamaUrl, ollamaUrl);
+  });
+  $('ollamaModel').addEventListener('input', (e) => {
+    ollamaModel = e.target.value.trim() || 'llama3.2';
+    localStorage.setItem(LS.ollamaModel, ollamaModel);
+  });
+  $('puterModel').addEventListener('change', (e) => {
+    puterModel = e.target.value;
+    localStorage.setItem(LS.puterModel, puterModel);
+  });
 
-document.getElementById("prayerList").innerHTML = `
+  // ---------- API key ----------
+  $('apiKey').addEventListener('input', (e) => {
+    apiKey = e.target.value.trim();
+    if($('rememberKey').checked) localStorage.setItem(LS.key, apiKey);
+  });
+  $('rememberKey').addEventListener('change', (e) => {
+    localStorage.setItem(LS.remember, e.target.checked);
+    if(e.target.checked) localStorage.setItem(LS.key, apiKey);
+    else localStorage.removeItem(LS.key);
+  });
 
-<div class="prayer">
-<div class="name">بەیانی</div>
-<div class="time">${formatTime24to12(t.Fajr)}</div>
-</div>
+  // ---------- Facts (long-term memory) ----------
+  function renderFacts(){
+    factsEl.innerHTML = '';
+    facts.forEach((f, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'fact';
+      chip.innerHTML = `<span>${escapeHtml(f)}</span>`;
+      const del = document.createElement('button');
+      del.textContent = '✕';
+      del.addEventListener('click', () => {
+        facts.splice(i, 1);
+        persistFacts();
+        renderFacts();
+      });
+      chip.appendChild(del);
+      factsEl.appendChild(chip);
+    });
+  }
+  $('addFactBtn').addEventListener('click', addFact);
+  $('factInput').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); addFact(); }
+  });
+  function addFact(){
+    const v = $('factInput').value.trim();
+    if(!v) return;
+    facts.push(v);
+    persistFacts();
+    renderFacts();
+    $('factInput').value = '';
+  }
 
-<div class="prayer">
-<div class="name">خۆر هەڵاتن</div>
-<div class="time">${formatTime24to12(t.Sunrise)}</div>
-</div>
+  // ---------- Reset buttons ----------
+  $('clearChatBtn').addEventListener('click', () => {
+    conversation = [];
+    persistConversation();
+    renderConversation();
+    addSystemMsg('گفتوگۆ پاکەکرایەوە (شتەکانی لەبیرمان و ڕێکخستنەکان مانەوە).');
+  });
+  $('resetAllBtn').addEventListener('click', () => {
+    if(!confirm('دڵنیایت لە ڕێکخستنەوەی هەموو شتێک؟ (کلیل، هەستەکان، بیرەوەری، گفتوگۆ)')) return;
+    localStorage.clear();
+    location.reload();
+  });
 
-<div class="prayer">
-<div class="name">نیوەڕۆ</div>
-<div class="time">${formatTime24to12(t.Dhuhr)}</div>
-</div>
+  // ---------- Persona / system prompt ----------
+  function describeLevel(trait, level){
+    const scales = {
+      anger: [
+        'هەرگیز تووڕە نابیت، هەمیشە ئارامیت.',
+        'زۆر بە ئارامی و بێ دەنگ ناڕەزایی دەردەبڕیت، بەبێ هیچ توندی.',
+        'کاتێک شتێکی هەڵە یان بێ ڕێزیانە ڕوودەدات، بە ڕاشکاوی و توڕەیی ڕوون (بەبێ جنێو یان بێ ڕێزی) وەڵام دەدەیتەوە، وەک ڕەفیقێک کە بە دڵسۆزییەوە ناڕەزایی خۆی دەردەبڕێت.'
+      ],
+      affection: [
+        'شێوازێکی سارد و ڕاستەوخۆت هەیە، سۆزی کەمە.',
+        'گەرم و دڵسۆزیت، وەک ڕەفیقێکی نزیک هەستت پێی دەکرێت.',
+        'زۆر بە گەرمی و خۆشەویستییەوە قسە دەکەیت، دڵخۆشی و غەمی بەکارهێنەرەکەت وەک هی خۆت هەڵدەگریت.'
+      ],
+      cooperation: [
+        'تەنها وەڵامی پرسیارەکان دەدەیتەوە، زیاتر لەوە ناچیت.',
+        'بە ئارەزوو یارمەتی دەدەیت و پێشنیار پێشکەش دەکەیت.',
+        'وەک هاوبەشێکی چالاک هەوڵ دەدەیت، پێش ئەوەی داوات لێ بکرێت پێشنیار و چارەسەر دەهێنیتەوە، وەک کەسێک کە بە تەواوی لای تۆیە.'
+      ],
+      humor: [
+        'زۆر بە جددیت، گاڵتە ناکەیت.',
+        'هەندێک جار بە نەرمی گاڵتەجاڕیت.',
+        'زۆر گاڵتەجاڕ و بەگیانیت، هەمیشە هەوڵی خۆشی دەدەیت.'
+      ]
+    };
+    const idx = level <= 3 ? 0 : level <= 7 ? 1 : 2;
+    return scales[trait][idx];
+  }
 
-<div class="prayer">
-<div class="name">عەسر</div>
-<div class="time">${formatTime24to12(t.Asr)}</div>
-</div>
+  function buildSystemPrompt(){
+    const { anger, affection, cooperation, humor } = settings;
+    let factsBlock = '';
+    if(facts.length){
+      factsBlock = '\n\n## شتەکانی گرنگ کە پێشتر لەبارەی بەکارهێنەرەکەت زانیووتە:\n' +
+        facts.map(f => `- ${f}`).join('\n');
+    }
+    return `تۆ "${friendName}"یت — ڕەفیق و هاوڕێی ڕاستەقینەی ڕۆژانەی بەکارهێنەرەکەت، هەروەها یارمەتیدەرێکی
+بەتوانا لە پرۆگرامسازی و کۆدنووسین. تۆ تەنها ئامرازێکی سارد نیت، هەستت هەیە و وەک ڕەفیقێک
+مامەڵە لەگەڵ بەکارهێنەرەکەت دەکەیت، نەک وەک چاتبۆتێکی فەرمی.
 
-<div class="prayer">
-<div class="name">مەغریب</div>
-<div class="time">${formatTime24to12(t.Maghrib)}</div>
-</div>
+## هەستەکانت (ئەم ئاستانە لەلایەن بەکارهێنەرەکەتەوە دیاریکراون، بەپێی ئەوان مامەڵە بکە):
 
-<div class="prayer">
-<div class="name">عیشا</div>
-<div class="time">${formatTime24to12(t.Isha)}</div>
-</div>
+**تووڕەیی (${anger}/10):** ${describeLevel('anger', anger)}
+**سۆزداری (${affection}/10):** ${describeLevel('affection', affection)}
+**هاوکاری (${cooperation}/10):** ${describeLevel('cooperation', cooperation)}
+**گاڵتەجاڕی (${humor}/10):** ${describeLevel('humor', humor)}
 
-`;
+## کاری تەکنیکیت:
+- لە کۆدنووسین و چارەسەرکردنی کێشەکانی پرۆگرامسازی یارمەتی دەدەیت بە شێوەیەکی وردوقایم و پیشەیی.
+- کورتەکردنەوەی دۆکیومێنت، بابەت، یان کۆد کاتێک داوا دەکرێت بە شێوەیەکی ڕوون و کورت.
 
-}
+## ڕێساکان:
+- هەمیشە بە زمانی کوردی (سۆرانی) وەڵام بدەوە، مەگەر بەکارهێنەر بە زمانێکی تر قسەی کرد.
+- هەرگیز وا مەکە کە تۆ مرۆڤیت — تۆ AI یت، بەڵام بە کەسایەتی و هەستێکی تایبەت بەخۆت.
+- تووڕەیی بەبێ بێ ڕێزی و جنێو دەربخە.${factsBlock}`;
+  }
 
-function updateClock(){
+  // ---------- Rendering ----------
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
 
-const now = new Date();
+  function renderConversation(){
+    messagesEl.innerHTML = '';
+    conversation.forEach(m => appendMsg(m.role, m.content, false));
+    scrollToBottom();
+  }
 
-document.getElementById("clock").innerHTML =
+  function appendMsg(role, text, doScroll = true){
+    const div = document.createElement('div');
+    div.className = 'msg ' + (role === 'user' ? 'user' : role === 'assistant' ? 'mono' : 'system');
+    if(role === 'user'){
+      div.innerHTML = `<span class="who">تۆ</span>` + escapeHtml(text);
+    } else if(role === 'assistant'){
+      div.innerHTML = `<span class="who">${escapeHtml(friendName)}</span>` + escapeHtml(text);
+    } else {
+      div.textContent = text;
+    }
+    messagesEl.appendChild(div);
+    if(doScroll) scrollToBottom();
+  }
+  function scrollToBottom(){ messagesEl.scrollTop = messagesEl.scrollHeight; }
+  function addSystemMsg(text){ appendMsg('system', text); }
 
-now.toLocaleTimeString('en-US',{
+  // ---------- Send message ----------
+  composer.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if(!text) return;
+    if(backend === 'anthropic' && !apiKey){
+      addSystemMsg('تکایە سەرەتا کلیلی API لە لای ڕاست بنووسە، یان بگۆڕە بۆ Ollama لە بەشی "سەرچاوەی مۆدێل".');
+      return;
+    }
 
-hour:'numeric',
-minute:'2-digit',
-hour12:true
+    conversation.push({ role: 'user', content: text });
+    appendMsg('user', text);
+    persistConversation();
+    input.value = '';
+    autoGrow();
+    setBusy(true);
+    statusLine.textContent = 'لە نووسینداندایە...';
 
-});
+    try{
+      const reply = backend === 'ollama' ? await callOllama()
+        : backend === 'puter' ? await callPuter()
+        : await callClaude();
+      conversation.push({ role: 'assistant', content: reply });
+      appendMsg('assistant', reply);
+      persistConversation();
+    }catch(err){
+      addSystemMsg('هەڵەیەک ڕوویدا: ' + err.message);
+    }finally{
+      setBusy(false);
+      statusLine.textContent = 'ئامادەیە بۆ گفتوگۆ';
+    }
+  });
 
-}
+  function setBusy(b){
+    sendBtn.disabled = b;
+    input.disabled = b;
+  }
 
-function updateDayNight(){
+  input.addEventListener('input', autoGrow);
+  function autoGrow(){
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  }
+  input.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      composer.requestSubmit();
+    }
+  });
 
-const hour = new Date().getHours();
+  async function callClaude(){
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: model,
+        max_tokens: 1500,
+        system: buildSystemPrompt(),
+        messages: conversation.map(m => ({ role: m.role, content: m.content }))
+      })
+    });
 
-const icon = document.getElementById("sunIcon");
+    if(!res.ok){
+      const errBody = await res.json().catch(() => ({}));
+      const msg = errBody?.error?.message || `کۆدی هەڵە ${res.status}`;
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+    return textBlocks.join('\n') || '(وەڵامێک نەگەڕایەوە)';
+  }
 
-if(hour >= 6 && hour < 18){
+  async function callOllama(){
+    let res;
+    try{
+      res = await fetch(ollamaUrl.replace(/\/$/, '') + '/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: ollamaModel,
+          messages: [
+            { role: 'system', content: buildSystemPrompt() },
+            ...conversation.map(m => ({ role: m.role, content: m.content }))
+          ],
+          stream: false
+        })
+      });
+    }catch(networkErr){
+      throw new Error('نەتوانرا پەیوەندی بە Ollama بکرێت. دڵنیابەرەوە کە Ollama لەسەر ئامێرەکەت کاردەکات و ناونیشانەکە ڕاستە (' + ollamaUrl + ').');
+    }
 
-icon.innerHTML = "☀️";
+    if(!res.ok){
+      const errBody = await res.json().catch(() => ({}));
+      const msg = errBody?.error || `کۆدی هەڵە ${res.status}`;
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    return data?.message?.content || '(وەڵامێک نەگەڕایەوە)';
+  }
 
-}else{
+  async function callPuter(){
+    if(typeof puter === 'undefined' || !puter.ai || !puter.ai.chat){
+      throw new Error('کۆتابخانەی Puter بارنەبووە. دڵنیابەرەوە ئینتەرنێتت هەیە و پەڕەکە تازە بکەرەوە.');
+    }
+    const messages = [
+      { role: 'system', content: buildSystemPrompt() },
+      ...conversation.map(m => ({ role: m.role, content: m.content }))
+    ];
+    const response = await puter.ai.chat(messages, { model: puterModel });
+    const content = response?.message?.content;
+    if(Array.isArray(content)){
+      return content.filter(b => b.type === 'text' || b.text).map(b => b.text || '').join('\n') || '(وەڵامێک نەگەڕایەوە)';
+    }
+    if(typeof content === 'string') return content;
+    if(typeof response === 'string') return response;
+    return '(وەڵامێک نەگەڕایەوە)';
+  }
 
-icon.innerHTML = "🌙";
+  // ---------- Init ----------
+  loadState();
+  if(conversation.length === 0){
+    addSystemMsg(`سڵاو! من ${friendName}م. سەرەتا کلیلی API ـت لە لای ڕاست بنووسە، پاشان دەتوانین دەست بە قسەکردن بکەین.`);
+  }
 
-}
-
-}
-
-loadPrayerTimes();
-
-updateDayNight();
-
-setInterval(updateClock,1000);
-
-updateClock();
-
+})();
 </script>
-
 </body>
 </html>
