@@ -341,6 +341,7 @@ button.submit:disabled{ opacity:.6; cursor:default; transform:none; }
   font-size:16px;
   margin-bottom:14px;
 }
+.popup-card.wide{ max-width:420px; text-align:right; }
 .popup-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
@@ -361,6 +362,125 @@ button.close-btn{
   box-shadow:none;
 }
 
+/* ---------- prayer / slot picker ---------- */
+.prayer-tabs{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  margin-bottom:12px;
+}
+.prayer-tabs::-webkit-scrollbar{ height:4px; }
+.prayer-tab{
+  flex:0 0 auto;
+  min-width:72px;
+  padding:10px 8px;
+  border-radius:14px;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(230,205,138,.4);
+  color:var(--gold-300);
+  text-align:center;
+  cursor:pointer;
+  transition:background .15s, border-color .15s, transform .1s;
+}
+.prayer-tab:active{ transform:scale(.96); }
+.prayer-tab .ic{ font-size:18px; display:block; margin-bottom:4px; }
+.prayer-tab .lb{ font-size:11px; font-weight:800; }
+.prayer-tab.active{
+  background:var(--gold-500);
+  color:var(--emerald-950);
+  border-color:var(--gold-500);
+}
+
+.prayer-range{
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  color:rgba(250,246,234,.8);
+  margin-bottom:4px;
+}
+.prayer-audience{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--gold-300);
+  margin-bottom:12px;
+}
+
+.slots-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  max-height:250px;
+  overflow-y:auto;
+  margin-bottom:10px;
+  padding:2px;
+}
+.slot-btn{
+  position:relative;
+  padding:11px 4px;
+  border-radius:12px;
+  background:rgba(250,246,234,.95);
+  border:1.5px solid rgba(230,205,138,.5);
+  color:var(--emerald-800);
+  font-weight:800;
+  font-size:12.5px;
+  text-align:center;
+  cursor:pointer;
+  transition:transform .1s, background .15s, border-color .15s;
+}
+.slot-btn:active{ transform:scale(.95); }
+.slot-btn.full{
+  opacity:.45;
+  pointer-events:none;
+  background:rgba(250,246,234,.5);
+}
+.slot-btn.full::after{
+  content:"⏳";
+  position:absolute;
+  top:-6px; left:-6px;
+  font-size:11px;
+}
+.slot-btn.selected{
+  background:var(--ok);
+  color:#fff;
+  border-color:var(--ok);
+}
+.slot-btn.selected::before{
+  content:"✓";
+  position:absolute;
+  top:-7px; right:-7px;
+  width:16px; height:16px;
+  border-radius:50%;
+  background:var(--gold-300);
+  color:var(--emerald-950);
+  font-size:10px;
+  font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+}
+.slots-empty{
+  grid-column:1/-1;
+  text-align:center;
+  font-size:12px;
+  font-weight:600;
+  color:rgba(250,246,234,.6);
+  padding:20px 0;
+}
+.time-summary{
+  text-align:center;
+  font-size:12.5px;
+  font-weight:800;
+  color:var(--cream-50);
+  background:rgba(255,255,255,.08);
+  border:1px dashed rgba(230,205,138,.5);
+  border-radius:12px;
+  padding:9px;
+  margin-bottom:4px;
+}
+
 @media(max-width:380px){
   body{padding:12px}
   .card{padding:14px}
@@ -375,7 +495,7 @@ button.close-btn{
 <div class="container">
 
   <div class="header">
-    <div class="dome"> سیوک </div>
+    <div class="dome"> سروشتی عەرەفە</div>
     <h1>خزمەتگوزاری تۆمارکردنی سەردانی ڕەوزە</h1>
     <p>پڕۆسەیەکی سادە و دڵنیا بۆ تۆمارکردنی داواکاریت</p>
   </div>
@@ -499,17 +619,19 @@ button.close-btn{
 </div>
 
 <div class="popup" id="timePopup">
-  <div class="popup-card">
-    <h3>کاتژمێر هەڵبژێرە</h3>
-    <div class="popup-grid">
-      <select id="hour"></select>
-      <select id="minute"></select>
-      <select id="ampm">
-        <option value="AM">بەیانی</option>
-        <option value="PM">شەو</option>
-      </select>
-    </div>
-    <button class="submit" onclick="saveTime()">هەڵبژاردن</button>
+  <div class="popup-card wide">
+    <h3>کاتژمێری سەردان هەڵبژێرە</h3>
+
+    <div class="prayer-tabs" id="prayerTabs"></div>
+
+    <div class="prayer-range" id="prayerRange"></div>
+    <div class="prayer-audience" id="prayerAudience"></div>
+
+    <div class="slots-grid" id="slotsGrid"></div>
+
+    <div class="time-summary" id="timeSummary" style="display:none"></div>
+
+    <button class="submit" onclick="saveTimeSlot()">هەڵبژاردن</button>
     <button class="close-btn" onclick="closePopups()">داخستن</button>
   </div>
 </div>
@@ -541,13 +663,109 @@ for(let y=2026;y<=2032;y++){
   year.innerHTML += `<option value="${y}">${y}</option>`;
 }
 
-for(let i=1;i<=12;i++){
-  hour.innerHTML += `<option value="${i}">${i}</option>`;
+/* ---------- prayer periods & time slots (Nusuk-style) ---------- */
+const prayerPeriods = [
+  {
+    key:"fajr", icon:"🌅", label:"فەجر",
+    range:"لە فەجر بۆ زوهر", audience:"👳‍♀️ تایبەت بە ئافرەتان",
+    times:[
+      {t:"06:40 AM"},{t:"07:00 AM"},{t:"07:20 AM"},
+      {t:"07:40 AM"},{t:"08:00 AM",full:true},{t:"08:20 AM"},
+      {t:"08:40 AM",full:true},{t:"09:00 AM",full:true},{t:"09:20 AM",full:true},
+      {t:"09:40 AM",full:true},{t:"10:00 AM",full:true},{t:"10:20 AM",full:true},
+      {t:"10:40 AM",full:true}
+    ]
+  },
+  {
+    key:"dhuhr", icon:"☀️", label:"زوهر",
+    range:"لە زوهر بۆ عەسر", audience:"🧔 تایبەت بە پیاوان",
+    times:[
+      {t:"02:40 PM"},{t:"03:00 PM"},{t:"03:20 PM"},{t:"03:40 PM"}
+    ]
+  },
+  {
+    key:"asr", icon:"🌤️", label:"عەسر",
+    range:"لە عەسر بۆ مەغریب", audience:"🧔 تایبەت بە پیاوان",
+    times:[
+      {t:"04:00 PM"},{t:"04:20 PM"},{t:"04:40 PM"},
+      {t:"05:00 PM",full:true},{t:"05:20 PM",full:true},{t:"05:40 PM",full:true},
+      {t:"06:00 PM",full:true},{t:"06:20 PM",full:true},{t:"06:40 PM",full:true},
+      {t:"07:00 PM",full:true}
+    ]
+  },
+  {
+    key:"maghrib", icon:"🌇", label:"مەغریب",
+    range:"لە مەغریب بۆ عیشا", audience:"🧕 تایبەت بە ئافرەتان",
+    times:[
+      {t:"07:30 PM"},{t:"07:50 PM"},{t:"08:10 PM"}
+    ]
+  },
+  {
+    key:"isha", icon:"🌙", label:"عیشا",
+    range:"دوای عیشا", audience:"👳‍♀️ 🧔 پیاو و ئافرەت",
+    times:[
+      {t:"09:00 PM"},{t:"09:20 PM"},{t:"09:40 PM"}
+    ]
+  }
+];
+
+let selectedPeriodKey = "";
+let selectedSlot = "";
+
+function renderPrayerTabs(){
+  prayerTabs.innerHTML = prayerPeriods.map(p=>`
+    <div class="prayer-tab" data-key="${p.key}" onclick="selectPeriod('${p.key}')">
+      <span class="ic">${p.icon}</span>
+      <span class="lb">${p.label}</span>
+    </div>
+  `).join("");
+}
+renderPrayerTabs();
+
+function selectPeriod(key){
+  selectedPeriodKey = key;
+  selectedSlot = "";
+  timeSummary.style.display = "none";
+
+  document.querySelectorAll(".prayer-tab").forEach(el=>{
+    el.classList.toggle("active", el.dataset.key === key);
+  });
+
+  const period = prayerPeriods.find(p=>p.key===key);
+  prayerRange.innerText = period.range;
+  prayerAudience.innerText = period.audience;
+
+  if(period.times.length===0){
+    slotsGrid.innerHTML = `<div class="slots-empty">هیچ کاتێکی بەردەست نییە بۆ ئەم کاتەی نوێژ</div>`;
+    return;
+  }
+
+  slotsGrid.innerHTML = period.times.map(s=>`
+    <div class="slot-btn ${s.full?'full':''}" data-t="${s.t}" onclick="selectSlot('${s.t}',this)">${s.t}</div>
+  `).join("");
 }
 
-for(let i=0;i<60;i++){
-  let v = String(i).padStart(2,"0");
-  minute.innerHTML += `<option value="${v}">${v}</option>`;
+function selectSlot(t,el){
+  selectedSlot = t;
+  document.querySelectorAll(".slot-btn").forEach(x=>x.classList.remove("selected"));
+  el.classList.add("selected");
+
+  const period = prayerPeriods.find(p=>p.key===selectedPeriodKey);
+  timeSummary.style.display = "block";
+  timeSummary.innerText = `${period.icon} ${period.label} — ${t}`;
+}
+
+function saveTimeSlot(){
+  if(!selectedPeriodKey || !selectedSlot){
+    timeSummary.style.display = "block";
+    timeSummary.style.color = "#ffb3b3";
+    timeSummary.innerText = "تکایە سەرەتا نوێژ و کاتژمێر هەڵبژێرە";
+    return;
+  }
+  const period = prayerPeriods.find(p=>p.key===selectedPeriodKey);
+  selectedTime = `${period.label} - ${selectedSlot}`;
+  timeText.innerText = `${period.icon} ${period.label} — ${selectedSlot}`;
+  closePopups();
 }
 
 function openDatePopup(){
@@ -556,6 +774,9 @@ function openDatePopup(){
 
 function openTimePopup(){
   timePopup.style.display = "flex";
+  if(!selectedPeriodKey){
+    selectPeriod(prayerPeriods[0].key);
+  }
 }
 
 function closePopups(){
@@ -566,12 +787,6 @@ function closePopups(){
 function saveDate(){
   selectedDate = `${year.value}-${month.value}-${day.value}`;
   dateText.innerText = `${day.value} / ${monthsKu[Number(month.value)-1]} / ${year.value}`;
-  closePopups();
-}
-
-function saveTime(){
-  selectedTime = `${hour.value}:${minute.value} ${ampm.value}`;
-  timeText.innerText = `${hour.value}:${minute.value} ${ampm.options[ampm.selectedIndex].text}`;
   closePopups();
 }
 
@@ -695,6 +910,8 @@ async function sendRequest(){
     selectedDate="";
     selectedTime="";
     selectedPay="";
+    selectedPeriodKey="";
+    selectedSlot="";
     dateText.innerText="بەروار هەڵبژێرە";
     timeText.innerText="کاتژمێر هەڵبژێرە";
     payNumber.innerText="ژمارەی پارەدان لێرە دەردەکەوێت";
