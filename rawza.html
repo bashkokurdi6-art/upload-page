@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>خزمەتگوزاری ڕەوزە </title>
+<title>خزمەتگوزاری ڕەوزە</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -495,9 +495,9 @@ button.close-btn{
 <div class="container">
 
   <div class="header">
-    <div class="dome"> سروشتی عەرەفە</div>
+    <div class="dome"> سیوک </div>
     <h1>خزمەتگوزاری تۆمارکردنی سەردانی ڕەوزە</h1>
-    <p>پڕۆسەیەکی سادە و دڵنیا بۆ تۆمارکردنی داواکاریت</p>
+    <p>کۆمپانیای سروشتی عەرەفە</p>
   </div>
 
   <div class="stepper">
@@ -645,6 +645,8 @@ let paymentNumbers = {};
 let selectedPay = "";
 let selectedDate = "";
 let selectedTime = "";
+let selectedPeriodKey = "";
+let selectedSlot = "";
 
 const monthsKu = [
   "کانوونی دووەم","شوبات","ئازار","نیسان","ئایار","حوزەیران",
@@ -663,54 +665,85 @@ for(let y=2026;y<=2032;y++){
   year.innerHTML += `<option value="${y}">${y}</option>`;
 }
 
-/* ---------- prayer periods & time slots (Nusuk-style) ---------- */
-const prayerPeriods = [
+/* ---------- prayer periods & time slots (loaded from Supabase) ---------- */
+// داتای فۆڵباک (ئەگەر خشتەکان لە Supabase بەردەست نەبن) - هەمووی بەردەستە
+let prayerPeriods = [
   {
-    key:"fajr", icon:"🌅", label:"فەجر",
-    range:"لە فەجر بۆ زوهر", audience:"👳‍♀️ تایبەت بە ئافرەتان",
+    key:"fajr", icon:"🌅", label:"بەیانی",
+    range:"لە بەیانی بۆ نیوەڕۆ", audience:"بۆ پیاو و ئافرەت",
     times:[
-      {t:"06:40 AM"},{t:"07:00 AM"},{t:"07:20 AM"},
-      {t:"07:40 AM"},{t:"08:00 AM",full:true},{t:"08:20 AM"},
-      {t:"08:40 AM",full:true},{t:"09:00 AM",full:true},{t:"09:20 AM",full:true},
-      {t:"09:40 AM",full:true},{t:"10:00 AM",full:true},{t:"10:20 AM",full:true},
-      {t:"10:40 AM",full:true}
+      {t:"06:40 AM"},{t:"07:00 AM"},{t:"07:20 AM"},{t:"07:40 AM"},
+      {t:"08:00 AM"},{t:"08:20 AM"},{t:"08:40 AM"},{t:"09:00 AM"},
+      {t:"09:20 AM"},{t:"09:40 AM"},{t:"10:00 AM"},{t:"10:20 AM"},{t:"10:40 AM"}
     ]
   },
   {
-    key:"dhuhr", icon:"☀️", label:"زوهر",
-    range:"لە زوهر بۆ عەسر", audience:"🧔 تایبەت بە پیاوان",
+    key:"dhuhr", icon:"☀️", label:"نیوەڕۆ",
+    range:"لە نیوەڕۆ بۆ دواینیوەڕۆ", audience:"بۆ پیاو و ئافرەت",
     times:[
       {t:"02:40 PM"},{t:"03:00 PM"},{t:"03:20 PM"},{t:"03:40 PM"}
     ]
   },
   {
-    key:"asr", icon:"🌤️", label:"عەسر",
-    range:"لە عەسر بۆ مەغریب", audience:"🧔 تایبەت بە پیاوان",
+    key:"asr", icon:"🌤️", label:"دواینیوەڕۆ",
+    range:"لە دواینیوەڕۆ بۆ ئێوارە", audience:"بۆ پیاو و ئافرەت",
     times:[
-      {t:"04:00 PM"},{t:"04:20 PM"},{t:"04:40 PM"},
-      {t:"05:00 PM",full:true},{t:"05:20 PM",full:true},{t:"05:40 PM",full:true},
-      {t:"06:00 PM",full:true},{t:"06:20 PM",full:true},{t:"06:40 PM",full:true},
-      {t:"07:00 PM",full:true}
+      {t:"04:00 PM"},{t:"04:20 PM"},{t:"04:40 PM"},{t:"05:00 PM"},
+      {t:"05:20 PM"},{t:"05:40 PM"},{t:"06:00 PM"},{t:"06:20 PM"},
+      {t:"06:40 PM"},{t:"07:00 PM"}
     ]
   },
   {
-    key:"maghrib", icon:"🌇", label:"مەغریب",
-    range:"لە مەغریب بۆ عیشا", audience:"🧕 تایبەت بە ئافرەتان",
+    key:"maghrib", icon:"🌇", label:"ئێوارە",
+    range:"لە ئێوارە بۆ شەو", audience:"بۆ پیاو و ئافرەت",
     times:[
       {t:"07:30 PM"},{t:"07:50 PM"},{t:"08:10 PM"}
     ]
   },
   {
-    key:"isha", icon:"🌙", label:"عیشا",
-    range:"دوای عیشا", audience:"👳‍♀️ 🧔 پیاو و ئافرەت",
+    key:"isha", icon:"🌙", label:"شەو",
+    range:"دوای شەو", audience:"بۆ پیاو و ئافرەت",
     times:[
       {t:"09:00 PM"},{t:"09:20 PM"},{t:"09:40 PM"}
     ]
   }
 ];
 
-let selectedPeriodKey = "";
-let selectedSlot = "";
+let slotsReady = false;
+
+async function loadPrayerSlots(){
+  try{
+    const {data:periodsData, error:pErr} = await db
+      .from("rawda_prayer_periods")
+      .select("*")
+      .order("sort_order", {ascending:true});
+    if(pErr || !periodsData || periodsData.length===0) throw pErr || new Error("no periods");
+
+    const {data:slotsData, error:sErr} = await db
+      .from("rawda_prayer_slots")
+      .select("*")
+      .order("sort_order", {ascending:true});
+    if(sErr) throw sErr;
+
+    prayerPeriods = periodsData.map(p=>({
+      key:p.period_key,
+      icon:p.period_icon,
+      label:p.period_label,
+      range:p.period_range,
+      audience:p.period_audience,
+      times:(slotsData||[])
+        .filter(s=>s.period_key===p.period_key)
+        .map(s=>({t:s.slot_time, full:!!s.is_full}))
+    }));
+  }catch(err){
+    // ئەگەر خشتەکان بەردەست نەبن، داتای فۆڵباکی سەرەوە بەکاردێت
+  }
+  slotsReady = true;
+  renderPrayerTabs();
+  if(selectedPeriodKey){
+    selectPeriod(selectedPeriodKey);
+  }
+}
 
 function renderPrayerTabs(){
   prayerTabs.innerHTML = prayerPeriods.map(p=>`
@@ -774,7 +807,7 @@ function openDatePopup(){
 
 function openTimePopup(){
   timePopup.style.display = "flex";
-  if(!selectedPeriodKey){
+  if(!selectedPeriodKey && prayerPeriods.length>0){
     selectPeriod(prayerPeriods[0].key);
   }
 }
@@ -841,6 +874,7 @@ async function loadData(){
 }
 
 loadData();
+loadPrayerSlots();
 
 function selectPay(type,el){
   selectedPay = type;
