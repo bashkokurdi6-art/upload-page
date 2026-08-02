@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="document.getElementById('statusMsg').textContent='هەڵە: کتێبخانەی Supabase بارنەبوو (CDN بلۆک کراوە یان ئینتەرنێت نییە)'; document.getElementById('statusMsg').classList.add('error');"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
   :root{
@@ -137,8 +137,10 @@
     font-size:13px;
     text-align:center;
     color:rgba(253,248,236,0.55);
+    word-break: break-word;
+    padding: 0 10px;
   }
-  .msg.error{ color:#e08a8a; }
+  .msg.error{ color:#f87171; font-weight: bold; }
 
   /* ---------- winners board ---------- */
   .board{
@@ -216,7 +218,7 @@
 </head>
 <body>
 
-  <img src="1785452936015.png" alt="سروشتی عەرەفە" class="logo">
+  <img src="1785452936015.png" alt="سروشتی عەرەفە" class="logo" onerror="this.style.display='none'">
   <div class="brand-en">SRUSHT E ARAFA COMPANY</div>
   <h1>چەرخی دیاری عومرە</h1>
   <div class="sub">چەرخەکە بسوڕێنە و براوە دیاری بکە — تا ٣ جار</div>
@@ -263,6 +265,10 @@
 
   const segmentColors = ['#12817b', '#0a4f4c'];
 
+  function getName(item) {
+    return item.full_name || item.name || item.fullname || item.username || 'بێ ناو';
+  }
+
   function drawWheel(items){
     const size = canvas.width;
     const center = size/2;
@@ -299,7 +305,7 @@
       ctx.textAlign = 'right';
       ctx.fillStyle = '#fdf8ec';
       ctx.font = "600 13px Tajawal, sans-serif";
-      let label = item.full_name || '';
+      let label = getName(item);
       if(label.length > 13) label = label.slice(0,12) + '…';
       ctx.fillText(label, radius - 16, 5);
       ctx.restore();
@@ -322,10 +328,10 @@
     card.className = 'winner-card';
     card.innerHTML = `
       <button class="delete-btn" title="سڕینەوە">×</button>
-      <div class="name">${winner.full_name || ''}</div>
+      <div class="name">${getName(winner)}</div>
       <div class="meta">
-        <span>🏙️ ${winner.city || ''}</span>
-        <span class="phone">📱 ${winner.phone || ''}</span>
+        <span>🏙️ ${winner.city || 'نادیار'}</span>
+        <span class="phone">📱 ${winner.phone || winner.mobile || ''}</span>
       </div>
     `;
 
@@ -359,7 +365,7 @@
 
     wheelWrap.style.transition = 'none';
     wheelWrap.style.transform = 'rotate(0deg)';
-    void wheelWrap.offsetWidth; // force reflow
+    void wheelWrap.offsetWidth;
     wheelWrap.style.transition = 'transform 4.4s cubic-bezier(0.12,0.68,0.16,1)';
     wheelWrap.style.transform = `rotate(${totalRotation}deg)`;
 
@@ -385,49 +391,46 @@
     }, 4500);
   }
 
-  let supabase = null;
-
   async function loadRecords(){
     try{
-      if(typeof window.supabase === 'undefined'){
-        throw new Error('کتێبخانەی Supabase بارنەبووە');
+      if(typeof window.supabase === 'undefined' || !window.supabase.createClient){
+        throw new Error('کتێبخانەی Supabase دروست بارنەبووە');
       }
 
-      if(!supabase){
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('پەیوەندی بە Supabase درێژەی کێشا — ئینتەرنێت پشکنە')), 8000)
-      );
-
-      const { data, error } = await Promise.race([
-        supabase.from(TABLE_NAME).select('*'),
-        timeout
-      ]);
+      const { data, error } = await client
+        .from(TABLE_NAME)
+        .select('*');
 
       if(error){
-        throw new Error(error.message || JSON.stringify(error));
+        throw error;
       }
 
       pool = data || [];
       drawWheel(pool);
 
       if(pool.length === 0){
-        statusMsg.textContent = 'هیچ ناوێک تۆمار نەکراوە لە داتابەیسەکەدا';
+        statusMsg.textContent = 'خشتەکە بەتاڵە، هیچ ناوێک نەدۆزرایەوە';
       } else {
-        statusMsg.textContent = `${pool.length} کەس ئامادەن بۆ چەرخەکە`;
+        statusMsg.textContent = `${pool.length} کەس بارکران بۆ چەرخەکە`;
         spinBtn.disabled = false;
       }
     } catch(err){
-      console.error('Supabase load error:', err);
-      statusMsg.textContent = 'هەڵە: ' + err.message;
+      console.error('کێشە لە بارکردن:', err);
+      statusMsg.textContent = 'هەڵە: ' + (err.message || 'پەیوەندی لەگەڵ داتابەیس دروست نەبوو');
       statusMsg.classList.add('error');
     }
   }
 
   spinBtn.addEventListener('click', spin);
-  loadRecords();
+  
+  // دڵنیابوونەوە لە باربوونی تەواوی پەڕەکە
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadRecords);
+  } else {
+    loadRecords();
+  }
 </script>
 
 </body>
