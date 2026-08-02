@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="document.getElementById('statusMsg').textContent='هەڵە: کتێبخانەی Supabase بارنەبوو (CDN بلۆک کراوە یان ئینتەرنێت نییە)'; document.getElementById('statusMsg').classList.add('error');"></script>
 
 <style>
   :root{
@@ -248,8 +248,6 @@
   const SUPABASE_ANON_KEY = "sb_publishable_PG5N97j4zLgutokXK6qUFQ_Oj5BivQg";
   const TABLE_NAME = "registrations"; // ئەگەر ناوی خشتەکەت جیاوازە، لێرە بیگۆڕە
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   const wheelWrap = document.querySelector('.wheel-wrap');
@@ -389,25 +387,44 @@
     }, 4500);
   }
 
+  let supabase = null;
+
   async function loadRecords(){
-    const { data, error } = await supabase
-      .from(TABLE_NAME)
-      .select('*');
+    try{
+      if(typeof window.supabase === 'undefined'){
+        throw new Error('کتێبخانەی Supabase بارنەبووە (CDN بلۆک کراوە یان ئینتەرنێت کێشەی هەیە)');
+      }
 
-    if(error){
-      statusMsg.textContent = 'هەڵە لە هێنانی داتاکان: ' + error.message;
+      if(!supabase){
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('پەیوەندی بە Supabase درێژەی کێشا (timeout) — تکایە نێت پشکنە')), 8000)
+      );
+
+      const { data, error } = await Promise.race([
+        supabase.from(TABLE_NAME).select('*'),
+        timeout
+      ]);
+
+      if(error){
+        throw new Error(error.message || JSON.stringify(error));
+      }
+
+      pool = data || [];
+      drawWheel(pool);
+
+      if(pool.length === 0){
+        statusMsg.textContent = 'هیچ ناوێک تۆمار نەکراوە (خشتەکە بەتاڵە یان ناوی خشتەکە هەڵەیە)';
+      } else {
+        statusMsg.textContent = `${pool.length} کەس ئامادەن بۆ چەرخ`;
+        spinBtn.disabled = false;
+      }
+    } catch(err){
+      console.error('Supabase load error:', err);
+      statusMsg.textContent = 'هەڵە: ' + err.message;
       statusMsg.classList.add('error');
-      return;
-    }
-
-    pool = data || [];
-    drawWheel(pool);
-
-    if(pool.length === 0){
-      statusMsg.textContent = 'هیچ ناوێک تۆمار نەکراوە';
-    } else {
-      statusMsg.textContent = `${pool.length} کەس ئامادەن بۆ چەرخ`;
-      spinBtn.disabled = false;
     }
   }
 
