@@ -214,11 +214,62 @@
     color:rgba(253,248,236,0.3);
     text-align:center;
   }
+
+  /* ---------- winner reveal overlay ---------- */
+  .winner-reveal{
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    pointer-events:none;
+    background:rgba(7,59,56,0);
+    transition: background .5s ease;
+  }
+  .winner-reveal.show-bg{
+    background:rgba(7,59,56,0.55);
+  }
+
+  .winner-reveal .reveal-box{
+    text-align:center;
+    padding:26px 34px;
+    border-radius:18px;
+    border:2px solid var(--gold);
+    background:linear-gradient(180deg, var(--teal-mid), var(--teal-deep));
+    box-shadow:0 0 0 6px rgba(212,175,55,0.18), 0 20px 50px rgba(0,0,0,0.6);
+    opacity:0;
+    transform: translateY(0) scale(0.3);
+    transition: transform .55s cubic-bezier(.2,1.4,.4,1), opacity .35s ease;
+  }
+
+  .winner-reveal .reveal-box.pop-in{
+    opacity:1;
+    transform: translateY(0) scale(1);
+  }
+
+  .winner-reveal .reveal-box.fly-down{
+    transition: transform .75s cubic-bezier(.5,0,.7,1), opacity .55s ease .2s;
+    opacity:0;
+  }
+
+  .winner-reveal .reveal-label{
+    font-size:13px;
+    letter-spacing:2px;
+    color:var(--gold-light);
+    margin-bottom:8px;
+  }
+
+  .winner-reveal .reveal-name{
+    font-family:'Amiri', serif;
+    font-size:34px;
+    color:var(--cream);
+  }
 </style>
 </head>
 <body>
 
-  <img src="1785452936015.png" alt="سروشتی عەرەفە" class="logo" onerror="this.style.display='none'">
+  <img src="logo.png" alt="سروشتی عەرەفە" class="logo" onerror="this.style.display='none'">
   <div class="brand-en">SRUSHT E ARAFA COMPANY</div>
   <h1>چەرخی دیاری عومرە</h1>
   <div class="sub">چەرخەکە بسوڕێنە و براوە دیاری بکە — تا ٣ جار</div>
@@ -244,6 +295,13 @@
 
   <footer>پڕۆژەی دیاری عومرە — سروشتی عەرەفە © 2026</footer>
 
+  <div class="winner-reveal" id="winnerReveal">
+    <div class="reveal-box" id="revealBox">
+      <div class="reveal-label">🎉 براوە 🎉</div>
+      <div class="reveal-name" id="revealName"></div>
+    </div>
+  </div>
+
 <script>
   const SUPABASE_URL = "https://slllcibigutjivauryvc.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
@@ -257,6 +315,9 @@
   const statusMsg = document.getElementById('statusMsg');
   const winnersList = document.getElementById('winnersList');
   const boardEmpty = document.getElementById('boardEmpty');
+  const winnerReveal = document.getElementById('winnerReveal');
+  const revealBox = document.getElementById('revealBox');
+  const revealName = document.getElementById('revealName');
 
   const MAX_SPINS = 3;
   let pool = [];
@@ -267,6 +328,70 @@
 
   function getName(item) {
     return item.full_name || item.name || item.fullname || item.username || 'بێ ناو';
+  }
+
+  /* ---------------- sound effects (Web Audio API, no files needed) ---------------- */
+  let audioCtx = null;
+  function getAudioCtx(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playTick(){
+    try{
+      const ac = getAudioCtx();
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1400, ac.currentTime);
+      gain.gain.setValueAtTime(0.12, ac.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.05);
+      osc.connect(gain).connect(ac.destination);
+      osc.start();
+      osc.stop(ac.currentTime + 0.05);
+    }catch(e){ /* audio not available, ignore */ }
+  }
+
+  function playWinSound(){
+    try{
+      const ac = getAudioCtx();
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6
+      notes.forEach((freq, i)=>{
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ac.currentTime + i*0.11);
+        gain.gain.setValueAtTime(0.0001, ac.currentTime + i*0.11);
+        gain.gain.exponentialRampToValueAtTime(0.22, ac.currentTime + i*0.11 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + i*0.11 + 0.4);
+        osc.connect(gain).connect(ac.destination);
+        osc.start(ac.currentTime + i*0.11);
+        osc.stop(ac.currentTime + i*0.11 + 0.42);
+      });
+    }catch(e){ /* audio not available, ignore */ }
+  }
+
+  /* schedule ticking sound across the spin duration, slowing down like a real wheel */
+  function scheduleSpinTicks(durationMs){
+    const totalTicks = 42;
+    let elapsed = 0;
+    // ease-out spacing: ticks start fast (small gaps) and end slow (big gaps)
+    const weights = [];
+    let sum = 0;
+    for(let i=0;i<totalTicks;i++){
+      const w = 1 + Math.pow(i/totalTicks, 2.2) * 6; // grows -> bigger gaps later
+      weights.push(w);
+      sum += w;
+    }
+    let t = 0;
+    weights.forEach(w=>{
+      const gap = (w/sum) * durationMs;
+      t += gap;
+      setTimeout(playTick, t);
+    });
   }
 
   function drawWheel(items){
@@ -345,11 +470,50 @@
     winnersList.prepend(card);
   }
 
+  /* big centered reveal of the winner's name, then it shrinks and flies down
+     toward the wheel/board area before the real card is added to the list */
+  function revealWinner(winner){
+    return new Promise(resolve=>{
+      revealName.textContent = getName(winner);
+      revealBox.classList.remove('fly-down');
+      revealBox.style.transform = 'translateY(0) scale(0.3)';
+      winnerReveal.classList.add('show-bg');
+
+      playWinSound();
+
+      // pop in, big, centered
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          revealBox.classList.add('pop-in');
+        });
+      });
+
+      // after a beat, fly it down toward the wheel/board, shrinking and fading
+      setTimeout(()=>{
+        const wheelRect = wheelWrap.getBoundingClientRect();
+        const boxRect = revealBox.getBoundingClientRect();
+        const targetY = wheelRect.top + wheelRect.height/2 - (boxRect.top + boxRect.height/2);
+        revealBox.classList.add('fly-down');
+        revealBox.style.transform = `translateY(${targetY}px) scale(0.15)`;
+      }, 1600);
+
+      // clean up and resolve so the real winner card can be added
+      setTimeout(()=>{
+        winnerReveal.classList.remove('show-bg');
+        revealBox.classList.remove('pop-in','fly-down');
+        revealBox.style.transform = 'translateY(0) scale(0.3)';
+        resolve();
+      }, 2400);
+    });
+  }
+
   function spin(){
     if(spinning || spinsUsed >= MAX_SPINS || pool.length === 0) return;
     spinning = true;
     spinBtn.disabled = true;
     statusMsg.textContent = '';
+
+    getAudioCtx(); // unlock audio on user gesture
 
     const n = pool.length;
     const winnerIndex = Math.floor(Math.random() * n);
@@ -362,16 +526,21 @@
 
     const fullTurns = 5 * 360;
     const totalRotation = fullTurns + rotNeeded;
+    const SPIN_DURATION = 4400;
 
     wheelWrap.style.transition = 'none';
     wheelWrap.style.transform = 'rotate(0deg)';
     void wheelWrap.offsetWidth;
-    wheelWrap.style.transition = 'transform 4.4s cubic-bezier(0.12,0.68,0.16,1)';
+    wheelWrap.style.transition = `transform ${SPIN_DURATION}ms cubic-bezier(0.12,0.68,0.16,1)`;
     wheelWrap.style.transform = `rotate(${totalRotation}deg)`;
 
-    setTimeout(()=>{
+    scheduleSpinTicks(SPIN_DURATION);
+
+    setTimeout(async ()=>{
       spinsUsed++;
       spinsUsedText.textContent = spinsUsed;
+
+      await revealWinner(winner);
 
       addWinnerCard(winner);
       pool.splice(winnerIndex, 1);
@@ -388,7 +557,7 @@
       } else {
         spinBtn.disabled = false;
       }
-    }, 4500);
+    }, SPIN_DURATION + 100);
   }
 
   async function loadRecords(){
@@ -424,7 +593,7 @@
   }
 
   spinBtn.addEventListener('click', spin);
-  
+
   // دڵنیابوونەوە لە باربوونی تەواوی پەڕەکە
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadRecords);
