@@ -314,8 +314,9 @@ font-size:26px;
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const supabaseUrl = 'https://mjccxambuphyuzpdaoow.supabase.co'
-const supabaseKey = 'sb_publishable_PG5N97j4zLgutokXK6qUFQ_Oj5BivQg'
+// زانیارییە نوێیەکانی Supabase کە بنێردراون
+const supabaseUrl = 'https://slllcibigutjivauryvc.supabase.co'
+const supabaseKey = 'sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
@@ -325,28 +326,48 @@ const totalCount = document.getElementById('totalCount')
 
 async function loadRegistrations(){
 
-    // 1. هێنانی هەموو داتاکان بە یەکجار
-    const { data, count, error } = await supabase
+    // 1. هێنانی ژمارەی گشتی
+    const { count, error: countError } = await supabase
         .from('registrations')
-        .select('*', { count: 'exact' })
-        .order('id', { ascending: false });
+        .select('*', { count: 'exact', head: true })
 
-    if(error){
-        console.error("Error fetching data:", error);
-        namesList.innerHTML = '<div style="padding:10px; color:#ff6b6b;">کێشەیەک لە ڕاکێشانی داتاکان ڕوویدا</div>';
-        return;
+    if(!countError){
+        totalCount.innerText = count || 0
     }
 
-    // نیشاندانی ژمارەی گشتی
-    totalCount.innerText = count || (data ? data.length : 0);
+    // 2. هێنانی تەواوی ناوەکان بە چەند کۆمەڵەیەک (Pagination Loop) بۆ ڕێگری لە لیمیت
+    let allData = []
+    let pageFrom = 0
+    const pageSize = 1000
 
-    if(!data || data.length === 0){
+    while(true){
+        const { data, error } = await supabase
+            .from('registrations')
+            .select('*')
+            .order('id', { ascending: false })
+            .range(pageFrom, pageFrom + pageSize - 1)
+
+        if(error){
+            console.error("Error fetching data:", error);
+            if(allData.length === 0){
+                namesList.innerHTML = '<div style="padding:10px; color:#ff6b6b;">کێشەیەک لە ڕاکێشانی داتاکان ڕوویدا</div>';
+            }
+            break;
+        }
+
+        allData = allData.concat(data)
+
+        if(data.length < pageSize) break
+        pageFrom += pageSize
+    }
+
+    if(allData.length === 0){
         namesList.innerHTML = '<div style="padding:10px;">هیچ تۆمارکراوێک نییە</div>';
         return;
     }
 
-    // 2. دروستکردنی HTML بە یەکجار (زۆر خێرا ترە و ئامێرەکە گران ناکات)
-    const listHtml = data.map((item, index) => `
+    // 3. ڕێکخستن و نیشاندانی سەرجەم ناوەکان بە یەکجار
+    const listHtml = allData.map((item, index) => `
         <div class="name-item">
             <span>${index + 1}</span>
             ${item.full_name || 'بێ ناو'}
