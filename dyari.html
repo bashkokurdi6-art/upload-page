@@ -73,7 +73,6 @@
     margin-bottom:22px;
   }
 
-  /* outer decorative gold ring, echoing the logo's border */
   .wheel-frame::before{
     content:"";
     position:absolute;
@@ -217,7 +216,7 @@
 </head>
 <body>
 
-  <img src="logo.png" alt="سروشتی عەرەفە" class="logo">
+  <img src="1785452936015.png" alt="سروشتی عەرەفە" class="logo">
   <div class="brand-en">SRUSHT E ARAFA COMPANY</div>
   <h1>چەرخی دیاری عومرە</h1>
   <div class="sub">چەرخەکە بسوڕێنە و براوە دیاری بکە — تا ٣ جار</div>
@@ -244,9 +243,9 @@
   <footer>پڕۆژەی دیاری عومرە — سروشتی عەرەفە © 2026</footer>
 
 <script>
-  const SUPABASE_URL = "https://mjccxambuphyuzpdaoow.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_PG5N97j4zLgutokXK6qUFQ_Oj5BivQg";
-  const TABLE_NAME = "registrations"; // ئەگەر ناوی خشتەکەت جیاوازە، لێرە بیگۆڕە
+  const SUPABASE_URL = "https://slllcibigutjivauryvc.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
+  const TABLE_NAME = "registrations";
 
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
@@ -352,7 +351,6 @@
     const anglePerDeg = 360 / n;
     const segCenterDeg = winnerIndex * anglePerDeg + anglePerDeg / 2;
 
-    // پۆینتەر لە سەرەوە (٢٧٠ پلە بەپێی چوارچێوەی canvas)
     let rotNeeded = (270 - segCenterDeg) % 360;
     if (rotNeeded < 0) rotNeeded += 360;
 
@@ -392,7 +390,7 @@
   async function loadRecords(){
     try{
       if(typeof window.supabase === 'undefined'){
-        throw new Error('کتێبخانەی Supabase بارنەبووە (CDN بلۆک کراوە یان ئینتەرنێت کێشەی هەیە)');
+        throw new Error('کتێبخانەی Supabase بارنەبووە');
       }
 
       if(!supabase){
@@ -400,7 +398,7 @@
       }
 
       const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('پەیوەندی بە Supabase درێژەی کێشا (timeout) — تکایە نێت پشکنە')), 8000)
+        setTimeout(() => reject(new Error('پەیوەندی بە Supabase درێژەی کێشا — ئینتەرنێت پشکنە')), 8000)
       );
 
       const { data, error } = await Promise.race([
@@ -416,9 +414,9 @@
       drawWheel(pool);
 
       if(pool.length === 0){
-        statusMsg.textContent = 'هیچ ناوێک تۆمار نەکراوە (خشتەکە بەتاڵە یان ناوی خشتەکە هەڵەیە)';
+        statusMsg.textContent = 'هیچ ناوێک تۆمار نەکراوە لە داتابەیسەکەدا';
       } else {
-        statusMsg.textContent = `${pool.length} کەس ئامادەن بۆ چەرخ`;
+        statusMsg.textContent = `${pool.length} کەس ئامادەن بۆ چەرخەکە`;
         spinBtn.disabled = false;
       }
     } catch(err){
