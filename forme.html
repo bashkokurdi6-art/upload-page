@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سیستەمی گەشتی حەج و عومرە</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+/* ===================== توکنەکانی دیزاین ===================== */
+:root{
+  --bg:#faf6ec;
+  --bg-alt:#f1ead8;
+  --panel:#fffdf7;
+  --primary:#0b4636;
+  --primary-dark:#082e24;
+  --primary-light:#12634b;
+  --gold:#c8a24d;
+  --gold-light:#e9d49b;
+  --text:#1d2b24;
+  --muted:#71807a;
+  --danger:#a3402e;
+  --danger-bg:#f7e6e1;
+  --success:#2f6b4f;
+  --success-bg:#e5f0e8;
+  --border:#e1d6b3;
+  --font-display:'Amiri', serif;
+  --font-body:'Cairo', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  min-height:100vh;
+  background-image:
+    radial-gradient(circle at 0 0, rgba(11,70,54,0.04) 0, transparent 45%),
+    radial-gradient(circle at 100% 0, rgba(200,162,77,0.08) 0, transparent 45%);
+}
+
+/* خاتەم / ئەستێرەی هەشت لاتەنی — عنصری نیشانە */
+.khatam{
+  display:inline-block; width:1em; height:1em; position:relative; vertical-align:middle;
+}
+.khatam svg{width:100%;height:100%;display:block;}
+
+/* ===================== هێدەر ===================== */
+header.topbar{
+  background:linear-gradient(135deg, var(--primary-dark), var(--primary) 60%, var(--primary-light));
+  color:#fdf9ec;
+  padding:22px 28px 18px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:4px solid var(--gold);
+}
+header.topbar::before{
+  content:"";
+  position:absolute; inset:0;
+  opacity:.14;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23e9d49b' stroke-width='1.4'%3E%3Cpath d='M60 5 L75 30 L105 30 L85 50 L95 80 L60 62 L25 80 L35 50 L15 30 L45 30 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:120px 120px;
+}
+.topbar-inner{position:relative; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;}
+.brand{display:flex; align-items:center; gap:12px;}
+.brand .khatam{width:38px;height:38px; color:var(--gold-light);}
+.brand h1{font-family:var(--font-display); font-size:26px; margin:0; letter-spacing:.5px;}
+.brand p{margin:2px 0 0; font-size:13px; color:var(--gold-light); font-weight:600;}
+
+nav.tabs{display:flex; gap:8px; flex-wrap:wrap; position:relative;}
+nav.tabs button{
+  font-family:var(--font-body); font-weight:700; font-size:14px;
+  background:rgba(255,255,255,0.08); color:#fdf9ec; border:1px solid rgba(233,212,155,0.35);
+  padding:9px 16px; border-radius:999px; cursor:pointer; transition:.2s;
+}
+nav.tabs button:hover{background:rgba(255,255,255,0.18);}
+nav.tabs button.active{background:var(--gold); color:var(--primary-dark); border-color:var(--gold);}
+
+main{max-width:1300px; margin:0 auto; padding:24px 20px 80px;}
+.tab-section{display:none; animation:fade .25s ease;}
+.tab-section.active{display:block;}
+@keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+/* ===================== کارت / پانێل ===================== */
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:20px;
+  position:relative;
+  box-shadow:0 2px 10px rgba(11,70,54,0.05);
+}
+.card::before{
+  content:""; position:absolute; top:0; right:24px; left:24px; height:3px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius:0 0 3px 3px;
+}
+.card h2{
+  font-family:var(--font-display); color:var(--primary); font-size:19px; margin:0 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.card h2 .khatam{width:16px;height:16px; color:var(--gold);}
+
+.grid{display:grid; gap:16px;}
+.grid.cols-2{grid-template-columns:repeat(2,1fr);}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.grid.cols-4{grid-template-columns:repeat(4,1fr);}
+@media(max-width:900px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr;}}
+
+/* ===================== ستاتی کارتی داشبۆرد ===================== */
+.stat{
+  background:var(--bg-alt); border:1px solid var(--border); border-radius:12px; padding:14px 16px;
+  display:flex; flex-direction:column; gap:6px;
+}
+.stat .label{font-size:12.5px; color:var(--muted); font-weight:700;}
+.stat .value{font-family:var(--font-mono); font-size:26px; font-weight:700; color:var(--primary-dark);}
+.stat.gold .value{color:var(--gold);}
+.stat.danger .value{color:var(--danger);}
+
+/* ===================== فۆرم ===================== */
+label{display:block; font-size:13px; font-weight:700; margin-bottom:5px; color:var(--primary-dark);}
+input, select, textarea{
+  width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:9px;
+  font-family:var(--font-body); font-size:14px; background:#fff; color:var(--text);
+}
+input:focus, select:focus, textarea:focus{outline:2px solid var(--gold); outline-offset:1px; border-color:var(--gold);}
+.field{margin-bottom:12px;}
+.btn{
+  font-family:var(--font-body); font-weight:700; font-size:14px; padding:10px 18px; border-radius:10px;
+  border:none; cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:6px;
+}
+.btn-primary{background:var(--primary); color:#fdf9ec;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-gold{background:var(--gold); color:var(--primary-dark);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-outline{background:transparent; border:1px solid var(--primary); color:var(--primary);}
+.btn-outline:hover{background:var(--bg-alt);}
+.btn-danger{background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger);}
+.btn-danger:hover{background:var(--danger); color:#fff;}
+.btn-sm{padding:6px 10px; font-size:12.5px; border-radius:8px;}
+.row-actions{display:flex; gap:6px;}
+.toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center;}
+
+/* ===================== خشتە ===================== */
+.table-wrap{overflow-x:auto; border:1px solid var(--border); border-radius:12px;}
+table{width:100%; border-collapse:collapse; font-size:13.5px; min-width:900px;}
+thead th{
+  background:var(--primary); color:#fdf9ec; padding:10px 10px; text-align:center; font-weight:700;
+  position:sticky; top:0; white-space:nowrap;
+}
+tbody td{padding:8px 10px; text-align:center; border-bottom:1px solid var(--border); white-space:nowrap;}
+tbody tr:nth-child(even){background:var(--bg-alt);}
+tbody tr:hover{background:var(--gold-light);}
+.badge{padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700; display:inline-block;}
+.badge.paid{background:var(--success-bg); color:var(--success);}
+.badge.partial{background:#fdf1d6; color:#8a6a1a;}
+.badge.unpaid{background:var(--danger-bg); color:var(--danger);}
+.badge.vip{background:var(--gold-light); color:var(--primary-dark);}
+.badge.child{background:#e3ecf7; color:#2b4f7a;}
+.mono{font-family:var(--font-mono);}
+.muted{color:var(--muted); font-size:12.5px;}
+
+/* ===================== ژوورەکان ===================== */
+.room-card{
+  background:var(--bg-alt); border:1px solid var(--border); border-radius:12px; padding:14px; position:relative;
+}
+.room-card .fill-bar{height:8px; background:#e6dcb8; border-radius:99px; overflow:hidden; margin:8px 0;}
+.room-card .fill-bar > div{height:100%; background:var(--primary);}
+.room-card.full .fill-bar > div{background:var(--gold);}
+.room-card ul{margin:6px 0 0; padding-right:18px; font-size:12.5px;}
+
+footer.pagefoot{text-align:center; color:var(--muted); font-size:12.5px; padding:24px 0 10px;}
+
+/* ===================== چاپکردن ===================== */
+@media print{
+  header.topbar nav.tabs, .no-print{display:none !important;}
+  body{background:#fff;}
+  .tab-section{display:block !important;}
+  .card{box-shadow:none; border:1px solid #999;}
+  main{padding:0;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="khatam">
+        <svg viewBox="0 0 100 100"><path fill="currentColor" d="M50 4 L61 25 L88 25 L70 42 L79 68 L50 51 L21 68 L30 42 L12 25 L39 25 Z"/></svg>
+      </span>
+      <div>
+        <h1>سیستەمی گەشتی حەج و عومرە</h1>
+        <p>بەڕێوەبردنی گەشتیاران · ژوورەکان · دارایی</p>
+      </div>
+    </div>
+    <nav class="tabs no-print">
+      <button data-tab="dashboard" class="active">داشبۆرد</button>
+      <button data-tab="pilgrims">گەشتیاران</button>
+      <button data-tab="staff">ستاف</button>
+      <button data-tab="finance">دارایی گەشت</button>
+      <button data-tab="rooms">ژوورەکان</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============== TAB: DASHBOARD ============== -->
+  <section id="tab-dashboard" class="tab-section active">
+    <div class="card">
+      <h2><span class="khatam"><svg viewBox="0 0 100 100"><path fill="currentColor" d="M50 4 L61 25 L88 25 L70 42 L79 68 L50 51 L21 68 L30 42 L12 25 L39 25 Z"/></svg></span> سەرژمێری گشتی</h2>
+      <div class="grid cols-4" id="dashStatsMain"></div>
+    </div>
+    <div class="card">
+      <h2>پارەدان</h2>
+      <div class="grid cols-4" id="dashStatsMoney"></div>
+    </div>
+    <div class="card">
+      <h2>خزمەت گوزاری و جۆر</h2>
+      <div class="grid cols-4" id="dashStatsType"></div>
+    </div>
+    <div class="card">
+      <h2>ڕەگەز</h2>
+      <div class="grid cols-2" id="dashStatsGender"></div>
+    </div>
+    <div class="card">
+      <h2>کەسانی پارەیان نەداوە</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>ناوی سیانی</th><th>مۆبایل</th><th>خزمەت گوزاری</th><th>پێویست</th><th>دراوە</th><th>ماوە</th></tr></thead>
+          <tbody id="dashUnpaidBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== TAB: PILGRIMS ============== -->
+  <section id="tab-pilgrims" class="tab-section">
+    <div class="card">
+      <h2>نرخەکان</h2>
+      <div class="grid cols-2">
+        <div class="field"><label>نرخی خدمات ($)</label><input type="number" id="priceWith" step="0.01"></div>
+        <div class="field"><label>نرخی بێ خدمات ($)</label><input type="number" id="priceWithout" step="0.01"></div>
+      </div>
+      <button class="btn btn-primary" id="saveSettingsBtn">پاشەکەوتکردنی نرخ</button>
+    </div>
+
+    <div class="card">
+      <h2 id="formTitle">زیادکردنی گەشتیار</h2>
+      <div class="grid cols-3">
+        <div class="field"><label>ناوی سیانی</label><input id="pFullName" placeholder="ناوی سیانی"></div>
+        <div class="field"><label>ژمارە مۆبایل</label><input id="pPhone" placeholder="07xxxxxxxxx"></div>
+        <div class="field"><label>خزمەت گوزاری</label>
+          <select id="pService"><option value="خدمات">١. خدمات</option><option value="بێ خدمات">٢. بێ خدمات</option></select>
+        </div>
+        <div class="field"><label>جۆر</label>
+          <select id="pCategory"><option value="ئاسایی">ئاسایی</option><option value="مندال">مندال</option><option value="VIP">VIP</option></select>
+        </div>
+        <div class="field"><label>ڕەگەز</label>
+          <select id="pGender"><option value="پیاو">پیاو</option><option value="ژن">ژن</option></select>
+        </div>
+        <div class="field"><label>بڕی پارەی دراو ($)</label><input type="number" id="pPaid" step="0.01" value="0"></div>
+        <div class="field"><label>تێبینی</label><input id="pNotes" placeholder="تێبینی (ئارەزوومەندانە)"></div>
+      </div>
+      <input type="hidden" id="pEditId">
+      <button class="btn btn-primary" id="pSaveBtn">زیادکردن</button>
+      <button class="btn btn-outline" id="pCancelEditBtn" style="display:none;">هەڵوەشاندنەوە</button>
+    </div>
+
+    <div class="card">
+      <h2>لیستی گەشتیاران</h2>
+      <div class="toolbar no-print">
+        <input style="max-width:220px;" id="pSearch" placeholder="گەڕان بە ناو یان مۆبایل...">
+        <select style="max-width:170px;" id="pFilterStatus">
+          <option value="">هەموو دۆخەکان</option>
+          <option value="paid">دراوە</option>
+          <option value="partial">بەشێک دراوە</option>
+          <option value="unpaid">نەدراوە</option>
+        </select>
+        <button class="btn btn-gold btn-sm" id="exportExcelBtn">📊 دابەزاندن بۆ Excel</button>
+        <button class="btn btn-outline btn-sm" id="printBtn">🖨️ چاپکردن</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>ناوی سیانی</th><th>مۆبایل</th><th>خزمەت گوزاری</th><th>جۆر</th><th>ڕەگەز</th>
+              <th>پێویست</th><th>دراوە</th><th>ماوە</th><th>دۆخ</th><th>ژوور</th><th class="no-print">کردار</th>
+            </tr>
+          </thead>
+          <tbody id="pilgrimsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== TAB: STAFF ============== -->
+  <section id="tab-staff" class="tab-section">
+    <div class="card">
+      <h2>زیادکردنی ستاف (ڕێبەری گەشت / شۆفێری گەشت / مامۆستای ئاینی)</h2>
+      <div class="grid cols-3">
+        <div class="field"><label>ناوی سیانی</label><input id="sFullName" placeholder="ناوی سیانی"></div>
+        <div class="field"><label>ژمارە مۆبایل</label><input id="sPhone" placeholder="07xxxxxxxxx"></div>
+        <div class="field"><label>ڕۆڵ</label>
+          <select id="sRole">
+            <option value="ڕێبەری گەشت">ڕێبەری گەشت</option>
+            <option value="شۆفێری گەشت">شۆفێری گەشت</option>
+            <option value="مامۆستای ئاینی">مامۆستای ئاینی</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="sSaveBtn">زیادکردن</button>
+    </div>
+    <div class="grid cols-3" id="staffColumns"></div>
+  </section>
+
+  <!-- ============== TAB: FINANCE ============== -->
+  <section id="tab-finance" class="tab-section">
+    <div class="card">
+      <h2>نرخی پاس · نرخی ڕێبەری گەشت · مەسروفات</h2>
+      <div class="grid cols-3">
+        <div class="field"><label>نرخی پاس ($)</label><input type="number" id="fBus" step="0.01"></div>
+        <div class="field"><label>نرخی ڕێبەری گەشت ($)</label><input type="number" id="fGuide" step="0.01"></div>
+        <div class="field"><label>مەسروفاتی گەشت ($)</label><input type="number" id="fExpenses" step="0.01"></div>
+      </div>
+      <div class="field"><label>تێبینی</label><textarea id="fNotes" rows="2"></textarea></div>
+      <button class="btn btn-primary" id="fSaveBtn">پاشەکەوتکردن</button>
+    </div>
+    <div class="card">
+      <h2>سەرژمێری قازانج</h2>
+      <div class="grid cols-4" id="financeStats"></div>
+    </div>
+  </section>
+
+  <!-- ============== TAB: ROOMS ============== -->
+  <section id="tab-rooms" class="tab-section">
+    <div class="card">
+      <h2>زیادکردنی ژوور</h2>
+      <div class="grid cols-3">
+        <div class="field"><label>ژمارەی ژوور</label><input id="rNumber" placeholder="مثال: 101"></div>
+        <div class="field"><label>ئێوارە (سریر)</label>
+          <select id="rCapacity"><option value="3">٣ سریری</option><option value="4">٤ سریری</option><option value="5">٥ سریری</option></select>
+        </div>
+        <div class="field"><label>جۆری ژوور</label>
+          <select id="rGenderType"><option value="پیاو">پیاو</option><option value="ژن">ژن</option><option value="VIP">VIP</option></select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="rSaveBtn">زیادکردنی ژوور</button>
+    </div>
+    <div class="card">
+      <h2>دابەشکردنی ژوورەکان</h2>
+      <div class="grid cols-3" id="roomsGrid"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pagefoot no-print">سیستەمی گەشتی حەج و عومرە — هەموو مافەکان پارێزراون</footer>
+
+<script>
+/* ===================== Supabase Init ===================== */
+const SUPABASE_URL = "https://mjccxambuphyuzpdaoow.supabase.co";
+const SUPABASE_KEY = "sb_publishable_PG5N97j4zLgutokXK6qUFQ_Oj5BivQg";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ===================== State ===================== */
+let PILGRIMS = [], STAFF = [], ROOMS = [], SETTINGS = {price_with_services:0, price_without_services:0}, FINANCE = {bus_price:0, guide_price:0, expenses:0, notes:''};
+
+/* ===================== Tabs ===================== */
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ===================== Helpers ===================== */
+const fmt = n => (Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:0, maximumFractionDigits:2});
+function statusOf(p){
+  const due = Number(p.amount_due)||0, paid = Number(p.amount_paid)||0;
+  if(paid<=0) return 'unpaid';
+  if(paid>=due) return 'paid';
+  return 'partial';
+}
+function statusLabel(s){ return s==='paid' ? 'دراوە' : s==='partial' ? 'بەشێک دراوە' : 'نەدراوە'; }
+
+async function loadAll(){
+  const [{data:settings}, {data:pilgrims}, {data:staff}, {data:rooms}, {data:finance}] = await Promise.all([
+    sb.from('settings').select('*').eq('id',1).single(),
+    sb.from('pilgrims').select('*').order('created_at',{ascending:true}),
+    sb.from('staff').select('*').order('created_at',{ascending:true}),
+    sb.from('rooms').select('*').order('room_number',{ascending:true}),
+    sb.from('trip_finance').select('*').eq('id',1).single(),
+  ]);
+  if(settings) SETTINGS = settings;
+  PILGRIMS = pilgrims || [];
+  STAFF = staff || [];
+  ROOMS = rooms || [];
+  if(finance) FINANCE = finance;
+
+  document.getElementById('priceWith').value = SETTINGS.price_with_services ?? 0;
+  document.getElementById('priceWithout').value = SETTINGS.price_without_services ?? 0;
+  document.getElementById('fBus').value = FINANCE.bus_price ?? 0;
+  document.getElementById('fGuide').value = FINANCE.guide_price ?? 0;
+  document.getElementById('fExpenses').value = FINANCE.expenses ?? 0;
+  document.getElementById('fNotes').value = FINANCE.notes ?? '';
+
+  renderDashboard();
+  renderPilgrims();
+  renderStaff();
+  renderRooms();
+  renderFinance();
+}
+
+/* ===================== SETTINGS (prices) ===================== */
+document.getElementById('saveSettingsBtn').addEventListener('click', async ()=>{
+  const price_with_services = Number(document.getElementById('priceWith').value)||0;
+  const price_without_services = Number(document.getElementById('priceWithout').value)||0;
+  await sb.from('settings').update({price_with_services, price_without_services, updated_at:new Date().toISOString()}).eq('id',1);
+  SETTINGS = {price_with_services, price_without_services};
+  alert('نرخەکان پاشەکەوت کران');
+  loadAll();
+});
+
+/* ===================== PILGRIMS ===================== */
+function resetPilgrimForm(){
+  document.getElementById('pEditId').value='';
+  document.getElementById('pFullName').value='';
+  document.getElementById('pPhone').value='';
+  document.getElementById('pService').value='خدمات';
+  document.getElementById('pCategory').value='ئاسایی';
+  document.getElementById('pGender').value='پیاو';
+  document.getElementById('pPaid').value='0';
+  document.getElementById('pNotes').value='';
+  document.getElementById('formTitle').textContent='زیادکردنی گەشتیار';
+  document.getElementById('pSaveBtn').textContent='زیادکردن';
+  document.getElementById('pCancelEditBtn').style.display='none';
+}
+
+document.getElementById('pSaveBtn').addEventListener('click', async ()=>{
+  const full_name = document.getElementById('pFullName').value.trim();
+  if(!full_name){ alert('تکایە ناوی سیانی بنووسە'); return; }
+  const phone = document.getElementById('pPhone').value.trim();
+  const service_type = document.getElementById('pService').value;
+  const category = document.getElementById('pCategory').value;
+  const gender = document.getElementById('pGender').value;
+  const amount_paid = Number(document.getElementById('pPaid').value)||0;
+  const notes = document.getElementById('pNotes').value.trim();
+  const amount_due = service_type==='خدمات' ? Number(SETTINGS.price_with_services)||0 : Number(SETTINGS.price_without_services)||0;
+  const editId = document.getElementById('pEditId').value;
+
+  const payload = {full_name, phone, service_type, category, gender, amount_due, amount_paid, notes};
+
+  if(editId){
+    await sb.from('pilgrims').update(payload).eq('id', editId);
+  } else {
+    await sb.from('pilgrims').insert(payload);
+  }
+  resetPilgrimForm();
+  loadAll();
+});
+
+document.getElementById('pCancelEditBtn').addEventListener('click', resetPilgrimForm);
+
+document.getElementById('pSearch').addEventListener('input', renderPilgrims);
+document.getElementById('pFilterStatus').addEventListener('change', renderPilgrims);
+
+function renderPilgrims(){
+  const search = (document.getElementById('pSearch').value||'').trim();
+  const filterStatus = document.getElementById('pFilterStatus').value;
+  const body = document.getElementById('pilgrimsBody');
+  body.innerHTML = '';
+
+  let rows = PILGRIMS.filter(p=>{
+    const s = statusOf(p);
+    if(filterStatus && s!==filterStatus) return false;
+    if(search && !(`${p.full_name} ${p.phone||''}`.includes(search))) return false;
+    return true;
+  });
+
+  rows.forEach((p, idx)=>{
+    const due = Number(p.amount_due)||0, paid = Number(p.amount_paid)||0, remain = Math.max(due-paid,0);
+    const s = statusOf(p);
+    const room = ROOMS.find(r=>r.id===p.room_id);
+    const roomOptions = ROOMS.filter(r=>{
+      if(p.category==='VIP') return r.gender_type==='VIP';
+      return r.gender_type===p.gender;
+    }).map(r=>`<option value="${r.id}" ${p.room_id===r.id?'selected':''}>${r.room_number} (${r.capacity} سریری)</option>`).join('');
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td>${p.full_name}</td>
+      <td class="mono">${p.phone||'-'}</td>
+      <td>${p.service_type}</td>
+      <td>${p.category==='VIP'?'<span class="badge vip">VIP</span>':p.category==='مندال'?'<span class="badge child">مندال</span>':'ئاسایی'}</td>
+      <td>${p.gender}</td>
+      <td class="mono">${fmt(due)}</td>
+      <td class="mono">${fmt(paid)}</td>
+      <td class="mono">${fmt(remain)}</td>
+      <td><span class="badge ${s}">${statusLabel(s)}</span></td>
+      <td>
+        <select class="roomSelect no-print" data-id="${p.id}" style="min-width:120px;">
+          <option value="">— هیچ —</option>
+          ${roomOptions}
+        </select>
+      </td>
+      <td class="no-print">
+        <div class="row-actions">
+          <button class="btn btn-outline btn-sm editP" data-id="${p.id}">دەستکاری</button>
+          <button class="btn btn-danger btn-sm delP" data-id="${p.id}">سڕینەوە</button>
+        </div>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll('.editP').forEach(btn=>btn.addEventListener('click', ()=>{
+    const p = PILGRIMS.find(x=>x.id===btn.dataset.id);
+    if(!p) return;
+    document.getElementById('pEditId').value = p.id;
+    document.getElementById('pFullName').value = p.full_name;
+    document.getElementById('pPhone').value = p.phone||'';
+    document.getElementById('pService').value = p.service_type;
+    document.getElementById('pCategory').value = p.category;
+    document.getElementById('pGender').value = p.gender;
+    document.getElementById('pPaid').value = p.amount_paid;
+    document.getElementById('pNotes').value = p.notes||'';
+    document.getElementById('formTitle').textContent='دەستکاریکردنی گەشتیار';
+    document.getElementById('pSaveBtn').textContent='پاشەکەوتکردنی گۆڕانکاری';
+    document.getElementById('pCancelEditBtn').style.display='inline-flex';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }));
+
+  body.querySelectorAll('.delP').forEach(btn=>btn.addEventListener('click', async ()=>{
+    if(!confirm('دڵنیایت لە سڕینەوە؟')) return;
+    await sb.from('pilgrims').delete().eq('id', btn.dataset.id);
+    loadAll();
+  }));
+
+  body.querySelectorAll('.roomSelect').forEach(sel=>sel.addEventListener('change', async ()=>{
+    const room_id = sel.value || null;
+    await sb.from('pilgrims').update({room_id}).eq('id', sel.dataset.id);
+    loadAll();
+  }));
+}
+
+/* ===================== DASHBOARD ===================== */
+function renderDashboard(){
+  const total = PILGRIMS.length;
+  const withServices = PILGRIMS.filter(p=>p.service_type==='خدمات').length;
+  const withoutServices = PILGRIMS.filter(p=>p.service_type==='بێ خدمات').length;
+  const children = PILGRIMS.filter(p=>p.category==='مندال').length;
+  const vip = PILGRIMS.filter(p=>p.category==='VIP').length;
+  const men = PILGRIMS.filter(p=>p.gender==='پیاو').length;
+  const women = PILGRIMS.filter(p=>p.gender==='ژن').length;
+  const totalDue = PILGRIMS.reduce((s,p)=>s+(Number(p.amount_due)||0),0);
+  const totalPaid = PILGRIMS.reduce((s,p)=>s+(Number(p.amount_paid)||0),0);
+  const totalRemain = Math.max(totalDue-totalPaid,0);
+  const paidCount = PILGRIMS.filter(p=>statusOf(p)==='paid').length;
+  const unpaidCount = PILGRIMS.filter(p=>statusOf(p)==='unpaid').length;
+  const partialCount = PILGRIMS.filter(p=>statusOf(p)==='partial').length;
+
+  document.getElementById('dashStatsMain').innerHTML = `
+    ${stat('کۆی گشتی گەشتیاران', total)}
+    ${stat('کەسی دراوی تەواو', paidCount,'gold')}
+    ${stat('کەسی بەشێک دراوە', partialCount)}
+    ${stat('کەسی نەیداوە', unpaidCount,'danger')}
+  `;
+  document.getElementById('dashStatsMoney').innerHTML = `
+    ${stat('کۆی پارەی پێویست ($)', fmt(totalDue))}
+    ${stat('کۆی پارەی وەرگیراو ($)', fmt(totalPaid),'gold')}
+    ${stat('کۆی پارەی ماوە ($)', fmt(totalRemain),'danger')}
+    ${stat('نرخ (خدمات / بێ خدمات)', `${fmt(SETTINGS.price_with_services)} / ${fmt(SETTINGS.price_without_services)}`)}
+  `;
+  document.getElementById('dashStatsType').innerHTML = `
+    ${stat('خدمات', withServices)}
+    ${stat('بێ خدمات', withoutServices)}
+    ${stat('مندال', children)}
+    ${stat('VIP', vip,'gold')}
+  `;
+  document.getElementById('dashStatsGender').innerHTML = `
+    ${stat('پیاو', men)}
+    ${stat('ژن', women)}
+  `;
+
+  const unpaidBody = document.getElementById('dashUnpaidBody');
+  unpaidBody.innerHTML = '';
+  PILGRIMS.filter(p=>statusOf(p)!=='paid').forEach((p,idx)=>{
+    const due=Number(p.amount_due)||0, paid=Number(p.amount_paid)||0, remain=Math.max(due-paid,0);
+    unpaidBody.innerHTML += `<tr>
+      <td>${idx+1}</td><td>${p.full_name}</td><td class="mono">${p.phone||'-'}</td>
+      <td>${p.service_type}</td><td class="mono">${fmt(due)}</td><td class="mono">${fmt(paid)}</td><td class="mono">${fmt(remain)}</td>
+    </tr>`;
+  });
+  if(!PILGRIMS.some(p=>statusOf(p)!=='paid')){
+    unpaidBody.innerHTML = `<tr><td colspan="7" class="muted">هەموو کەسان پارەیان داوە ✅</td></tr>`;
+  }
+}
+function stat(label, value, cls=''){
+  return `<div class="stat ${cls}"><div class="label">${label}</div><div class="value">${value}</div></div>`;
+}
+
+/* ===================== STAFF ===================== */
+document.getElementById('sSaveBtn').addEventListener('click', async ()=>{
+  const full_name = document.getElementById('sFullName').value.trim();
+  if(!full_name){ alert('تکایە ناو بنووسە'); return; }
+  const phone = document.getElementById('sPhone').value.trim();
+  const role = document.getElementById('sRole').value;
+  await sb.from('staff').insert({full_name, phone, role});
+  document.getElementById('sFullName').value='';
+  document.getElementById('sPhone').value='';
+  loadAll();
+});
+
+function renderStaff(){
+  const roles = ['ڕێبەری گەشت','شۆفێری گەشت','مامۆستای ئاینی'];
+  const wrap = document.getElementById('staffColumns');
+  wrap.innerHTML = roles.map(role=>{
+    const list = STAFF.filter(s=>s.role===role);
+    return `<div class="card" style="margin-bottom:0;">
+      <h2>${role} <span class="muted">(${list.length})</span></h2>
+      <div class="table-wrap"><table><thead><tr><th>ناو</th><th>مۆبایل</th><th class="no-print">کردار</th></tr></thead>
+      <tbody>
+        ${list.map(s=>`<tr><td>${s.full_name}</td><td class="mono">${s.phone||'-'}</td>
+          <td class="no-print"><button class="btn btn-danger btn-sm delStaff" data-id="${s.id}">سڕینەوە</button></td></tr>`).join('') || `<tr><td colspan="3" class="muted">هیچ تۆمار نەکراوە</td></tr>`}
+      </tbody></table></div>
+    </div>`;
+  }).join('');
+
+  wrap.querySelectorAll('.delStaff').forEach(btn=>btn.addEventListener('click', async ()=>{
+    if(!confirm('دڵنیایت لە سڕینەوە؟')) return;
+    await sb.from('staff').delete().eq('id', btn.dataset.id);
+    loadAll();
+  }));
+}
+
+/* ===================== FINANCE ===================== */
+document.getElementById('fSaveBtn').addEventListener('click', async ()=>{
+  const bus_price = Number(document.getElementById('fBus').value)||0;
+  const guide_price = Number(document.getElementById('fGuide').value)||0;
+  const expenses = Number(document.getElementById('fExpenses').value)||0;
+  const notes = document.getElementById('fNotes').value.trim();
+  await sb.from('trip_finance').update({bus_price, guide_price, expenses, notes, updated_at:new Date().toISOString()}).eq('id',1);
+  FINANCE = {bus_price, guide_price, expenses, notes};
+  alert('پاشەکەوت کرا');
+  loadAll();
+});
+
+function renderFinance(){
+  const totalPaid = PILGRIMS.reduce((s,p)=>s+(Number(p.amount_paid)||0),0);
+  const totalDue = PILGRIMS.reduce((s,p)=>s+(Number(p.amount_due)||0),0);
+  const costs = (Number(FINANCE.bus_price)||0) + (Number(FINANCE.guide_price)||0) + (Number(FINANCE.expenses)||0);
+  const profitActual = totalPaid - costs;
+  const profitExpected = totalDue - costs;
+  document.getElementById('financeStats').innerHTML = `
+    ${stat('کۆی تێچوون ($)', fmt(costs),'danger')}
+    ${stat('کۆی وەرگیراو ($)', fmt(totalPaid),'gold')}
+    ${stat('قازانجی ئێستا ($)', fmt(profitActual), profitActual>=0?'gold':'danger')}
+    ${stat('قازانجی چاوەڕوانکراو ($)', fmt(profitExpected), profitExpected>=0?'':'danger')}
+  `;
+}
+
+/* ===================== ROOMS ===================== */
+document.getElementById('rSaveBtn').addEventListener('click', async ()=>{
+  const room_number = document.getElementById('rNumber').value.trim();
+  if(!room_number){ alert('تکایە ژمارەی ژوور بنووسە'); return; }
+  const capacity = Number(document.getElementById('rCapacity').value);
+  const gender_type = document.getElementById('rGenderType').value;
+  await sb.from('rooms').insert({room_number, capacity, gender_type});
+  document.getElementById('rNumber').value='';
+  loadAll();
+});
+
+function renderRooms(){
+  const wrap = document.getElementById('roomsGrid');
+  wrap.innerHTML = '';
+  ROOMS.forEach(r=>{
+    const occupants = PILGRIMS.filter(p=>p.room_id===r.id);
+    const pct = Math.min(100, Math.round((occupants.length / r.capacity) * 100));
+    const full = occupants.length >= r.capacity;
+    const div = document.createElement('div');
+    div.className = 'room-card' + (full?' full':'');
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>ژوور ${r.room_number}</strong>
+        <span class="badge ${r.gender_type==='VIP'?'vip':''}" style="background:var(--panel); border:1px solid var(--border);">${r.gender_type}</span>
+      </div>
+      <div class="muted">${occupants.length} / ${r.capacity} سریری</div>
+      <div class="fill-bar"><div style="width:${pct}%"></div></div>
+      <ul>${occupants.map(o=>`<li>${o.full_name}</li>`).join('') || '<li class="muted">بەتاڵ</li>'}</ul>
+      <button class="btn btn-danger btn-sm no-print delRoom" data-id="${r.id}" style="margin-top:8px;">سڕینەوەی ژوور</button>
+    `;
+    wrap.appendChild(div);
+  });
+  wrap.querySelectorAll('.delRoom').forEach(btn=>btn.addEventListener('click', async ()=>{
+    if(!confirm('دڵنیایت لە سڕینەوەی ژوور؟')) return;
+    await sb.from('rooms').delete().eq('id', btn.dataset.id);
+    loadAll();
+  }));
+}
+
+/* ===================== EXPORT / PRINT ===================== */
+document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+
+document.getElementById('exportExcelBtn').addEventListener('click', ()=>{
+  const wb = XLSX.utils.book_new();
+
+  const pRows = PILGRIMS.map((p,i)=>({
+    '#': i+1, 'ناوی سیانی': p.full_name, 'مۆبایل': p.phone,
+    'خزمەت گوزاری': p.service_type, 'جۆر': p.category, 'ڕەگەز': p.gender,
+    'پێویست': p.amount_due, 'دراوە': p.amount_paid,
+    'ماوە': Math.max((p.amount_due||0)-(p.amount_paid||0),0),
+    'دۆخ': statusLabel(statusOf(p)),
+    'ژوور': (ROOMS.find(r=>r.id===p.room_id)||{}).room_number || ''
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pRows), 'گەشتیاران');
+
+  const sRows = STAFF.map((s,i)=>({'#':i+1, 'ناو':s.full_name, 'مۆبایل':s.phone, 'ڕۆڵ':s.role}));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sRows), 'ستاف');
+
+  const rRows = ROOMS.map((r,i)=>({
+    '#':i+1, 'ژمارەی ژوور':r.room_number, 'کاپاسیتی':r.capacity, 'جۆر':r.gender_type,
+    'ژمارەی نیشتەجێ': PILGRIMS.filter(p=>p.room_id===r.id).length
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rRows), 'ژوورەکان');
+
+  const totalDue = PILGRIMS.reduce((s,p)=>s+(Number(p.amount_due)||0),0);
+  const totalPaid = PILGRIMS.reduce((s,p)=>s+(Number(p.amount_paid)||0),0);
+  const costs = (Number(FINANCE.bus_price)||0)+(Number(FINANCE.guide_price)||0)+(Number(FINANCE.expenses)||0);
+  const summaryRows = [
+    {'بابەت':'کۆی گشتی گەشتیاران','بڕ':PILGRIMS.length},
+    {'بابەت':'خدمات','بڕ':PILGRIMS.filter(p=>p.service_type==='خدمات').length},
+    {'بابەت':'بێ خدمات','بڕ':PILGRIMS.filter(p=>p.service_type==='بێ خدمات').length},
+    {'بابەت':'مندال','بڕ':PILGRIMS.filter(p=>p.category==='مندال').length},
+    {'بابەت':'VIP','بڕ':PILGRIMS.filter(p=>p.category==='VIP').length},
+    {'بابەت':'پیاو','بڕ':PILGRIMS.filter(p=>p.gender==='پیاو').length},
+    {'بابەت':'ژن','بڕ':PILGRIMS.filter(p=>p.gender==='ژن').length},
+    {'بابەت':'کۆی پارەی پێویست','بڕ':totalDue},
+    {'بابەت':'کۆی پارەی وەرگیراو','بڕ':totalPaid},
+    {'بابەت':'کۆی پارەی ماوە','بڕ':Math.max(totalDue-totalPaid,0)},
+    {'بابەت':'نرخی پاس','بڕ':FINANCE.bus_price},
+    {'بابەت':'نرخی ڕێبەری گەشت','بڕ':FINANCE.guide_price},
+    {'بابەت':'مەسروفات','بڕ':FINANCE.expenses},
+    {'بابەت':'کۆی تێچوون','بڕ':costs},
+    {'بابەت':'قازانجی ئێستا','بڕ':totalPaid-costs},
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), 'پوختە');
+
+  XLSX.writeFile(wb, `گەشتی_حەج_عومرە_${new Date().toISOString().slice(0,10)}.xlsx`);
+});
+
+/* ===================== Init ===================== */
+loadAll().catch(err=>{
+  console.error(err);
+  alert('کێشەیەک هەیە لە پەیوەندیکردن بە Supabase — تکایە دڵنیابەرەوە لە جدوڵەکان (schema.sql) دروستکراون.');
+});
+</script>
+</body>
+</html>
