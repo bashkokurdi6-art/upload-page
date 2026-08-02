@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>چەرخی دیاری عومرە | سروشتی عەرەفە</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root{
+    --teal-deep:   #0e6b66;
+    --teal-dark:   #073b38;
+    --teal-mid:    #12817b;
+    --gold:        #d4af37;
+    --gold-light:  #f0d377;
+    --gold-dark:   #a8791f;
+    --cream:       #fdf8ec;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(212,175,55,0.10), transparent 55%),
+      var(--teal-dark);
+    color:var(--cream);
+    font-family:'Tajawal', sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 30px 16px 50px;
+  }
+
+  .logo{
+    width:88px; height:88px;
+    border-radius:50%;
+    margin-bottom:10px;
+    box-shadow:0 0 0 3px var(--gold), 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .brand-en{
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--gold-light);
+    margin-bottom:2px;
+  }
+
+  h1{
+    font-family:'Amiri', serif;
+    font-size:28px;
+    text-align:center;
+    color:var(--cream);
+    margin-bottom:4px;
+  }
+
+  .sub{
+    font-size:13px;
+    color:rgba(253,248,236,0.6);
+    text-align:center;
+    margin-bottom:26px;
+  }
+
+  /* ---------- wheel ---------- */
+  .wheel-frame{
+    position:relative;
+    width:min(360px, 86vw);
+    aspect-ratio:1/1;
+    margin-bottom:22px;
+  }
+
+  /* outer decorative gold ring, echoing the logo's border */
+  .wheel-frame::before{
+    content:"";
+    position:absolute;
+    inset:-14px;
+    border-radius:50%;
+    border:3px solid var(--gold);
+    background:
+      repeating-conic-gradient(var(--gold-light) 0deg 4deg, transparent 4deg 18deg);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #000 calc(100% - 9px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 10px), #000 calc(100% - 9px));
+    opacity:0.85;
+  }
+
+  .pointer{
+    position:absolute;
+    top:-22px; left:50%;
+    transform:translateX(-50%);
+    font-size:34px;
+    color:var(--gold-light);
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+    z-index:5;
+  }
+
+  .wheel-wrap{
+    width:100%; height:100%;
+    border-radius:50%;
+    overflow:hidden;
+    box-shadow:0 0 0 4px var(--teal-dark), 0 0 0 7px var(--gold), 0 14px 40px rgba(0,0,0,0.55);
+  }
+
+  #wheelCanvas{ display:block; width:100%; height:100%; }
+
+  .spins-count{
+    font-size:13px;
+    color:rgba(253,248,236,0.65);
+    margin-bottom:16px;
+    text-align:center;
+  }
+  .spins-count b{ color:var(--gold-light); }
+
+  button#spinBtn{
+    display:block;
+    width:min(360px,86vw);
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(180deg, var(--gold-light), var(--gold));
+    color:var(--teal-dark);
+    font-family:'Tajawal', sans-serif;
+    font-weight:900;
+    font-size:16.5px;
+    letter-spacing:0.5px;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(212,175,55,0.25);
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  button#spinBtn:hover:not(:disabled){ transform:translateY(-1px); }
+  button#spinBtn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .msg{
+    margin-top:12px;
+    font-size:13px;
+    text-align:center;
+    color:rgba(253,248,236,0.55);
+  }
+  .msg.error{ color:#e08a8a; }
+
+  /* ---------- winners board ---------- */
+  .board{
+    width:min(460px,92vw);
+    margin-top:34px;
+  }
+
+  .board-title{
+    font-family:'Amiri', serif;
+    font-size:19px;
+    text-align:center;
+    color:var(--gold-light);
+    margin-bottom:14px;
+  }
+
+  .winner-card{
+    position:relative;
+    background:linear-gradient(180deg, var(--teal-mid), var(--teal-deep));
+    border:1.5px solid var(--gold);
+    border-radius:12px;
+    padding:14px 44px 14px 16px;
+    margin-bottom:12px;
+    animation:pop .35s ease;
+  }
+
+  @keyframes pop{ from{opacity:0; transform:scale(0.94);} to{opacity:1; transform:scale(1);} }
+
+  .winner-card .name{
+    font-family:'Amiri', serif;
+    font-size:18px;
+    color:var(--cream);
+    margin-bottom:6px;
+  }
+
+  .winner-card .meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 16px;
+    font-size:12.5px;
+    color:rgba(253,248,236,0.75);
+  }
+
+  .winner-card .meta span{ display:flex; align-items:center; gap:4px; }
+  .winner-card .meta .phone{ direction:ltr; }
+
+  .winner-card .delete-btn{
+    position:absolute;
+    top:10px; left:10px;
+    width:26px; height:26px;
+    border:none;
+    border-radius:50%;
+    background:rgba(0,0,0,0.25);
+    color:var(--gold-light);
+    font-size:15px;
+    line-height:1;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .15s ease;
+  }
+  .winner-card .delete-btn:hover{ background:rgba(0,0,0,0.45); }
+
+  .board-empty{
+    text-align:center;
+    font-size:12.5px;
+    color:rgba(253,248,236,0.4);
+  }
+
+  footer{
+    margin-top:30px;
+    font-size:11px;
+    color:rgba(253,248,236,0.3);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+
+  <img src="logo.png" alt="سروشتی عەرەفە" class="logo">
+  <div class="brand-en">SRUSHT E ARAFA COMPANY</div>
+  <h1>چەرخی دیاری عومرە</h1>
+  <div class="sub">چەرخەکە بسوڕێنە و براوە دیاری بکە — تا ٣ جار</div>
+
+  <div class="wheel-frame">
+    <div class="pointer">▼</div>
+    <div class="wheel-wrap">
+      <canvas id="wheelCanvas" width="360" height="360"></canvas>
+    </div>
+  </div>
+
+  <div class="spins-count">هەڵبژاردنی بەکارهاتوو: <b id="spinsUsedText">0</b> / ٣</div>
+
+  <button id="spinBtn" disabled>🎡 سووڕاندنی چەرخ</button>
+  <div class="msg" id="statusMsg">چاوەڕێی هێنانی ناوەکان...</div>
+
+  <div class="board">
+    <div class="board-title">🏆 براوەکان</div>
+    <div id="winnersList">
+      <div class="board-empty" id="boardEmpty">هێشتا براوەیەک دیاری نەکراوە</div>
+    </div>
+  </div>
+
+  <footer>پڕۆژەی دیاری عومرە — سروشتی عەرەفە © 2026</footer>
+
+<script>
+  const SUPABASE_URL = "https://mjccxambuphyuzpdaoow.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_PG5N97j4zLgutokXK6qUFQ_Oj5BivQg";
+  const TABLE_NAME = "registrations"; // ئەگەر ناوی خشتەکەت جیاوازە، لێرە بیگۆڕە
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+  const wheelWrap = document.querySelector('.wheel-wrap');
+  const spinBtn = document.getElementById('spinBtn');
+  const spinsUsedText = document.getElementById('spinsUsedText');
+  const statusMsg = document.getElementById('statusMsg');
+  const winnersList = document.getElementById('winnersList');
+  const boardEmpty = document.getElementById('boardEmpty');
+
+  const MAX_SPINS = 3;
+  let pool = [];
+  let spinsUsed = 0;
+  let spinning = false;
+
+  const segmentColors = ['#12817b', '#0a4f4c'];
+
+  function drawWheel(items){
+    const size = canvas.width;
+    const center = size/2;
+    const radius = center - 4;
+    ctx.clearRect(0,0,size,size);
+
+    if(items.length === 0){
+      ctx.fillStyle = '#0a4f4c';
+      ctx.beginPath();
+      ctx.arc(center,center,radius,0,Math.PI*2);
+      ctx.fill();
+      return;
+    }
+
+    const anglePer = (Math.PI*2)/items.length;
+
+    items.forEach((item, i)=>{
+      const start = i*anglePer;
+      const end = start+anglePer;
+
+      ctx.beginPath();
+      ctx.moveTo(center,center);
+      ctx.arc(center,center,radius,start,end);
+      ctx.closePath();
+      ctx.fillStyle = segmentColors[i % 2];
+      ctx.fill();
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(center,center);
+      ctx.rotate(start + anglePer/2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fdf8ec';
+      ctx.font = "600 13px Tajawal, sans-serif";
+      let label = item.full_name || '';
+      if(label.length > 13) label = label.slice(0,12) + '…';
+      ctx.fillText(label, radius - 16, 5);
+      ctx.restore();
+    });
+
+    // hub
+    ctx.beginPath();
+    ctx.arc(center,center,20,0,Math.PI*2);
+    ctx.fillStyle = '#d4af37';
+    ctx.fill();
+    ctx.strokeStyle = '#fdf8ec';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  function addWinnerCard(winner){
+    boardEmpty.style.display = 'none';
+
+    const card = document.createElement('div');
+    card.className = 'winner-card';
+    card.innerHTML = `
+      <button class="delete-btn" title="سڕینەوە">×</button>
+      <div class="name">${winner.full_name || ''}</div>
+      <div class="meta">
+        <span>🏙️ ${winner.city || ''}</span>
+        <span class="phone">📱 ${winner.phone || ''}</span>
+      </div>
+    `;
+
+    card.querySelector('.delete-btn').addEventListener('click', ()=>{
+      card.remove();
+      if(winnersList.querySelectorAll('.winner-card').length === 0){
+        boardEmpty.style.display = 'block';
+      }
+    });
+
+    winnersList.prepend(card);
+  }
+
+  function spin(){
+    if(spinning || spinsUsed >= MAX_SPINS || pool.length === 0) return;
+    spinning = true;
+    spinBtn.disabled = true;
+    statusMsg.textContent = '';
+
+    const n = pool.length;
+    const winnerIndex = Math.floor(Math.random() * n);
+    const winner = pool[winnerIndex];
+    const anglePerDeg = 360 / n;
+    const segCenterDeg = winnerIndex * anglePerDeg + anglePerDeg / 2;
+
+    // پۆینتەر لە سەرەوە (٢٧٠ پلە بەپێی چوارچێوەی canvas)
+    let rotNeeded = (270 - segCenterDeg) % 360;
+    if (rotNeeded < 0) rotNeeded += 360;
+
+    const fullTurns = 5 * 360;
+    const totalRotation = fullTurns + rotNeeded;
+
+    wheelWrap.style.transition = 'none';
+    wheelWrap.style.transform = 'rotate(0deg)';
+    void wheelWrap.offsetWidth; // force reflow
+    wheelWrap.style.transition = 'transform 4.4s cubic-bezier(0.12,0.68,0.16,1)';
+    wheelWrap.style.transform = `rotate(${totalRotation}deg)`;
+
+    setTimeout(()=>{
+      spinsUsed++;
+      spinsUsedText.textContent = spinsUsed;
+
+      addWinnerCard(winner);
+      pool.splice(winnerIndex, 1);
+      drawWheel(pool);
+
+      spinning = false;
+
+      if(spinsUsed >= MAX_SPINS){
+        spinBtn.disabled = true;
+        spinBtn.textContent = 'کۆتایی بە ٣ هەڵبژاردنەکە هات';
+      } else if(pool.length === 0){
+        spinBtn.disabled = true;
+        spinBtn.textContent = 'هیچ ناوێکی دیکە نەماوە';
+      } else {
+        spinBtn.disabled = false;
+      }
+    }, 4500);
+  }
+
+  async function loadRecords(){
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('*');
+
+    if(error){
+      statusMsg.textContent = 'هەڵە لە هێنانی داتاکان: ' + error.message;
+      statusMsg.classList.add('error');
+      return;
+    }
+
+    pool = data || [];
+    drawWheel(pool);
+
+    if(pool.length === 0){
+      statusMsg.textContent = 'هیچ ناوێک تۆمار نەکراوە';
+    } else {
+      statusMsg.textContent = `${pool.length} کەس ئامادەن بۆ چەرخ`;
+      spinBtn.disabled = false;
+    }
+  }
+
+  spinBtn.addEventListener('click', spin);
+  loadRecords();
+</script>
+
+</body>
+</html>
