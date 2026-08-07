@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خدمة زيارة الروضة الشريفة</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@600;700;900&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --emerald-950:#0a2e24;
+  --emerald-800:#0f4a38;
+  --emerald-700:#146349;
+  --gold-500:#c9a24a;
+  --gold-300:#e6cd8a;
+  --cream-50:#faf6ea;
+  --cream-100:#f3ecd8;
+  --ink:#17332a;
+  --muted:#6b7a72;
+  --danger:#c14545;
+  --ok:#1f9d63;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Noto Sans Arabic',Tahoma,Arial,sans-serif!important;
+}
+
+body{
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(8,38,28,.86),rgba(8,38,28,.90)),
+    url("Rawdah.png") center/cover fixed no-repeat;
+  background-color:var(--emerald-950);
+  color:var(--ink);
+  padding:16px 14px 40px;
+  direction:rtl;
+}
+
+.container{
+  max-width:480px;
+  margin:auto;
+}
+
+/* ---------- header ---------- */
+.header{
+  text-align:center;
+  padding:6px 0 20px;
+}
+.header .dome{ font-size:34px; }
+.profile-photo{
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  margin:10px auto 4px;
+  border:3px solid var(--gold-500);
+  box-shadow:0 8px 22px rgba(0,0,0,.35), 0 0 0 5px rgba(230,205,138,.18);
+  object-fit:cover;
+  display:block;
+  background:var(--emerald-800);
+}
+.header h1{
+  font-family:'Noto Kufi Arabic',sans-serif;
+  color:var(--cream-50);
+  font-size:21px;
+  font-weight:900;
+  margin-top:6px;
+}
+.header p{
+  color:var(--gold-300);
+  font-size:12.5px;
+  font-weight:600;
+  margin-top:5px;
+}
+
+/* ---------- stepper ---------- */
+.stepper{
+  display:flex; align-items:flex-start; justify-content:center;
+  gap:4px; margin-bottom:18px;
+}
+.step{ display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; max-width:110px; }
+.step-circle{
+  width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800;
+  border:2px solid var(--gold-500);
+  background:rgba(255,255,255,.08); color:var(--gold-300);
+}
+.step.active .step-circle{ background:var(--gold-500); color:var(--emerald-950); }
+.step-label{ font-size:10.5px; color:var(--gold-300); font-weight:600; opacity:.85; }
+.step-line{ height:2px; flex:1; background:rgba(230,205,138,.35); margin-top:12px; }
+
+/* ---------- cards ---------- */
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.05));
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1.5px solid rgba(230,205,138,.55);
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 12px 32px rgba(0,0,0,.30);
+}
+
+.card-title{
+  display:flex; align-items:center; gap:8px;
+  font-size:15px; font-weight:800; color:var(--gold-300);
+  margin-bottom:14px;
+}
+.card-title .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold-500); }
+
+/* ---------- price ---------- */
+.price-card{ text-align:center; }
+.price-title{ color:var(--gold-300); font-weight:700; font-size:13.5px; }
+.price{
+  font-size:32px; color:#fff; font-weight:900; margin-top:6px;
+  text-shadow:0 3px 10px rgba(0,0,0,.4);
+}
+.price-note{
+  font-size:11px; color:rgba(250,246,234,.75); margin-top:8px; line-height:1.7;
+}
+
+.spinner{
+  display:inline-block;
+  width:22px; height:22px;
+  border:3px solid rgba(230,205,138,.3);
+  border-top-color:var(--gold-300);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  vertical-align:middle;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.pay-number.loading{
+  color:rgba(15,74,56,.6);
+  font-style:italic;
+}
+
+/* ---------- fields ---------- */
+.field{ margin-bottom:12px; }
+.field label{
+  display:block; font-size:12.5px; font-weight:800;
+  color:var(--gold-300); margin-bottom:6px;
+}
+input,select,textarea,.fake-input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1.5px solid rgba(230,205,138,.6);
+  outline:none;
+  background:rgba(250,246,234,.95);
+  font-size:14px;
+  font-weight:600;
+  direction:rtl;
+  text-align:right;
+  color:var(--ink);
+  transition:border-color .15s, box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--gold-500);
+  box-shadow:0 0 0 3px rgba(201,162,74,.28);
+  background:#fff;
+}
+textarea{ min-height:70px; resize:none; }
+
+input.invalid{
+  border-color:var(--danger);
+  box-shadow:0 0 0 3px rgba(193,69,69,.22);
+}
+.field-error{
+  display:none;
+  font-size:11px;
+  color:#ffb3b3;
+  font-weight:700;
+  margin-top:5px;
+}
+.field-error.show{ display:block; }
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.full{ grid-column:1/-1; }
+
+.fake-input{
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:700;
+  color:var(--emerald-800);
+}
+.fake-input:active{ transform:scale(.98); }
+
+/* ---------- payment ---------- */
+.payments{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+.pay{
+  padding:12px 5px;
+  border-radius:14px;
+  font-weight:800;
+  text-align:center;
+  cursor:pointer;
+  border:2px solid transparent;
+  font-size:12.5px;
+  color:#fff;
+  position:relative;
+  box-shadow:0 6px 14px rgba(0,0,0,.22);
+  transition:transform .1s, border-color .15s;
+}
+.pay:active{ transform:scale(.96); }
+.fastpay{background:#c14545}
+.fib{background:#0e7a4d}
+.qicard{background:#c9962b}
+.pay.active{
+  border-color:var(--gold-300);
+  box-shadow:0 0 0 3px rgba(230,205,138,.35);
+}
+.pay.active::after{
+  content:"✓";
+  position:absolute; top:-8px; left:-8px;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--gold-300); color:var(--emerald-950);
+  font-size:11px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.pay-number{
+  margin-top:10px;
+  background:rgba(250,246,234,.95);
+  border:1.5px dashed var(--gold-500);
+  border-radius:14px;
+  padding:12px;
+  text-align:center;
+  font-weight:800;
+  font-size:13px;
+  color:var(--emerald-800);
+}
+
+/* ---------- uploads ---------- */
+.file-box input{ display:none; }
+.file-label{
+  width:100%;
+  min-height:48px;
+  border-radius:14px;
+  border:1.5px dashed rgba(230,205,138,.7);
+  background:rgba(250,246,234,.12);
+  color:var(--gold-300);
+  font-weight:700;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  cursor:pointer;
+  transition:background .15s, border-color .15s;
+}
+.file-label:hover{ background:rgba(250,246,234,.2); border-color:var(--gold-500); }
+.file-label.done{
+  color:var(--emerald-800);
+  background:rgba(250,246,234,.95);
+  border-style:solid;
+  border-color:var(--ok);
+}
+.preview{
+  width:100%;
+  max-height:170px;
+  object-fit:cover;
+  border-radius:14px;
+  margin-top:8px;
+  display:none;
+  border:2px solid var(--gold-500);
+}
+
+/* ---------- trust row ---------- */
+.trust-row{
+  display:flex; align-items:center; gap:10px;
+  margin-top:6px; padding:11px 13px;
+  background:rgba(250,246,234,.10);
+  border:1px solid rgba(230,205,138,.35);
+  border-radius:14px;
+}
+.trust-row .ic{ font-size:16px; }
+.trust-row .txt{ font-size:11px; color:rgba(250,246,234,.85); font-weight:600; line-height:1.6; }
+
+/* ---------- submit ---------- */
+button.submit{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--gold-500),#a9822f);
+  color:var(--emerald-950);
+  font-size:15.5px;
+  font-weight:900;
+  margin-top:16px;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(201,162,74,.35);
+  transition:transform .12s;
+}
+button.submit:hover{ transform:translateY(-2px); }
+button.submit:active{ transform:scale(.98); }
+button.submit:disabled{ opacity:.6; cursor:default; transform:none; }
+
+.msg{
+  text-align:center;
+  margin-top:12px;
+  font-weight:800;
+  font-size:13px;
+  color:#fff;
+}
+
+.footer-note{
+  text-align:center; font-size:11px; color:rgba(250,246,234,.6);
+  margin-top:8px; line-height:1.8;
+}
+
+/* ---------- social icons ---------- */
+.social-row{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+  margin-top:16px;
+}
+.social-icon{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid var(--gold-300);
+  box-shadow:0 6px 16px rgba(0,0,0,.28);
+  transition:transform .12s, box-shadow .12s;
+  text-decoration:none;
+  overflow:hidden;
+}
+.social-icon:active{ transform:scale(.92); }
+.social-icon svg{ width:24px; height:24px; }
+.social-icon.facebook{ background:#1877F2; }
+.social-icon.facebook svg{ fill:#fff; }
+.social-icon.tiktok{ background:#000; }
+.social-icon.whatsapp{ background:#25D366; }
+.social-icon.whatsapp svg{ fill:#fff; }
+.social-icon.profile{
+  padding:0;
+  border-color:var(--gold-500);
+}
+.social-icon.profile img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* ---------- popup ---------- */
+.popup{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.62);
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+.popup-card{
+  width:100%;
+  max-width:360px;
+  background:linear-gradient(155deg,var(--emerald-800),var(--emerald-950));
+  border:1.5px solid var(--gold-500);
+  border-radius:24px;
+  padding:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.55);
+  text-align:center;
+}
+.popup-card h3{
+  font-family:'Noto Kufi Arabic',sans-serif;
+  color:var(--gold-300);
+  font-size:16px;
+  margin-bottom:14px;
+}
+.popup-card.wide{ max-width:420px; text-align:right; }
+.popup-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+.popup-grid select{
+  height:50px;
+  text-align:center;
+  font-size:14px;
+  font-weight:700;
+  padding:6px;
+}
+button.close-btn{
+  background:transparent;
+  border:1.5px solid rgba(255,255,255,.3);
+  color:rgba(255,255,255,.8);
+  margin-top:8px;
+  box-shadow:none;
+}
+
+/* ---------- prayer / slot picker ---------- */
+.prayer-tabs{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  margin-bottom:12px;
+}
+.prayer-tabs::-webkit-scrollbar{ height:4px; }
+.prayer-tab{
+  flex:0 0 auto;
+  min-width:72px;
+  padding:10px 8px;
+  border-radius:14px;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(230,205,138,.4);
+  color:var(--gold-300);
+  text-align:center;
+  cursor:pointer;
+  transition:background .15s, border-color .15s, transform .1s;
+}
+.prayer-tab:active{ transform:scale(.96); }
+.prayer-tab .ic{ font-size:18px; display:block; margin-bottom:4px; }
+.prayer-tab .lb{ font-size:11px; font-weight:800; }
+.prayer-tab.active{
+  background:var(--gold-500);
+  color:var(--emerald-950);
+  border-color:var(--gold-500);
+}
+
+.prayer-range{
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  color:rgba(250,246,234,.8);
+  margin-bottom:4px;
+}
+.prayer-audience{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--gold-300);
+  margin-bottom:12px;
+}
+
+.slots-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  max-height:250px;
+  overflow-y:auto;
+  margin-bottom:10px;
+  padding:2px;
+}
+.slot-btn{
+  position:relative;
+  padding:11px 4px;
+  border-radius:12px;
+  background:rgba(250,246,234,.95);
+  border:1.5px solid rgba(230,205,138,.5);
+  color:var(--emerald-800);
+  font-weight:800;
+  font-size:12.5px;
+  text-align:center;
+  cursor:pointer;
+  transition:transform .1s, background .15s, border-color .15s;
+}
+.slot-btn:active{ transform:scale(.95); }
+.slot-btn.full{
+  opacity:.45;
+  pointer-events:none;
+  background:rgba(250,246,234,.5);
+}
+.slot-btn.full::after{
+  content:"⏳";
+  position:absolute;
+  top:-6px; left:-6px;
+  font-size:11px;
+}
+.slot-btn.selected{
+  background:var(--ok);
+  color:#fff;
+  border-color:var(--ok);
+}
+.slot-btn.selected::before{
+  content:"✓";
+  position:absolute;
+  top:-7px; right:-7px;
+  width:16px; height:16px;
+  border-radius:50%;
+  background:var(--gold-300);
+  color:var(--emerald-950);
+  font-size:10px;
+  font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+}
+.slots-empty{
+  grid-column:1/-1;
+  text-align:center;
+  font-size:12px;
+  font-weight:600;
+  color:rgba(250,246,234,.6);
+  padding:20px 0;
+}
+.time-summary{
+  text-align:center;
+  font-size:12.5px;
+  font-weight:800;
+  color:var(--cream-50);
+  background:rgba(255,255,255,.08);
+  border:1px dashed rgba(230,205,138,.5);
+  border-radius:12px;
+  padding:9px;
+  margin-bottom:4px;
+}
+
+@media(max-width:380px){
+  body{padding:12px}
+  .card{padding:14px}
+  .header h1{font-size:18px}
+  input,select,textarea,.fake-input{font-size:13px;padding:10px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <img src="1786140198689.png" alt="الصورة الشخصية" class="profile-photo">
+    <h1>خدمة حجز زيارة الروضة الشريفة</h1>
+    <p>المصطفى لحجوزات الروضة الشريفة</p>
+     <p>٠٧٨٢٤٨٥٩٦٠٤</p>
+  </div>
+
+  <div class="stepper">
+    <div class="step active">
+      <div class="step-circle">١</div>
+      <div class="step-label">المعلومات</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">٢</div>
+      <div class="step-label">الدفع</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">٣</div>
+      <div class="step-label">التأكيد</div>
+    </div>
+  </div>
+
+  <div class="card price-card">
+    <div class="price-title">سعر الخدمة</div>
+    <div class="price" id="priceBox"><span class="spinner"></span></div>
+    <div class="price-note">هذا السعر لخدمة التسجيل وتحديد موعد الزيارة. بعد تأكيد الدفع، سيصلك رسالة تأكيد.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> نموذج تعبئة المعلومات</div>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>الاسم الثلاثي</label>
+        <input id="fullName" type="text" placeholder="اكتب الاسم الكامل">
+      </div>
+
+      <div class="field">
+        <label>رقم الموبايل</label>
+        <input id="mobile" type="tel" placeholder="0750xxxxxxx" maxlength="11" inputmode="numeric">
+        <div class="field-error" id="mobileError">رقم الموبايل غير صحيح (مثال: 07701234567)</div>
+      </div>
+
+      <div class="field">
+        <label>التاريخ</label>
+        <div class="fake-input" onclick="openDatePopup()" id="dateText">اختر التاريخ</div>
+      </div>
+
+      <div class="field">
+        <label>الوقت</label>
+        <div class="fake-input" onclick="openTimePopup()" id="timeText">اختر الوقت</div>
+      </div>
+
+      <div class="field full">
+        <label>الجنس</label>
+        <select id="gender">
+          <option value="">اختر</option>
+          <option value="ذكر">👨 ذكر</option>
+          <option value="أنثى">👩 أنثى</option>
+        </select>
+      </div>
+
+      <div class="field full file-box">
+        <label>صورة الفيزا</label>
+        <label class="file-label" for="visaImg" id="visaLabel">📷 ارفع صورة</label>
+        <input id="visaImg" type="file" accept="image/*">
+        <img id="visaPreview" class="preview">
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> الدفع</div>
+
+    <div class="field">
+      <label>اختر طريقة الدفع</label>
+      <div class="payments">
+        <div class="pay fastpay" onclick="selectPay('fastpay',this)">FastPay</div>
+        <div class="pay fib" onclick="selectPay('fib',this)">FIB</div>
+        <div class="pay qicard" onclick="selectPay('qicard',this)">QiCard</div>
+      </div>
+      <div class="pay-number" id="payNumber">رقم الدفع سيظهر هنا</div>
+    </div>
+
+    <div class="field file-box">
+      <label>صورة الدفع</label>
+      <label class="file-label" for="paymentImg" id="paymentLabel">📷 ارفع صورة</label>
+      <input id="paymentImg" type="file" accept="image/*">
+      <img id="paymentPreview" class="preview">
+    </div>
+
+    <div class="field">
+      <label>ملاحظة (اختياري)</label>
+      <textarea id="note" placeholder="اكتب ملاحظتك..."></textarea>
+    </div>
+
+    <div class="trust-row">
+      <div class="ic">🔒</div>
+      <div class="txt">يتم حفظ معلوماتك بأمان. لأي استفسار تواصل معنا عبر واتساب.</div>
+    </div>
+
+    <button class="submit" id="sendBtn" onclick="sendRequest()">🕌 إرسال الطلب</button>
+    <div class="msg" id="msg"></div>
+
+    <div class="social-row">
+      <span class="social-icon profile" aria-label="الصورة الشخصية">
+        <img src="Bashko.png" alt="الصورة الشخصية">
+      </span>
+      <a href="https://www.facebook.com/share/17zrRTrWvZ/" target="_blank" rel="noopener" class="social-icon facebook" aria-label="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>
+      </a>
+      <a href="https://tiktok.com/@haji..basher" target="_blank" rel="noopener" class="social-icon tiktok" aria-label="TikTok">
+        <svg viewBox="0 0 24 24">
+          <path fill="#25F4EE" d="M17.1 6.32c-.75-.68-1.2-1.65-1.25-2.72h-2.4v12.62c0 1.4-1.14 2.54-2.54 2.54a2.54 2.54 0 0 1-2.54-2.54c0-1.4 1.14-2.53 2.54-2.53.22 0 .43.03.63.08V11.2a5.1 5.1 0 0 0-.63-.04c-2.73 0-4.94 2.21-4.94 4.93s2.21 4.94 4.94 4.94 4.94-2.22 4.94-4.94V9.1a7.4 7.4 0 0 0 4.1 1.24V7.87a4.94 4.94 0 0 1-2.85-1.55z" transform="translate(-.35,-.35)"/>
+          <path fill="#FE2C55" d="M17.45 6.67c-.75-.68-1.2-1.65-1.25-2.72h-2.4v12.62c0 1.4-1.14 2.54-2.54 2.54a2.54 2.54 0 0 1-2.54-2.54c0-1.4 1.14-2.53 2.54-2.53.22 0 .43.03.63.08V11.55a5.1 5.1 0 0 0-.63-.04c-2.73 0-4.94 2.21-4.94 4.93s2.21 4.94 4.94 4.94 4.94-2.22 4.94-4.94V9.45a7.4 7.4 0 0 0 4.1 1.24V8.22a4.94 4.94 0 0 1-2.85-1.55z" transform="translate(.35,.35)"/>
+          <path fill="#fff" d="M17.28 6.5c-.75-.68-1.2-1.65-1.25-2.72h-2.4v12.62c0 1.4-1.14 2.54-2.54 2.54a2.54 2.54 0 0 1-2.54-2.54c0-1.4 1.14-2.53 2.54-2.53.22 0 .43.03.63.08V11.37a5.1 5.1 0 0 0-.63-.04c-2.73 0-4.94 2.21-4.94 4.93s2.21 4.94 4.94 4.94 4.94-2.22 4.94-4.94V9.27a7.4 7.4 0 0 0 4.1 1.24V8.04a4.94 4.94 0 0 1-2.85-1.55z"/>
+        </svg>
+      </a>
+      <a href="https://chat.whatsapp.com/KSEt168OZolGO5Q9x5pITd?s=cl&p=a&mlu=0&ilr=0" target="_blank" rel="noopener" class="social-icon whatsapp" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M12.01 2C6.5 2 2 6.48 2 11.97c0 1.98.58 3.83 1.58 5.4L2 22l4.79-1.53a10.02 10.02 0 0 0 5.22 1.46h.01c5.5 0 10-4.48 10-9.96C22 6.48 17.51 2 12.01 2zm0 18.2c-1.68 0-3.24-.5-4.55-1.35l-.33-.2-3.15 1 1.02-3.06-.21-.32a8.15 8.15 0 0 1-1.28-4.3c0-4.53 3.7-8.22 8.5-8.22 4.79 0 8.5 3.69 8.5 8.22 0 4.53-3.71 8.23-8.5 8.23zm4.67-6.16c-.25-.13-1.5-.74-1.73-.82-.23-.09-.4-.13-.57.12-.17.26-.65.82-.8 1-.14.17-.29.19-.54.06-.25-.12-1.06-.39-2.02-1.24-.75-.66-1.25-1.48-1.4-1.73-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.42.08-.17.04-.31-.02-.43-.06-.13-.57-1.36-.78-1.86-.2-.49-.41-.42-.57-.43h-.49c-.17 0-.44.06-.67.31-.23.26-.87.85-.87 2.07s.9 2.41 1.02 2.57c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.42 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.5-.61 1.71-1.2.21-.59.21-1.09.15-1.2-.06-.11-.23-.17-.48-.29z"/></svg>
+      </a>
+    </div>
+
+    <div class="footer-note">الدعم: ٠٧٨٢٤٨٥٩٦٠٤ (واتساب)</div>
+  </div>
+
+</div>
+
+<div class="popup" id="datePopup">
+  <div class="popup-card">
+    <h3>اختر التاريخ</h3>
+    <div class="popup-grid">
+      <select id="day"></select>
+      <select id="month"></select>
+      <select id="year"></select>
+    </div>
+    <button class="submit" onclick="saveDate()">اختيار</button>
+    <button class="close-btn" onclick="closePopups()">إغلاق</button>
+  </div>
+</div>
+
+<div class="popup" id="timePopup">
+  <div class="popup-card wide">
+    <h3>اختر وقت الزيارة</h3>
+
+    <div class="prayer-tabs" id="prayerTabs"></div>
+
+    <div class="prayer-range" id="prayerRange"></div>
+    <div class="prayer-audience" id="prayerAudience"></div>
+
+    <div class="slots-grid" id="slotsGrid"></div>
+
+    <div class="time-summary" id="timeSummary" style="display:none"></div>
+
+    <button class="submit" onclick="saveTimeSlot()">اختيار</button>
+    <button class="close-btn" onclick="closePopups()">إغلاق</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://slllcibigutjivauryvc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let paymentNumbers = {};
+let selectedPay = "";
+let selectedDate = "";
+let selectedTime = "";
+let selectedPeriodKey = "";
+let selectedSlot = "";
+
+const monthsKu = [
+  "كانون الثاني","شباط","آذار","نيسان","أيار","حزيران",
+  "تموز","آب","أيلول","تشرين الأول","تشرين الثاني","كانون الأول"
+];
+
+for(let i=1;i<=31;i++){
+  day.innerHTML += `<option value="${String(i).padStart(2,"0")}">${i}</option>`;
+}
+
+monthsKu.forEach((m,i)=>{
+  month.innerHTML += `<option value="${String(i+1).padStart(2,"0")}">${m}</option>`;
+});
+
+for(let y=2026;y<=2032;y++){
+  year.innerHTML += `<option value="${y}">${y}</option>`;
+}
+
+/* ---------- prayer periods & time slots (loaded from Supabase) ---------- */
+// بيانات احتياطية (في حال عدم توفر الجداول في Supabase) - جميعها متاحة
+let prayerPeriods = [
+  {
+    key:"fajr", icon:"🌅", label:"الفجر",
+    range:"من الفجر إلى الظهر", audience:"للرجال والنساء",
+    times:[
+      {t:"06:40 AM"},{t:"07:00 AM"},{t:"07:20 AM"},{t:"07:40 AM"},
+      {t:"08:00 AM"},{t:"08:20 AM"},{t:"08:40 AM"},{t:"09:00 AM"},
+      {t:"09:20 AM"},{t:"09:40 AM"},{t:"10:00 AM"},{t:"10:20 AM"},{t:"10:40 AM"}
+    ]
+  },
+  {
+    key:"dhuhr", icon:"☀️", label:"الظهر",
+    range:"من الظهر إلى العصر", audience:"للرجال والنساء",
+    times:[
+      {t:"02:40 PM"},{t:"03:00 PM"},{t:"03:20 PM"},{t:"03:40 PM"}
+    ]
+  },
+  {
+    key:"asr", icon:"🌤️", label:"العصر",
+    range:"من العصر إلى المغرب", audience:"للرجال والنساء",
+    times:[
+      {t:"04:00 PM"},{t:"04:20 PM"},{t:"04:40 PM"},{t:"05:00 PM"},
+      {t:"05:20 PM"},{t:"05:40 PM"},{t:"06:00 PM"},{t:"06:20 PM"},
+      {t:"06:40 PM"},{t:"07:00 PM"}
+    ]
+  },
+  {
+    key:"maghrib", icon:"🌇", label:"المغرب",
+    range:"من المغرب إلى العشاء", audience:"للرجال والنساء",
+    times:[
+      {t:"07:30 PM"},{t:"07:50 PM"},{t:"08:10 PM"}
+    ]
+  },
+  {
+    key:"isha", icon:"🌙", label:"العشاء",
+    range:"بعد العشاء", audience:"للرجال والنساء",
+    times:[
+      {t:"09:00 PM"},{t:"09:20 PM"},{t:"09:40 PM"}
+    ]
+  }
+];
+
+let slotsReady = false;
+
+async function loadPrayerSlots(){
+  try{
+    const {data:periodsData, error:pErr} = await db
+      .from("rawda_prayer_periods")
+      .select("*")
+      .order("sort_order", {ascending:true});
+    if(pErr || !periodsData || periodsData.length===0) throw pErr || new Error("no periods");
+
+    const {data:slotsData, error:sErr} = await db
+      .from("rawda_prayer_slots")
+      .select("*")
+      .order("sort_order", {ascending:true});
+    if(sErr) throw sErr;
+
+    prayerPeriods = periodsData.map(p=>({
+      key:p.period_key,
+      icon:p.period_icon,
+      label:p.period_label,
+      range:p.period_range,
+      audience:p.period_audience,
+      times:(slotsData||[])
+        .filter(s=>s.period_key===p.period_key)
+        .map(s=>({t:s.slot_time, full:!!s.is_full}))
+    }));
+  }catch(err){
+    // في حال عدم توفر الجداول، تُستخدم البيانات الاحتياطية أعلاه
+  }
+  slotsReady = true;
+  renderPrayerTabs();
+  if(selectedPeriodKey){
+    selectPeriod(selectedPeriodKey);
+  }
+}
+
+function renderPrayerTabs(){
+  prayerTabs.innerHTML = prayerPeriods.map(p=>`
+    <div class="prayer-tab" data-key="${p.key}" onclick="selectPeriod('${p.key}')">
+      <span class="ic">${p.icon}</span>
+      <span class="lb">${p.label}</span>
+    </div>
+  `).join("");
+}
+renderPrayerTabs();
+
+function selectPeriod(key){
+  selectedPeriodKey = key;
+  selectedSlot = "";
+  timeSummary.style.display = "none";
+
+  document.querySelectorAll(".prayer-tab").forEach(el=>{
+    el.classList.toggle("active", el.dataset.key === key);
+  });
+
+  const period = prayerPeriods.find(p=>p.key===key);
+  prayerRange.innerText = period.range;
+  prayerAudience.innerText = period.audience;
+
+  if(period.times.length===0){
+    slotsGrid.innerHTML = `<div class="slots-empty">لا توجد أوقات متاحة لهذه الصلاة</div>`;
+    return;
+  }
+
+  slotsGrid.innerHTML = period.times.map(s=>`
+    <div class="slot-btn ${s.full?'full':''}" data-t="${s.t}" onclick="selectSlot('${s.t}',this)">${s.t}</div>
+  `).join("");
+}
+
+function selectSlot(t,el){
+  selectedSlot = t;
+  document.querySelectorAll(".slot-btn").forEach(x=>x.classList.remove("selected"));
+  el.classList.add("selected");
+
+  const period = prayerPeriods.find(p=>p.key===selectedPeriodKey);
+  timeSummary.style.display = "block";
+  timeSummary.innerText = `${period.icon} ${period.label} — ${t}`;
+}
+
+function saveTimeSlot(){
+  if(!selectedPeriodKey || !selectedSlot){
+    timeSummary.style.display = "block";
+    timeSummary.style.color = "#ffb3b3";
+    timeSummary.innerText = "الرجاء اختيار الصلاة والوقت أولاً";
+    return;
+  }
+  const period = prayerPeriods.find(p=>p.key===selectedPeriodKey);
+  selectedTime = `${period.label} - ${selectedSlot}`;
+  timeText.innerText = `${period.icon} ${period.label} — ${selectedSlot}`;
+  closePopups();
+}
+
+function openDatePopup(){
+  datePopup.style.display = "flex";
+}
+
+function openTimePopup(){
+  timePopup.style.display = "flex";
+  if(!selectedPeriodKey && prayerPeriods.length>0){
+    selectPeriod(prayerPeriods[0].key);
+  }
+}
+
+function closePopups(){
+  datePopup.style.display = "none";
+  timePopup.style.display = "none";
+}
+
+function saveDate(){
+  selectedDate = `${year.value}-${month.value}-${day.value}`;
+  dateText.innerText = `${day.value} / ${monthsKu[Number(month.value)-1]} / ${year.value}`;
+  closePopups();
+}
+
+function preview(input,img,label){
+  input.addEventListener("change",()=>{
+    const file=input.files[0];
+    if(file){
+      img.src=URL.createObjectURL(file);
+      img.style.display="block";
+      label.innerText="✅ تم رفع الصورة";
+      label.classList.add("done");
+    }
+  });
+}
+
+preview(visaImg,visaPreview,visaLabel);
+preview(paymentImg,paymentPreview,paymentLabel);
+
+function isValidMobile(value){
+  return /^07[3-9][0-9]{8}$/.test(value.trim());
+}
+
+mobile.addEventListener("input",()=>{
+  mobile.value = mobile.value.replace(/[^0-9]/g,"");
+});
+
+mobile.addEventListener("blur",()=>{
+  if(mobile.value.trim() === ""){
+    mobile.classList.remove("invalid");
+    mobileError.classList.remove("show");
+    return;
+  }
+  const ok = isValidMobile(mobile.value);
+  mobile.classList.toggle("invalid", !ok);
+  mobileError.classList.toggle("show", !ok);
+});
+
+async function loadData(){
+  try{
+    const {data:priceData} = await db.from("rawda_prices").select("*").limit(1).single();
+    priceBox.innerText = priceData?.price || "3500 دينار";
+  }catch(err){
+    priceBox.innerText = "3500 دينار";
+  }
+
+  try{
+    const {data:payData} = await db.from("payment_numbers").select("*").limit(1).single();
+    paymentNumbers = payData || {};
+  }catch(err){
+    paymentNumbers = {};
+  }
+}
+
+loadData();
+loadPrayerSlots();
+
+function selectPay(type,el){
+  selectedPay = type;
+  document.querySelectorAll(".pay").forEach(x=>x.classList.remove("active"));
+  el.classList.add("active");
+
+  if(type==="fastpay") payNumber.innerText = paymentNumbers.fastpay || "رقم FastPay غير محدد";
+  if(type==="fib") payNumber.innerText = paymentNumbers.fib || "رقم FIB غير محدد";
+  if(type==="qicard") payNumber.innerText = paymentNumbers.qicard || "رقم QiCard غير محدد";
+}
+
+async function uploadImage(file,folder){
+  if(!file) return "";
+  const safeName = file.name.replace(/\s+/g,"-");
+  const name = folder + "/" + Date.now() + "-" + safeName;
+  const {error} = await db.storage.from("rawda-images").upload(name,file);
+  if(error) throw error;
+  const {data} = db.storage.from("rawda-images").getPublicUrl(name);
+  return data.publicUrl;
+}
+
+async function sendRequest(){
+  msg.innerText="";
+  sendBtn.disabled=true;
+  sendBtn.innerText="الرجاء الانتظار...";
+
+  try{
+    const full_name = fullName.value.trim();
+    const phone = mobile.value.trim();
+    const genderVal = gender.value;
+    const noteVal = note.value.trim();
+
+    if(!full_name || !phone || !selectedDate || !selectedTime || !genderVal || !selectedPay){
+      throw new Error("الرجاء تعبئة جميع الحقول المطلوبة");
+    }
+
+    if(!isValidMobile(phone)){
+      mobile.classList.add("invalid");
+      mobileError.classList.add("show");
+      throw new Error("رقم الموبايل غير صحيح، الرجاء التحقق منه مرة أخرى");
+    }
+
+    const visa_url = await uploadImage(visaImg.files[0],"visa");
+    const payment_url = await uploadImage(paymentImg.files[0],"payment");
+
+    const { error } = await db.from("rawda_requests").insert([{
+    naw_syani: full_name,
+    mobile: phone,
+    roj: selectedDate,
+    katzhmer: selectedTime,
+    gender: genderVal,
+    paradan: selectedPay,
+    tebini: noteVal,
+    passport_image: visa_url,
+    payment_image: payment_url
+}]);
+
+    if(error) throw error;
+
+    msg.style.color="#8fe3b0";
+    msg.innerText="تم إرسال طلبك بنجاح ✅";
+
+    fullName.value="";
+    mobile.value="";
+    gender.value="";
+    note.value="";
+    selectedDate="";
+    selectedTime="";
+    selectedPay="";
+    selectedPeriodKey="";
+    selectedSlot="";
+    dateText.innerText="اختر التاريخ";
+    timeText.innerText="اختر الوقت";
+    payNumber.innerText="رقم الدفع سيظهر هنا";
+    document.querySelectorAll(".pay").forEach(x=>x.classList.remove("active"));
+    visaPreview.style.display="none";
+    paymentPreview.style.display="none";
+    visaLabel.innerText="📷 ارفع صورة";
+    paymentLabel.innerText="📷 ارفع صورة";
+    visaLabel.classList.remove("done");
+    paymentLabel.classList.remove("done");
+    mobile.classList.remove("invalid");
+    mobileError.classList.remove("show");
+
+  }catch(err){
+    msg.style.color="#ff8f8f";
+    msg.innerText=err.message;
+  }
+
+  sendBtn.disabled=false;
+  sendBtn.innerText="🕌 إرسال الطلب";
+}
+</script>
+
+</body>
+</html>
