@@ -1,570 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ku" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ئاکسچێنجی دراوەی کوردی</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { arabic: ['Noto Sans Arabic', 'sans-serif'] },
-          colors: { navy: '#09233F', navy2: '#0D3157', gold: '#C9A227', gold2: '#E0BD55' }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    *{box-sizing:border-box}
-    body{
-      margin:0;font-family:'Noto Sans Arabic',sans-serif;color:#172033;
-      background:radial-gradient(circle at top right,rgba(201,162,39,.12),transparent 30%),
-                 radial-gradient(circle at bottom left,rgba(13,49,87,.12),transparent 35%),#f5f7fa
-    }
-    .glass{background:rgba(255,255,255,.90);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.7);box-shadow:0 15px 40px rgba(9,35,63,.08)}
-    .gold-gradient{background:linear-gradient(135deg,#c9a227,#e4c45f)}
-    .navy-gradient{background:linear-gradient(135deg,#09233f,#0d3157)}
-    .input-style{width:100%;border:1px solid #e2e6ec;background:#fafbfd;border-radius:14px;padding:13px 15px;outline:none;transition:.2s;font-family:inherit}
-    .input-style:focus{border-color:#c9a227;box-shadow:0 0 0 3px rgba(201,162,39,.12);background:#fff}
-    .swap-button{transition:.25s}.swap-button:hover{transform:rotate(180deg)}
-    .status-pending{color:#a56b00;background:#fff6d9}.status-completed{color:#18794e;background:#e5f8ed}.status-cancelled{color:#b42318;background:#fdecec}
-    .toast{animation:toast .25s ease-out}@keyframes toast{from{transform:translateY(-10px);opacity:0}to{transform:translateY(0);opacity:1}}
-    @media(max-width:768px){.desktop-only{display:none}}
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KR Exchange</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="https://www.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}html{background:#f3f6fa}body{margin:0;font-family:"Noto Sans Arabic",sans-serif;color:#122033;background:linear-gradient(180deg,#071b2f 0,#0b2948 230px,#f4f7fb 230px);min-height:100vh}
+.shell{width:min(100%,480px);margin:auto;min-height:100vh;padding-bottom:86px}.glass{background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.8);box-shadow:0 18px 55px rgba(4,20,36,.13)}
+.gold{background:linear-gradient(135deg,#d2aa37,#f0d56f)}.navy{background:linear-gradient(135deg,#071b2f,#0d355c)}
+.service-btn{border:1px solid #e4eaf1;background:#fff;border-radius:18px;padding:12px;display:flex;align-items:center;gap:10px;width:100%;min-height:64px}
+.logo{width:42px;height:42px;border-radius:13px;object-fit:contain;background:#fff;border:1px solid #edf0f4;padding:4px}
+.modal{position:fixed;inset:0;background:rgba(2,12,22,.58);z-index:90;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(100%,480px);max-height:78vh;background:#fff;border-radius:28px 28px 0 0;padding:18px;overflow:auto}
+.hide{display:none!important}.rate-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid #edf1f5}.rate-row:last-child{border:0}
+.offer-track{display:flex;gap:12px;overflow:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.offer{min-width:86%;scroll-snap-align:start}
+.input{width:100%;border:1px solid #dde4ec;background:#f9fbfd;border-radius:16px;padding:14px;outline:none}.input:focus{border-color:#d2aa37;box-shadow:0 0 0 3px rgba(210,170,55,.13)}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid #e8edf2;padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr)}
+.navitem{text-align:center;font-size:10px;color:#738092}.navitem b{display:block;font-size:19px;line-height:23px}.navitem.active{color:#0b2948;font-weight:800}
+.step{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e8edf2;color:#738092;font-weight:800}.step.on{background:#0b2948;color:#fff}
+.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%);width:min(calc(100% - 28px),450px);z-index:120}
+tv-ticker-tape{--tv-ticker-tape-height:44px}
+</style>
 </head>
-
 <body>
-<header class="navy-gradient text-white sticky top-0 z-50 shadow-lg">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="h-[76px] flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl gold-gradient flex items-center justify-center text-navy font-black text-xl shadow-lg">$</div>
-        <div>
-          <h1 class="font-extrabold text-lg leading-5">ئەڵگۆڕینی دراوەی کوردی</h1>
-          <p class="text-[11px] text-white/60">Exchange & Digital Wallet</p>
-        </div>
-      </div>
-      <nav class="desktop-only flex items-center gap-7 text-sm">
-        <a href="#exchange" class="hover:text-yellow-300 transition">گۆڕین</a>
-        <a href="#transactions" class="text-white/70 hover:text-white transition">مامەڵەکان</a>
-        <a href="#rates" class="text-white/70 hover:text-white transition">نرخەکان</a>
-      </nav>
-      <div class="flex items-center gap-2">
-        <span id="connectionDot" class="w-2.5 h-2.5 rounded-full bg-yellow-400" title="پشکنین..."></span>
-        <button class="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center">👤</button>
-      </div>
-    </div>
+<div class="shell">
+<header class="px-4 pt-4 pb-3 text-white">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2"><div class="gold text-[#071b2f] font-black rounded-xl w-10 h-10 grid place-items-center">KR</div><div><h1 class="font-black leading-5">KR EXCHANGE</h1><p class="text-[9px] text-white/55 tracking-wider">DIGITAL EXCHANGE</p></div></div>
+    <button id="langBtn" class="bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-xs">🌐 <span id="langLabel">کوردی</span></button>
   </div>
 </header>
 
-<main class="max-w-7xl mx-auto px-4 py-7">
-  <section class="mb-7">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-      <div>
-        <p class="text-gray-500 text-sm">بەخێربێیت 👋</p>
-        <h2 class="text-2xl md:text-3xl font-extrabold text-navy">گۆڕینی پارە و Digital Wallet</h2>
-        <p class="text-gray-500 text-sm mt-1">FastPay، FIB، Qi Card و NasWallet</p>
-      </div>
-      <div class="flex items-center gap-2 text-xs bg-white px-4 py-2 rounded-full shadow-sm">
-        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> سیستەم چالاکە
-      </div>
-    </div>
-  </section>
+<div class="bg-[#061522] border-y border-white/10">
+<tv-ticker-tape symbols="OANDA:XAUUSD,OANDA:XAGUSD,TVC:DXY,FX:EURUSD,FX:GBPUSD,BITSTAMP:BTCUSD,TVC:USOIL" theme="dark" display-mode="adaptive"></tv-ticker-tape>
+</div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <section id="exchange" class="lg:col-span-2">
-      <div class="glass rounded-3xl p-5 md:p-7">
-        <div class="flex items-center justify-between mb-6">
-          <div><h3 class="font-extrabold text-xl text-navy">گۆڕینی دراو</h3><p class="text-xs text-gray-500 mt-1">زانیارییەکانی مامەڵەکەت داخڵ بکە</p></div>
-          <div class="w-10 h-10 rounded-xl bg-yellow-50 text-gold flex items-center justify-center">⇄</div>
-        </div>
+<main class="px-4 pt-4 space-y-4">
+<section id="exchange" class="glass rounded-[28px] p-4">
+ <div class="flex justify-between items-start mb-4"><div><p class="text-[11px] text-gray-400" data-i="instant">گۆڕینی خێرا</p><h2 class="text-xl font-black text-[#09233f]" data-i="exchange">گۆڕینی پارە</h2></div><span class="text-[10px] font-bold bg-green-50 text-green-700 px-2.5 py-1 rounded-full">● LIVE</span></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_55px_1fr] gap-3 items-end">
-          <div>
-            <label class="block text-sm font-semibold mb-2">لە</label>
-            <select id="fromWallet" class="input-style"></select>
-          </div>
-          <div class="flex justify-center pb-1">
-            <button id="swapBtn" type="button" class="swap-button w-12 h-12 rounded-2xl navy-gradient text-white flex items-center justify-center text-xl shadow-md">⇄</button>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold mb-2">بۆ</label>
-            <select id="toWallet" class="input-style"></select>
-          </div>
-        </div>
+ <label class="text-xs font-bold text-gray-500" data-i="send">تۆ دەنێریت</label>
+ <div class="mt-2 grid grid-cols-[1fr_128px] gap-2">
+   <input id="amount" class="input text-lg font-black" type="number" inputmode="decimal" placeholder="1,000,000">
+   <button id="fromBtn" class="service-btn"></button>
+ </div>
 
-        <div class="mt-5">
-          <label class="block text-sm font-semibold mb-2">بڕی پارە</label>
-          <div class="relative">
-            <input id="amount" type="number" min="0" step="any" inputmode="decimal" placeholder="بڕەکە بنووسە..." class="input-style text-lg font-bold pl-20">
-            <span id="fromCurrency" class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500">IQD</span>
-          </div>
-        </div>
+ <div class="flex items-center gap-3 my-3"><div class="h-px bg-gray-100 flex-1"></div><button id="swap" class="navy text-white w-11 h-11 rounded-2xl shadow-lg">⇅</button><div class="h-px bg-gray-100 flex-1"></div></div>
 
-        <div class="mt-4 rounded-2xl bg-navy/[.04] border border-navy/5 p-4">
-          <div class="flex items-center justify-between gap-3">
-            <div><p class="text-xs text-gray-500">بڕی وەرگیراو</p><div id="receiveAmount" class="text-2xl font-extrabold text-navy mt-1">0</div></div>
-            <div class="text-left"><p class="text-xs text-gray-500">نرخ</p><p id="currentRate" class="font-bold text-gold">1 : 1</p></div>
-          </div>
-        </div>
+ <label class="text-xs font-bold text-gray-500" data-i="receive">تۆ وەردەگریت</label>
+ <div class="mt-2 grid grid-cols-[1fr_128px] gap-2">
+   <div class="input text-lg font-black bg-[#f5f8fb]" id="receive">0</div>
+   <button id="toBtn" class="service-btn"></button>
+ </div>
 
-        <div class="mt-5">
-          <label class="block text-sm font-semibold mb-2">ژمارەی هەژمار / Wallet</label>
-          <input id="accountNumber" type="text" placeholder="ژمارەی هەژمار یان Wallet ـەکە بنووسە" class="input-style">
-        </div>
+ <div class="mt-3 bg-[#f7f9fc] border border-gray-100 rounded-2xl p-3 flex justify-between items-center">
+   <div><p class="text-[10px] text-gray-400" data-i="ourRate">نرخی KR</p><strong id="pairRate" class="text-sm text-[#09233f]">—</strong></div>
+   <div class="text-left"><p class="text-[10px] text-gray-400">100 USD</p><strong id="usdHint" class="text-sm text-[#b68a10]">—</strong></div>
+ </div>
+ <button id="continueBtn" class="gold w-full mt-4 py-4 rounded-2xl font-black text-[#071b2f] shadow-lg" data-i="continue">بەردەوام بە بۆ گۆڕین ←</button>
+</section>
 
-        <div class="mt-5">
-          <label class="block text-sm font-semibold mb-2">وێنەی پسوڵەی پارەدان</label>
-          <label for="receipt" class="cursor-pointer border-2 border-dashed border-gray-200 hover:border-gold rounded-2xl p-5 flex flex-col items-center justify-center text-center transition bg-gray-50/50">
-            <div class="w-12 h-12 rounded-2xl bg-yellow-50 text-gold flex items-center justify-center text-xl mb-2">↑</div>
-            <p class="font-semibold text-sm">کلیک بکە بۆ هەڵبژاردنی وێنە</p>
-            <p class="text-xs text-gray-400 mt-1">JPG / PNG / WEBP / PDF — تا 5MB</p>
-            <input id="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden">
-          </label>
-          <p id="fileName" class="text-xs text-green-600 mt-2 hidden"></p>
-        </div>
+<section id="offersSec" class="hide">
+ <div class="flex items-center justify-between mb-2"><h3 class="font-black text-[#09233f]" data-i="offers">ئۆفەر و بڵاوکراوە</h3><span class="text-[10px] text-gray-400">KR Exchange</span></div>
+ <div id="offers" class="offer-track"></div>
+</section>
 
-        <div class="mt-5">
-          <label class="block text-sm font-semibold mb-2">تێبینی</label>
-          <textarea id="note" rows="3" maxlength="500" placeholder="ئەگەر تێبینییەکت هەیە..." class="input-style resize-none"></textarea>
-        </div>
+<section id="rates" class="glass rounded-[26px] p-4">
+ <div class="flex items-center justify-between"><div><p class="text-[10px] text-gray-400">KR BOARD</p><h3 class="font-black text-[#09233f]" data-i="ourRates">نرخەکانی ئێمە</h3></div><button id="refresh" class="text-xs text-[#b68a10]">↻</button></div>
+ <div class="mt-3"><p class="text-[11px] font-bold text-gray-400 mb-1" data-i="usd100">نرخی 100$</p><div id="usdRates"></div></div>
+ <div class="mt-4 pt-3 border-t"><p class="text-[11px] font-bold text-gray-400 mb-1" data-i="pairRates">نرخی گۆڕین</p><div id="pairRates"></div></div>
+</section>
 
-        <button id="submitBtn" type="button" class="w-full mt-6 py-4 rounded-2xl gold-gradient text-navy font-extrabold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition">
-          ناردنی داواکارییەکە
-        </button>
-        <p class="text-center text-[11px] text-gray-400 mt-3">مامەڵەکەت دوای ناردن لەلایەن بەڕێوەبەرەوە پشکنین دەکرێت.</p>
-      </div>
-    </section>
-
-    <aside id="rates">
-      <div class="glass rounded-3xl p-5 sticky top-24">
-        <div class="flex items-center justify-between mb-5">
-          <div><h3 class="font-extrabold text-lg text-navy">نرخەکان</h3><p class="text-xs text-gray-400">لە Supabase ـەوە</p></div>
-          <span class="flex items-center gap-1 text-[10px] text-green-600"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Live</span>
-        </div>
-        <div id="ratesList" class="space-y-3"></div>
-        <div class="mt-5 pt-4 border-t">
-          <p class="text-[11px] text-gray-400">دواین نوێکردنەوە:</p>
-          <p id="lastUpdate" class="text-xs font-semibold text-navy mt-1">—</p>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <section id="transactions" class="mt-7">
-    <div class="glass rounded-3xl p-5 md:p-7">
-      <div class="flex items-center justify-between mb-5">
-        <div><h3 class="font-extrabold text-xl text-navy">دواین مامەڵەکان</h3><p class="text-xs text-gray-500">Recent Transactions</p></div>
-        <button id="refreshBtn" class="text-xs text-navy hover:text-gold">نوێکردنەوە ↻</button>
-      </div>
-      <div class="hidden md:block overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead><tr class="border-b text-gray-400 text-xs">
-            <th class="text-right py-3 px-2">ID</th><th class="text-right py-3 px-2">لە</th><th class="text-right py-3 px-2">بۆ</th>
-            <th class="text-right py-3 px-2">بڕ</th><th class="text-right py-3 px-2">وەرگیراو</th><th class="text-right py-3 px-2">بەروار</th><th class="text-right py-3 px-2">دۆخ</th>
-          </tr></thead>
-          <tbody id="transactionTable"></tbody>
-        </table>
-      </div>
-      <div id="mobileTransactions" class="md:hidden space-y-3"></div>
-      <div id="emptyTransactions" class="hidden text-center py-10 text-gray-400 text-sm">هێشتا هیچ مامەڵەیەک نییە.</div>
-    </div>
-  </section>
+<section id="track" class="glass rounded-[26px] p-4">
+ <h3 class="font-black text-[#09233f]" data-i="tracking">بەدواداچوونی مامەڵە</h3><p class="text-xs text-gray-400 mt-1" data-i="trackingSub">کۆدی مامەڵەکەت بنووسە.</p>
+ <div class="flex gap-2 mt-3"><input id="trackCode" class="input" placeholder="KR-123456"><button id="trackBtn" class="navy text-white rounded-2xl px-5 font-bold" data-i="search">گەڕان</button></div>
+ <div id="trackResult" class="mt-3"></div>
+</section>
 </main>
+</div>
 
-<div id="toast" class="fixed top-24 left-4 right-4 md:left-auto md:right-6 md:w-96 hidden z-[100]"></div>
+<nav class="bottom">
+ <a href="#exchange" class="navitem active"><b>⌂</b><span data-i="home">سەرەکی</span></a>
+ <a href="#exchange" class="navitem"><b>⇄</b><span data-i="exchangeShort">گۆڕین</span></a>
+ <a href="#rates" class="navitem"><b>▥</b><span data-i="ratesShort">نرخەکان</span></a>
+ <a href="#track" class="navitem"><b>⌕</b><span data-i="trackShort">بەدواداچوون</span></a>
+</nav>
 
-<footer class="mt-10 bg-navy text-white">
-  <div class="max-w-7xl mx-auto px-4 py-7 flex flex-col md:flex-row justify-between gap-5">
-    <div><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-xl gold-gradient text-navy flex items-center justify-center font-black">$</div><span class="font-bold">ئەڵگۆڕینی دراوەی کوردی</span></div><p class="text-xs text-white/50 mt-2">خزمەتگوزاری گۆڕینی دراو و Digital Wallet</p></div>
-    <div class="text-xs text-white/50">© 2026 هەموو مافەکان پارێزراون</div>
-  </div>
-</footer>
+<div id="serviceModal" class="modal hide"><div class="sheet"><div class="flex justify-between items-center mb-3"><h3 class="font-black" data-i="choose">هەڵبژێرە</h3><button onclick="closeService()" class="w-9 h-9 rounded-full bg-gray-100">×</button></div><div id="serviceList" class="space-y-2"></div></div></div>
+<div id="langModal" class="modal hide"><div class="sheet"><h3 class="font-black mb-3">Language / زمان</h3><div class="space-y-2"><button onclick="setLang('ku')" class="service-btn">کوردی</button><button onclick="setLang('ar')" class="service-btn">العربية</button><button onclick="setLang('en')" class="service-btn">English</button></div></div></div>
+
+<div id="orderModal" class="modal hide"><div class="sheet">
+ <div class="flex justify-between"><div><p class="text-[10px] text-gray-400">KR EXCHANGE</p><h3 class="font-black text-lg" data-i="completeOrder">تەواوکردنی مامەڵە</h3></div><button onclick="closeOrder()" class="w-9 h-9 rounded-full bg-gray-100">×</button></div>
+ <div class="flex items-center justify-center gap-2 my-4"><span class="step on">1</span><span class="w-10 h-px bg-gray-200"></span><span class="step on">2</span><span class="w-10 h-px bg-gray-200"></span><span class="step">3</span></div>
+ <div id="orderSummary" class="bg-[#f7f9fc] rounded-2xl p-3 text-sm mb-3"></div>
+ <div id="payBox" class="bg-amber-50 border border-amber-100 rounded-2xl p-3 mb-3"></div>
+ <div class="space-y-3">
+  <input id="fullName" class="input" data-ph="name" placeholder="ناوی تەواو">
+  <input id="phone" class="input" inputmode="tel" data-ph="phone" placeholder="ژمارەی مۆبایل">
+  <input id="destAccount" class="input" data-ph="dest" placeholder="ژمارەی هەژماری وەرگر">
+  <label class="block border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center text-sm cursor-pointer"><span data-i="receipt">📎 وێنەی پسوڵە هەڵبژێرە</span><input id="receipt" type="file" accept="image/*,application/pdf" class="hidden"></label>
+  <button id="submitOrder" class="gold w-full py-4 rounded-2xl font-black text-[#071b2f]" data-i="submit">ناردنی داواکاری</button>
+ </div>
+</div></div>
+<div id="toast" class="toast hide"></div>
 
 <script>
-/* ================= SUPABASE ================= */
-const SUPABASE_URL = "https://xeslocltzfapocwrssst.supabase.co";
-const SUPABASE_KEY = "sb_publishable_tVNj4U0o80SENtjRyYsf_w_W_RrTC0O";
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-/* ================= STATE ================= */
-let rates = {};
-let wallets = [];
-
-/* ================= HELPERS ================= */
-const $ = id => document.getElementById(id);
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
-
-function walletLabel(wallet) {
-  if (!wallet) return "";
-  return `${wallet.name}${wallet.currency ? " — " + wallet.currency : ""}`;
-}
-
-function getWallet(id) {
-  return wallets.find(w => w.code === id);
-}
-
-function getCurrency(code) {
-  const w = getWallet(code);
-  return w?.currency || (code === "USD" ? "USD" : code === "EUR" ? "EUR" : "IQD");
-}
-
-function formatNumber(n, max=4) {
-  return Number(n || 0).toLocaleString("en-US", {maximumFractionDigits:max});
-}
-
-function showToast(message, type="success") {
-  const el = $("toast");
-  const cls = type === "error"
-    ? "bg-red-50 border-red-200 text-red-700"
-    : "bg-green-50 border-green-200 text-green-700";
-  el.innerHTML = `<div class="toast border rounded-2xl p-4 shadow-xl ${cls} font-semibold text-sm">${escapeHtml(message)}</div>`;
-  el.classList.remove("hidden");
-  clearTimeout(window.toastTimer);
-  window.toastTimer = setTimeout(() => el.classList.add("hidden"), 4000);
-}
-
-/* ================= DEFAULT DATA ================= */
-/* Used only if tables are empty/unavailable. The app still attempts Supabase first. */
-const fallbackWallets = [
-  {code:"FASTPAY_IQD", name:"FastPay", currency:"IQD", active:true},
-  {code:"FIB_IQD", name:"FIB", currency:"IQD", active:true},
-  {code:"QI_IQD", name:"Qi Card", currency:"IQD", active:true},
-  {code:"NAS_IQD", name:"NasWallet", currency:"IQD", active:true},
-  {code:"USD", name:"USD", currency:"USD", active:true},
-  {code:"EUR", name:"EUR", currency:"EUR", active:true}
+const URL="https://xeslocltzfapocwrssst.supabase.co", KEY="sb_publishable_tVNj4U0o80SENtjRyYsf_w_W_RrTC0O"; const db=supabase.createClient(URL,KEY);
+const ZLOGO="data:image/jpeg;base64,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AAAAAACQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//Z";
+const fallbackServices=[
+ {code:"FASTPAY",name:"FastPay",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://www.fast-pay.iq"},
+ {code:"FIB",name:"FIB",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://fib.iq"},
+ {code:"QI",name:"Qi Card",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://qi.iq"},
+ {code:"KOREK",name:"Korek",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://www.korektel.com"},
+ {code:"ASIACELL",name:"Asiacell",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://www.asiacell.com"},
+ {code:"ZCHARGE",name:"Z! Charge",currency:"IQD",logo:ZLOGO}
 ];
-
-const fallbackRates = [
-  {from_currency:"USD", to_currency:"IQD", rate:1520},
-  {from_currency:"EUR", to_currency:"IQD", rate:3050},
-  {from_currency:"IQD", to_currency:"USD", rate:1/1520},
-  {from_currency:"IQD", to_currency:"EUR", rate:1/3050},
-  {from_currency:"USD", to_currency:"EUR", rate:1520/3050},
-  {from_currency:"EUR", to_currency:"USD", rate:3050/1520},
-  {from_currency:"FASTPAY_IQD", to_currency:"FIB_IQD", rate:1},
-  {from_currency:"FIB_IQD", to_currency:"FASTPAY_IQD", rate:1},
-  {from_currency:"FASTPAY_IQD", to_currency:"QI_IQD", rate:1},
-  {from_currency:"QI_IQD", to_currency:"FASTPAY_IQD", rate:1},
-  {from_currency:"FASTPAY_IQD", to_currency:"NAS_IQD", rate:1},
-  {from_currency:"NAS_IQD", to_currency:"FASTPAY_IQD", rate:1},
-  {from_currency:"FIB_IQD", to_currency:"QI_IQD", rate:1},
-  {from_currency:"QI_IQD", to_currency:"FIB_IQD", rate:1},
-  {from_currency:"FIB_IQD", to_currency:"NAS_IQD", rate:1},
-  {from_currency:"NAS_IQD", to_currency:"FIB_IQD", rate:1},
-  {from_currency:"QI_IQD", to_currency:"NAS_IQD", rate:1},
-  {from_currency:"NAS_IQD", to_currency:"QI_IQD", rate:1}
-];
-
-/* ================= LOAD WALLET DATA ================= */
-async function loadWallets() {
-  const {data, error} = await db.from("wallets")
-    .select("code,name,currency,active")
-    .eq("active", true)
-    .order("sort_order", {ascending:true});
-
-  if (!error && data?.length) {
-    wallets = data;
-  } else {
-    wallets = fallbackWallets;
-    if (error) console.warn("wallets:", error.message);
-  }
-
-  const from = $("fromWallet");
-  const to = $("toWallet");
-  const oldFrom = from.value;
-  const oldTo = to.value;
-
-  from.innerHTML = wallets.map(w => `<option value="${escapeHtml(w.code)}">${escapeHtml(walletLabel(w))}</option>`).join("");
-  to.innerHTML = wallets.map(w => `<option value="${escapeHtml(w.code)}">${escapeHtml(walletLabel(w))}</option>`).join("");
-
-  from.value = wallets.some(w=>w.code===oldFrom) ? oldFrom : (wallets[0]?.code || "FASTPAY_IQD");
-  to.value = wallets.some(w=>w.code===oldTo) ? oldTo : (wallets[1]?.code || wallets[0]?.code || "FIB_IQD");
-
-  calculateExchange();
+let services=fallbackServices, pairs={}, usd={}, accounts={}, from="FASTPAY",to="ZCHARGE", pickTarget="from";
+const $=x=>document.getElementById(x), fmt=n=>Number(n||0).toLocaleString("en-US",{maximumFractionDigits:2});
+const tr={
+ ku:{instant:"گۆڕینی خێرا",exchange:"گۆڕینی پارە",send:"تۆ دەنێریت",receive:"تۆ وەردەگریت",ourRate:"نرخی KR",continue:"بەردەوام بە بۆ گۆڕین ←",offers:"ئۆفەر و بڵاوکراوە",ourRates:"نرخەکانی ئێمە",usd100:"نرخی 100$",pairRates:"نرخی گۆڕین",tracking:"بەدواداچوونی مامەڵە",trackingSub:"کۆدی مامەڵەکەت بنووسە.",search:"گەڕان",home:"سەرەکی",exchangeShort:"گۆڕین",ratesShort:"نرخەکان",trackShort:"بەدواداچوون",choose:"هەڵبژێرە",completeOrder:"تەواوکردنی مامەڵە",receipt:"📎 وێنەی پسوڵە هەڵبژێرە",submit:"ناردنی داواکاری",name:"ناوی تەواو",phone:"ژمارەی مۆبایل",dest:"ژمارەی هەژماری وەرگر"},
+ ar:{instant:"تبديل سريع",exchange:"تبديل الأموال",send:"أنت ترسل",receive:"أنت تستلم",ourRate:"سعر KR",continue:"متابعة التبديل ←",offers:"العروض والإعلانات",ourRates:"أسعارنا",usd100:"سعر 100$",pairRates:"أسعار التحويل",tracking:"تتبع المعاملة",trackingSub:"أدخل رمز المعاملة.",search:"بحث",home:"الرئيسية",exchangeShort:"تبديل",ratesShort:"الأسعار",trackShort:"تتبع",choose:"اختر",completeOrder:"إكمال المعاملة",receipt:"📎 اختر صورة الإيصال",submit:"إرسال الطلب",name:"الاسم الكامل",phone:"رقم الهاتف",dest:"رقم حساب المستلم"},
+ en:{instant:"Instant exchange",exchange:"Exchange Money",send:"You send",receive:"You receive",ourRate:"KR Rate",continue:"Continue to exchange →",offers:"Offers & Announcements",ourRates:"Our Rates",usd100:"100 USD rate",pairRates:"Exchange rates",tracking:"Track Transaction",trackingSub:"Enter your transaction code.",search:"Search",home:"Home",exchangeShort:"Exchange",ratesShort:"Rates",trackShort:"Track",choose:"Choose service",completeOrder:"Complete transaction",receipt:"📎 Choose payment receipt",submit:"Submit request",name:"Full name",phone:"Mobile number",dest:"Recipient account number"}
+};
+let lang=localStorage.krLang||"ku";
+function setLang(l){lang=l;localStorage.krLang=l;document.documentElement.lang=l;document.documentElement.dir=l==="en"?"ltr":"rtl";$("langLabel").textContent=l==="ku"?"کوردی":l==="ar"?"العربية":"English";document.querySelectorAll("[data-i]").forEach(e=>e.textContent=tr[l][e.dataset.i]||e.textContent);document.querySelectorAll("[data-ph]").forEach(e=>e.placeholder=tr[l][e.dataset.ph]||e.placeholder);$("langModal").classList.add("hide")}
+function svc(c){return services.find(x=>x.code===c)||fallbackServices.find(x=>x.code===c)}
+function serviceHTML(c){let s=svc(c);return `<img class="logo" src="${s.logo}" onerror="this.style.display='none'"><div class="min-w-0 text-right"><b class="block text-[11px] truncate">${s.name}</b><span class="text-[9px] text-gray-400">${s.currency}</span></div>`}
+function drawPickers(){$("fromBtn").innerHTML=serviceHTML(from);$("toBtn").innerHTML=serviceHTML(to)}
+function rate(){return Number(pairs[`${from}|${to}`]??(from===to?1:0))}
+function calc(){let a=Number($("amount").value||0),r=rate();$("receive").textContent=r?fmt(a*r):"—";$("pairRate").textContent=r?`1 ${svc(from).name} = ${fmt(r)} ${svc(to).name}`:"نرخ دانەنراوە";$("usdHint").textContent=usd[to]?`${fmt(usd[to])} IQD`:"—"}
+function openService(target){pickTarget=target;$("serviceList").innerHTML=services.map(s=>`<button class="service-btn" onclick="chooseService('${s.code}')">${serviceHTML(s.code)}<span class="mr-auto text-gray-300">›</span></button>`).join("");$("serviceModal").classList.remove("hide")}
+function closeService(){$("serviceModal").classList.add("hide")} function chooseService(c){if(pickTarget==="from")from=c;else to=c;closeService();drawPickers();calc()}
+function toast(m,err=false){$("toast").innerHTML=`<div class="${err?"bg-red-50 text-red-700 border-red-200":"bg-green-50 text-green-700 border-green-200"} border rounded-2xl p-4 shadow-xl text-sm font-bold">${m}</div>`;$("toast").classList.remove("hide");setTimeout(()=>$("toast").classList.add("hide"),3500)}
+async function load(){
+ let [p,u,a,o,s]=await Promise.all([
+  db.from("exchange_pairs").select("*").eq("active",true),
+  db.from("service_usd_rates").select("*").eq("active",true),
+  db.from("payment_accounts").select("*").eq("active",true),
+  db.from("offers").select("*").eq("active",true).order("sort_order"),
+  db.from("services").select("*").eq("active",true).order("sort_order")
+ ]);
+ if(!s.error&&s.data?.length) services=s.data.map(x=>({...x,logo:x.code==="ZCHARGE"?ZLOGO:(x.logo_url||"")}));
+ pairs={};(p.data||[]).forEach(x=>pairs[`${x.from_code}|${x.to_code}`]=Number(x.rate));
+ usd={};(u.data||[]).forEach(x=>usd[x.service_code]=Number(x.iqd_per_100usd));
+ accounts={};(a.data||[]).forEach(x=>(accounts[x.service_code]??=[]).push(x));
+ renderRates();renderOffers(o.data||[]);drawPickers();calc()
 }
-
-/* ================= LOAD RATES ================= */
-async function loadRates() {
-  const {data, error} = await db.from("exchange_rates")
-    .select("from_currency,to_currency,rate,active,updated_at")
-    .eq("active", true);
-
-  if (!error && data?.length) {
-    rates = {};
-    data.forEach(r => rates[`${r.from_currency}|${r.to_currency}`] = Number(r.rate));
-    $("lastUpdate").textContent = new Date().toLocaleString("ku-IQ");
-  } else {
-    rates = {};
-    fallbackRates.forEach(r => rates[`${r.from_currency}|${r.to_currency}`] = Number(r.rate));
-    $("lastUpdate").textContent = "نرخی سەرەتایی";
-    if (error) console.warn("exchange_rates:", error.message);
-  }
-
-  renderRates();
-  calculateExchange();
+function renderRates(){
+ $("usdRates").innerHTML=services.map(s=>`<div class="rate-row"><div class="flex items-center gap-2"><img class="w-8 h-8 rounded-lg object-contain border p-1" src="${s.logo}"><b class="text-xs">${s.name}</b></div><strong class="text-sm text-[#09233f]">${usd[s.code]?fmt(usd[s.code])+" IQD":"—"}</strong></div>`).join("");
+ let arr=Object.entries(pairs).slice(0,10);$("pairRates").innerHTML=arr.length?arr.map(([k,r])=>{let [f,t]=k.split("|");return `<div class="rate-row"><span class="text-xs font-bold">${svc(f)?.name||f} → ${svc(t)?.name||t}</span><strong class="text-xs text-[#b68a10]">1 → ${fmt(r)}</strong></div>`}).join(""):`<p class="text-xs text-gray-400 py-3">هێشتا نرخ دانەنراوە.</p>`
 }
-
-function findRate(from, to) {
-  if (from === to) return 1;
-
-  const direct = rates[`${from}|${to}`];
-  if (Number.isFinite(direct)) return direct;
-
-  const fromCur = getCurrency(from);
-  const toCur = getCurrency(to);
-
-  if (fromCur === toCur) return 1;
-
-  const currencyDirect = rates[`${fromCur}|${toCur}`];
-  if (Number.isFinite(currencyDirect)) return currencyDirect;
-
-  const currencyReverse = rates[`${toCur}|${fromCur}`];
-  if (Number.isFinite(currencyReverse) && currencyReverse !== 0) return 1 / currencyReverse;
-
-  return null;
-}
-
-/* ================= CALCULATION ================= */
-function calculateExchange() {
-  const from = $("fromWallet").value;
-  const to = $("toWallet").value;
-  const amount = Number($("amount").value || 0);
-  const rate = findRate(from, to);
-
-  $("fromCurrency").textContent = getCurrency(from);
-
-  if (rate === null) {
-    $("receiveAmount").textContent = "—";
-    $("currentRate").textContent = "نرخ بەردەست نییە";
-    return;
-  }
-
-  const receive = amount * rate;
-  $("receiveAmount").textContent = formatNumber(receive, 6);
-
-  const fromCur = getCurrency(from);
-  const toCur = getCurrency(to);
-
-  $("currentRate").textContent =
-    `1 ${fromCur} = ${formatNumber(rate, 6)} ${toCur}`;
-}
-
-/* ================= RATES UI ================= */
-function renderRates() {
-  const shown = [
-    ["USD","IQD","دۆلار"],
-    ["EUR","IQD","یۆرۆ"],
-    ["FASTPAY_IQD","FIB_IQD","FastPay → FIB"],
-    ["QI_IQD","FIB_IQD","Qi Card → FIB"],
-    ["NAS_IQD","FIB_IQD","NasWallet → FIB"]
-  ];
-
-  $("ratesList").innerHTML = shown.map(([from,to,title]) => {
-    const rate = findRate(from,to);
-    return `
-      <div class="bg-white border rounded-2xl p-4 flex items-center justify-between">
-        <div>
-          <p class="font-bold text-sm">${escapeHtml(title)}</p>
-          <p class="text-[10px] text-gray-400 mt-1">${escapeHtml(from)} → ${escapeHtml(to)}</p>
-        </div>
-        <strong class="text-navy">${rate === null ? "—" : formatNumber(rate,6)}</strong>
-      </div>`;
-  }).join("");
-}
-
-/* ================= FILE ================= */
-$("receipt").addEventListener("change", () => {
-  const file = $("receipt").files[0];
-  if (!file) {
-    $("fileName").classList.add("hidden");
-    return;
-  }
-  $("fileName").textContent = `✓ ${file.name}`;
-  $("fileName").classList.remove("hidden");
-});
-
-/* ================= SWAP ================= */
-$("swapBtn").addEventListener("click", () => {
-  const a = $("fromWallet").value;
-  $("fromWallet").value = $("toWallet").value;
-  $("toWallet").value = a;
-  calculateExchange();
-});
-
-/* ================= SUBMIT ================= */
-$("submitBtn").addEventListener("click", async () => {
-  const button = $("submitBtn");
-  const from = $("fromWallet").value;
-  const to = $("toWallet").value;
-  const amount = Number($("amount").value);
-  const account = $("accountNumber").value.trim();
-  const note = $("note").value.trim();
-  const file = $("receipt").files[0];
-  const rate = findRate(from,to);
-  const receive = rate === null ? null : amount * rate;
-
-  if (!amount || amount <= 0) return showToast("تکایە بڕی پارە داخڵ بکە.", "error");
-  if (rate === null) return showToast("نرخی ئەم گۆڕینە بەردەست نییە.", "error");
-  if (!account) return showToast("تکایە ژمارەی Wallet / هەژمار داخڵ بکە.", "error");
-  if (!file) return showToast("تکایە پسوڵەی پارەدان Upload بکە.", "error");
-  if (file.size > 5 * 1024 * 1024) return showToast("قەبارەی فایل نابێت لە 5MB زیاتر بێت.", "error");
-
-  button.disabled = true;
-  button.textContent = "لە ناردندایە...";
-
-  try {
-    const ext = file.name.split(".").pop().toLowerCase();
-    const safeExt = /^[a-z0-9]+$/.test(ext) ? ext : "bin";
-    const filePath = `${crypto.randomUUID()}.${safeExt}`;
-
-    const {error: uploadError} = await db.storage
-      .from("payment-receipts")
-      .upload(filePath, file, {upsert:false, contentType:file.type || undefined});
-
-    if (uploadError) throw new Error("هەڵە لە Upload ـی پسوڵە: " + uploadError.message);
-
-    const {data: inserted, error: insertError} = await db
-      .from("transactions")
-      .insert({
-        from_wallet: from,
-        to_wallet: to,
-        amount,
-        receive_amount: receive,
-        exchange_rate: rate,
-        account_number: account,
-        receipt_path: filePath,
-        note: note || null,
-        status: "Pending"
-      })
-      .select("id,tracking_code")
-      .single();
-
-    if (insertError) {
-      await db.storage.from("payment-receipts").remove([filePath]);
-      throw new Error("هەڵە لە تۆمارکردنی مامەڵە: " + insertError.message);
-    }
-
-    showToast(`داواکاری نێردرا. کۆدی بەدواداچوون: ${inserted.tracking_code}`);
-    $("amount").value = "";
-    $("accountNumber").value = "";
-    $("note").value = "";
-    $("receipt").value = "";
-    $("fileName").classList.add("hidden");
-    calculateExchange();
-    await loadTransactions();
-  } catch (err) {
-    console.error(err);
-    showToast(err.message || "هەڵەیەک ڕوویدا.", "error");
-  } finally {
-    button.disabled = false;
-    button.textContent = "ناردنی داواکارییەکە";
-  }
-});
-
-/* ================= TRANSACTIONS ================= */
-function statusBadge(status) {
-  const s = String(status || "Pending");
-  if (s === "Completed") return `<span class="status-completed px-3 py-1 rounded-full text-[10px] font-bold">تەواوبوو</span>`;
-  if (s === "Cancelled") return `<span class="status-cancelled px-3 py-1 rounded-full text-[10px] font-bold">هەڵوەشێنراوە</span>`;
-  return `<span class="status-pending px-3 py-1 rounded-full text-[10px] font-bold">چاوەڕوانە</span>`;
-}
-
-async function loadTransactions() {
-  const {data, error} = await db.from("transactions")
-    .select("id,tracking_code,from_wallet,to_wallet,amount,receive_amount,status,created_at")
-    .order("created_at", {ascending:false})
-    .limit(20);
-
-  if (error) {
-    console.warn("transactions:", error.message);
-    $("transactionTable").innerHTML = "";
-    $("mobileTransactions").innerHTML = "";
-    $("emptyTransactions").classList.remove("hidden");
-    return;
-  }
-
-  $("emptyTransactions").classList.toggle("hidden", !data?.length);
-
-  $("transactionTable").innerHTML = (data || []).map(tx => {
-    const fw = getWallet(tx.from_wallet);
-    const tw = getWallet(tx.to_wallet);
-    return `
-      <tr class="border-b last:border-0 hover:bg-gray-50 transition">
-        <td class="py-4 px-2 font-bold text-navy">${escapeHtml(tx.tracking_code || tx.id)}</td>
-        <td class="py-4 px-2">${escapeHtml(fw?.name || tx.from_wallet)}</td>
-        <td class="py-4 px-2">${escapeHtml(tw?.name || tx.to_wallet)}</td>
-        <td class="py-4 px-2 font-bold">${formatNumber(tx.amount)} ${escapeHtml(fw?.currency || "")}</td>
-        <td class="py-4 px-2 font-bold">${formatNumber(tx.receive_amount)} ${escapeHtml(tw?.currency || "")}</td>
-        <td class="py-4 px-2 text-gray-500">${new Date(tx.created_at).toLocaleDateString("ku-IQ")}</td>
-        <td class="py-4 px-2">${statusBadge(tx.status)}</td>
-      </tr>`;
-  }).join("");
-
-  $("mobileTransactions").innerHTML = (data || []).map(tx => {
-    const fw = getWallet(tx.from_wallet);
-    const tw = getWallet(tx.to_wallet);
-    return `
-      <div class="border rounded-2xl p-4 bg-white">
-        <div class="flex justify-between items-start gap-2">
-          <div>
-            <p class="text-xs text-gray-400">${escapeHtml(tx.tracking_code || tx.id)}</p>
-            <p class="font-bold text-navy mt-1">${escapeHtml(fw?.name || tx.from_wallet)} <span class="text-gold mx-1">→</span> ${escapeHtml(tw?.name || tx.to_wallet)}</p>
-          </div>
-          ${statusBadge(tx.status)}
-        </div>
-        <div class="flex justify-between mt-4 text-xs"><span class="text-gray-400">بڕ</span><strong>${formatNumber(tx.amount)} ${escapeHtml(fw?.currency || "")}</strong></div>
-        <div class="flex justify-between mt-2 text-xs"><span class="text-gray-400">وەرگیراو</span><strong>${formatNumber(tx.receive_amount)} ${escapeHtml(tw?.currency || "")}</strong></div>
-        <div class="flex justify-between mt-2 text-xs"><span class="text-gray-400">بەروار</span><span>${new Date(tx.created_at).toLocaleDateString("ku-IQ")}</span></div>
-      </div>`;
-  }).join("");
-}
-
-/* ================= EVENTS ================= */
-$("amount").addEventListener("input", calculateExchange);
-$("fromWallet").addEventListener("change", calculateExchange);
-$("toWallet").addEventListener("change", calculateExchange);
-$("refreshBtn").addEventListener("click", async () => {
-  await Promise.all([loadWallets(), loadRates(), loadTransactions()]);
-  showToast("داتا نوێکرایەوە.");
-});
-
-/* ================= CONNECTION CHECK ================= */
-async function checkConnection() {
-  const dot = $("connectionDot");
-  const {error} = await db.from("wallets").select("code").limit(1);
-  if (!error) {
-    dot.className = "w-2.5 h-2.5 rounded-full bg-green-400";
-    dot.title = "Supabase پەیوەندی هەیە";
-  } else {
-    dot.className = "w-2.5 h-2.5 rounded-full bg-red-400";
-    dot.title = "کێشەی Supabase/RLS";
-    console.warn("Supabase connection:", error.message);
-  }
-}
-
-/* ================= START ================= */
-(async function init() {
-  await loadWallets();
-  await loadRates();
-  await loadTransactions();
-  await checkConnection();
-})();
+function renderOffers(list){if(!list.length)return;$("offersSec").classList.remove("hide");$("offers").innerHTML=list.map(x=>`<article class="offer navy text-white rounded-3xl p-4"><span class="text-[9px] bg-white/10 px-2 py-1 rounded-full">${x.badge||"KR OFFER"}</span><h4 class="font-black mt-3">${x.title}</h4><p class="text-xs text-white/65 mt-1">${x.body||""}</p></article>`).join("")}
+function closeOrder(){$("orderModal").classList.add("hide")}
+$("continueBtn").onclick=()=>{let a=Number($("amount").value),r=rate();if(!a||!r)return toast("تکایە بڕ و نرخ دیاری بکە.",true);let acc=(accounts[from]||[])[0];$("orderSummary").innerHTML=`<b>${svc(from).name} → ${svc(to).name}</b><div class="flex justify-between mt-2"><span>${fmt(a)} IQD</span><strong>${fmt(a*r)} IQD</strong></div>`;$("payBox").innerHTML=acc?`<p class="text-xs text-gray-500">پارەکە بنێرە بۆ ${svc(from).name}</p><strong class="block mt-1">${acc.account_name||""} — ${acc.account_number}</strong>`:`<p class="text-xs text-red-600">هەژماری وەرگرتن لە Admin دانەنراوە.</p>`;$("orderModal").classList.remove("hide")}
+$("submitOrder").onclick=async()=>{let a=Number($("amount").value),r=rate(),file=$("receipt").files[0],acc=(accounts[from]||[])[0];if(!$("fullName").value.trim()||!$("phone").value.trim()||!$("destAccount").value.trim()||!file)return toast("هەموو زانیارییەکان و پسوڵە پڕ بکە.",true);let path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${(file.name.split(".").pop()||"jpg").replace(/[^a-z0-9]/gi,"")}`;let up=await db.storage.from("payment-receipts").upload(path,file);if(up.error)return toast(up.error.message,true);let code="KR-"+Math.floor(100000+Math.random()*900000);let ins=await db.from("transactions").insert({tracking_code:code,from_wallet:from,to_wallet:to,amount:a,receive_amount:a*r,exchange_rate:r,account_number:$("destAccount").value.trim(),receipt_path:path,note:`${$("fullName").value.trim()} | ${$("phone").value.trim()} | receive_account:${acc?.account_number||""}`,status:"Pending"});if(ins.error)return toast(ins.error.message,true);closeOrder();toast(`داواکاری نێردرا: ${code}`);$("trackCode").value=code}
+$("trackBtn").onclick=async()=>{let c=$("trackCode").value.trim();if(!c)return;let {data,error}=await db.from("transactions").select("tracking_code,from_wallet,to_wallet,amount,receive_amount,status,created_at").eq("tracking_code",c).maybeSingle();$("trackResult").innerHTML=error||!data?`<p class="text-xs text-red-600">مامەڵە نەدۆزرایەوە.</p>`:`<div class="bg-[#f7f9fc] rounded-2xl p-3 text-xs"><b>${data.tracking_code}</b><div class="mt-2">${svc(data.from_wallet)?.name||data.from_wallet} → ${svc(data.to_wallet)?.name||data.to_wallet}</div><div class="mt-1">${fmt(data.amount)} → ${fmt(data.receive_amount)}</div><span class="inline-block mt-2 bg-amber-50 text-amber-700 px-2 py-1 rounded-full">${data.status}</span></div>`}
+$("fromBtn").onclick=()=>openService("from");$("toBtn").onclick=()=>openService("to");$("swap").onclick=()=>{[from,to]=[to,from];drawPickers();calc()};$("amount").oninput=calc;$("langBtn").onclick=()=>$("langModal").classList.remove("hide");$("refresh").onclick=load;
+setLang(lang);drawPickers();load();
 </script>
-</body>
-</html>
+</body></html>
