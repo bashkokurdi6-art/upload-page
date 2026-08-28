@@ -1,297 +1,570 @@
-نالinput::placeholder{
-color:#cccccc;
-}
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ئاکسچێنجی دراوەی کوردی</title>
 
-button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:12px;
-background:linear-gradient(135deg,#0f9d58,#FFD700);
-color:black;
-font-weight:bold;
-font-size:17px;
-cursor:pointer;
-transition:.3s;
-}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-button:hover{
-transform:translateY(-2px);
-}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-.stats{
-display:flex;
-justify-content:center;
-align-items:center;
-height:150px;
-flex-direction:column;
-}
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { arabic: ['Noto Sans Arabic', 'sans-serif'] },
+          colors: { navy: '#09233F', navy2: '#0D3157', gold: '#C9A227', gold2: '#E0BD55' }
+        }
+      }
+    }
+  </script>
 
-.stats-number{
-font-size:50px;
-font-weight:800;
-color:#FFD700;
-}
-
-.stats-text{
-font-size:18px;
-}
-
-.names-box{
-max-height:450px;
-overflow-y:auto;
-}
-
-.name-item{
-padding:12px;
-margin-bottom:10px;
-border-radius:10px;
-background:rgba(255,255,255,.07);
-border-right:4px solid #FFD700;
-}
-
-.name-item span{
-color:#FFD700;
-font-weight:bold;
-margin-left:10px;
-}
-
-.footer{
-margin-top:25px;
-text-align:center;
-padding:20px;
-font-size:14px;
-color:#ddd;
-}
-
-.success{
-background:#0f9d58;
-padding:12px;
-border-radius:10px;
-margin-bottom:15px;
-display:none;
-}
-
-.error{
-background:#b00020;
-padding:12px;
-border-radius:10px;
-margin-bottom:15px;
-display:none;
-}
-
-@media(max-width:900px){
-.grid{
-grid-template-columns:1fr;
-}
-
-.hero h1{
-font-size:28px;
-}
-}
-</style>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:'Noto Sans Arabic',sans-serif;color:#172033;
+      background:radial-gradient(circle at top right,rgba(201,162,39,.12),transparent 30%),
+                 radial-gradient(circle at bottom left,rgba(13,49,87,.12),transparent 35%),#f5f7fa
+    }
+    .glass{background:rgba(255,255,255,.90);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.7);box-shadow:0 15px 40px rgba(9,35,63,.08)}
+    .gold-gradient{background:linear-gradient(135deg,#c9a227,#e4c45f)}
+    .navy-gradient{background:linear-gradient(135deg,#09233f,#0d3157)}
+    .input-style{width:100%;border:1px solid #e2e6ec;background:#fafbfd;border-radius:14px;padding:13px 15px;outline:none;transition:.2s;font-family:inherit}
+    .input-style:focus{border-color:#c9a227;box-shadow:0 0 0 3px rgba(201,162,39,.12);background:#fff}
+    .swap-button{transition:.25s}.swap-button:hover{transform:rotate(180deg)}
+    .status-pending{color:#a56b00;background:#fff6d9}.status-completed{color:#18794e;background:#e5f8ed}.status-cancelled{color:#b42318;background:#fdecec}
+    .toast{animation:toast .25s ease-out}@keyframes toast{from{transform:translateY(-10px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @media(max-width:768px){.desktop-only{display:none}}
+  </style>
 </head>
 
 <body>
+<header class="navy-gradient text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="h-[76px] flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl gold-gradient flex items-center justify-center text-navy font-black text-xl shadow-lg">$</div>
+        <div>
+          <h1 class="font-extrabold text-lg leading-5">ئەڵگۆڕینی دراوەی کوردی</h1>
+          <p class="text-[11px] text-white/60">Exchange & Digital Wallet</p>
+        </div>
+      </div>
+      <nav class="desktop-only flex items-center gap-7 text-sm">
+        <a href="#exchange" class="hover:text-yellow-300 transition">گۆڕین</a>
+        <a href="#transactions" class="text-white/70 hover:text-white transition">مامەڵەکان</a>
+        <a href="#rates" class="text-white/70 hover:text-white transition">نرخەکان</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <span id="connectionDot" class="w-2.5 h-2.5 rounded-full bg-yellow-400" title="پشکنین..."></span>
+        <button class="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center">👤</button>
+      </div>
+    </div>
+  </div>
+</header>
 
-<div class="container">
+<main class="max-w-7xl mx-auto px-4 py-7">
+  <section class="mb-7">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <p class="text-gray-500 text-sm">بەخێربێیت 👋</p>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-navy">گۆڕینی پارە و Digital Wallet</h2>
+        <p class="text-gray-500 text-sm mt-1">FastPay، FIB، Qi Card و NasWallet</p>
+      </div>
+      <div class="flex items-center gap-2 text-xs bg-white px-4 py-2 rounded-full shadow-sm">
+        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> سیستەم چالاکە
+      </div>
+    </div>
+  </section>
 
-<div class="glass hero">
-<h1>🕋  دیاری - حاجی کاروان ستونی</h1>
-<p>‌‌حاجی کاروان ستونی - گەشتی عومرەی بەخۆرای بۆ کەسانی هەژار و کەم دەرامەت </p>
-</div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <section id="exchange" class="lg:col-span-2">
+      <div class="glass rounded-3xl p-5 md:p-7">
+        <div class="flex items-center justify-between mb-6">
+          <div><h3 class="font-extrabold text-xl text-navy">گۆڕینی دراو</h3><p class="text-xs text-gray-500 mt-1">زانیارییەکانی مامەڵەکەت داخڵ بکە</p></div>
+          <div class="w-10 h-10 rounded-xl bg-yellow-50 text-gold flex items-center justify-center">⇄</div>
+        </div>
 
-<div class="grid">
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_55px_1fr] gap-3 items-end">
+          <div>
+            <label class="block text-sm font-semibold mb-2">لە</label>
+            <select id="fromWallet" class="input-style"></select>
+          </div>
+          <div class="flex justify-center pb-1">
+            <button id="swapBtn" type="button" class="swap-button w-12 h-12 rounded-2xl navy-gradient text-white flex items-center justify-center text-xl shadow-md">⇄</button>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2">بۆ</label>
+            <select id="toWallet" class="input-style"></select>
+          </div>
+        </div>
 
-<div class="glass card">
+        <div class="mt-5">
+          <label class="block text-sm font-semibold mb-2">بڕی پارە</label>
+          <div class="relative">
+            <input id="amount" type="number" min="0" step="any" inputmode="decimal" placeholder="بڕەکە بنووسە..." class="input-style text-lg font-bold pl-20">
+            <span id="fromCurrency" class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500">IQD</span>
+          </div>
+        </div>
 
-<div class="card-title">📋 فۆڕمی تۆمارکردن</div>
+        <div class="mt-4 rounded-2xl bg-navy/[.04] border border-navy/5 p-4">
+          <div class="flex items-center justify-between gap-3">
+            <div><p class="text-xs text-gray-500">بڕی وەرگیراو</p><div id="receiveAmount" class="text-2xl font-extrabold text-navy mt-1">0</div></div>
+            <div class="text-left"><p class="text-xs text-gray-500">نرخ</p><p id="currentRate" class="font-bold text-gold">1 : 1</p></div>
+          </div>
+        </div>
 
-<div id="success" class="success">تۆمارکردن بە سەرکەوتوویی ئەنجامدرا</div>
-<div id="error" class="error">هەڵەیەک ڕوویدا</div>
+        <div class="mt-5">
+          <label class="block text-sm font-semibold mb-2">ژمارەی هەژمار / Wallet</label>
+          <input id="accountNumber" type="text" placeholder="ژمارەی هەژمار یان Wallet ـەکە بنووسە" class="input-style">
+        </div>
 
-<form id="registerForm">
+        <div class="mt-5">
+          <label class="block text-sm font-semibold mb-2">وێنەی پسوڵەی پارەدان</label>
+          <label for="receipt" class="cursor-pointer border-2 border-dashed border-gray-200 hover:border-gold rounded-2xl p-5 flex flex-col items-center justify-center text-center transition bg-gray-50/50">
+            <div class="w-12 h-12 rounded-2xl bg-yellow-50 text-gold flex items-center justify-center text-xl mb-2">↑</div>
+            <p class="font-semibold text-sm">کلیک بکە بۆ هەڵبژاردنی وێنە</p>
+            <p class="text-xs text-gray-400 mt-1">JPG / PNG / WEBP / PDF — تا 5MB</p>
+            <input id="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden">
+          </label>
+          <p id="fileName" class="text-xs text-green-600 mt-2 hidden"></p>
+        </div>
 
-<div class="form-group">
-<label>ناوی سیانی</label>
-<input type="text" id="fullName" placeholder="ناوی تەواو" required>
-</div>
+        <div class="mt-5">
+          <label class="block text-sm font-semibold mb-2">تێبینی</label>
+          <textarea id="note" rows="3" maxlength="500" placeholder="ئەگەر تێبینییەکت هەیە..." class="input-style resize-none"></textarea>
+        </div>
 
-<div class="form-group">
-<label>ژمارەی مۆبایل</label>
-<input type="tel" id="phone" placeholder="0750xxxxxxx" required>
-</div>
+        <button id="submitBtn" type="button" class="w-full mt-6 py-4 rounded-2xl gold-gradient text-navy font-extrabold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition">
+          ناردنی داواکارییەکە
+        </button>
+        <p class="text-center text-[11px] text-gray-400 mt-3">مامەڵەکەت دوای ناردن لەلایەن بەڕێوەبەرەوە پشکنین دەکرێت.</p>
+      </div>
+    </section>
 
-<div class="form-group">
-<label>شار</label>
-<select id="city" required>
-<option value="">شار هەڵبژێرە</option>
-<option value="هەولێر">هەولێر</option>
-<option value="سلێمانی">سلێمانی</option>
-<option value="دهۆک">دهۆک</option>
-<option value="کەرکوک">کەرکوک</option>
-<option value="هەڵبجە">هەڵبجە</option>
-</select>
-</div>
+    <aside id="rates">
+      <div class="glass rounded-3xl p-5 sticky top-24">
+        <div class="flex items-center justify-between mb-5">
+          <div><h3 class="font-extrabold text-lg text-navy">نرخەکان</h3><p class="text-xs text-gray-400">لە Supabase ـەوە</p></div>
+          <span class="flex items-center gap-1 text-[10px] text-green-600"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Live</span>
+        </div>
+        <div id="ratesList" class="space-y-3"></div>
+        <div class="mt-5 pt-4 border-t">
+          <p class="text-[11px] text-gray-400">دواین نوێکردنەوە:</p>
+          <p id="lastUpdate" class="text-xs font-semibold text-navy mt-1">—</p>
+        </div>
+      </div>
+    </aside>
+  </div>
 
-<button type="submit">تۆمارکردن</button>
+  <section id="transactions" class="mt-7">
+    <div class="glass rounded-3xl p-5 md:p-7">
+      <div class="flex items-center justify-between mb-5">
+        <div><h3 class="font-extrabold text-xl text-navy">دواین مامەڵەکان</h3><p class="text-xs text-gray-500">Recent Transactions</p></div>
+        <button id="refreshBtn" class="text-xs text-navy hover:text-gold">نوێکردنەوە ↻</button>
+      </div>
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="border-b text-gray-400 text-xs">
+            <th class="text-right py-3 px-2">ID</th><th class="text-right py-3 px-2">لە</th><th class="text-right py-3 px-2">بۆ</th>
+            <th class="text-right py-3 px-2">بڕ</th><th class="text-right py-3 px-2">وەرگیراو</th><th class="text-right py-3 px-2">بەروار</th><th class="text-right py-3 px-2">دۆخ</th>
+          </tr></thead>
+          <tbody id="transactionTable"></tbody>
+        </table>
+      </div>
+      <div id="mobileTransactions" class="md:hidden space-y-3"></div>
+      <div id="emptyTransactions" class="hidden text-center py-10 text-gray-400 text-sm">هێشتا هیچ مامەڵەیەک نییە.</div>
+    </div>
+  </section>
+</main>
 
-</form>
+<div id="toast" class="fixed top-24 left-4 right-4 md:left-auto md:right-6 md:w-96 hidden z-[100]"></div>
 
-</div>
+<footer class="mt-10 bg-navy text-white">
+  <div class="max-w-7xl mx-auto px-4 py-7 flex flex-col md:flex-row justify-between gap-5">
+    <div><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-xl gold-gradient text-navy flex items-center justify-center font-black">$</div><span class="font-bold">ئەڵگۆڕینی دراوەی کوردی</span></div><p class="text-xs text-white/50 mt-2">خزمەتگوزاری گۆڕینی دراو و Digital Wallet</p></div>
+    <div class="text-xs text-white/50">© 2026 هەموو مافەکان پارێزراون</div>
+  </div>
+</footer>
 
-<div class="glass card">
-<div class="stats">
-<div id="totalCount" class="stats-number">0</div>
-<div class="stats-text">ڕێژەی تۆمارکراوەکان</div>
-</div>
-</div>
+<script>
+/* ================= SUPABASE ================= */
+const SUPABASE_URL = "https://xeslocltzfapocwrssst.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tVNj4U0o80SENtjRyYsf_w_W_RrTC0O";
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-</div>
+/* ================= STATE ================= */
+let rates = {};
+let wallets = [];
 
-<div class="glass card" style="margin-top:20px;">
+/* ================= HELPERS ================= */
+const $ = id => document.getElementById(id);
 
-<div class="card-title">👥 لیستی تۆمارکراوەکان</div>
-
-<div id="namesList" class="names-box"></div>
-
-</div>
-
-<div class="footer glass">
-پڕۆژەی دیاری عمرە حاجی کاروان ستونی © 2026
-</div>
-
-</div>
-
-<script type="module">
-
-import { createClient }
-from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const supabaseUrl =
-'https://slllcibigutjivauryvc.supabase.co'
-
-const supabaseKey =
-'sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH'
-
-const supabase =
-createClient(
-supabaseUrl,
-supabaseKey
-)
-
-const form =
-document.getElementById('registerForm')
-
-const namesList =
-document.getElementById('namesList')
-
-const totalCount =
-document.getElementById('totalCount')
-
-async function loadRegistrations(){
-
-const { count, error: countError } =
-await supabase
-.from('registrations')
-.select('*', {
-count:'exact',
-head:true
-})
-
-if(!countError){
-totalCount.innerText = count || 0
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
 }
 
-let allData = []
-let from = 0
-const pageSize = 1000
-
-while(true){
-
-const { data, error } =
-await supabase
-.from('registrations')
-.select('*')
-.order('id',{ascending:false})
-.range(from, from + pageSize - 1)
-
-if(error) return
-
-allData = allData.concat(data)
-
-if(data.length < pageSize) break
-
-from += pageSize
+function walletLabel(wallet) {
+  if (!wallet) return "";
+  return `${wallet.name}${wallet.currency ? " — " + wallet.currency : ""}`;
 }
 
-namesList.innerHTML=''
-
-allData.forEach((item,index)=>{
-
-namesList.innerHTML += `
-<div class="name-item">
-<span>${index+1}</span>
-${item.full_name}
-</div>
-`
-
-})
-
+function getWallet(id) {
+  return wallets.find(w => w.code === id);
 }
 
-form.addEventListener(
-'submit',
-async(e)=>{
-
-e.preventDefault()
-
-const fullName =
-document.getElementById('fullName').value
-
-const phone =
-document.getElementById('phone').value
-
-const city =
-document.getElementById('city').value
-
-const { error } =
-await supabase
-.from('registrations')
-.insert([
-{
-full_name:fullName,
-phone:phone,
-city:city
-}
-])
-
-if(error){
-
-document.getElementById('error').style.display='block'
-
-setTimeout(()=>{
-document.getElementById('error').style.display='none'
-},3000)
-
-return
+function getCurrency(code) {
+  const w = getWallet(code);
+  return w?.currency || (code === "USD" ? "USD" : code === "EUR" ? "EUR" : "IQD");
 }
 
-document.getElementById('success').style.display='block'
+function formatNumber(n, max=4) {
+  return Number(n || 0).toLocaleString("en-US", {maximumFractionDigits:max});
+}
 
-setTimeout(()=>{
-document.getElementById('success').style.display='none'
-},3000)
+function showToast(message, type="success") {
+  const el = $("toast");
+  const cls = type === "error"
+    ? "bg-red-50 border-red-200 text-red-700"
+    : "bg-green-50 border-green-200 text-green-700";
+  el.innerHTML = `<div class="toast border rounded-2xl p-4 shadow-xl ${cls} font-semibold text-sm">${escapeHtml(message)}</div>`;
+  el.classList.remove("hidden");
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => el.classList.add("hidden"), 4000);
+}
 
-form.reset()
+/* ================= DEFAULT DATA ================= */
+/* Used only if tables are empty/unavailable. The app still attempts Supabase first. */
+const fallbackWallets = [
+  {code:"FASTPAY_IQD", name:"FastPay", currency:"IQD", active:true},
+  {code:"FIB_IQD", name:"FIB", currency:"IQD", active:true},
+  {code:"QI_IQD", name:"Qi Card", currency:"IQD", active:true},
+  {code:"NAS_IQD", name:"NasWallet", currency:"IQD", active:true},
+  {code:"USD", name:"USD", currency:"USD", active:true},
+  {code:"EUR", name:"EUR", currency:"EUR", active:true}
+];
 
-loadRegistrations()
+const fallbackRates = [
+  {from_currency:"USD", to_currency:"IQD", rate:1520},
+  {from_currency:"EUR", to_currency:"IQD", rate:3050},
+  {from_currency:"IQD", to_currency:"USD", rate:1/1520},
+  {from_currency:"IQD", to_currency:"EUR", rate:1/3050},
+  {from_currency:"USD", to_currency:"EUR", rate:1520/3050},
+  {from_currency:"EUR", to_currency:"USD", rate:3050/1520},
+  {from_currency:"FASTPAY_IQD", to_currency:"FIB_IQD", rate:1},
+  {from_currency:"FIB_IQD", to_currency:"FASTPAY_IQD", rate:1},
+  {from_currency:"FASTPAY_IQD", to_currency:"QI_IQD", rate:1},
+  {from_currency:"QI_IQD", to_currency:"FASTPAY_IQD", rate:1},
+  {from_currency:"FASTPAY_IQD", to_currency:"NAS_IQD", rate:1},
+  {from_currency:"NAS_IQD", to_currency:"FASTPAY_IQD", rate:1},
+  {from_currency:"FIB_IQD", to_currency:"QI_IQD", rate:1},
+  {from_currency:"QI_IQD", to_currency:"FIB_IQD", rate:1},
+  {from_currency:"FIB_IQD", to_currency:"NAS_IQD", rate:1},
+  {from_currency:"NAS_IQD", to_currency:"FIB_IQD", rate:1},
+  {from_currency:"QI_IQD", to_currency:"NAS_IQD", rate:1},
+  {from_currency:"NAS_IQD", to_currency:"QI_IQD", rate:1}
+];
 
-})
+/* ================= LOAD WALLET DATA ================= */
+async function loadWallets() {
+  const {data, error} = await db.from("wallets")
+    .select("code,name,currency,active")
+    .eq("active", true)
+    .order("sort_order", {ascending:true});
 
-loadRegistrations()
+  if (!error && data?.length) {
+    wallets = data;
+  } else {
+    wallets = fallbackWallets;
+    if (error) console.warn("wallets:", error.message);
+  }
 
+  const from = $("fromWallet");
+  const to = $("toWallet");
+  const oldFrom = from.value;
+  const oldTo = to.value;
+
+  from.innerHTML = wallets.map(w => `<option value="${escapeHtml(w.code)}">${escapeHtml(walletLabel(w))}</option>`).join("");
+  to.innerHTML = wallets.map(w => `<option value="${escapeHtml(w.code)}">${escapeHtml(walletLabel(w))}</option>`).join("");
+
+  from.value = wallets.some(w=>w.code===oldFrom) ? oldFrom : (wallets[0]?.code || "FASTPAY_IQD");
+  to.value = wallets.some(w=>w.code===oldTo) ? oldTo : (wallets[1]?.code || wallets[0]?.code || "FIB_IQD");
+
+  calculateExchange();
+}
+
+/* ================= LOAD RATES ================= */
+async function loadRates() {
+  const {data, error} = await db.from("exchange_rates")
+    .select("from_currency,to_currency,rate,active,updated_at")
+    .eq("active", true);
+
+  if (!error && data?.length) {
+    rates = {};
+    data.forEach(r => rates[`${r.from_currency}|${r.to_currency}`] = Number(r.rate));
+    $("lastUpdate").textContent = new Date().toLocaleString("ku-IQ");
+  } else {
+    rates = {};
+    fallbackRates.forEach(r => rates[`${r.from_currency}|${r.to_currency}`] = Number(r.rate));
+    $("lastUpdate").textContent = "نرخی سەرەتایی";
+    if (error) console.warn("exchange_rates:", error.message);
+  }
+
+  renderRates();
+  calculateExchange();
+}
+
+function findRate(from, to) {
+  if (from === to) return 1;
+
+  const direct = rates[`${from}|${to}`];
+  if (Number.isFinite(direct)) return direct;
+
+  const fromCur = getCurrency(from);
+  const toCur = getCurrency(to);
+
+  if (fromCur === toCur) return 1;
+
+  const currencyDirect = rates[`${fromCur}|${toCur}`];
+  if (Number.isFinite(currencyDirect)) return currencyDirect;
+
+  const currencyReverse = rates[`${toCur}|${fromCur}`];
+  if (Number.isFinite(currencyReverse) && currencyReverse !== 0) return 1 / currencyReverse;
+
+  return null;
+}
+
+/* ================= CALCULATION ================= */
+function calculateExchange() {
+  const from = $("fromWallet").value;
+  const to = $("toWallet").value;
+  const amount = Number($("amount").value || 0);
+  const rate = findRate(from, to);
+
+  $("fromCurrency").textContent = getCurrency(from);
+
+  if (rate === null) {
+    $("receiveAmount").textContent = "—";
+    $("currentRate").textContent = "نرخ بەردەست نییە";
+    return;
+  }
+
+  const receive = amount * rate;
+  $("receiveAmount").textContent = formatNumber(receive, 6);
+
+  const fromCur = getCurrency(from);
+  const toCur = getCurrency(to);
+
+  $("currentRate").textContent =
+    `1 ${fromCur} = ${formatNumber(rate, 6)} ${toCur}`;
+}
+
+/* ================= RATES UI ================= */
+function renderRates() {
+  const shown = [
+    ["USD","IQD","دۆلار"],
+    ["EUR","IQD","یۆرۆ"],
+    ["FASTPAY_IQD","FIB_IQD","FastPay → FIB"],
+    ["QI_IQD","FIB_IQD","Qi Card → FIB"],
+    ["NAS_IQD","FIB_IQD","NasWallet → FIB"]
+  ];
+
+  $("ratesList").innerHTML = shown.map(([from,to,title]) => {
+    const rate = findRate(from,to);
+    return `
+      <div class="bg-white border rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="font-bold text-sm">${escapeHtml(title)}</p>
+          <p class="text-[10px] text-gray-400 mt-1">${escapeHtml(from)} → ${escapeHtml(to)}</p>
+        </div>
+        <strong class="text-navy">${rate === null ? "—" : formatNumber(rate,6)}</strong>
+      </div>`;
+  }).join("");
+}
+
+/* ================= FILE ================= */
+$("receipt").addEventListener("change", () => {
+  const file = $("receipt").files[0];
+  if (!file) {
+    $("fileName").classList.add("hidden");
+    return;
+  }
+  $("fileName").textContent = `✓ ${file.name}`;
+  $("fileName").classList.remove("hidden");
+});
+
+/* ================= SWAP ================= */
+$("swapBtn").addEventListener("click", () => {
+  const a = $("fromWallet").value;
+  $("fromWallet").value = $("toWallet").value;
+  $("toWallet").value = a;
+  calculateExchange();
+});
+
+/* ================= SUBMIT ================= */
+$("submitBtn").addEventListener("click", async () => {
+  const button = $("submitBtn");
+  const from = $("fromWallet").value;
+  const to = $("toWallet").value;
+  const amount = Number($("amount").value);
+  const account = $("accountNumber").value.trim();
+  const note = $("note").value.trim();
+  const file = $("receipt").files[0];
+  const rate = findRate(from,to);
+  const receive = rate === null ? null : amount * rate;
+
+  if (!amount || amount <= 0) return showToast("تکایە بڕی پارە داخڵ بکە.", "error");
+  if (rate === null) return showToast("نرخی ئەم گۆڕینە بەردەست نییە.", "error");
+  if (!account) return showToast("تکایە ژمارەی Wallet / هەژمار داخڵ بکە.", "error");
+  if (!file) return showToast("تکایە پسوڵەی پارەدان Upload بکە.", "error");
+  if (file.size > 5 * 1024 * 1024) return showToast("قەبارەی فایل نابێت لە 5MB زیاتر بێت.", "error");
+
+  button.disabled = true;
+  button.textContent = "لە ناردندایە...";
+
+  try {
+    const ext = file.name.split(".").pop().toLowerCase();
+    const safeExt = /^[a-z0-9]+$/.test(ext) ? ext : "bin";
+    const filePath = `${crypto.randomUUID()}.${safeExt}`;
+
+    const {error: uploadError} = await db.storage
+      .from("payment-receipts")
+      .upload(filePath, file, {upsert:false, contentType:file.type || undefined});
+
+    if (uploadError) throw new Error("هەڵە لە Upload ـی پسوڵە: " + uploadError.message);
+
+    const {data: inserted, error: insertError} = await db
+      .from("transactions")
+      .insert({
+        from_wallet: from,
+        to_wallet: to,
+        amount,
+        receive_amount: receive,
+        exchange_rate: rate,
+        account_number: account,
+        receipt_path: filePath,
+        note: note || null,
+        status: "Pending"
+      })
+      .select("id,tracking_code")
+      .single();
+
+    if (insertError) {
+      await db.storage.from("payment-receipts").remove([filePath]);
+      throw new Error("هەڵە لە تۆمارکردنی مامەڵە: " + insertError.message);
+    }
+
+    showToast(`داواکاری نێردرا. کۆدی بەدواداچوون: ${inserted.tracking_code}`);
+    $("amount").value = "";
+    $("accountNumber").value = "";
+    $("note").value = "";
+    $("receipt").value = "";
+    $("fileName").classList.add("hidden");
+    calculateExchange();
+    await loadTransactions();
+  } catch (err) {
+    console.error(err);
+    showToast(err.message || "هەڵەیەک ڕوویدا.", "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "ناردنی داواکارییەکە";
+  }
+});
+
+/* ================= TRANSACTIONS ================= */
+function statusBadge(status) {
+  const s = String(status || "Pending");
+  if (s === "Completed") return `<span class="status-completed px-3 py-1 rounded-full text-[10px] font-bold">تەواوبوو</span>`;
+  if (s === "Cancelled") return `<span class="status-cancelled px-3 py-1 rounded-full text-[10px] font-bold">هەڵوەشێنراوە</span>`;
+  return `<span class="status-pending px-3 py-1 rounded-full text-[10px] font-bold">چاوەڕوانە</span>`;
+}
+
+async function loadTransactions() {
+  const {data, error} = await db.from("transactions")
+    .select("id,tracking_code,from_wallet,to_wallet,amount,receive_amount,status,created_at")
+    .order("created_at", {ascending:false})
+    .limit(20);
+
+  if (error) {
+    console.warn("transactions:", error.message);
+    $("transactionTable").innerHTML = "";
+    $("mobileTransactions").innerHTML = "";
+    $("emptyTransactions").classList.remove("hidden");
+    return;
+  }
+
+  $("emptyTransactions").classList.toggle("hidden", !data?.length);
+
+  $("transactionTable").innerHTML = (data || []).map(tx => {
+    const fw = getWallet(tx.from_wallet);
+    const tw = getWallet(tx.to_wallet);
+    return `
+      <tr class="border-b last:border-0 hover:bg-gray-50 transition">
+        <td class="py-4 px-2 font-bold text-navy">${escapeHtml(tx.tracking_code || tx.id)}</td>
+        <td class="py-4 px-2">${escapeHtml(fw?.name || tx.from_wallet)}</td>
+        <td class="py-4 px-2">${escapeHtml(tw?.name || tx.to_wallet)}</td>
+        <td class="py-4 px-2 font-bold">${formatNumber(tx.amount)} ${escapeHtml(fw?.currency || "")}</td>
+        <td class="py-4 px-2 font-bold">${formatNumber(tx.receive_amount)} ${escapeHtml(tw?.currency || "")}</td>
+        <td class="py-4 px-2 text-gray-500">${new Date(tx.created_at).toLocaleDateString("ku-IQ")}</td>
+        <td class="py-4 px-2">${statusBadge(tx.status)}</td>
+      </tr>`;
+  }).join("");
+
+  $("mobileTransactions").innerHTML = (data || []).map(tx => {
+    const fw = getWallet(tx.from_wallet);
+    const tw = getWallet(tx.to_wallet);
+    return `
+      <div class="border rounded-2xl p-4 bg-white">
+        <div class="flex justify-between items-start gap-2">
+          <div>
+            <p class="text-xs text-gray-400">${escapeHtml(tx.tracking_code || tx.id)}</p>
+            <p class="font-bold text-navy mt-1">${escapeHtml(fw?.name || tx.from_wallet)} <span class="text-gold mx-1">→</span> ${escapeHtml(tw?.name || tx.to_wallet)}</p>
+          </div>
+          ${statusBadge(tx.status)}
+        </div>
+        <div class="flex justify-between mt-4 text-xs"><span class="text-gray-400">بڕ</span><strong>${formatNumber(tx.amount)} ${escapeHtml(fw?.currency || "")}</strong></div>
+        <div class="flex justify-between mt-2 text-xs"><span class="text-gray-400">وەرگیراو</span><strong>${formatNumber(tx.receive_amount)} ${escapeHtml(tw?.currency || "")}</strong></div>
+        <div class="flex justify-between mt-2 text-xs"><span class="text-gray-400">بەروار</span><span>${new Date(tx.created_at).toLocaleDateString("ku-IQ")}</span></div>
+      </div>`;
+  }).join("");
+}
+
+/* ================= EVENTS ================= */
+$("amount").addEventListener("input", calculateExchange);
+$("fromWallet").addEventListener("change", calculateExchange);
+$("toWallet").addEventListener("change", calculateExchange);
+$("refreshBtn").addEventListener("click", async () => {
+  await Promise.all([loadWallets(), loadRates(), loadTransactions()]);
+  showToast("داتا نوێکرایەوە.");
+});
+
+/* ================= CONNECTION CHECK ================= */
+async function checkConnection() {
+  const dot = $("connectionDot");
+  const {error} = await db.from("wallets").select("code").limit(1);
+  if (!error) {
+    dot.className = "w-2.5 h-2.5 rounded-full bg-green-400";
+    dot.title = "Supabase پەیوەندی هەیە";
+  } else {
+    dot.className = "w-2.5 h-2.5 rounded-full bg-red-400";
+    dot.title = "کێشەی Supabase/RLS";
+    console.warn("Supabase connection:", error.message);
+  }
+}
+
+/* ================= START ================= */
+(async function init() {
+  await loadWallets();
+  await loadRates();
+  await loadTransactions();
+  await checkConnection();
+})();
 </script>
-
 </body>
 </html>
