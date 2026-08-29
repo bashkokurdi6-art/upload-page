@@ -1,223 +1,307 @@
 <!doctype html>
 <html lang="ku" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>KR Exchange</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box}html{background:#f3f6fa}body{margin:0;font-family:"Noto Sans Arabic",sans-serif;color:#122033;background:linear-gradient(180deg,#071b2f 0,#0b2948 230px,#f4f7fb 230px);min-height:100vh}
-.shell{width:min(100%,480px);margin:auto;min-height:100vh;padding-bottom:86px}.glass{background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.8);box-shadow:0 18px 55px rgba(4,20,36,.13)}
-.gold{background:linear-gradient(135deg,#d2aa37,#f0d56f)}.navy{background:linear-gradient(135deg,#071b2f,#0d355c)}
-.service-btn{border:1px solid #e4eaf1;background:#fff;border-radius:18px;padding:12px;display:flex;align-items:center;gap:10px;width:100%;min-height:64px}
-.logo{width:42px;height:42px;border-radius:13px;object-fit:contain;background:#fff;border:1px solid #edf0f4;padding:4px}
-.modal{position:fixed;inset:0;background:rgba(2,12,22,.58);z-index:90;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(100%,480px);max-height:78vh;background:#fff;border-radius:28px 28px 0 0;padding:18px;overflow:auto}
-.hide{display:none!important}.rate-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid #edf1f5}.rate-row:last-child{border:0}
-.offer-track{display:flex;gap:12px;overflow:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.offer{min-width:86%;scroll-snap-align:start}
-.input{width:100%;border:1px solid #dde4ec;background:#f9fbfd;border-radius:16px;padding:14px;outline:none}.input:focus{border-color:#d2aa37;box-shadow:0 0 0 3px rgba(210,170,55,.13)}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid #e8edf2;padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr)}
-.navitem{text-align:center;font-size:10px;color:#738092}.navitem b{display:block;font-size:19px;line-height:23px}.navitem.active{color:#0b2948;font-weight:800}
-.step{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e8edf2;color:#738092;font-weight:800}.step.on{background:#0b2948;color:#fff}
-.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%);width:min(calc(100% - 28px),450px);z-index:120}
-</style>
-
-<style id="kr-dark-premium-v2">
-:root{--bg:#05070b;--panel:#0c111b;--panel2:#111827;--line:#1c2635;--text:#f4f7fb;--muted:#778399;--blue:#4777ff;--green:#18d886;--red:#ff4b55;--gold:#e1b84b}
-html{background:var(--bg)!important}
-body{background:radial-gradient(circle at 50% -80px,#152344 0,#080c13 260px,#05070b 520px)!important;color:var(--text)!important;min-height:100vh}
-.shell{width:min(100%,480px);background:transparent!important}
-header{padding-top:calc(14px + env(safe-area-inset-top))!important}
-.glass{background:linear-gradient(145deg,rgba(17,24,39,.98),rgba(9,14,23,.98))!important;border:1px solid var(--line)!important;box-shadow:0 18px 50px rgba(0,0,0,.32)!important}
-.gold{background:linear-gradient(135deg,#4f7cff,#6b8dff)!important;color:white!important}
-.navy{background:#182238!important}
-.service-btn{background:#090d14!important;border-color:#202a39!important;color:#fff!important;border-radius:12px!important;min-height:58px!important}
-.logo{background:#fff!important;border:0!important;border-radius:10px!important;width:38px!important;height:38px!important}
-.input{background:#080c12!important;border-color:#202a39!important;color:#fff!important;border-radius:12px!important}
-.input:focus{border-color:#4f7cff!important;box-shadow:0 0 0 3px rgba(79,124,255,.13)!important}
-#exchange{border-radius:16px!important;padding:14px!important}
-#exchange h2,#rates h3,#track h3{color:#fff!important}
-#exchange label,.text-gray-500,.text-gray-400{color:#778399!important}
-#receive{background:#080c12!important}
-#pairRate{color:#fff!important}
-#usdHint{color:#18d886!important}
-#exchange .bg-\[\#f7f9fc\]{background:#080c12!important;border-color:#1c2635!important}
-#continueBtn{box-shadow:0 8px 25px rgba(71,119,255,.24)!important}
-#rates,#track{border-radius:16px!important}
-.rate-row{border-color:#1c2635!important}
-.rate-row strong{color:#e8edf6!important}
-#pairRates strong{color:#18d886!important}
-#offersSec h3{color:#fff!important}
-.offer{background:linear-gradient(135deg,#111a2c,#182d61)!important;border:1px solid #26385d}
-.bottom{background:rgba(7,10,16,.96)!important;border-color:#1a2330!important}
-.navitem{color:#657086!important}.navitem.active{color:#5f86ff!important}
-.modal{background:rgba(0,0,0,.76)!important}.sheet{background:#0c111b!important;color:#fff!important;border:1px solid #202a39}
-.step{background:#1b2533!important;color:#768398!important}.step.on{background:#4f7cff!important;color:#fff!important}
-#orderSummary,#trackResult>div{background:#080c12!important;color:#fff!important}
-#payBox{background:#171309!important;border-color:#3c3010!important}
-.market-head{display:flex;justify-content:space-between;align-items:center;padding:0 16px 8px}
-.market-head span:first-child{font-size:11px;font-weight:800;color:#9aa6ba}.market-head span:last-child{font-size:9px;color:#18d886}
-.hero-copy{padding:12px 4px 4px}.hero-copy h2{font-size:23px;line-height:1.35;font-weight:900}.hero-copy p{font-size:11px;color:#778399;margin-top:4px}
-.tradingview-widget-container{background:#080c12!important}
-</style>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07110d" />
+  <title>KR Exchange</title>
+  <link rel="icon" href="KR.png" />
+  <link rel="apple-touch-icon" href="KR.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#050a08;--panel:rgba(11,25,19,.72);--panel2:rgba(255,255,255,.055);
+      --line:rgba(255,255,255,.10);--text:#f6fff9;--muted:#98aaa1;
+      --green:#22c55e;--green2:#10b981;--red:#ef4444;--gold:#d7b45a;
+      --shadow:0 24px 70px rgba(0,0,0,.42);
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:
+      radial-gradient(circle at 14% -8%,rgba(34,197,94,.18),transparent 28%),
+      radial-gradient(circle at 95% 10%,rgba(239,68,68,.13),transparent 24%),
+      linear-gradient(180deg,#07110d 0%,#050a08 52%,#030605 100%);
+      color:var(--text);font-family:"Noto Kufi Arabic","Inter",system-ui,sans-serif;min-height:100vh}
+    body.ltr{direction:ltr;font-family:"Inter","Noto Kufi Arabic",system-ui,sans-serif}
+    a{color:inherit}.wrap{width:min(1120px,calc(100% - 24px));margin:auto}
+    .glass{background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+      border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    header{position:sticky;top:0;z-index:30;background:rgba(3,8,6,.68);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
+    .topbar{height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .brand img{width:48px;height:48px;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.05);padding:4px;border:1px solid rgba(255,255,255,.08)}
+    .brand strong{font-size:15px;letter-spacing:.4px}
+    .lang{border:1px solid var(--line);background:#0b1712;color:#fff;border-radius:12px;padding:9px 10px;outline:none;font:inherit}
+    .ticker-shell{border-bottom:1px solid rgba(255,255,255,.07);background:rgba(5,13,9,.72);overflow:hidden}
+    .ticker{height:43px;display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+    .ticker-track{display:inline-flex;gap:14px;align-items:center;min-width:max-content;animation:scroll 26s linear infinite}
+    .tick{display:flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.035);font:600 12px Inter,sans-serif}
+    .up{color:#4ade80}.down{color:#f87171}.dot{width:7px;height:7px;background:#22c55e;border-radius:50%;box-shadow:0 0 12px #22c55e}
+    @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    .hero{padding:30px 0 16px}.hero-card{border-radius:28px;padding:25px;position:relative;overflow:hidden}
+    .hero-card:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(34,197,94,.12);filter:blur(10px);left:-70px;top:-70px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;color:#b9d7c4;font-size:12px;padding:7px 10px;border:1px solid rgba(34,197,94,.18);border-radius:999px;background:rgba(34,197,94,.07)}
+    h1{font-size:clamp(28px,6vw,48px);line-height:1.35;margin:14px 0 8px;max-width:760px}
+    .hero p{color:var(--muted);font-size:13px;line-height:2;margin:0;max-width:760px}
+    .section{padding:15px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .section-head h2{margin:0;font-size:19px}.section-head span{color:var(--muted);font-size:11px}
+    .wallet-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .wallet-card{border-radius:20px;padding:14px;min-width:0;position:relative;overflow:hidden}
+    .wallet-card:after{content:"";position:absolute;inset:auto -35px -45px auto;width:95px;height:95px;border-radius:50%;background:rgba(34,197,94,.09)}
+    .wallet-top{display:flex;align-items:center;gap:10px}.wallet-top img{width:48px;height:48px;border-radius:14px;object-fit:contain;background:#fff;padding:5px}
+    .wallet-name{font-size:13px;font-weight:800}.wallet-rate{font:800 18px Inter,sans-serif;margin-top:14px}
+    .wallet-rate small{font:500 10px "Noto Kufi Arabic",sans-serif;color:var(--muted)}
+    .exchange-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+    .card{border-radius:24px;padding:18px}.card h3{margin:0 0 14px;font-size:17px}
+    label{display:block;color:#b7c7bf;font-size:11px;margin:10px 0 7px}
+    input,select,textarea{width:100%;border:1px solid rgba(255,255,255,.11);background:rgba(1,8,5,.72);color:#fff;border-radius:14px;padding:13px 12px;outline:none;font:inherit}
+    input:focus,select:focus{border-color:rgba(34,197,94,.6);box-shadow:0 0 0 3px rgba(34,197,94,.08)}
+    .pair{display:grid;grid-template-columns:1fr 46px 1fr;align-items:end;gap:8px}
+    .swap{height:46px;border-radius:14px;border:1px solid rgba(34,197,94,.25);background:rgba(34,197,94,.11);color:#7bf2a2;font-size:20px;cursor:pointer}
+    .amountbox{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.11);border-radius:15px;background:rgba(1,8,5,.72);padding-inline-end:12px}
+    .amountbox input{border:0;background:transparent;box-shadow:none}.usdtag{font:800 12px Inter;color:#86efac}
+    .paybox{margin-top:13px;padding:14px;border-radius:18px;border:1px solid rgba(34,197,94,.18);background:linear-gradient(145deg,rgba(34,197,94,.08),rgba(255,255,255,.025));display:none}
+    .payhead{display:flex;align-items:center;gap:10px}.payhead img{width:48px;height:48px;border-radius:13px;background:#fff;object-fit:contain;padding:5px}
+    .numberline{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
+    .number{direction:ltr;text-align:left;font:800 14px Inter;background:#07100c;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:12px;overflow:auto}
+    .copy{border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.06);color:#fff;border-radius:12px;padding:0 13px;font:inherit;cursor:pointer}
+    .estimate{margin-top:12px;display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px}.estimate strong{color:#fff;font:800 14px Inter}
+    .primary{width:100%;margin-top:14px;border:0;border-radius:15px;padding:14px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#04150a;font:800 13px "Noto Kufi Arabic",sans-serif;cursor:pointer;box-shadow:0 10px 28px rgba(34,197,94,.18)}
+    .primary:disabled{opacity:.55;cursor:not-allowed}.track-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+    .secondary{border:1px solid rgba(255,255,255,.11);border-radius:14px;background:rgba(255,255,255,.055);color:#fff;padding:0 16px;font:700 12px "Noto Kufi Arabic";cursor:pointer}
+    .result{display:none;margin-top:13px;border-radius:16px;padding:13px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);font-size:12px;line-height:2}
+    .receipt{display:none;margin-top:15px;border-radius:20px;padding:16px;text-align:center;border:1px solid rgba(215,180,90,.27);background:rgba(215,180,90,.06)}
+    .receipt-code{font:900 22px Inter;letter-spacing:1.2px;color:#f3d990;margin:7px 0}
+    .status{display:inline-block;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800}.pending{background:rgba(245,158,11,.12);color:#fbbf24}.approved,.completed{background:rgba(34,197,94,.12);color:#4ade80}.rejected{background:rgba(239,68,68,.12);color:#f87171}
+    .help{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}.wa{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:#25D366;color:#06200f;border-radius:14px;padding:12px 14px;font-size:12px;font-weight:800;flex:1}
+    footer{padding:28px 0 36px;color:#71827a;font-size:11px;text-align:center}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eefbf3;color:#06100a;padding:10px 14px;border-radius:13px;font-size:11px;font-weight:800;z-index:90;transition:.25s}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:800px){.wallet-row{grid-template-columns:repeat(2,1fr)}.exchange-grid{grid-template-columns:1fr}.hero{padding-top:18px}}
+    @media(max-width:470px){.wrap{width:min(100% - 16px,1120px)}.topbar{height:64px}.brand img{width:42px;height:42px}.brand strong{display:none}.hero-card{padding:19px;border-radius:22px}.wallet-card{padding:12px}.wallet-top img{width:42px;height:42px}.wallet-rate{font-size:16px}.card{padding:14px;border-radius:20px}.pair{grid-template-columns:1fr 40px 1fr}.swap{height:44px}.section-head h2{font-size:16px}}
+  </style>
 </head>
 <body>
-<div class="shell">
-<header class="px-4 pt-4 pb-3 text-white">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2"><div class="gold font-black rounded-lg w-9 h-9 grid place-items-center">KR</div><div><h1 class="font-black leading-5 text-sm">KR EXCHANGE</h1><p class="text-[8px] text-white/40 tracking-[.18em]">DIGITAL ASSET EXCHANGE</p></div></div>
-    <button id="langBtn" class="bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-xs">🌐 <span id="langLabel">کوردی</span></button>
+<header>
+  <div class="wrap topbar">
+    <a class="brand" href="#">
+      <img src="KR.png" alt="KR Exchange">
+      <strong>KR EXCHANGE</strong>
+    </a>
+    <select class="lang" id="lang">
+      <option value="ku">کوردی</option>
+      <option value="ar">العربية</option>
+      <option value="en">English</option>
+    </select>
   </div>
 </header>
 
-<div class="bg-[#061522] border-y border-white/10 min-h-[46px]">
-  <div class="tradingview-widget-container" style="height:46px;overflow:hidden">
-    <div class="tradingview-widget-container__widget"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-    {
-      "symbols": [
-        {"proName":"CMCMARKETS:GOLD","title":"Gold"},
-        {"proName":"OANDA:XAGUSD","title":"Silver"},
-        {"proName":"TVC:DXY","title":"Dollar Index"},
-        {"proName":"FX:EURUSD","title":"EUR/USD"},
-        {"proName":"FX:GBPUSD","title":"GBP/USD"},
-        {"proName":"BITSTAMP:BTCUSD","title":"Bitcoin"},
-        {"proName":"TVC:USOIL","title":"Oil"}
-      ],
-      "showSymbolLogo": true,
-      "isTransparent": true,
-      "displayMode": "adaptive",
-      "colorTheme": "dark",
-      "locale": "en"
-    }
-    </script>
+<div class="ticker-shell">
+  <div class="wrap ticker">
+    <div class="ticker-track" id="tickerTrack">
+      <span class="tick"><span class="dot"></span> LIVE MARKET</span>
+      <span class="tick">BTC <b>...</b></span><span class="tick">ETH <b>...</b></span><span class="tick">BNB <b>...</b></span><span class="tick">SOL <b>...</b></span>
+      <span class="tick"><span class="dot"></span> LIVE MARKET</span>
+      <span class="tick">BTC <b>...</b></span><span class="tick">ETH <b>...</b></span><span class="tick">BNB <b>...</b></span><span class="tick">SOL <b>...</b></span>
+    </div>
   </div>
 </div>
 
-<main class="px-4 pt-4 space-y-4">
-<div class="hero-copy"><h2>Trade smarter with <span style="color:#5f86ff">KR.</span></h2><p>گۆڕینی خێرا و سادەی پارە و خزمەتگوزارییە ئەلیکترۆنییەکان</p></div>
-<div class="market-head"><span>MARKET OVERVIEW</span><span>● LIVE MARKET</span></div>
-<section id="exchange" class="glass rounded-[28px] p-4">
- <div class="flex justify-between items-start mb-4"><div><p class="text-[9px] text-gray-400 uppercase tracking-widest">QUICK EXCHANGE</p><h2 class="text-lg font-black" data-i="exchange">گۆڕینی پارە</h2></div><span class="text-[10px] font-bold bg-green-50 text-green-700 px-2.5 py-1 rounded-full">● LIVE</span></div>
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-card glass">
+      <span class="eyebrow">● <span data-i18n="trusted">ئاڵوگۆڕی پارە بە شێوەی فەرمی و خێرا</span></span>
+      <h1 data-i18n="hero">ئاڵوگۆڕی دراو و وەلێتە ئەلیکترۆنییەکان لە یەک شوێن</h1>
+      <p data-i18n="heroSub">نرخە نوێکان ببینە، وەلێت هەڵبژێرە، پارە بنێرە و بە کۆدی وەسڵ داواکارییەکەت بەدواداچوون بکە.</p>
+    </div>
+  </section>
 
- <label class="text-xs font-bold text-gray-500" data-i="send">تۆ دەنێریت</label>
- <div class="mt-2 grid grid-cols-[1fr_128px] gap-2">
-   <input id="amount" class="input text-lg font-black" type="number" inputmode="decimal" placeholder="1,000,000">
-   <button id="fromBtn" class="service-btn"></button>
- </div>
+  <section class="section">
+    <div class="section-head">
+      <h2 data-i18n="walletRates">نرخی وەلێتەکان</h2>
+      <span data-i18n="per100">بەرامبەر ١٠٠ دۆلار</span>
+    </div>
+    <div class="wallet-row" id="walletCards"></div>
+  </section>
 
- <div class="flex items-center gap-3 my-3"><div class="h-px bg-gray-100 flex-1"></div><button id="swap" class="navy text-white w-11 h-11 rounded-2xl shadow-lg">⇅</button><div class="h-px bg-gray-100 flex-1"></div></div>
+  <section class="section">
+    <div class="exchange-grid">
+      <div class="card glass">
+        <h3 data-i18n="exchangeTitle">داواکاری ئاڵوگۆڕی پارە</h3>
+        <div class="pair">
+          <div><label data-i18n="from">لە</label><select id="fromWallet"></select></div>
+          <button class="swap" id="swapBtn" type="button">⇄</button>
+          <div><label data-i18n="to">بۆ</label><select id="toWallet"></select></div>
+        </div>
 
- <label class="text-xs font-bold text-gray-500" data-i="receive">تۆ وەردەگریت</label>
- <div class="mt-2 grid grid-cols-[1fr_128px] gap-2">
-   <div class="input text-lg font-black bg-[#f5f8fb]" id="receive">0</div>
-   <button id="toBtn" class="service-btn"></button>
- </div>
+        <label data-i18n="amount">بڕی پارە</label>
+        <div class="amountbox"><input id="amount" inputmode="decimal" type="number" min="1" step="0.01" placeholder="100"><span class="usdtag">USD</span></div>
 
- <div class="mt-3 bg-[#f7f9fc] border border-gray-100 rounded-2xl p-3 flex justify-between items-center">
-   <div><p class="text-[10px] text-gray-400" data-i="ourRate">نرخی KR</p><strong id="pairRate" class="text-sm text-[#09233f]">—</strong></div>
-   <div class="text-left"><p class="text-[10px] text-gray-400">100 USD</p><strong id="usdHint" class="text-sm text-[#b68a10]">—</strong></div>
- </div>
- <button id="continueBtn" class="gold w-full mt-4 py-4 rounded-2xl font-black text-[#071b2f] shadow-lg" data-i="continue">بەردەوام بە بۆ گۆڕین ←</button>
-</section>
+        <label data-i18n="receiveAccount">ژمارە/ئەکاونتی وەرگر</label>
+        <input id="receiveAccount" autocomplete="off" placeholder="0750... / Account ID">
 
-<section id="offersSec" class="hide">
- <div class="flex items-center justify-between mb-2"><h3 class="font-black text-[#09233f]" data-i="offers">ئۆفەر و بڵاوکراوە</h3><span class="text-[10px] text-gray-400">KR Exchange</span></div>
- <div id="offers" class="offer-track"></div>
-</section>
+        <div class="paybox" id="payBox">
+          <div class="payhead">
+            <img id="payLogo" src="" alt="">
+            <div><div style="font-size:10px;color:#91a49a" data-i18n="sendTo">پارە بنێرە بۆ</div><strong id="payName"></strong></div>
+          </div>
+          <div class="numberline">
+            <div class="number" id="payNumber">—</div>
+            <button type="button" class="copy" id="copyBtn" data-i18n="copy">کۆپی</button>
+          </div>
+          <div class="estimate">
+            <span data-i18n="payAmount">بڕی ناردن</span><strong><span id="payAmount">0</span> USD</strong>
+          </div>
+          <div class="estimate">
+            <span data-i18n="estimate">بڕی خەمڵێنراوی وەرگرتن</span><strong><span id="receiveEstimate">0</span> USD</strong>
+          </div>
+        </div>
 
-<section id="rates" class="glass rounded-[26px] p-4">
- <div class="flex items-center justify-between"><div><p class="text-[10px] text-gray-400">KR BOARD</p><h3 class="font-black text-[#09233f]" data-i="ourRates">نرخەکانی ئێمە</h3></div><button id="refresh" class="text-xs text-[#b68a10]">↻</button></div>
- <div class="mt-3"><p class="text-[11px] font-bold text-gray-400 mb-1" data-i="usd100">نرخی 100$</p><div id="usdRates"></div></div>
- <div class="mt-4 pt-3 border-t"><p class="text-[11px] font-bold text-gray-400 mb-1" data-i="pairRates">نرخی گۆڕین</p><div id="pairRates"></div></div>
-</section>
+        <button id="submitBtn" class="primary" data-i18n="submit">ناردنی داواکاری</button>
+        <div class="receipt" id="receiptBox">
+          <div style="font-size:11px;color:#c9b778" data-i18n="receiptLabel">کۆدی وەسڵی تۆ</div>
+          <div class="receipt-code" id="receiptCode"></div>
+          <div style="font-size:10px;color:#98aaa1" data-i18n="saveCode">ئەم کۆدە هەڵبگرە بۆ بەدواداچوون.</div>
+        </div>
+      </div>
 
-<section id="track" class="glass rounded-[26px] p-4">
- <h3 class="font-black text-[#09233f]" data-i="tracking">بەدواداچوونی مامەڵە</h3><p class="text-xs text-gray-400 mt-1" data-i="trackingSub">کۆدی مامەڵەکەت بنووسە.</p>
- <div class="flex gap-2 mt-3"><input id="trackCode" class="input" placeholder="KR-123456"><button id="trackBtn" class="navy text-white rounded-2xl px-5 font-bold" data-i="search">گەڕان</button></div>
- <div id="trackResult" class="mt-3"></div>
-</section>
+      <div class="card glass">
+        <h3 data-i18n="trackTitle">بەدواداچوونی وەسڵ</h3>
+        <label data-i18n="receiptEnter">کۆدی وەسڵ داخڵ بکە</label>
+        <div class="track-row">
+          <input id="trackCode" autocomplete="off" placeholder="KR-XXXX-XXXX">
+          <button class="secondary" id="trackBtn" data-i18n="search">گەڕان</button>
+        </div>
+        <div class="result" id="trackResult"></div>
+
+        <div class="help">
+          <a class="wa" href="https://wa.me/6288214653918" target="_blank" rel="noopener">WhatsApp <span data-i18n="support">پشتیوانی</span></a>
+        </div>
+        <div style="margin-top:15px;color:#82948a;font-size:10px;line-height:2" data-i18n="notice">
+          تکایە پێش ناردنی پارە ژمارەکە و بڕەکە دووبارە بپشکنەوە. نرخەکان لەلایەن ئەدمینەوە نوێ دەکرێنەوە.
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
-</div>
 
-<nav class="bottom">
- <a href="#exchange" class="navitem active"><b>⌂</b><span data-i="home">سەرەکی</span></a>
- <a href="#exchange" class="navitem"><b>⇄</b><span data-i="exchangeShort">گۆڕین</span></a>
- <a href="#rates" class="navitem"><b>▥</b><span data-i="ratesShort">نرخەکان</span></a>
- <a href="#track" class="navitem"><b>⌕</b><span data-i="trackShort">بەدواداچوون</span></a>
-</nav>
-
-<div id="serviceModal" class="modal hide"><div class="sheet"><div class="flex justify-between items-center mb-3"><h3 class="font-black" data-i="choose">هەڵبژێرە</h3><button onclick="closeService()" class="w-9 h-9 rounded-full bg-gray-100">×</button></div><div id="serviceList" class="space-y-2"></div></div></div>
-<div id="langModal" class="modal hide"><div class="sheet"><h3 class="font-black mb-3">Language / زمان</h3><div class="space-y-2"><button onclick="setLang('ku')" class="service-btn">کوردی</button><button onclick="setLang('ar')" class="service-btn">العربية</button><button onclick="setLang('en')" class="service-btn">English</button></div></div></div>
-
-<div id="orderModal" class="modal hide"><div class="sheet">
- <div class="flex justify-between"><div><p class="text-[10px] text-gray-400">KR EXCHANGE</p><h3 class="font-black text-lg" data-i="completeOrder">تەواوکردنی مامەڵە</h3></div><button onclick="closeOrder()" class="w-9 h-9 rounded-full bg-gray-100">×</button></div>
- <div class="flex items-center justify-center gap-2 my-4"><span class="step on">1</span><span class="w-10 h-px bg-gray-200"></span><span class="step on">2</span><span class="w-10 h-px bg-gray-200"></span><span class="step">3</span></div>
- <div id="orderSummary" class="bg-[#f7f9fc] rounded-2xl p-3 text-sm mb-3"></div>
- <div id="payBox" class="bg-amber-50 border border-amber-100 rounded-2xl p-3 mb-3"></div>
- <div class="space-y-3">
-  <input id="fullName" class="input" data-ph="name" placeholder="ناوی تەواو">
-  <input id="phone" class="input" inputmode="tel" data-ph="phone" placeholder="ژمارەی مۆبایل">
-  <input id="destAccount" class="input" data-ph="dest" placeholder="ژمارەی هەژماری وەرگر">
-  <label class="block border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center text-sm cursor-pointer"><span data-i="receipt">📎 وێنەی پسوڵە هەڵبژێرە</span><input id="receipt" type="file" accept="image/*,application/pdf" class="hidden"></label>
-  <button id="submitOrder" class="gold w-full py-4 rounded-2xl font-black text-[#071b2f]" data-i="submit">ناردنی داواکاری</button>
- </div>
-</div></div>
-<div id="toast" class="toast hide"></div>
+<footer>© <span id="year"></span> KR Exchange — Secure Digital Exchange</footer>
+<div class="toast" id="toast"></div>
 
 <script>
-const URL="https://xeslocltzfapocwrssst.supabase.co", KEY="sb_publishable_tVNj4U0o80SENtjRyYsf_w_W_RrTC0O"; const db=supabase.createClient(URL,KEY);
-const ZLOGO="data:image/jpeg;base64,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AAAAAACQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//Z";
-const fallbackServices=[
- {code:"FASTPAY",name:"FastPay",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://www.fast-pay.iq"},
- {code:"FIB",name:"FIB",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://fib.iq"},
- {code:"QI",name:"Qi Card",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://qi.iq"},
- {code:"KOREK",name:"Korek",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://www.korektel.com"},
- {code:"ASIACELL",name:"Asiacell",currency:"IQD",logo:"https://www.google.com/s2/favicons?sz=128&domain_url=https://www.asiacell.com"},
- {code:"ZCHARGE",name:"Z! Charge",currency:"IQD",logo:ZLOGO}
+const SUPABASE_URL = "https://xeslocltzfapocwrssst.supabase.co";
+const SUPABASE_KEY = "sb_publishable_tVNj4U0o80SENtjRyYsf_w_W_RrTC0O";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const FALLBACK = [
+  {slug:"fib",name:"FIB",image_file:"FIB.png",account_number:"—",rate_iqd_per_usd:1320},
+  {slug:"zcharge",name:"Zain Cash / Zcharge",image_file:"Zcharge.jpeg",account_number:"—",rate_iqd_per_usd:1320},
+  {slug:"qcard",name:"Qi Card",image_file:"Qcard.png",account_number:"—",rate_iqd_per_usd:1320},
+  {slug:"fastpay",name:"FastPay",image_file:"fastpay.png",account_number:"—",rate_iqd_per_usd:1320}
 ];
-let services=fallbackServices, pairs={}, usd={}, accounts={}, from="FASTPAY",to="ZCHARGE", pickTarget="from";
-const $=x=>document.getElementById(x), fmt=n=>Number(n||0).toLocaleString("en-US",{maximumFractionDigits:2});
-const tr={
- ku:{instant:"گۆڕینی خێرا",exchange:"گۆڕینی پارە",send:"تۆ دەنێریت",receive:"تۆ وەردەگریت",ourRate:"نرخی KR",continue:"بەردەوام بە بۆ گۆڕین ←",offers:"ئۆفەر و بڵاوکراوە",ourRates:"نرخەکانی ئێمە",usd100:"نرخی 100$",pairRates:"نرخی گۆڕین",tracking:"بەدواداچوونی مامەڵە",trackingSub:"کۆدی مامەڵەکەت بنووسە.",search:"گەڕان",home:"سەرەکی",exchangeShort:"گۆڕین",ratesShort:"نرخەکان",trackShort:"بەدواداچوون",choose:"هەڵبژێرە",completeOrder:"تەواوکردنی مامەڵە",receipt:"📎 وێنەی پسوڵە هەڵبژێرە",submit:"ناردنی داواکاری",name:"ناوی تەواو",phone:"ژمارەی مۆبایل",dest:"ژمارەی هەژماری وەرگر"},
- ar:{instant:"تبديل سريع",exchange:"تبديل الأموال",send:"أنت ترسل",receive:"أنت تستلم",ourRate:"سعر KR",continue:"متابعة التبديل ←",offers:"العروض والإعلانات",ourRates:"أسعارنا",usd100:"سعر 100$",pairRates:"أسعار التحويل",tracking:"تتبع المعاملة",trackingSub:"أدخل رمز المعاملة.",search:"بحث",home:"الرئيسية",exchangeShort:"تبديل",ratesShort:"الأسعار",trackShort:"تتبع",choose:"اختر",completeOrder:"إكمال المعاملة",receipt:"📎 اختر صورة الإيصال",submit:"إرسال الطلب",name:"الاسم الكامل",phone:"رقم الهاتف",dest:"رقم حساب المستلم"},
- en:{instant:"Instant exchange",exchange:"Exchange Money",send:"You send",receive:"You receive",ourRate:"KR Rate",continue:"Continue to exchange →",offers:"Offers & Announcements",ourRates:"Our Rates",usd100:"100 USD rate",pairRates:"Exchange rates",tracking:"Track Transaction",trackingSub:"Enter your transaction code.",search:"Search",home:"Home",exchangeShort:"Exchange",ratesShort:"Rates",trackShort:"Track",choose:"Choose service",completeOrder:"Complete transaction",receipt:"📎 Choose payment receipt",submit:"Submit request",name:"Full name",phone:"Mobile number",dest:"Recipient account number"}
+let wallets = [...FALLBACK];
+
+const T = {
+ ku:{trusted:"ئاڵوگۆڕی پارە بە شێوەی فەرمی و خێرا",hero:"ئاڵوگۆڕی دراو و وەلێتە ئەلیکترۆنییەکان لە یەک شوێن",heroSub:"نرخە نوێکان ببینە، وەلێت هەڵبژێرە، پارە بنێرە و بە کۆدی وەسڵ داواکارییەکەت بەدواداچوون بکە.",walletRates:"نرخی وەلێتەکان",per100:"بەرامبەر ١٠٠ دۆلار",exchangeTitle:"داواکاری ئاڵوگۆڕی پارە",from:"لە",to:"بۆ",amount:"بڕی پارە",receiveAccount:"ژمارە/ئەکاونتی وەرگر",sendTo:"پارە بنێرە بۆ",copy:"کۆپی",payAmount:"بڕی ناردن",estimate:"بڕی خەمڵێنراوی وەرگرتن",submit:"ناردنی داواکاری",receiptLabel:"کۆدی وەسڵی تۆ",saveCode:"ئەم کۆدە هەڵبگرە بۆ بەدواداچوون.",trackTitle:"بەدواداچوونی وەسڵ",receiptEnter:"کۆدی وەسڵ داخڵ بکە",search:"گەڕان",support:"پشتیوانی",notice:"تکایە پێش ناردنی پارە ژمارەکە و بڕەکە دووبارە بپشکنەوە. نرخەکان لەلایەن ئەدمینەوە نوێ دەکرێنەوە.",pending:"چاوەڕوان",approved:"پەسەندکراو",completed:"تەواوکراو",rejected:"ڕەتکراو",notFound:"وەسڵ نەدۆزرایەوە",fill:"تکایە زانیارییە پێویستەکان پڕبکەرەوە.",sent:"داواکارییەکەت بە سەرکەوتوویی نێردرا.",copyDone:"کۆپی کرا."},
+ ar:{trusted:"تبادل مالي رسمي وسريع",hero:"تبادل العملات والمحافظ الإلكترونية في مكان واحد",heroSub:"شاهد أحدث الأسعار، اختر المحفظة، أرسل المبلغ وتابع طلبك برمز الإيصال.",walletRates:"أسعار المحافظ",per100:"مقابل 100 دولار",exchangeTitle:"طلب تحويل",from:"من",to:"إلى",amount:"المبلغ",receiveAccount:"رقم/حساب المستلم",sendTo:"أرسل إلى",copy:"نسخ",payAmount:"مبلغ الإرسال",estimate:"المبلغ المتوقع",submit:"إرسال الطلب",receiptLabel:"رمز الإيصال",saveCode:"احتفظ بهذا الرمز للمتابعة.",trackTitle:"تتبع الإيصال",receiptEnter:"أدخل رمز الإيصال",search:"بحث",support:"الدعم",notice:"يرجى التحقق من الرقم والمبلغ قبل الإرسال. الأسعار يتم تحديثها من قبل الإدارة.",pending:"قيد الانتظار",approved:"مقبول",completed:"مكتمل",rejected:"مرفوض",notFound:"لم يتم العثور على الإيصال",fill:"يرجى ملء الحقول المطلوبة.",sent:"تم إرسال الطلب بنجاح.",copyDone:"تم النسخ."},
+ en:{trusted:"Fast, professional digital exchange",hero:"Currency and e-wallet exchange in one place",heroSub:"View updated rates, choose wallets, send funds and track your request with a receipt code.",walletRates:"Wallet rates",per100:"Per 100 USD",exchangeTitle:"Exchange request",from:"From",to:"To",amount:"Amount",receiveAccount:"Recipient account / wallet",sendTo:"Send funds to",copy:"Copy",payAmount:"Send amount",estimate:"Estimated receive",submit:"Submit request",receiptLabel:"Your receipt code",saveCode:"Keep this code for tracking.",trackTitle:"Track receipt",receiptEnter:"Enter receipt code",search:"Search",support:"Support",notice:"Please double-check the account number and amount before sending. Rates are updated by the administrator.",pending:"Pending",approved:"Approved",completed:"Completed",rejected:"Rejected",notFound:"Receipt not found",fill:"Please complete the required fields.",sent:"Request submitted successfully.",copyDone:"Copied."}
 };
-let lang=localStorage.krLang||"ku";
-function setLang(l){lang=l;localStorage.krLang=l;document.documentElement.lang=l;document.documentElement.dir=l==="en"?"ltr":"rtl";$("langLabel").textContent=l==="ku"?"کوردی":l==="ar"?"العربية":"English";document.querySelectorAll("[data-i]").forEach(e=>e.textContent=tr[l][e.dataset.i]||e.textContent);document.querySelectorAll("[data-ph]").forEach(e=>e.placeholder=tr[l][e.dataset.ph]||e.placeholder);$("langModal").classList.add("hide")}
-function svc(c){return services.find(x=>x.code===c)||fallbackServices.find(x=>x.code===c)}
-function serviceHTML(c){let s=svc(c);return `<img class="logo" src="${s.logo}" onerror="this.style.display='none'"><div class="min-w-0 text-right"><b class="block text-[11px] truncate">${s.name}</b><span class="text-[9px] text-gray-400">${s.currency}</span></div>`}
-function drawPickers(){$("fromBtn").innerHTML=serviceHTML(from);$("toBtn").innerHTML=serviceHTML(to)}
-function rate(){return Number(pairs[`${from}|${to}`]??(from===to?1:0))}
-function calc(){let a=Number($("amount").value||0),r=rate();$("receive").textContent=r?fmt(a*r):"—";$("pairRate").textContent=r?`1 ${svc(from).name} = ${fmt(r)} ${svc(to).name}`:"نرخ دانەنراوە";$("usdHint").textContent=usd[to]?`${fmt(usd[to])} IQD`:"—"}
-function openService(target){pickTarget=target;$("serviceList").innerHTML=services.map(s=>`<button class="service-btn" onclick="chooseService('${s.code}')">${serviceHTML(s.code)}<span class="mr-auto text-gray-300">›</span></button>`).join("");$("serviceModal").classList.remove("hide")}
-function closeService(){$("serviceModal").classList.add("hide")} function chooseService(c){if(pickTarget==="from")from=c;else to=c;closeService();drawPickers();calc()}
-function toast(m,err=false){$("toast").innerHTML=`<div class="${err?"bg-red-50 text-red-700 border-red-200":"bg-green-50 text-green-700 border-green-200"} border rounded-2xl p-4 shadow-xl text-sm font-bold">${m}</div>`;$("toast").classList.remove("hide");setTimeout(()=>$("toast").classList.add("hide"),3500)}
-async function load(){
- let [p,u,a,o,s]=await Promise.all([
-  db.from("exchange_pairs").select("*").eq("active",true),
-  db.from("service_usd_rates").select("*").eq("active",true),
-  db.from("payment_accounts").select("*").eq("active",true),
-  db.from("offers").select("*").eq("active",true).order("sort_order"),
-  db.from("services").select("*").eq("active",true).order("sort_order")
- ]);
- if(!s.error&&s.data?.length) services=s.data.map(x=>({...x,logo:x.code==="ZCHARGE"?ZLOGO:(x.logo_url||"")}));
- pairs={};(p.data||[]).forEach(x=>pairs[`${x.from_code}|${x.to_code}`]=Number(x.rate));
- usd={};(u.data||[]).forEach(x=>usd[x.service_code]=Number(x.iqd_per_100usd));
- accounts={};(a.data||[]).forEach(x=>(accounts[x.service_code]??=[]).push(x));
- renderRates();renderOffers(o.data||[]);drawPickers();calc()
+let lang = localStorage.getItem("kr_lang") || "ku";
+function tr(k){return (T[lang]&&T[lang][k])||k}
+function setLang(l){
+  lang=l; localStorage.setItem("kr_lang",l);
+  document.documentElement.lang=l; document.documentElement.dir=l==="en"?"ltr":"rtl";
+  document.body.classList.toggle("ltr",l==="en");
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=tr(el.dataset.i18n));
+  document.getElementById("lang").value=l; renderWallets(); renderSelects(); updatePayBox();
 }
-function renderRates(){
- $("usdRates").innerHTML=services.map(s=>`<div class="rate-row"><div class="flex items-center gap-2"><img class="w-8 h-8 rounded-lg object-contain border p-1" src="${s.logo}"><b class="text-xs">${s.name}</b></div><strong class="text-sm text-[#09233f]">${usd[s.code]?fmt(usd[s.code])+" IQD":"—"}</strong></div>`).join("");
- let arr=Object.entries(pairs).slice(0,10);$("pairRates").innerHTML=arr.length?arr.map(([k,r])=>{let [f,t]=k.split("|");return `<div class="rate-row"><span class="text-xs font-bold">${svc(f)?.name||f} → ${svc(t)?.name||t}</span><strong class="text-xs text-[#b68a10]">1 → ${fmt(r)}</strong></div>`}).join(""):`<p class="text-xs text-gray-400 py-3">هێشتا نرخ دانەنراوە.</p>`
+document.getElementById("lang").addEventListener("change",e=>setLang(e.target.value));
+
+function fmtIQD(n){return new Intl.NumberFormat(lang==="en"?"en-US":"ar-IQ",{maximumFractionDigits:0}).format(n)}
+function fmt(n,d=2){return new Intl.NumberFormat(lang==="en"?"en-US":"en-US",{maximumFractionDigits:d}).format(Number(n||0))}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+
+async function loadWallets(){
+  const {data,error}=await sb.from("wallets").select("slug,name,image_file,account_number,rate_iqd_per_usd,is_active,sort_order").eq("is_active",true).order("sort_order");
+  if(!error && data?.length) wallets=data;
+  renderWallets(); renderSelects(); updatePayBox();
 }
-function renderOffers(list){if(!list.length)return;$("offersSec").classList.remove("hide");$("offers").innerHTML=list.map(x=>`<article class="offer navy text-white rounded-3xl p-4"><span class="text-[9px] bg-white/10 px-2 py-1 rounded-full">${x.badge||"KR OFFER"}</span><h4 class="font-black mt-3">${x.title}</h4><p class="text-xs text-white/65 mt-1">${x.body||""}</p></article>`).join("")}
-function closeOrder(){$("orderModal").classList.add("hide")}
-$("continueBtn").onclick=()=>{let a=Number($("amount").value),r=rate();if(!a||!r)return toast("تکایە بڕ و نرخ دیاری بکە.",true);let acc=(accounts[from]||[])[0];$("orderSummary").innerHTML=`<b>${svc(from).name} → ${svc(to).name}</b><div class="flex justify-between mt-2"><span>${fmt(a)} IQD</span><strong>${fmt(a*r)} IQD</strong></div>`;$("payBox").innerHTML=acc?`<p class="text-xs text-gray-500">پارەکە بنێرە بۆ ${svc(from).name}</p><strong class="block mt-1">${acc.account_name||""} — ${acc.account_number}</strong>`:`<p class="text-xs text-red-600">هەژماری وەرگرتن لە Admin دانەنراوە.</p>`;$("orderModal").classList.remove("hide")}
-$("submitOrder").onclick=async()=>{let a=Number($("amount").value),r=rate(),file=$("receipt").files[0],acc=(accounts[from]||[])[0];if(!$("fullName").value.trim()||!$("phone").value.trim()||!$("destAccount").value.trim()||!file)return toast("هەموو زانیارییەکان و پسوڵە پڕ بکە.",true);let path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${(file.name.split(".").pop()||"jpg").replace(/[^a-z0-9]/gi,"")}`;let up=await db.storage.from("payment-receipts").upload(path,file);if(up.error)return toast(up.error.message,true);let code="KR-"+Math.floor(100000+Math.random()*900000);let ins=await db.from("transactions").insert({tracking_code:code,from_wallet:from,to_wallet:to,amount:a,receive_amount:a*r,exchange_rate:r,account_number:$("destAccount").value.trim(),receipt_path:path,note:`${$("fullName").value.trim()} | ${$("phone").value.trim()} | receive_account:${acc?.account_number||""}`,status:"Pending"});if(ins.error)return toast(ins.error.message,true);closeOrder();toast(`داواکاری نێردرا: ${code}`);$("trackCode").value=code}
-$("trackBtn").onclick=async()=>{let c=$("trackCode").value.trim();if(!c)return;let {data,error}=await db.from("transactions").select("tracking_code,from_wallet,to_wallet,amount,receive_amount,status,created_at").eq("tracking_code",c).maybeSingle();$("trackResult").innerHTML=error||!data?`<p class="text-xs text-red-600">مامەڵە نەدۆزرایەوە.</p>`:`<div class="bg-[#f7f9fc] rounded-2xl p-3 text-xs"><b>${data.tracking_code}</b><div class="mt-2">${svc(data.from_wallet)?.name||data.from_wallet} → ${svc(data.to_wallet)?.name||data.to_wallet}</div><div class="mt-1">${fmt(data.amount)} → ${fmt(data.receive_amount)}</div><span class="inline-block mt-2 bg-amber-50 text-amber-700 px-2 py-1 rounded-full">${data.status}</span></div>`}
-$("fromBtn").onclick=()=>openService("from");$("toBtn").onclick=()=>openService("to");$("swap").onclick=()=>{[from,to]=[to,from];drawPickers();calc()};$("amount").oninput=calc;$("langBtn").onclick=()=>$("langModal").classList.remove("hide");$("refresh").onclick=load;
-setLang(lang);drawPickers();load();
+function renderWallets(){
+  const root=document.getElementById("walletCards");
+  root.innerHTML=wallets.map(w=>`<article class="wallet-card glass">
+    <div class="wallet-top"><img src="${esc(w.image_file)}" alt="${esc(w.name)}"><div class="wallet-name">${esc(w.name)}</div></div>
+    <div class="wallet-rate">${fmtIQD(Number(w.rate_iqd_per_usd)*100)} <small>IQD / 100 USD</small></div>
+  </article>`).join("");
+}
+function renderSelects(){
+  const html=wallets.map(w=>`<option value="${esc(w.slug)}">${esc(w.name)}</option>`).join("");
+  const f=document.getElementById("fromWallet"),t=document.getElementById("toWallet");
+  const fv=f.value,tv=t.value; f.innerHTML=html;t.innerHTML=html;
+  if(wallets.length>1){f.value=wallets.some(x=>x.slug===fv)?fv:wallets[0].slug;t.value=wallets.some(x=>x.slug===tv)?tv:wallets[1].slug}
+}
+function current(id){return wallets.find(w=>w.slug===document.getElementById(id).value)}
+function updatePayBox(){
+  const from=current("fromWallet"),to=current("toWallet"),amount=Number(document.getElementById("amount").value||0);
+  if(!from)return;
+  document.getElementById("payBox").style.display="block";
+  document.getElementById("payLogo").src=from.image_file;document.getElementById("payName").textContent=from.name;
+  document.getElementById("payNumber").textContent=from.account_number||"—";
+  document.getElementById("payAmount").textContent=fmt(amount);
+  let receive=0;if(from&&to&&Number(to.rate_iqd_per_usd)>0)receive=amount*Number(from.rate_iqd_per_usd)/Number(to.rate_iqd_per_usd);
+  document.getElementById("receiveEstimate").textContent=fmt(receive);
+}
+["fromWallet","toWallet","amount"].forEach(id=>document.getElementById(id).addEventListener("input",updatePayBox));
+document.getElementById("swapBtn").onclick=()=>{const f=document.getElementById("fromWallet"),t=document.getElementById("toWallet");[f.value,t.value]=[t.value,f.value];updatePayBox()};
+document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(document.getElementById("payNumber").textContent);toast(tr("copyDone"))};
+
+function code(){const s=()=>Math.random().toString(36).slice(2,6).toUpperCase();return `KR-${s()}-${s()}`}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+document.getElementById("submitBtn").onclick=async()=>{
+  const btn=document.getElementById("submitBtn"),from=current("fromWallet"),to=current("toWallet");
+  const amount=Number(document.getElementById("amount").value),receive_account=document.getElementById("receiveAccount").value.trim();
+  if(!from||!to||from.slug===to.slug||!amount||amount<=0||!receive_account){toast(tr("fill"));return}
+  const estimated_receive=amount*Number(from.rate_iqd_per_usd)/Number(to.rate_iqd_per_usd);
+  btn.disabled=true;
+  let receipt_code=code();
+  let {error}=await sb.from("exchange_requests").insert({
+    receipt_code,from_wallet:from.slug,to_wallet:to.slug,amount,estimated_receive,receive_account,
+    from_rate:Number(from.rate_iqd_per_usd),to_rate:Number(to.rate_iqd_per_usd),status:"pending"
+  });
+  if(error && String(error.message).toLowerCase().includes("duplicate")){receipt_code=code();({error}=await sb.from("exchange_requests").insert({receipt_code,from_wallet:from.slug,to_wallet:to.slug,amount,estimated_receive,receive_account,from_rate:Number(from.rate_iqd_per_usd),to_rate:Number(to.rate_iqd_per_usd),status:"pending"}))}
+  btn.disabled=false;
+  if(error){console.error(error);toast(error.message||"Error");return}
+  document.getElementById("receiptCode").textContent=receipt_code;document.getElementById("receiptBox").style.display="block";
+  document.getElementById("trackCode").value=receipt_code;toast(tr("sent"));
+};
+
+document.getElementById("trackBtn").onclick=track;
+document.getElementById("trackCode").addEventListener("keydown",e=>{if(e.key==="Enter")track()});
+async function track(){
+  const c=document.getElementById("trackCode").value.trim().toUpperCase(),box=document.getElementById("trackResult");
+  if(!c)return;
+  const {data,error}=await sb.rpc("track_exchange",{p_receipt_code:c});
+  const r=Array.isArray(data)?data[0]:data;
+  box.style.display="block";
+  if(error||!r){box.innerHTML=`<span style="color:#f87171">${tr("notFound")}</span>`;return}
+  box.innerHTML=`<div><b>${esc(r.receipt_code)}</b> <span class="status ${esc(r.status)}">${tr(r.status)}</span></div>
+  <div>${esc(r.from_name||r.from_wallet)} → ${esc(r.to_name||r.to_wallet)}</div>
+  <div>${fmt(r.amount)} USD → ${fmt(r.estimated_receive)} USD</div>
+  <div style="color:#83958b">${new Date(r.created_at).toLocaleString()}</div>`;
+}
+
+async function loadTicker(){
+  try{
+    const pairs=["BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT"];
+    const res=await Promise.all(pairs.map(p=>fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${p}`).then(r=>r.json())));
+    const ticks=res.map((x,i)=>{const s=pairs[i].replace("USDT",""),chg=Number(x.priceChangePercent);return `<span class="tick">${s} <b>$${fmt(Number(x.lastPrice),2)}</b> <em class="${chg>=0?"up":"down"}">${chg>=0?"+":""}${fmt(chg,2)}%</em></span>`}).join("");
+    document.getElementById("tickerTrack").innerHTML=`<span class="tick"><span class="dot"></span> LIVE MARKET</span>${ticks}<span class="tick"><span class="dot"></span> LIVE MARKET</span>${ticks}`;
+  }catch(e){console.warn("Ticker unavailable",e)}
+}
+document.getElementById("year").textContent=new Date().getFullYear();
+setLang(lang);loadWallets();loadTicker();setInterval(loadTicker,60000);
 </script>
-</body></html>
+</body>
+</html>
