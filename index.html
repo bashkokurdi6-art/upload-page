@@ -1,96 +1,151 @@
 <!doctype html>
 <html lang="ku" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#07110d" />
-  <title>KR Exchange</title>
-  <link rel="icon" href="KR.png" />
-  <link rel="apple-touch-icon" href="KR.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root{
-      --bg:#050a08;--panel:rgba(11,25,19,.72);--panel2:rgba(255,255,255,.055);
-      --line:rgba(255,255,255,.10);--text:#f6fff9;--muted:#98aaa1;
-      --green:#22c55e;--green2:#10b981;--red:#ef4444;--gold:#d7b45a;
-      --shadow:0 24px 70px rgba(0,0,0,.42);
-    }
-    *{box-sizing:border-box} html{scroll-behavior:smooth}
-    body{margin:0;background:
-      radial-gradient(circle at 14% -8%,rgba(34,197,94,.18),transparent 28%),
-      radial-gradient(circle at 95% 10%,rgba(239,68,68,.13),transparent 24%),
-      linear-gradient(180deg,#07110d 0%,#050a08 52%,#030605 100%);
-      color:var(--text);font-family:"Noto Kufi Arabic","Inter",system-ui,sans-serif;min-height:100vh}
-    body.ltr{direction:ltr;font-family:"Inter","Noto Kufi Arabic",system-ui,sans-serif}
-    a{color:inherit}.wrap{width:min(1120px,calc(100% - 24px));margin:auto}
-    .glass{background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
-      border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-    header{position:sticky;top:0;z-index:30;background:rgba(3,8,6,.68);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
-    .topbar{height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .brand img{width:48px;height:48px;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.05);padding:4px;border:1px solid rgba(255,255,255,.08)}
-    .brand strong{font-size:15px;letter-spacing:.4px}
-    .lang{border:1px solid var(--line);background:#0b1712;color:#fff;border-radius:12px;padding:9px 10px;outline:none;font:inherit}
-    .ticker-shell{border-bottom:1px solid rgba(255,255,255,.07);background:rgba(5,13,9,.72);overflow:hidden}
-    .ticker{height:43px;display:flex;align-items:center;white-space:nowrap;overflow:hidden}
-    .ticker-track{display:inline-flex;gap:14px;align-items:center;min-width:max-content;animation:scroll 26s linear infinite}
-    .tick{display:flex;align-items:center;gap:7px;padding:7px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.035);font:600 12px Inter,sans-serif}
-    .up{color:#4ade80}.down{color:#f87171}.dot{width:7px;height:7px;background:#22c55e;border-radius:50%;box-shadow:0 0 12px #22c55e}
-    @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    .hero{padding:30px 0 16px}.hero-card{border-radius:28px;padding:25px;position:relative;overflow:hidden}
-    .hero-card:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(34,197,94,.12);filter:blur(10px);left:-70px;top:-70px}
-    .eyebrow{display:inline-flex;align-items:center;gap:7px;color:#b9d7c4;font-size:12px;padding:7px 10px;border:1px solid rgba(34,197,94,.18);border-radius:999px;background:rgba(34,197,94,.07)}
-    h1{font-size:clamp(28px,6vw,48px);line-height:1.35;margin:14px 0 8px;max-width:760px}
-    .hero p{color:var(--muted);font-size:13px;line-height:2;margin:0;max-width:760px}
-    .section{padding:15px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-bottom:12px}
-    .section-head h2{margin:0;font-size:19px}.section-head span{color:var(--muted);font-size:11px}
-    .wallet-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    .wallet-card{border-radius:20px;padding:14px;min-width:0;position:relative;overflow:hidden}
-    .wallet-card:after{content:"";position:absolute;inset:auto -35px -45px auto;width:95px;height:95px;border-radius:50%;background:rgba(34,197,94,.09)}
-    .wallet-top{display:flex;align-items:center;gap:10px}.wallet-top img{width:48px;height:48px;border-radius:14px;object-fit:contain;background:#fff;padding:5px}
-    .wallet-name{font-size:13px;font-weight:800}.wallet-rate{font:800 18px Inter,sans-serif;margin-top:14px}
-    .wallet-rate small{font:500 10px "Noto Kufi Arabic",sans-serif;color:var(--muted)}
-    .exchange-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
-    .card{border-radius:24px;padding:18px}.card h3{margin:0 0 14px;font-size:17px}
-    label{display:block;color:#b7c7bf;font-size:11px;margin:10px 0 7px}
-    input,select,textarea{width:100%;border:1px solid rgba(255,255,255,.11);background:rgba(1,8,5,.72);color:#fff;border-radius:14px;padding:13px 12px;outline:none;font:inherit}
-    input:focus,select:focus{border-color:rgba(34,197,94,.6);box-shadow:0 0 0 3px rgba(34,197,94,.08)}
-    .pair{display:grid;grid-template-columns:1fr 46px 1fr;align-items:end;gap:8px}
-    .swap{height:46px;border-radius:14px;border:1px solid rgba(34,197,94,.25);background:rgba(34,197,94,.11);color:#7bf2a2;font-size:20px;cursor:pointer}
-    .amountbox{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.11);border-radius:15px;background:rgba(1,8,5,.72);padding-inline-end:12px}
-    .amountbox input{border:0;background:transparent;box-shadow:none}.usdtag{font:800 12px Inter;color:#86efac}
-    .paybox{margin-top:13px;padding:14px;border-radius:18px;border:1px solid rgba(34,197,94,.18);background:linear-gradient(145deg,rgba(34,197,94,.08),rgba(255,255,255,.025));display:none}
-    .payhead{display:flex;align-items:center;gap:10px}.payhead img{width:48px;height:48px;border-radius:13px;background:#fff;object-fit:contain;padding:5px}
-    .numberline{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
-    .number{direction:ltr;text-align:left;font:800 14px Inter;background:#07100c;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:12px;overflow:auto}
-    .copy{border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.06);color:#fff;border-radius:12px;padding:0 13px;font:inherit;cursor:pointer}
-    .estimate{margin-top:12px;display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px}.estimate strong{color:#fff;font:800 14px Inter}
-    .primary{width:100%;margin-top:14px;border:0;border-radius:15px;padding:14px;background:linear-gradient(135deg,#16a34a,#22c55e);color:#04150a;font:800 13px "Noto Kufi Arabic",sans-serif;cursor:pointer;box-shadow:0 10px 28px rgba(34,197,94,.18)}
-    .primary:disabled{opacity:.55;cursor:not-allowed}.track-row{display:grid;grid-template-columns:1fr auto;gap:8px}
-    .secondary{border:1px solid rgba(255,255,255,.11);border-radius:14px;background:rgba(255,255,255,.055);color:#fff;padding:0 16px;font:700 12px "Noto Kufi Arabic";cursor:pointer}
-    .result{display:none;margin-top:13px;border-radius:16px;padding:13px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);font-size:12px;line-height:2}
-    .receipt{display:none;margin-top:15px;border-radius:20px;padding:16px;text-align:center;border:1px solid rgba(215,180,90,.27);background:rgba(215,180,90,.06)}
-    .receipt-code{font:900 22px Inter;letter-spacing:1.2px;color:#f3d990;margin:7px 0}
-    .status{display:inline-block;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800}.pending{background:rgba(245,158,11,.12);color:#fbbf24}.approved,.completed{background:rgba(34,197,94,.12);color:#4ade80}.rejected{background:rgba(239,68,68,.12);color:#f87171}
-    .help{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}.wa{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:#25D366;color:#06200f;border-radius:14px;padding:12px 14px;font-size:12px;font-weight:800;flex:1}
-    footer{padding:28px 0 36px;color:#71827a;font-size:11px;text-align:center}
-    .toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#eefbf3;color:#06100a;padding:10px 14px;border-radius:13px;font-size:11px;font-weight:800;z-index:90;transition:.25s}
-    .toast.show{opacity:1;transform:translate(-50%,0)}
-    @media(max-width:800px){.wallet-row{grid-template-columns:repeat(2,1fr)}.exchange-grid{grid-template-columns:1fr}.hero{padding-top:18px}}
-    @media(max-width:470px){.wrap{width:min(100% - 16px,1120px)}.topbar{height:64px}.brand img{width:42px;height:42px}.brand strong{display:none}.hero-card{padding:19px;border-radius:22px}.wallet-card{padding:12px}.wallet-top img{width:42px;height:42px}.wallet-rate{font-size:16px}.card{padding:14px;border-radius:20px}.pair{grid-template-columns:1fr 40px 1fr}.swap{height:44px}.section-head h2{font-size:16px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0d12">
+<title>KR Exchange</title>
+<link rel="icon" href="KR.png">
+<link rel="apple-touch-icon" href="KR.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#090c11;--bg2:#0d1218;--card:#11161de6;--card2:#151b23e6;
+  --line:#ffffff0f;--line2:#ffffff1c;--txt:#f2f1ea;--muted:#828d9c;
+  --gold:#e8a53c;--gold-deep:#c07f1f;--mint:#3ecf9a;--rose:#ff6b6a;
+  --mono:"IBM Plex Mono",monospace;--disp:"Space Grotesk","Noto Kufi Arabic",sans-serif;
+  --shadow:0 24px 70px #00000066;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--txt);font-family:"Noto Kufi Arabic","Space Grotesk",sans-serif;
+background:
+radial-gradient(ellipse 900px 500px at 8% -6%,#e8a53c14,transparent 55%),
+radial-gradient(ellipse 700px 500px at 104% 4%,#3ecf9a10,transparent 50%),
+linear-gradient(180deg,#0a0d12 0%,#0b0f15 45%,#07090d 100%);}
+body.en{font-family:"Space Grotesk","Noto Kufi Arabic",sans-serif}
+.wrap{width:min(100% - 22px,1100px);margin:auto}
+.glass{background:linear-gradient(180deg,#ffffff0a,#ffffff04);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+
+header{position:sticky;top:0;z-index:30;background:#090c11ec;border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}
+.top{height:66px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+.brand img{width:42px;height:42px;object-fit:contain;border-radius:12px;padding:5px;background:#ffffff08;border:1px solid var(--line)}
+.brand-meta{display:flex;flex-direction:column;line-height:1.1}
+.brand-meta b{font:700 13px var(--disp);letter-spacing:.14em}
+.brand-meta span{font-size:9px;color:var(--muted);margin-top:5px;font-family:var(--mono)}
+.lang{border:1px solid var(--line2);background:#0d1117;color:#fff;border-radius:11px;padding:10px 12px;outline:none;font:600 11px "Noto Kufi Arabic"}
+
+/* --- signature: live rate tape --- */
+.market{border-bottom:1px solid var(--line);background:#0b0f15;overflow:hidden;position:relative}
+.market:before{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,#e8a53c55,transparent)}
+.market-inner{height:40px;display:flex;align-items:center;overflow:hidden}
+.market-track{display:flex;align-items:center;gap:8px;white-space:nowrap;min-width:max-content;animation:marquee 30s linear infinite;font-family:var(--mono)}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#ffffff03;border-radius:8px;padding:6px 10px;font:600 11px var(--mono);letter-spacing:.01em}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);box-shadow:0 0 8px #ff6b6a99;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.up{color:var(--mint)} .down{color:var(--rose)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+.hero{padding:26px 0 14px}
+.hero-card{position:relative;overflow:hidden;border-radius:22px;padding:28px 22px}
+.hero-card:before{content:"";position:absolute;inset:-90px auto auto -60px;width:220px;height:220px;border-radius:50%;background:#e8a53c1a;filter:blur(30px)}
+.hero-card:after{content:"";position:absolute;right:-70px;bottom:-120px;width:240px;height:240px;border-radius:50%;background:#3ecf9a12;filter:blur(30px)}
+.hero-content{position:relative;z-index:2}
+.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid #e8a53c33;background:#e8a53c0d;color:#f0c17e;border-radius:8px;padding:7px 10px;font:600 10px var(--mono);letter-spacing:.03em}
+.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(24px,5.4vw,42px);letter-spacing:-.01em;line-height:1.4;margin:16px 0 8px;max-width:760px}
+.hero p{margin:0;max-width:720px;color:var(--muted);font-size:12px;line-height:2}
+
+.section{padding:14px 0}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 10px}
+.section-head h2{margin:0;font-size:15px;font-family:var(--disp);font-weight:600;letter-spacing:.01em}
+.section-head span{color:var(--muted);font-size:9px;font-family:var(--mono)}
+
+.wallet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.wallet-card{border-radius:16px;padding:14px;position:relative;overflow:hidden;min-height:132px;transition:border-color .2s}
+.wallet-card:hover{border-color:var(--line2)}
+.wallet-card:before{content:"";position:absolute;top:0;right:0;width:3px;height:0;background:linear-gradient(180deg,var(--gold),var(--mint));transition:height .25s}
+.wallet-card:hover:before{height:100%}
+.wallet-top{display:flex;align-items:center;gap:9px}
+.wallet-top img{width:40px;height:40px;object-fit:contain;border-radius:11px;background:#fff;padding:5px}
+.wallet-name{font-size:11px;font-weight:700;font-family:var(--disp)}
+.rate-caption{font-size:9px;color:var(--muted);margin-top:16px;font-family:var(--mono)}
+.rate{font:700 18px var(--mono);margin-top:4px;color:var(--gold)}
+.rate small{font-size:9px;color:var(--muted);font-weight:600}
+
+.exchange-layout{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}
+.panel{border-radius:18px;padding:17px}
+.panel-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.panel-title h3{margin:0;font-size:15px;font-family:var(--disp);font-weight:600}
+.secure{font-size:9px;color:var(--mint);background:#3ecf9a0f;border:1px solid #3ecf9a2a;padding:6px 8px;border-radius:8px;font-family:var(--mono)}
+label{display:block;font-size:9px;color:#96a0ad;margin:10px 0 6px;font-family:var(--mono);letter-spacing:.02em}
+select,input{width:100%;border:1px solid var(--line2);background:#0b0f14cc;color:#fff;border-radius:12px;padding:12px 11px;outline:none;font:600 12px "Noto Kufi Arabic"}
+select,input#amount,input#trackCode,input#receiveAccount{font-family:var(--mono)}
+input:focus,select:focus{border-color:#e8a53c66;box-shadow:0 0 0 3px #e8a53c14}
+.swap-row{display:grid;grid-template-columns:1fr 42px 1fr;gap:8px;align-items:end}
+.swap-btn{height:44px;border-radius:12px;border:1px solid #e8a53c30;background:#e8a53c0d;color:var(--gold);font-size:18px;cursor:pointer;transition:transform .25s}
+.swap-btn:hover{transform:rotate(180deg)}
+.amount-wrap{display:grid;grid-template-columns:1fr auto;align-items:center;border:1px solid var(--line2);background:#0b0f14cc;border-radius:12px;padding-inline-end:12px}
+.amount-wrap input{border:0;background:transparent;box-shadow:none}
+.currency-tag{font:700 11px var(--mono);color:var(--gold)}
+
+.pay-card{display:none;margin-top:12px;border:1px solid var(--line2);border-inline-start:3px solid var(--gold);background:linear-gradient(180deg,#e8a53c0a,#ffffff02);border-radius:14px;padding:13px}
+.pay-head{display:flex;align-items:center;gap:9px}
+.pay-head img{width:42px;height:42px;background:#fff;padding:5px;object-fit:contain;border-radius:10px}
+.pay-name{font-size:12px;font-weight:700;font-family:var(--disp)}
+.pay-sub{font-size:8px;color:var(--muted);font-family:var(--mono)}
+.copyline{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
+.number{direction:ltr;text-align:left;padding:11px;border-radius:10px;background:#080b0f;border:1px solid var(--line);font:700 12px var(--mono);overflow:auto;color:var(--gold)}
+.copy{border:1px solid var(--line2);background:#ffffff06;color:#fff;border-radius:10px;padding:0 12px;font:700 10px "Noto Kufi Arabic";cursor:pointer}
+.mini-summary{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sum{border:1px solid var(--line);background:#ffffff03;border-radius:11px;padding:10px}
+.sum span{display:block;color:var(--muted);font-size:8px;font-family:var(--mono)} .sum b{display:block;margin-top:4px;font:700 13px var(--mono)}
+
+.primary{width:100%;margin-top:14px;border:0;border-radius:12px;padding:14px;background:linear-gradient(135deg,#f0bc63,#c9821f);color:#160f06;font:700 12px "Noto Kufi Arabic";cursor:pointer;box-shadow:0 10px 26px #e8a53c26;transition:filter .15s}
+.primary:hover{filter:brightness(1.06)}
+.primary:disabled{opacity:.5}
+
+/* --- signature: torn ticket-stub receipt --- */
+.receipt{display:none;margin-top:16px;position:relative;background:#0e131a;border-radius:4px;padding:16px 13px 14px;text-align:center;
+  border-inline:1px dashed #e8a53c40;
+  -webkit-mask-image:radial-gradient(circle 6px at 0 0, transparent 6px, #000 6.5px),radial-gradient(circle 6px at 100% 0, transparent 6px, #000 6.5px),radial-gradient(circle 6px at 0 100%, transparent 6px, #000 6.5px),radial-gradient(circle 6px at 100% 100%, transparent 6px, #000 6.5px);
+  -webkit-mask-composite:source-in;mask-composite:intersect;}
+.receipt:before,.receipt:after{content:"";position:absolute;left:0;right:0;height:1px;background-image:repeating-linear-gradient(90deg,#e8a53c55 0 6px,transparent 6px 12px)}
+.receipt:before{top:0} .receipt:after{bottom:0}
+.receipt small{color:var(--muted);font-size:9px;font-family:var(--mono);letter-spacing:.04em}
+.receipt-code{font:700 21px var(--mono);letter-spacing:.09em;color:var(--gold);margin:7px 0}
+.track-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.secondary{border:1px solid var(--line2);background:#ffffff06;color:#fff;border-radius:11px;padding:0 14px;font:700 10px "Noto Kufi Arabic";cursor:pointer}
+.result{display:none;margin-top:11px;border:1px solid var(--line);background:#ffffff03;border-radius:12px;padding:12px;font-size:10px;line-height:2;font-family:var(--mono)}
+.status{display:inline-block;padding:4px 8px;border-radius:6px;font-size:8px;font-weight:700;font-family:var(--mono)}
+.pending{background:#f59e0b1a;color:#fbbf24} .approved,.completed{background:#3ecf9a1a;color:var(--mint)} .rejected{background:#ff6b6a1a;color:var(--rose)}
+.wa{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;text-decoration:none;background:#17603f;color:#e9fff2;border-radius:12px;padding:12px;font-size:11px;font-weight:700}
+.note{margin-top:11px;color:#6d7a72;font-size:8px;line-height:2;font-family:var(--mono)}
+footer{padding:25px 0 34px;text-align:center;color:#5f6b76;font-size:9px;font-family:var(--mono)}
+.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,18px);opacity:0;background:#f0ead9;color:#0a0d12;padding:10px 13px;border-radius:10px;font-size:10px;font-weight:700;z-index:99;transition:.22s;font-family:var(--mono)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:820px){.exchange-layout{grid-template-columns:1fr}}
+@media(max-width:650px){.wallet-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:470px){
+ .wrap{width:min(100% - 14px,1100px)} .top{height:60px} .brand img{width:38px;height:38px}
+ .brand-meta span{display:none} .hero{padding-top:16px} .hero-card{padding:20px 16px;border-radius:18px}
+ .hero h1{font-size:23px} .hero p{font-size:10px} .wallet-card{min-height:120px;padding:12px}
+ .wallet-top img{width:38px;height:38px} .rate{font-size:16px} .panel{padding:14px;border-radius:16px}
+ .swap-row{grid-template-columns:1fr 38px 1fr} .swap-btn{height:42px}
+}
+</style>
 </head>
 <body>
 <header>
-  <div class="wrap topbar">
+  <div class="wrap top">
     <a class="brand" href="#">
       <img src="KR.png" alt="KR Exchange">
-      <strong>KR EXCHANGE</strong>
+      <div class="brand-meta"><b>KR EXCHANGE</b><span>Digital Currency Exchange</span></div>
     </a>
-    <select class="lang" id="lang">
+    <select id="lang" class="lang">
       <option value="ku">کوردی</option>
       <option value="ar">العربية</option>
       <option value="en">English</option>
@@ -98,210 +153,152 @@
   </div>
 </header>
 
-<div class="ticker-shell">
-  <div class="wrap ticker">
-    <div class="ticker-track" id="tickerTrack">
-      <span class="tick"><span class="dot"></span> LIVE MARKET</span>
-      <span class="tick">BTC <b>...</b></span><span class="tick">ETH <b>...</b></span><span class="tick">BNB <b>...</b></span><span class="tick">SOL <b>...</b></span>
-      <span class="tick"><span class="dot"></span> LIVE MARKET</span>
-      <span class="tick">BTC <b>...</b></span><span class="tick">ETH <b>...</b></span><span class="tick">BNB <b>...</b></span><span class="tick">SOL <b>...</b></span>
-    </div>
-  </div>
+<div class="market">
+  <div class="wrap market-inner"><div class="market-track" id="tickerTrack"></div></div>
 </div>
 
 <main class="wrap">
   <section class="hero">
     <div class="hero-card glass">
-      <span class="eyebrow">● <span data-i18n="trusted">ئاڵوگۆڕی پارە بە شێوەی فەرمی و خێرا</span></span>
-      <h1 data-i18n="hero">ئاڵوگۆڕی دراو و وەلێتە ئەلیکترۆنییەکان لە یەک شوێن</h1>
-      <p data-i18n="heroSub">نرخە نوێکان ببینە، وەلێت هەڵبژێرە، پارە بنێرە و بە کۆدی وەسڵ داواکارییەکەت بەدواداچوون بکە.</p>
+      <div class="hero-content">
+        <div class="badge"><span class="live-dot"></span><span data-i18n="badge">خزمەتگوزاری ئاڵوگۆڕی دیجیتاڵ</span></div>
+        <h1 data-i18n="hero">ئاڵوگۆڕی پارە، بە شێوازێکی خێرا و فەرمی</h1>
+        <p data-i18n="heroSub">FastPay، FIB، Qi Card و ZCharge لە یەک شوێن. نرخ ببینە، داواکاری بنێرە و بە کۆدی وەسڵ بەدواداچوون بکە.</p>
+      </div>
     </div>
   </section>
 
   <section class="section">
-    <div class="section-head">
-      <h2 data-i18n="walletRates">نرخی وەلێتەکان</h2>
-      <span data-i18n="per100">بەرامبەر ١٠٠ دۆلار</span>
-    </div>
-    <div class="wallet-row" id="walletCards"></div>
+    <div class="section-head"><h2 data-i18n="rates">نرخی ئەمڕۆ</h2><span data-i18n="per100">بەرامبەر 100 USD</span></div>
+    <div class="wallet-grid" id="walletCards"></div>
   </section>
 
   <section class="section">
-    <div class="exchange-grid">
-      <div class="card glass">
-        <h3 data-i18n="exchangeTitle">داواکاری ئاڵوگۆڕی پارە</h3>
-        <div class="pair">
+    <div class="exchange-layout">
+      <div class="panel glass">
+        <div class="panel-title"><h3 data-i18n="exchange">ئاڵوگۆڕی دراو</h3><span class="secure" data-i18n="secure">پاراستراو</span></div>
+
+        <div class="swap-row">
           <div><label data-i18n="from">لە</label><select id="fromWallet"></select></div>
-          <button class="swap" id="swapBtn" type="button">⇄</button>
+          <button class="swap-btn" id="swapBtn" type="button">⇄</button>
           <div><label data-i18n="to">بۆ</label><select id="toWallet"></select></div>
         </div>
 
         <label data-i18n="amount">بڕی پارە</label>
-        <div class="amountbox"><input id="amount" inputmode="decimal" type="number" min="1" step="0.01" placeholder="100"><span class="usdtag">USD</span></div>
+        <div class="amount-wrap"><input id="amount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="100"><span class="currency-tag">USD</span></div>
 
-        <label data-i18n="receiveAccount">ژمارە/ئەکاونتی وەرگر</label>
+        <label data-i18n="recipient">ژمارە/ئەکاونتی وەرگر</label>
         <input id="receiveAccount" autocomplete="off" placeholder="0750... / Account ID">
 
-        <div class="paybox" id="payBox">
-          <div class="payhead">
+        <div class="pay-card" id="payBox">
+          <div class="pay-head">
             <img id="payLogo" src="" alt="">
-            <div><div style="font-size:10px;color:#91a49a" data-i18n="sendTo">پارە بنێرە بۆ</div><strong id="payName"></strong></div>
+            <div><div class="pay-sub" data-i18n="sendto">پارە بنێرە بۆ</div><div class="pay-name" id="payName"></div></div>
           </div>
-          <div class="numberline">
+          <div class="copyline">
             <div class="number" id="payNumber">—</div>
-            <button type="button" class="copy" id="copyBtn" data-i18n="copy">کۆپی</button>
+            <button class="copy" id="copyBtn" type="button" data-i18n="copy">کۆپی</button>
           </div>
-          <div class="estimate">
-            <span data-i18n="payAmount">بڕی ناردن</span><strong><span id="payAmount">0</span> USD</strong>
-          </div>
-          <div class="estimate">
-            <span data-i18n="estimate">بڕی خەمڵێنراوی وەرگرتن</span><strong><span id="receiveEstimate">0</span> USD</strong>
+          <div class="mini-summary">
+            <div class="sum"><span data-i18n="sendAmount">بڕی ناردن</span><b><span id="payAmount">0</span> USD</b></div>
+            <div class="sum"><span data-i18n="receive">خەمڵاندنی وەرگرتن</span><b><span id="receiveEstimate">0</span> USD</b></div>
           </div>
         </div>
 
         <button id="submitBtn" class="primary" data-i18n="submit">ناردنی داواکاری</button>
-        <div class="receipt" id="receiptBox">
-          <div style="font-size:11px;color:#c9b778" data-i18n="receiptLabel">کۆدی وەسڵی تۆ</div>
-          <div class="receipt-code" id="receiptCode"></div>
-          <div style="font-size:10px;color:#98aaa1" data-i18n="saveCode">ئەم کۆدە هەڵبگرە بۆ بەدواداچوون.</div>
-        </div>
+        <div class="receipt" id="receiptBox"><small data-i18n="receipt">کۆدی وەسڵ</small><div class="receipt-code" id="receiptCode"></div><small data-i18n="keep">ئەم کۆدە هەڵبگرە</small></div>
       </div>
 
-      <div class="card glass">
-        <h3 data-i18n="trackTitle">بەدواداچوونی وەسڵ</h3>
-        <label data-i18n="receiptEnter">کۆدی وەسڵ داخڵ بکە</label>
+      <div class="panel glass">
+        <div class="panel-title"><h3 data-i18n="track">بەدواداچوونی داواکاری</h3></div>
+        <label data-i18n="enterCode">کۆدی وەسڵ</label>
         <div class="track-row">
           <input id="trackCode" autocomplete="off" placeholder="KR-XXXX-XXXX">
           <button class="secondary" id="trackBtn" data-i18n="search">گەڕان</button>
         </div>
         <div class="result" id="trackResult"></div>
-
-        <div class="help">
-          <a class="wa" href="https://wa.me/6288214653918" target="_blank" rel="noopener">WhatsApp <span data-i18n="support">پشتیوانی</span></a>
-        </div>
-        <div style="margin-top:15px;color:#82948a;font-size:10px;line-height:2" data-i18n="notice">
-          تکایە پێش ناردنی پارە ژمارەکە و بڕەکە دووبارە بپشکنەوە. نرخەکان لەلایەن ئەدمینەوە نوێ دەکرێنەوە.
-        </div>
+        <a class="wa" href="https://wa.me/6288214653918" target="_blank" rel="noopener">WhatsApp <span data-i18n="support">پشتیوانی</span></a>
+        <div class="note" data-i18n="note">پێش ناردنی پارە ژمارەکە و بڕەکە دووبارە بپشکنەوە. نرخەکان لەلایەن ئەدمینەوە نوێ دەکرێنەوە.</div>
       </div>
     </div>
   </section>
 </main>
 
-<footer>© <span id="year"></span> KR Exchange — Secure Digital Exchange</footer>
+<footer>© <span id="year"></span> KR Exchange</footer>
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL = "https://xeslocltzfapocwrssst.supabase.co";
-const SUPABASE_KEY = "sb_publishable_tVNj4U0o80SENtjRyYsf_w_W_RrTC0O";
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL='https://xeslocltzfapocwrssst.supabase.co';
+const SUPABASE_KEY='sb_publishable_tVNj4U0o80SENtjRyYsf_w_W_RrTC0O';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const FALLBACK = [
-  {slug:"fib",name:"FIB",image_file:"FIB.png",account_number:"—",rate_iqd_per_usd:1320},
-  {slug:"zcharge",name:"Zain Cash / Zcharge",image_file:"ZCharge.jpeg",account_number:"—",rate_iqd_per_usd:1320},
-  {slug:"qcard",name:"Qi Card",image_file:"Qcard.png",account_number:"—",rate_iqd_per_usd:1320},
-  {slug:"fastpay",name:"FastPay",image_file:"fastpay.png",account_number:"—",rate_iqd_per_usd:1320}
+let wallets=[
+{slug:"fib",name:"FIB",image_file:"FIB.png",account_number:"—",rate_iqd_per_usd:1320},
+{slug:"zcharge",name:"ZCharge",image_file:"ZCharge.jpeg",account_number:"—",rate_iqd_per_usd:1320},
+{slug:"qcard",name:"Qi Card",image_file:"Qcard.png",account_number:"—",rate_iqd_per_usd:1320},
+{slug:"fastpay",name:"FastPay",image_file:"fastpay.png",account_number:"—",rate_iqd_per_usd:1320}
 ];
-let wallets = [...FALLBACK];
 
-const T = {
- ku:{trusted:"ئاڵوگۆڕی پارە بە شێوەی فەرمی و خێرا",hero:"ئاڵوگۆڕی دراو و وەلێتە ئەلیکترۆنییەکان لە یەک شوێن",heroSub:"نرخە نوێکان ببینە، وەلێت هەڵبژێرە، پارە بنێرە و بە کۆدی وەسڵ داواکارییەکەت بەدواداچوون بکە.",walletRates:"نرخی وەلێتەکان",per100:"بەرامبەر ١٠٠ دۆلار",exchangeTitle:"داواکاری ئاڵوگۆڕی پارە",from:"لە",to:"بۆ",amount:"بڕی پارە",receiveAccount:"ژمارە/ئەکاونتی وەرگر",sendTo:"پارە بنێرە بۆ",copy:"کۆپی",payAmount:"بڕی ناردن",estimate:"بڕی خەمڵێنراوی وەرگرتن",submit:"ناردنی داواکاری",receiptLabel:"کۆدی وەسڵی تۆ",saveCode:"ئەم کۆدە هەڵبگرە بۆ بەدواداچوون.",trackTitle:"بەدواداچوونی وەسڵ",receiptEnter:"کۆدی وەسڵ داخڵ بکە",search:"گەڕان",support:"پشتیوانی",notice:"تکایە پێش ناردنی پارە ژمارەکە و بڕەکە دووبارە بپشکنەوە. نرخەکان لەلایەن ئەدمینەوە نوێ دەکرێنەوە.",pending:"چاوەڕوان",approved:"پەسەندکراو",completed:"تەواوکراو",rejected:"ڕەتکراو",notFound:"وەسڵ نەدۆزرایەوە",fill:"تکایە زانیارییە پێویستەکان پڕبکەرەوە.",sent:"داواکارییەکەت بە سەرکەوتوویی نێردرا.",copyDone:"کۆپی کرا."},
- ar:{trusted:"تبادل مالي رسمي وسريع",hero:"تبادل العملات والمحافظ الإلكترونية في مكان واحد",heroSub:"شاهد أحدث الأسعار، اختر المحفظة، أرسل المبلغ وتابع طلبك برمز الإيصال.",walletRates:"أسعار المحافظ",per100:"مقابل 100 دولار",exchangeTitle:"طلب تحويل",from:"من",to:"إلى",amount:"المبلغ",receiveAccount:"رقم/حساب المستلم",sendTo:"أرسل إلى",copy:"نسخ",payAmount:"مبلغ الإرسال",estimate:"المبلغ المتوقع",submit:"إرسال الطلب",receiptLabel:"رمز الإيصال",saveCode:"احتفظ بهذا الرمز للمتابعة.",trackTitle:"تتبع الإيصال",receiptEnter:"أدخل رمز الإيصال",search:"بحث",support:"الدعم",notice:"يرجى التحقق من الرقم والمبلغ قبل الإرسال. الأسعار يتم تحديثها من قبل الإدارة.",pending:"قيد الانتظار",approved:"مقبول",completed:"مكتمل",rejected:"مرفوض",notFound:"لم يتم العثور على الإيصال",fill:"يرجى ملء الحقول المطلوبة.",sent:"تم إرسال الطلب بنجاح.",copyDone:"تم النسخ."},
- en:{trusted:"Fast, professional digital exchange",hero:"Currency and e-wallet exchange in one place",heroSub:"View updated rates, choose wallets, send funds and track your request with a receipt code.",walletRates:"Wallet rates",per100:"Per 100 USD",exchangeTitle:"Exchange request",from:"From",to:"To",amount:"Amount",receiveAccount:"Recipient account / wallet",sendTo:"Send funds to",copy:"Copy",payAmount:"Send amount",estimate:"Estimated receive",submit:"Submit request",receiptLabel:"Your receipt code",saveCode:"Keep this code for tracking.",trackTitle:"Track receipt",receiptEnter:"Enter receipt code",search:"Search",support:"Support",notice:"Please double-check the account number and amount before sending. Rates are updated by the administrator.",pending:"Pending",approved:"Approved",completed:"Completed",rejected:"Rejected",notFound:"Receipt not found",fill:"Please complete the required fields.",sent:"Request submitted successfully.",copyDone:"Copied."}
+const T={
+ku:{badge:"خزمەتگوزاری ئاڵوگۆڕی دیجیتاڵ",hero:"ئاڵوگۆڕی پارە، بە شێوازێکی خێرا و فەرمی",heroSub:"FastPay، FIB، Qi Card و ZCharge لە یەک شوێن. نرخ ببینە، داواکاری بنێرە و بە کۆدی وەسڵ بەدواداچوون بکە.",rates:"نرخی ئەمڕۆ",per100:"بەرامبەر 100 USD",exchange:"ئاڵوگۆڕی دراو",secure:"پاراستراو",from:"لە",to:"بۆ",amount:"بڕی پارە",recipient:"ژمارە/ئەکاونتی وەرگر",sendto:"پارە بنێرە بۆ",copy:"کۆپی",sendAmount:"بڕی ناردن",receive:"خەمڵاندنی وەرگرتن",submit:"ناردنی داواکاری",receipt:"کۆدی وەسڵ",keep:"ئەم کۆدە هەڵبگرە",track:"بەدواداچوونی داواکاری",enterCode:"کۆدی وەسڵ",search:"گەڕان",support:"پشتیوانی",note:"پێش ناردنی پارە ژمارەکە و بڕەکە دووبارە بپشکنەوە. نرخەکان لەلایەن ئەدمینەوە نوێ دەکرێنەوە.",pending:"چاوەڕوان",approved:"پەسەندکراو",completed:"تەواوکراو",rejected:"ڕەتکراو",notFound:"وەسڵ نەدۆزرایەوە",fill:"تکایە خانە پێویستەکان پڕ بکەرەوە",sent:"داواکاری نێردرا",copied:"کۆپی کرا"},
+ar:{badge:"خدمة تحويل رقمية",hero:"تحويل أموالك بسرعة وبشكل احترافي",heroSub:"FastPay وFIB وQi Card وZCharge في مكان واحد. شاهد السعر وأرسل الطلب وتابعه برمز الإيصال.",rates:"أسعار اليوم",per100:"مقابل 100 USD",exchange:"تحويل العملات",secure:"آمن",from:"من",to:"إلى",amount:"المبلغ",recipient:"حساب المستلم",sendto:"أرسل إلى",copy:"نسخ",sendAmount:"مبلغ الإرسال",receive:"المبلغ المتوقع",submit:"إرسال الطلب",receipt:"رمز الإيصال",keep:"احتفظ بهذا الرمز",track:"تتبع الطلب",enterCode:"رمز الإيصال",search:"بحث",support:"الدعم",note:"تحقق من الرقم والمبلغ قبل الإرسال. الأسعار يتم تحديثها من الإدارة.",pending:"قيد الانتظار",approved:"مقبول",completed:"مكتمل",rejected:"مرفوض",notFound:"لم يتم العثور على الإيصال",fill:"يرجى إكمال الحقول المطلوبة",sent:"تم إرسال الطلب",copied:"تم النسخ"},
+en:{badge:"Digital Exchange Service",hero:"Move money with speed and confidence",heroSub:"FastPay, FIB, Qi Card and ZCharge in one place. Check rates, submit a request and track it by receipt code.",rates:"Today's rates",per100:"Per 100 USD",exchange:"Exchange",secure:"Secure",from:"From",to:"To",amount:"Amount",recipient:"Recipient account",sendto:"Send funds to",copy:"Copy",sendAmount:"Send amount",receive:"Estimated receive",submit:"Submit request",receipt:"Receipt code",keep:"Keep this code",track:"Track request",enterCode:"Receipt code",search:"Search",support:"Support",note:"Double-check the account and amount before sending. Rates are updated by the administrator.",pending:"Pending",approved:"Approved",completed:"Completed",rejected:"Rejected",notFound:"Receipt not found",fill:"Please complete required fields",sent:"Request submitted",copied:"Copied"}
 };
-let lang = localStorage.getItem("kr_lang") || "ku";
-function tr(k){return (T[lang]&&T[lang][k])||k}
+let lang=localStorage.getItem("kr_lang")||"ku";
+const $=id=>document.getElementById(id);
+function tr(k){return T[lang]?.[k]||k}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function fmt(n,d=2){return new Intl.NumberFormat("en-US",{maximumFractionDigits:d}).format(Number(n||0))}
+function fmtIQD(n){return new Intl.NumberFormat("en-US",{maximumFractionDigits:0}).format(Number(n||0))}
+function toast(m){$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1700)}
 function setLang(l){
-  lang=l; localStorage.setItem("kr_lang",l);
-  document.documentElement.lang=l; document.documentElement.dir=l==="en"?"ltr":"rtl";
-  document.body.classList.toggle("ltr",l==="en");
-  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=tr(el.dataset.i18n));
-  document.getElementById("lang").value=l; renderWallets(); renderSelects(); updatePayBox();
+ lang=l;localStorage.setItem("kr_lang",l);document.documentElement.lang=l;document.documentElement.dir=l==="en"?"ltr":"rtl";
+ document.body.classList.toggle("en",l==="en");$("lang").value=l;document.querySelectorAll("[data-i18n]").forEach(x=>x.textContent=tr(x.dataset.i18n));
+ renderWallets();renderSelects();updatePayBox();
 }
-document.getElementById("lang").addEventListener("change",e=>setLang(e.target.value));
-
-function fmtIQD(n){return new Intl.NumberFormat(lang==="en"?"en-US":"ar-IQ",{maximumFractionDigits:0}).format(n)}
-function fmt(n,d=2){return new Intl.NumberFormat(lang==="en"?"en-US":"en-US",{maximumFractionDigits:d}).format(Number(n||0))}
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+$("lang").addEventListener("change",e=>setLang(e.target.value));
 
 async function loadWallets(){
-  const {data,error}=await sb.from("wallets").select("slug,name,image_file,account_number,rate_iqd_per_usd,is_active,sort_order").eq("is_active",true).order("sort_order");
-  if(!error && data?.length) wallets=data;
-  renderWallets(); renderSelects(); updatePayBox();
+ const {data,error}=await sb.from("wallets").select("slug,name,image_file,account_number,rate_iqd_per_usd,is_active,sort_order").eq("is_active",true).order("sort_order");
+ if(!error&&data?.length)wallets=data;renderWallets();renderSelects();updatePayBox();
 }
 function renderWallets(){
-  const root=document.getElementById("walletCards");
-  root.innerHTML=wallets.map(w=>`<article class="wallet-card glass">
-    <div class="wallet-top"><img src="${esc(w.image_file)}" alt="${esc(w.name)}"><div class="wallet-name">${esc(w.name)}</div></div>
-    <div class="wallet-rate">${fmtIQD(Number(w.rate_iqd_per_usd)*100)} <small>IQD / 100 USD</small></div>
-  </article>`).join("");
+ $("walletCards").innerHTML=wallets.map(w=>`<div class="wallet-card glass"><div class="wallet-top"><img src="${esc(w.image_file)}" alt="${esc(w.name)}"><div class="wallet-name">${esc(w.name)}</div></div><div class="rate-caption">${tr("per100")}</div><div class="rate">${fmtIQD(Number(w.rate_iqd_per_usd)*100)} <small>IQD</small></div></div>`).join("");
 }
 function renderSelects(){
-  const html=wallets.map(w=>`<option value="${esc(w.slug)}">${esc(w.name)}</option>`).join("");
-  const f=document.getElementById("fromWallet"),t=document.getElementById("toWallet");
-  const fv=f.value,tv=t.value; f.innerHTML=html;t.innerHTML=html;
-  if(wallets.length>1){f.value=wallets.some(x=>x.slug===fv)?fv:wallets[0].slug;t.value=wallets.some(x=>x.slug===tv)?tv:wallets[1].slug}
+ const h=wallets.map(w=>`<option value="${esc(w.slug)}">${esc(w.name)}</option>`).join("");let f=$("fromWallet"),t=$("toWallet"),fv=f.value,tv=t.value;f.innerHTML=h;t.innerHTML=h;
+ if(wallets.length>1){f.value=wallets.some(x=>x.slug===fv)?fv:wallets[0].slug;t.value=wallets.some(x=>x.slug===tv)?tv:wallets[1].slug}
 }
-function current(id){return wallets.find(w=>w.slug===document.getElementById(id).value)}
+function current(id){return wallets.find(w=>w.slug===$(id).value)}
 function updatePayBox(){
-  const from=current("fromWallet"),to=current("toWallet"),amount=Number(document.getElementById("amount").value||0);
-  if(!from)return;
-  document.getElementById("payBox").style.display="block";
-  document.getElementById("payLogo").src=from.image_file;document.getElementById("payName").textContent=from.name;
-  document.getElementById("payNumber").textContent=from.account_number||"—";
-  document.getElementById("payAmount").textContent=fmt(amount);
-  let receive=0;if(from&&to&&Number(to.rate_iqd_per_usd)>0)receive=amount*Number(from.rate_iqd_per_usd)/Number(to.rate_iqd_per_usd);
-  document.getElementById("receiveEstimate").textContent=fmt(receive);
+ const f=current("fromWallet"),t=current("toWallet"),a=Number($("amount").value||0);if(!f)return;
+ $("payBox").style.display="block";$("payLogo").src=f.image_file;$("payName").textContent=f.name;$("payNumber").textContent=f.account_number||"—";$("payAmount").textContent=fmt(a);
+ const r=f&&t&&Number(t.rate_iqd_per_usd)>0?a*Number(f.rate_iqd_per_usd)/Number(t.rate_iqd_per_usd):0;$("receiveEstimate").textContent=fmt(r);
 }
-["fromWallet","toWallet","amount"].forEach(id=>document.getElementById(id).addEventListener("input",updatePayBox));
-document.getElementById("swapBtn").onclick=()=>{const f=document.getElementById("fromWallet"),t=document.getElementById("toWallet");[f.value,t.value]=[t.value,f.value];updatePayBox()};
-document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(document.getElementById("payNumber").textContent);toast(tr("copyDone"))};
-
-function code(){const s=()=>Math.random().toString(36).slice(2,6).toUpperCase();return `KR-${s()}-${s()}`}
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-
-document.getElementById("submitBtn").onclick=async()=>{
-  const btn=document.getElementById("submitBtn"),from=current("fromWallet"),to=current("toWallet");
-  const amount=Number(document.getElementById("amount").value),receive_account=document.getElementById("receiveAccount").value.trim();
-  if(!from||!to||from.slug===to.slug||!amount||amount<=0||!receive_account){toast(tr("fill"));return}
-  const estimated_receive=amount*Number(from.rate_iqd_per_usd)/Number(to.rate_iqd_per_usd);
-  btn.disabled=true;
-  let receipt_code=code();
-  let {error}=await sb.from("exchange_requests").insert({
-    receipt_code,from_wallet:from.slug,to_wallet:to.slug,amount,estimated_receive,receive_account,
-    from_rate:Number(from.rate_iqd_per_usd),to_rate:Number(to.rate_iqd_per_usd),status:"pending"
-  });
-  if(error && String(error.message).toLowerCase().includes("duplicate")){receipt_code=code();({error}=await sb.from("exchange_requests").insert({receipt_code,from_wallet:from.slug,to_wallet:to.slug,amount,estimated_receive,receive_account,from_rate:Number(from.rate_iqd_per_usd),to_rate:Number(to.rate_iqd_per_usd),status:"pending"}))}
-  btn.disabled=false;
-  if(error){console.error(error);toast(error.message||"Error");return}
-  document.getElementById("receiptCode").textContent=receipt_code;document.getElementById("receiptBox").style.display="block";
-  document.getElementById("trackCode").value=receipt_code;toast(tr("sent"));
+["fromWallet","toWallet","amount"].forEach(id=>$(id).addEventListener("input",updatePayBox));
+$("swapBtn").onclick=()=>{let f=$("fromWallet"),t=$("toWallet");[f.value,t.value]=[t.value,f.value];updatePayBox()};
+$("copyBtn").onclick=async()=>{await navigator.clipboard.writeText($("payNumber").textContent);toast(tr("copied"))};
+function code(){const x=()=>Math.random().toString(36).slice(2,6).toUpperCase();return `KR-${x()}-${x()}`}
+$("submitBtn").onclick=async()=>{
+ const f=current("fromWallet"),t=current("toWallet"),amount=Number($("amount").value),receive_account=$("receiveAccount").value.trim();
+ if(!f||!t||f.slug===t.slug||!amount||amount<=0||!receive_account){toast(tr("fill"));return}
+ const estimated_receive=amount*Number(f.rate_iqd_per_usd)/Number(t.rate_iqd_per_usd);$("submitBtn").disabled=true;let receipt_code=code();
+ let {error}=await sb.from("exchange_requests").insert({receipt_code,from_wallet:f.slug,to_wallet:t.slug,amount,estimated_receive,receive_account,from_rate:Number(f.rate_iqd_per_usd),to_rate:Number(t.rate_iqd_per_usd),status:"pending"});
+ $("submitBtn").disabled=false;if(error){toast(error.message);return}
+ $("receiptCode").textContent=receipt_code;$("receiptBox").style.display="block";$("trackCode").value=receipt_code;toast(tr("sent"));
 };
-
-document.getElementById("trackBtn").onclick=track;
-document.getElementById("trackCode").addEventListener("keydown",e=>{if(e.key==="Enter")track()});
 async function track(){
-  const c=document.getElementById("trackCode").value.trim().toUpperCase(),box=document.getElementById("trackResult");
-  if(!c)return;
-  const {data,error}=await sb.rpc("track_exchange",{p_receipt_code:c});
-  const r=Array.isArray(data)?data[0]:data;
-  box.style.display="block";
-  if(error||!r){box.innerHTML=`<span style="color:#f87171">${tr("notFound")}</span>`;return}
-  box.innerHTML=`<div><b>${esc(r.receipt_code)}</b> <span class="status ${esc(r.status)}">${tr(r.status)}</span></div>
-  <div>${esc(r.from_name||r.from_wallet)} → ${esc(r.to_name||r.to_wallet)}</div>
-  <div>${fmt(r.amount)} USD → ${fmt(r.estimated_receive)} USD</div>
-  <div style="color:#83958b">${new Date(r.created_at).toLocaleString()}</div>`;
+ const c=$("trackCode").value.trim().toUpperCase();if(!c)return;const {data,error}=await sb.rpc("track_exchange",{p_receipt_code:c});const r=Array.isArray(data)?data[0]:data;$("trackResult").style.display="block";
+ if(error||!r){$("trackResult").innerHTML=`<span style="color:#c1c6ce">${tr("notFound")}</span>`;return}
+ $("trackResult").innerHTML=`<div><b>${esc(r.receipt_code)}</b> <span class="status ${esc(r.status)}">${tr(r.status)}</span></div><div>${esc(r.from_name||r.from_wallet)} → ${esc(r.to_name||r.to_wallet)}</div><div>${fmt(r.amount)} USD → ${fmt(r.estimated_receive)} USD</div><div style="color:#7f9187">${new Date(r.created_at).toLocaleString()}</div>`;
 }
-
+$("trackBtn").onclick=track;$("trackCode").addEventListener("keydown",e=>{if(e.key==="Enter")track()});
 async function loadTicker(){
-  try{
-    const pairs=["BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT"];
-    const res=await Promise.all(pairs.map(p=>fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${p}`).then(r=>r.json())));
-    const ticks=res.map((x,i)=>{const s=pairs[i].replace("USDT",""),chg=Number(x.priceChangePercent);return `<span class="tick">${s} <b>$${fmt(Number(x.lastPrice),2)}</b> <em class="${chg>=0?"up":"down"}">${chg>=0?"+":""}${fmt(chg,2)}%</em></span>`}).join("");
-    document.getElementById("tickerTrack").innerHTML=`<span class="tick"><span class="dot"></span> LIVE MARKET</span>${ticks}<span class="tick"><span class="dot"></span> LIVE MARKET</span>${ticks}`;
-  }catch(e){console.warn("Ticker unavailable",e)}
+ try{const pairs=["BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT"];const res=await Promise.all(pairs.map(p=>fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${p}`).then(r=>r.json())));
+ const items=res.map((x,i)=>{let s=pairs[i].replace("USDT",""),c=Number(x.priceChangePercent);return `<span class="pill">${s} <b>$${fmt(Number(x.lastPrice),2)}</b> <span class="${c>=0?"up":"down"}">${c>=0?"+":""}${fmt(c,2)}%</span></span>`}).join("");
+ $("tickerTrack").innerHTML=`<span class="pill"><span class="live-dot"></span> LIVE</span>${items}<span class="pill"><span class="live-dot"></span> LIVE</span>${items}`;}catch(e){$("tickerTrack").innerHTML='<span class="pill"><span class="live-dot"></span> LIVE MARKET</span>';}
 }
-document.getElementById("year").textContent=new Date().getFullYear();
-setLang(lang);loadWallets();loadTicker();setInterval(loadTicker,60000);
+$("year").textContent=new Date().getFullYear();setLang(lang);loadWallets();loadTicker();setInterval(loadTicker,60000);
 </script>
 </body>
 </html>
