@@ -5,7 +5,6 @@
 <title>KR Exchange</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module" src="https://www.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}html{background:#f3f6fa}body{margin:0;font-family:"Noto Sans Arabic",sans-serif;color:#122033;background:linear-gradient(180deg,#071b2f 0,#0b2948 230px,#f4f7fb 230px);min-height:100vh}
@@ -21,25 +20,86 @@
 .navitem{text-align:center;font-size:10px;color:#738092}.navitem b{display:block;font-size:19px;line-height:23px}.navitem.active{color:#0b2948;font-weight:800}
 .step{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e8edf2;color:#738092;font-weight:800}.step.on{background:#0b2948;color:#fff}
 .toast{position:fixed;top:74px;left:50%;transform:translateX(-50%);width:min(calc(100% - 28px),450px);z-index:120}
-tv-ticker-tape{--tv-ticker-tape-height:44px}
 </style>
+
+<style id="kr-dark-premium-v2">
+:root{--bg:#05070b;--panel:#0c111b;--panel2:#111827;--line:#1c2635;--text:#f4f7fb;--muted:#778399;--blue:#4777ff;--green:#18d886;--red:#ff4b55;--gold:#e1b84b}
+html{background:var(--bg)!important}
+body{background:radial-gradient(circle at 50% -80px,#152344 0,#080c13 260px,#05070b 520px)!important;color:var(--text)!important;min-height:100vh}
+.shell{width:min(100%,480px);background:transparent!important}
+header{padding-top:calc(14px + env(safe-area-inset-top))!important}
+.glass{background:linear-gradient(145deg,rgba(17,24,39,.98),rgba(9,14,23,.98))!important;border:1px solid var(--line)!important;box-shadow:0 18px 50px rgba(0,0,0,.32)!important}
+.gold{background:linear-gradient(135deg,#4f7cff,#6b8dff)!important;color:white!important}
+.navy{background:#182238!important}
+.service-btn{background:#090d14!important;border-color:#202a39!important;color:#fff!important;border-radius:12px!important;min-height:58px!important}
+.logo{background:#fff!important;border:0!important;border-radius:10px!important;width:38px!important;height:38px!important}
+.input{background:#080c12!important;border-color:#202a39!important;color:#fff!important;border-radius:12px!important}
+.input:focus{border-color:#4f7cff!important;box-shadow:0 0 0 3px rgba(79,124,255,.13)!important}
+#exchange{border-radius:16px!important;padding:14px!important}
+#exchange h2,#rates h3,#track h3{color:#fff!important}
+#exchange label,.text-gray-500,.text-gray-400{color:#778399!important}
+#receive{background:#080c12!important}
+#pairRate{color:#fff!important}
+#usdHint{color:#18d886!important}
+#exchange .bg-\[\#f7f9fc\]{background:#080c12!important;border-color:#1c2635!important}
+#continueBtn{box-shadow:0 8px 25px rgba(71,119,255,.24)!important}
+#rates,#track{border-radius:16px!important}
+.rate-row{border-color:#1c2635!important}
+.rate-row strong{color:#e8edf6!important}
+#pairRates strong{color:#18d886!important}
+#offersSec h3{color:#fff!important}
+.offer{background:linear-gradient(135deg,#111a2c,#182d61)!important;border:1px solid #26385d}
+.bottom{background:rgba(7,10,16,.96)!important;border-color:#1a2330!important}
+.navitem{color:#657086!important}.navitem.active{color:#5f86ff!important}
+.modal{background:rgba(0,0,0,.76)!important}.sheet{background:#0c111b!important;color:#fff!important;border:1px solid #202a39}
+.step{background:#1b2533!important;color:#768398!important}.step.on{background:#4f7cff!important;color:#fff!important}
+#orderSummary,#trackResult>div{background:#080c12!important;color:#fff!important}
+#payBox{background:#171309!important;border-color:#3c3010!important}
+.market-head{display:flex;justify-content:space-between;align-items:center;padding:0 16px 8px}
+.market-head span:first-child{font-size:11px;font-weight:800;color:#9aa6ba}.market-head span:last-child{font-size:9px;color:#18d886}
+.hero-copy{padding:12px 4px 4px}.hero-copy h2{font-size:23px;line-height:1.35;font-weight:900}.hero-copy p{font-size:11px;color:#778399;margin-top:4px}
+.tradingview-widget-container{background:#080c12!important}
+</style>
+
 </head>
 <body>
 <div class="shell">
 <header class="px-4 pt-4 pb-3 text-white">
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-2"><div class="gold text-[#071b2f] font-black rounded-xl w-10 h-10 grid place-items-center">KR</div><div><h1 class="font-black leading-5">KR EXCHANGE</h1><p class="text-[9px] text-white/55 tracking-wider">DIGITAL EXCHANGE</p></div></div>
+    <div class="flex items-center gap-2"><div class="gold font-black rounded-lg w-9 h-9 grid place-items-center">KR</div><div><h1 class="font-black leading-5 text-sm">KR EXCHANGE</h1><p class="text-[8px] text-white/40 tracking-[.18em]">DIGITAL ASSET EXCHANGE</p></div></div>
     <button id="langBtn" class="bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-xs">🌐 <span id="langLabel">کوردی</span></button>
   </div>
 </header>
 
-<div class="bg-[#061522] border-y border-white/10">
-<tv-ticker-tape symbols="OANDA:XAUUSD,OANDA:XAGUSD,TVC:DXY,FX:EURUSD,FX:GBPUSD,BITSTAMP:BTCUSD,TVC:USOIL" theme="dark" display-mode="adaptive"></tv-ticker-tape>
+<div class="bg-[#061522] border-y border-white/10 min-h-[46px]">
+  <div class="tradingview-widget-container" style="height:46px;overflow:hidden">
+    <div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+    {
+      "symbols": [
+        {"proName":"CMCMARKETS:GOLD","title":"Gold"},
+        {"proName":"OANDA:XAGUSD","title":"Silver"},
+        {"proName":"TVC:DXY","title":"Dollar Index"},
+        {"proName":"FX:EURUSD","title":"EUR/USD"},
+        {"proName":"FX:GBPUSD","title":"GBP/USD"},
+        {"proName":"BITSTAMP:BTCUSD","title":"Bitcoin"},
+        {"proName":"TVC:USOIL","title":"Oil"}
+      ],
+      "showSymbolLogo": true,
+      "isTransparent": true,
+      "displayMode": "adaptive",
+      "colorTheme": "dark",
+      "locale": "en"
+    }
+    </script>
+  </div>
 </div>
 
 <main class="px-4 pt-4 space-y-4">
+<div class="hero-copy"><h2>Trade smarter with <span style="color:#5f86ff">KR.</span></h2><p>گۆڕینی خێرا و سادەی پارە و خزمەتگوزارییە ئەلیکترۆنییەکان</p></div>
+<div class="market-head"><span>MARKET OVERVIEW</span><span>● LIVE MARKET</span></div>
 <section id="exchange" class="glass rounded-[28px] p-4">
- <div class="flex justify-between items-start mb-4"><div><p class="text-[11px] text-gray-400" data-i="instant">گۆڕینی خێرا</p><h2 class="text-xl font-black text-[#09233f]" data-i="exchange">گۆڕینی پارە</h2></div><span class="text-[10px] font-bold bg-green-50 text-green-700 px-2.5 py-1 rounded-full">● LIVE</span></div>
+ <div class="flex justify-between items-start mb-4"><div><p class="text-[9px] text-gray-400 uppercase tracking-widest">QUICK EXCHANGE</p><h2 class="text-lg font-black" data-i="exchange">گۆڕینی پارە</h2></div><span class="text-[10px] font-bold bg-green-50 text-green-700 px-2.5 py-1 rounded-full">● LIVE</span></div>
 
  <label class="text-xs font-bold text-gray-500" data-i="send">تۆ دەنێریت</label>
  <div class="mt-2 grid grid-cols-[1fr_128px] gap-2">
