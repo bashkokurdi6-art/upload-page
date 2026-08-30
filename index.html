@@ -312,6 +312,153 @@ input,select,textarea,button{
   .eyebrow{ font-size:9px; }
 }
 
+
+/* ===== Glass white theme ===== */
+body{
+  color:#ffffff;
+}
+
+.topbar{
+  background:rgba(255,255,255,.10) !important;
+  border-bottom:1px solid rgba(255,255,255,.18) !important;
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+}
+
+.panel,
+.plate,
+.pay-icon,
+.reveal-box,
+.tab-btn,
+.live-frame{
+  background:rgba(255,255,255,.14) !important;
+  border:1px solid rgba(255,255,255,.24) !important;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+  backdrop-filter:blur(18px) saturate(145%);
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+}
+
+.panel,
+.plate,
+.pay-icon,
+.reveal-box{
+  color:#fff !important;
+}
+
+.panel h2,
+.plate h3,
+label,
+.stat-num,
+.reveal-box,
+.pay-icon span{
+  color:#fff !important;
+}
+
+p,
+.eyebrow,
+.section > .wrap > p,
+.section-head p{
+  color:rgba(255,255,255,.78) !important;
+}
+
+input,
+select,
+textarea{
+  background:rgba(255,255,255,.16) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.28) !important;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:rgba(255,255,255,.58);
+}
+
+select option{
+  color:#111;
+  background:#fff;
+}
+
+.btn{
+  background:rgba(255,255,255,.20) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.28) !important;
+  box-shadow:0 6px 18px rgba(0,0,0,.16) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.btn:hover{
+  background:rgba(255,255,255,.28) !important;
+}
+
+.brand{
+  color:#fff !important;
+}
+
+.lang-switch{
+  background:rgba(255,255,255,.10) !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+}
+
+.lang-switch button{
+  color:#fff !important;
+}
+
+.lang-switch button.active{
+  background:rgba(255,255,255,.24) !important;
+  color:#fff !important;
+}
+
+.live-frame{
+  min-height:180px;
+  overflow:hidden;
+}
+
+.live-frame p{
+  color:rgba(255,255,255,.82) !important;
+}
+
+.whatsapp-fab{
+  background:rgba(255,255,255,.18) !important;
+  border:1px solid rgba(255,255,255,.26) !important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.footer{
+  color:rgba(255,255,255,.68) !important;
+  border-top:1px solid rgba(255,255,255,.15) !important;
+}
+
+
+/* ===== WhatsApp green button ===== */
+.whatsapp-fab{
+  background:#25D366 !important;
+  color:#fff !important;
+  border:1px solid #1faf54 !important;
+  box-shadow:0 8px 24px rgba(37,211,102,.32) !important;
+}
+.whatsapp-fab:hover{
+  background:#20bd5a !important;
+}
+
+
+/* Payment method logo cards */
+#pay-grid .pay-icon{
+  min-height:92px;
+  justify-content:center;
+}
+#pay-grid .pay-icon img{
+  width:72px !important;
+  height:48px !important;
+  object-fit:contain !important;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -331,8 +478,8 @@ input,select,textarea,button{
 <!-- HERO -->
 <section class="section">
   <div class="wrap">
-    <p class="eyebrow" data-i18n="hero_eyebrow">ڤایرۆ گەیمینگ </p>
-    <h1 data-i18n="hero_title">پلیتەکەت بکڕە، بەشداری بکە، ببەرەوە</h1>
+    <p class="eyebrow" data-i18n="hero_eyebrow">ڕوومی پۆبجی</p>
+    <h1 data-i18n="hero_title">بەشداری بکە و ببەرەوە</h1>
     <p data-i18n="hero_sub">هەڵبژاردەی یارزانە ئاست بەرزەکان و بینینی ڕاستەوخۆی خولەکان.</p>
     <div class="grid grid-3" style="margin-top:22px">
       <div class="plate">
@@ -485,8 +632,8 @@ const RECEIPTS_BUCKET = "receipts";
 const I18N = {
   ku: {
     dir: "rtl",
-    hero_eyebrow: "یاری پلیت",
-    hero_title: "پلیتەکەت بکڕە، بەشداری بکە، ببەرەوە",
+    hero_eyebrow: "ڕوومی پۆبجی",
+    hero_title: "بەشداری بکە و ببەرەوە",
     hero_sub: "هەڵبژاردنی ڕووم، پارەدانی ئاسان، و بینینی ڕاستەوخۆی خولەکان.",
     stat_online: "ئۆنلاین",
     stat_participants: "بەشداربوان",
@@ -704,12 +851,25 @@ async function loadPaymentMethods(){
   if (error) { console.error(error); grid.innerHTML = `<p style="color:var(--danger)">هەڵە: داتابەیس ڕێکنەخراوە یان schema.sql جێبەجێ نەکراوە</p>`; return; }
   PAYMENT_METHODS = data || [];
   if (!PAYMENT_METHODS.length){ grid.innerHTML = `<p>${t("no_data")}</p>`; return; }
-  grid.innerHTML = PAYMENT_METHODS.map(p=>`
-    <div class="pay-icon" data-id="${p.id}">
-      <img src="assets/${p.icon_file}" alt="${p.display_name}" onerror="this.style.display='none'">
-      <span>${p.display_name}</span>
-    </div>
-  `).join("");
+  grid.innerHTML = PAYMENT_METHODS.map(p=>{
+    const name = (p.display_name || "").trim().toLowerCase();
+    let icon = p.icon_file || "";
+
+    if (name.includes("fastpay") || name.includes("فاست") || name.includes("فاستپەی")) {
+      icon = "fastpay.png";
+    } else if (name === "fib" || name.includes("f.i.b") || name.includes("ئێف") || name.includes("fib")) {
+      icon = "FIB.png";
+    } else if (name.includes("qcard") || name.includes("qi card") || name.includes("کی کارد") || name.includes("کی‌کارد")) {
+      icon = "Qcard.png";
+    }
+
+    return `
+      <div class="pay-icon" data-id="${p.id}">
+        <img src="${icon}" alt="${p.display_name}" onerror="this.style.display='none'">
+        <span>${p.display_name}</span>
+      </div>
+    `;
+  }).join("");
   grid.querySelectorAll(".pay-icon").forEach(el=>{
     el.addEventListener("click", ()=>selectPayment(el.dataset.id));
   });
