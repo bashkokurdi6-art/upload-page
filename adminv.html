@@ -240,8 +240,8 @@ th{ color:var(--muted); font-weight:800; font-size:11px; text-transform:uppercas
     <p class="eyebrow">PLATE GAME</p>
     <h2>چوونەژوورەوەی ئەدمین</h2>
     <div class="field">
-      <label>ناوی بەکارهێنەر</label>
-      <input type="text" id="login-user">
+      <label>ئیمێڵ</label>
+      <input type="email" id="login-user" autocomplete="email" placeholder="Emad@viro99.com">
     </div>
     <div class="field">
       <label>وشەی نهێنی</label>
@@ -365,9 +365,9 @@ th{ color:var(--muted); font-weight:800; font-size:11px; text-transform:uppercas
           <div class="field"><label>ژمارەی ئۆنلاین (دەستی)</label><input id="s-online" type="number"></div>
         </div>
         <hr style="border-color:var(--border);margin:20px 0">
-        <h2>گۆڕینی وشەی نهێنی ئەدمین</h2>
+        <h2>هەژماری ئەدمین</h2>
         <div class="grid grid-2">
-          <div class="field"><label>ناوی بەکارهێنەری نوێ</label><input id="s-username"></div>
+          <div class="field"><label>ئیمێڵی ئەدمین</label><input id="s-username" type="email" disabled></div>
           <div class="field"><label>وشەی نهێنی نوێ</label><input id="s-password" type="password"></div>
         </div>
         <button class="btn" id="save-settings">پاشەکەوتکردن</button>
@@ -407,14 +407,15 @@ function showToast(msg){
 function fmtMoney(n){ return Number(n||0).toLocaleString(); }
 
 // ---------- چوونەژوورەوە ----------
-document.addEventListener("DOMContentLoaded", ()=>{
-  if (sessionStorage.getItem("plate_admin_ok") === "1"){
+document.addEventListener("DOMContentLoaded", async ()=>{
+  const { data: { session } } = await sb.auth.getSession();
+  if (session){
     showAdmin();
   }
 
   document.getElementById("login-btn").addEventListener("click", doLogin);
-  document.getElementById("logout-btn").addEventListener("click", ()=>{
-    sessionStorage.removeItem("plate_admin_ok");
+  document.getElementById("logout-btn").addEventListener("click", async ()=>{
+    await sb.auth.signOut();
     location.reload();
   });
 
@@ -431,19 +432,27 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 
 async function doLogin(){
-  const user = document.getElementById("login-user").value.trim();
+  const email = document.getElementById("login-user").value.trim();
   const pass = document.getElementById("login-pass").value;
-  const { data, error } = await sb.from("site_settings").select("key,value")
-    .in("key", ["admin_username","admin_password"]);
-  if (error){ showToast("هەڵەیەک ڕوویدا"); return; }
-  const map = {};
-  data.forEach(r=>map[r.key]=r.value);
-  if (user === map.admin_username && pass === map.admin_password){
-    sessionStorage.setItem("plate_admin_ok","1");
-    showAdmin();
-  } else {
-    document.getElementById("login-error").style.display="block";
+  const errorEl = document.getElementById("login-error");
+
+  errorEl.style.display = "none";
+
+  if (!email || !pass){
+    errorEl.textContent = "تکایە ئیمێڵ و وشەی نهێنی پڕ بکەرەوە";
+    errorEl.style.display = "block";
+    return;
   }
+
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if (error){
+    errorEl.textContent = "ئیمێڵ یان وشەی نهێنی هەڵەیە";
+    errorEl.style.display = "block";
+    return;
+  }
+
+  showAdmin();
 }
 
 function showAdmin(){
@@ -669,27 +678,38 @@ document.getElementById("add-ad")?.addEventListener("click", async ()=>{
 // ---------- ڕێکخستنەکان ----------
 async function loadSettings(){
   const { data } = await sb.from("site_settings").select("*")
-    .in("key", ["whatsapp_number","online_count","admin_username"]);
+    .in("key", ["whatsapp_number","online_count"]);
   const map = {};
   (data||[]).forEach(s=>map[s.key]=s.value);
   document.getElementById("s-whatsapp").value = map.whatsapp_number || "";
   document.getElementById("s-online").value = map.online_count || 0;
-  document.getElementById("s-username").value = map.admin_username || "";
+
+  const { data: { user } } = await sb.auth.getUser();
+  document.getElementById("s-username").value = user?.email || "";
 }
 document.getElementById("save-settings")?.addEventListener("click", async ()=>{
   const whatsapp = document.getElementById("s-whatsapp").value;
   const online = document.getElementById("s-online").value;
-  const newUser = document.getElementById("s-username").value.trim();
   const newPass = document.getElementById("s-password").value;
 
-  const rows = [
+  const { error: settingsError } = await sb.from("site_settings").upsert([
     { key: "whatsapp_number", value: whatsapp },
     { key: "online_count", value: String(online) },
-  ];
-  if (newUser) rows.push({ key: "admin_username", value: newUser });
-  if (newPass) rows.push({ key: "admin_password", value: newPass });
+  ]);
 
-  await sb.from("site_settings").upsert(rows);
+  if (settingsError){
+    showToast("هەڵە لە پاشەکەوتکردنی ڕێکخستنەکان");
+    return;
+  }
+
+  if (newPass){
+    const { error: passError } = await sb.auth.updateUser({ password: newPass });
+    if (passError){
+      showToast("وشەی نهێنی نوێ نەگۆڕدرا");
+      return;
+    }
+  }
+
   document.getElementById("s-password").value = "";
   showToast("ڕێکخستنەکان پاشەکەوت کران");
 });
