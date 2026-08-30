@@ -1105,6 +1105,40 @@ document.addEventListener("DOMContentLoaded", ()=>{
   });
 });
 
+
+async function loadRules(){
+  const box = document.getElementById("rules-text");
+  if (!box) return;
+
+  const { data, error } = await sb
+    .from("site_settings")
+    .select("value")
+    .eq("key", "participation_rules")
+    .maybeSingle();
+
+  if (error){
+    console.error("Rules load error:", error);
+    box.textContent = "هەڵە لە بارکردنی یاساکان";
+    return;
+  }
+
+  box.textContent = (data?.value || "یاساکان لەلایەن ئەدمینەوە زیاد دەکرێن.").trim();
+}
+
+// نوێکردنەوەی خۆکار کاتێک ئەدمین یاساکان دەگۆڕێت
+sb.channel("site-settings-rules")
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "site_settings",
+      filter: "key=eq.participation_rules"
+    },
+    () => loadRules()
+  )
+  .subscribe();
+
 function onLangChange(){
   renderRooms();
   loadWinners();
@@ -1119,6 +1153,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   loadLive();
   loadStats();
   loadAds();
+  loadRules();
   loadWhatsapp();
 });
 
