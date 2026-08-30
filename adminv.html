@@ -269,6 +269,7 @@ th{ color:var(--muted); font-weight:800; font-size:11px; text-transform:uppercas
       <button class="tab-btn" data-tab="submissions">تۆمارکراوەکان</button>
       <button class="tab-btn" data-tab="live">لایڤ یوتیوب</button>
       <button class="tab-btn" data-tab="ads">ڕیکلامی هەفتانە</button>
+      <button class="tab-btn" data-tab="rules">یاساکانی بەژداربوون</button>
       <button class="tab-btn" data-tab="settings">ڕێکخستنەکان</button>
     </div>
 
@@ -353,6 +354,19 @@ th{ color:var(--muted); font-weight:800; font-size:11px; text-transform:uppercas
       <div class="panel" style="margin-top:18px">
         <h2>ڕیکلامەکان</h2>
         <div class="grid grid-3" id="ads-list"></div>
+      </div>
+    </div>
+
+    <!-- PARTICIPATION RULES -->
+    <div class="tab-panel" id="tab-rules">
+      <div class="panel">
+        <h2>یاساکانی بەژداربوون</h2>
+        <p>هەر دەقێک لێرە بنووسیت، لە سایت لە ژێر ڕیکلامەکان نیشان دەدرێت.</p>
+        <div class="field">
+          <label>دەقی یاساکان</label>
+          <textarea id="rules-editor" rows="12" placeholder="١. یاسای یەکەم&#10;٢. یاسای دووەم&#10;٣. ..."></textarea>
+        </div>
+        <button class="btn" id="save-rules">پاشەکەوتکردنی یاساکان</button>
       </div>
     </div>
 
@@ -464,6 +478,7 @@ function showAdmin(){
   loadSubmissions();
   loadLive();
   loadAds();
+  loadRulesAdmin();
   loadSettings();
 }
 
@@ -673,6 +688,41 @@ document.getElementById("add-ad")?.addEventListener("click", async ()=>{
   document.getElementById("ad-title").value = "";
   document.getElementById("ad-file").value = "";
   loadAds();
+});
+
+
+// ---------- یاساکانی بەژداربوون ----------
+async function loadRulesAdmin(){
+  const { data, error } = await sb
+    .from("site_settings")
+    .select("value")
+    .eq("key","participation_rules")
+    .maybeSingle();
+
+  if (error){
+    console.error(error);
+    showToast("هەڵە لە خوێندنەوەی یاساکان");
+    return;
+  }
+
+  document.getElementById("rules-editor").value = data?.value || "";
+}
+
+document.getElementById("save-rules")?.addEventListener("click", async ()=>{
+  const value = document.getElementById("rules-editor").value.trim();
+
+  const { error } = await sb.from("site_settings").upsert(
+    { key:"participation_rules", value },
+    { onConflict:"key" }
+  );
+
+  if (error){
+    console.error(error);
+    showToast("یاساکان پاشەکەوت نەکران");
+    return;
+  }
+
+  showToast("یاساکان پاشەکەوت کران");
 });
 
 // ---------- ڕێکخستنەکان ----------
