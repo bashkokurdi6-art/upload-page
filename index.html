@@ -459,6 +459,62 @@ select option{
   object-fit:contain !important;
 }
 
+
+/* ===== Participation rules + success modal ===== */
+.rules-panel{
+  background:rgba(255,255,255,.14) !important;
+  border:1px solid rgba(255,255,255,.24) !important;
+  backdrop-filter:blur(18px) saturate(145%);
+  -webkit-backdrop-filter:blur(18px) saturate(145%);
+}
+.rules-text{
+  white-space:pre-wrap;
+  line-height:2;
+  font-size:14px;
+  color:#fff;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:12px;
+  padding:14px;
+}
+.success-modal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.success-modal.hidden{display:none !important;}
+.success-card{
+  width:min(92vw,380px);
+  text-align:center;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:18px;
+  padding:24px 18px;
+  color:#fff;
+  box-shadow:0 18px 50px rgba(0,0,0,.35);
+  backdrop-filter:blur(20px) saturate(150%);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);
+}
+.success-card h2{color:#fff !important;margin:8px 0;}
+.success-card p{color:rgba(255,255,255,.82) !important;}
+.success-icon{
+  width:64px;height:64px;border-radius:50%;
+  margin:0 auto 10px;
+  display:flex;align-items:center;justify-content:center;
+  background:#25D366;
+  color:#fff;
+  font-size:34px;
+  font-weight:900;
+  box-shadow:0 8px 24px rgba(37,211,102,.3);
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -479,7 +535,7 @@ select option{
 <section class="section">
   <div class="wrap">
     <p class="eyebrow" data-i18n="hero_eyebrow">ڕوومی پۆبجی</p>
-    <h1 data-i18n="hero_title">بەژداری بکە و ببەرەوە</h1>
+    <h1 data-i18n="hero_title">بەشداری بکە و ببەرەوە</h1>
     <p data-i18n="hero_sub">هەڵبژاردەی یارزانە ئاست بەرزەکان و بینینی ڕاستەوخۆی خولەکان.</p>
     <div class="grid grid-3" style="margin-top:22px">
       <div class="plate">
@@ -506,6 +562,19 @@ select option{
       <h2 data-i18n="ads_title">تازەترین ڕیکلامەکان</h2>
     </div>
     <div class="grid grid-3" id="ads-grid"></div>
+  </div>
+</section>
+
+<!-- PARTICIPATION RULES -->
+<section class="section" id="rules">
+  <div class="wrap">
+    <div class="panel rules-panel">
+      <div class="section-head">
+        <p class="eyebrow">یاساکانی یاری</p>
+        <h2>یاساکانی بەژداربوون</h2>
+      </div>
+      <div id="rules-text" class="rules-text">یاساکان لەلایەن ئەدمینەوە زیاد دەکرێن.</div>
+    </div>
   </div>
 </section>
 
@@ -611,6 +680,15 @@ select option{
 
 <a class="whatsapp-fab" id="whatsapp-fab" href="#" target="_blank" title="WhatsApp">💬</a>
 <div class="toast" id="toast"></div>
+
+<div class="success-modal hidden" id="success-modal" role="dialog" aria-modal="true">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <h2>بە سەرکەوتوویی تۆمار کرا</h2>
+    <p>داواکارییەکەت گەیشت. چاوەڕوانی پەسەندکردنی ئەدمین بە.</p>
+    <button class="btn" type="button" id="success-close">باشە</button>
+  </div>
+</div>
 
 <script>
 // =========================================================
@@ -987,21 +1065,31 @@ document.addEventListener("DOMContentLoaded", ()=>{
         receiptUrl = pub.publicUrl;
       }
 
-      const { error } = await sb.from("submissions").insert({
-        full_name: document.getElementById("f_name").value,
-        mobile: document.getElementById("f_mobile").value,
-        account_id: document.getElementById("f_accid").value,
-        account_name: document.getElementById("f_accname").value,
+      const submissionPayload = {
+        full_name: document.getElementById("f_name").value.trim(),
+        mobile: document.getElementById("f_mobile").value.trim(),
+        account_id: document.getElementById("f_accid").value.trim(),
+        account_name: document.getElementById("f_accname").value.trim(),
         room_id: roomId,
         room_price: room ? room.price : 0,
         payment_method_id: selectedPayment.id,
         receipt_url: receiptUrl,
-        note: document.getElementById("f_note").value,
+        note: document.getElementById("f_note").value.trim(),
         status: "pending"
-      });
-      if (error) throw error;
+      };
 
-      showToast(t("submitted_ok"));
+      const { data: insertedRow, error } = await sb
+        .from("submissions")
+        .insert(submissionPayload)
+        .select("id")
+        .single();
+
+      if (error){
+        console.error("Submission insert error:", error);
+        throw new Error(error.message || "نەتوانرا تۆمار بکرێت");
+      }
+
+      document.getElementById("success-modal").classList.remove("hidden");
       form.reset();
       document.getElementById("receipt-preview").classList.add("hidden");
       document.getElementById("pay-reveal").classList.add("hidden");
@@ -1009,7 +1097,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       loadStats();
     }catch(err){
       console.error(err);
-      showToast(t("submitted_err"));
+      showToast("هەڵە: " + (err?.message || t("submitted_err")));
     }finally{
       btn.disabled = false;
       btn.textContent = t("submit");
@@ -1021,6 +1109,7 @@ function onLangChange(){
   renderRooms();
   loadWinners();
   loadAds();
+  loadRules();
 }
 
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -1040,6 +1129,14 @@ document.addEventListener("click", (e)=>{
     if (el !== card) el.classList.remove("is-selected");
   });
   if (card) card.classList.toggle("is-selected", true);
+});
+
+
+document.getElementById("success-close")?.addEventListener("click", ()=>{
+  document.getElementById("success-modal")?.classList.add("hidden");
+});
+document.getElementById("success-modal")?.addEventListener("click", (e)=>{
+  if (e.target.id === "success-modal") e.currentTarget.classList.add("hidden");
 });
 
 </script>
