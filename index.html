@@ -42,15 +42,45 @@
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
+  position:relative;
   background:
-    radial-gradient(900px 500px at 10% -10%, rgba(212,184,63,.08), transparent 55%),
-    radial-gradient(900px 600px at 100% 10%, rgba(75,90,47,.35), transparent 55%),
-    linear-gradient(160deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
-  background-attachment:fixed;
+    linear-gradient(rgba(12,15,10,.72), rgba(12,15,10,.82)),
+    url("viro99-bg.png") center top / cover no-repeat fixed;
   color:var(--white);
   font-family:var(--font-ui);
   min-height:100vh;
   line-height:1.5;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(212,184,63,.10), transparent 56%),
+    radial-gradient(900px 650px at 100% 10%, rgba(75,90,47,.22), transparent 58%);
+}
+
+@media(max-width:820px){
+  body{
+    background:
+      linear-gradient(rgba(12,15,10,.76), rgba(12,15,10,.88)),
+      url("viro99-bg.png") 58% top / auto 100vh no-repeat fixed;
+    background-color:var(--bg-1);
+  }
+}
+
+@media(max-width:520px){
+  body{
+    background:
+      linear-gradient(rgba(12,15,10,.78), rgba(12,15,10,.90)),
+      url("viro99-bg.png") 54% top / auto 100vh no-repeat fixed;
+  }
+  .topbar{ background:rgba(18,22,14,.82); backdrop-filter:blur(8px); }
+  .panel{ background:rgba(200,182,136,.92); backdrop-filter:blur(4px); }
+  .plate{ background:linear-gradient(180deg,rgba(200,182,136,.95),rgba(185,164,118,.95)); }
 }
 
 body[dir="rtl"]{ text-align:right; }
