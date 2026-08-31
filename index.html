@@ -272,7 +272,8 @@ th{ color:var(--muted); font-weight:800; font-size:11px; text-transform:uppercas
 @media(max-width:820px){
   .grid-2{ grid-template-columns:1fr; }
   .grid-3{ grid-template-columns:repeat(3,minmax(0,1fr)); }
-  #prices-grid,#winners-grid,#ads-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #prices-grid,#winners-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #ads-grid{ grid-template-columns:1fr; }
   .wrap{ padding:0 10px; }
   .plate{ padding:7px; }
   .plate h3{ font-size:12px; }
@@ -519,14 +520,14 @@ select option{
 /* ===== Consistent ad image/video sizing ===== */
 .ad-media{
   width:100%;
-  aspect-ratio:1/1;
+  aspect-ratio:16/9;
   object-fit:cover;
   border-radius:12px;
   display:block;
   background:rgba(255,255,255,.08);
 }
 @media(max-width:520px){
-  .ad-media{ aspect-ratio:1/1; }
+  .ad-media{ aspect-ratio:16/9; }
 }
 
 </style>
