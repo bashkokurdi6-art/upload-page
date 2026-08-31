@@ -515,6 +515,20 @@ select option{
   box-shadow:0 8px 24px rgba(37,211,102,.3);
 }
 
+
+/* ===== Consistent ad image/video sizing ===== */
+.ad-media{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  border-radius:12px;
+  display:block;
+  background:rgba(255,255,255,.08);
+}
+@media(max-width:520px){
+  .ad-media{ aspect-ratio:1/1; }
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1016,8 +1030,8 @@ async function loadAds(){
   grid.innerHTML = data.map(a=>`
     <div class="plate">
       ${a.media_type === "video"
-        ? `<video src="${a.media_url}" controls style="width:100%;border-radius:12px"></video>`
-        : `<img src="${a.media_url}" alt="${a.title||''}" style="width:100%;border-radius:12px">`}
+        ? `<video class="ad-media" src="${a.media_url}" controls></video>`
+        : `<img class="ad-media" src="${a.media_url}" alt="${a.title||''}" loading="lazy">`}
       <h3 style="margin-top:10px">${a.title||""}</h3>
     </div>
   `).join("");
