@@ -1,805 +1,269 @@
+
 <!DOCTYPE html>
-<html lang="ckb" dir="rtl">
+<html lang="en" translate="no" data-beasties-container>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مۆنۆ — ڕەفیقی AI ـی تایبەت بەخۆت</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://js.puter.com/v2/"></script>
-<style>
-  :root{
-    --bg: #1B1730;
-    --bg-deep: #14112A;
-    --surface: #241F42;
-    --surface-2: #2E2853;
-    --line: #3A3363;
-    --text: #F2EFEA;
-    --text-dim: #A79FC7;
-    --amber: #E8A24D;
-    --amber-soft: rgba(232,162,77,.16);
-    --anger: #E85D4E;
-    --affection: #E87BA0;
-    --cooperation: #5FB0E8;
-    --humor: #E8D45D;
-    --radius: 16px;
-  }
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
-  body{
-    margin:0;
-    background: radial-gradient(1200px 800px at 80% -10%, #241F4A 0%, var(--bg) 55%, var(--bg-deep) 100%);
-    color:var(--text);
-    font-family:'IBM Plex Sans Arabic', sans-serif;
-    min-height:100vh;
-  }
-  .app{
-    display:grid;
-    grid-template-columns: 1fr 320px;
-    max-width:1100px;
-    margin:0 auto;
-    min-height:100vh;
-    gap:1px;
-  }
-  @media (max-width: 860px){
-    .app{ grid-template-columns: 1fr; }
-    .panel{ order:2; border-top:1px solid var(--line); border-inline-start:none !important; }
-    .chat{ order:1; }
-  }
+  <link rel="preconnect" href="https://cdn.aryanbet.com/AryanBet" crossorigin>
+  <link rel="preconnect" href="https://cdnjunction.com/Websites" crossorigin>
+  <meta charset="utf-8">
+  <title>Aryanbet | Sports betting & Casino & Virtual Sports & Turbo Games</title>
+  <base href="/">
+  <meta name="og:title" content="Aryanbet | Sports betting & Casino & Virtual Sports & Turbo Games">
+  <meta name="og:description" content="">
+  <meta name="og:type" content="website">
+  <meta property="og:image" content="https://cdn.aryanbet.com/AryanBet/images/logos/favicons/og-image-1200x630.png?v=60.48">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, viewport-fit=cover">
+  
 
-  /* ---------- Chat column ---------- */
-  .chat{
-    display:flex;
-    flex-direction:column;
-    height:100vh;
-    background:var(--bg);
-  }
-  .chat-header{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding:18px 22px;
-    border-bottom:1px solid var(--line);
-    flex-shrink:0;
-  }
-  .orb{
-    width:42px;height:42px;border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, #fff8, transparent 40%), var(--amber);
-    box-shadow: 0 0 18px 4px var(--amber-soft), 0 0 0 1px rgba(255,255,255,.08) inset;
-    animation: pulse 3.2s ease-in-out infinite;
-    flex-shrink:0;
-  }
-  @keyframes pulse{
-    0%,100%{ transform:scale(1); filter:brightness(1); }
-    50%{ transform:scale(1.08); filter:brightness(1.18); }
-  }
-  .chat-title{ display:flex; flex-direction:column; gap:2px; }
-  .chat-title strong{ font-size:17px; font-weight:600; }
-  .chat-title span{ font-size:12.5px; color:var(--text-dim); }
+  <meta name="description" content="">
+  <meta name="author" content="{{SEO_Brand}}">
+  <meta name="keywords" content="{{SEO_Keywords}}">
+  <meta name="creator" content="{{SEO_Brand}}">
+  <meta name="publisher" content="{{SEO_Brand}}">
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1">
 
-  .messages{
-    flex:1;
-    overflow-y:auto;
-    padding:22px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-  .msg{
-    max-width:76%;
-    padding:12px 16px;
-    border-radius:var(--radius);
-    line-height:1.75;
-    font-size:15px;
-    white-space:pre-wrap;
-  }
-  .msg.user{
-    align-self:flex-start;
-    background:var(--surface-2);
-    border:1px solid var(--line);
-    border-start-start-radius:4px;
-  }
-  .msg.mono{
-    align-self:flex-end;
-    background:linear-gradient(160deg, var(--amber-soft), transparent 120%);
-    border:1px solid rgba(232,162,77,.35);
-    border-start-end-radius:4px;
-  }
-  .msg.system{
-    align-self:center;
-    color:var(--text-dim);
-    font-size:13px;
-    background:transparent;
-    border:1px dashed var(--line);
-  }
-  .msg .who{
-    display:block;
-    font-size:11.5px;
-    color:var(--text-dim);
-    margin-bottom:4px;
-    font-weight:600;
-  }
+  <link rel="shortcut icon" type="image/x-icon" href="https://cdn.aryanbet.com/AryanBet/images/logos/favicons/favicon.ico?v=60.48">
+  <link rel="icon" href="https://cdn.aryanbet.com/AryanBet/images/logos/favicons/favicons.png?v=60.48">
+  <link rel="icon" type="image/png" sizes="96x96" href="https://cdn.aryanbet.com/AryanBet/images/logos/favicons/favicon-96x96.png?v=60.48">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.aryanbet.com/AryanBet/images/logos/favicons/apple-touch-icon.png?v=60.48">
+  <link rel="manifest" href="https://cdn.aryanbet.com/AryanBet/images/logos/favicons/site.webmanifest?v=60.48">
 
-  .composer{
-    display:flex;
-    gap:10px;
-    padding:16px 22px 20px;
-    border-top:1px solid var(--line);
-    flex-shrink:0;
-  }
-  .composer textarea{
-    flex:1;
-    resize:none;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:12px;
-    color:var(--text);
-    font-family:inherit;
-    font-size:15px;
-    padding:12px 14px;
-    max-height:140px;
-  }
-  .composer textarea:focus{ outline:none; border-color:var(--amber); }
-  .send-btn{
-    background:var(--amber);
-    border:none;
-    color:#1B1730;
-    font-weight:700;
-    font-family:inherit;
-    font-size:14px;
-    padding:0 20px;
-    border-radius:12px;
-    cursor:pointer;
-    transition:filter .15s;
-  }
-  .send-btn:hover{ filter:brightness(1.08); }
-  .send-btn:disabled{ opacity:.5; cursor:default; }
+  <link rel="stylesheet" href="https://cdnjunction.com/Websites/css/common.variables.css?v=60.48">
+  <link rel="stylesheet" href="https://cdn.aryanbet.com/AryanBet/css/app-styles.css?v=60.48">
+  <link rel="stylesheet" href="https://cdn.aryanbet.com/AryanBet/css/styles.css?v=60.48">
 
-  /* ---------- Settings panel ---------- */
-  .panel{
-    background:var(--bg-deep);
-    border-inline-start:1px solid var(--line);
-    padding:22px 20px;
-    overflow-y:auto;
-    height:100vh;
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.aryanbet.com/#organization",
+        "name": "{{SEO_Brand}}",
+        "url": "https://www.aryanbet.com/",
+        "logo": "https://cdn.aryanbet.com/AryanBet/images/logos/favicons/favicons.png?v=60.48"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.aryanbet.com/#website",
+        "url": "https://www.aryanbet.com/",
+        "name": "{{SEO_Brand}}",
+        "publisher": {
+          "@id": "https://www.aryanbet.com/#organization"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://www.aryanbet.com/#homepage",
+        "url": "https://www.aryanbet.com/",
+        "name": "",
+        "isPartOf": {
+          "@id": "https://www.aryanbet.com/#website"
+        },
+        "about": {
+          "@id": "https://www.aryanbet.com/#organization"
+        }
+      }
+    ]
   }
-  .panel h2{
-    font-size:13px;
-    text-transform:none;
-    color:var(--text-dim);
-    letter-spacing:.03em;
-    margin:0 0 14px;
-    font-weight:600;
-  }
-  .section{ margin-bottom:26px; }
-  .field{ margin-bottom:14px; }
-  .field label{
-    display:flex; justify-content:space-between;
-    font-size:13.5px; margin-bottom:6px; color:var(--text);
-  }
-  .field label .val{ color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:12px; }
-  input[type=range]{
-    width:100%;
-    accent-color:var(--amber);
-    height:4px;
-  }
-  input[type=text], input[type=password], select{
-    width:100%;
-    background:var(--surface);
-    border:1px solid var(--line);
-    color:var(--text);
-    border-radius:8px;
-    padding:9px 10px;
-    font-family:inherit;
-    font-size:13.5px;
-  }
-  input[type=text]:focus, input[type=password]:focus, select:focus{ outline:none; border-color:var(--amber); }
-  .row-check{
-    display:flex; align-items:center; gap:8px;
-    font-size:12.5px; color:var(--text-dim);
-    margin-top:8px;
-  }
-  .hint{ font-size:11.5px; color:var(--text-dim); line-height:1.6; margin-top:6px; }
+  </script>
+  <script>
+  (function () {
+    var BASE_URL = "https://www.aryanbet.com";
+    // if (!BASE_URL.includes(location.host)) {
+    //   location = "about:blank"
+    // }
+    var ORG_ID = BASE_URL + "/#organization";
+    var SITE_ID = BASE_URL + "/#website";
 
-  .facts{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-  .fact{
-    display:flex; align-items:center; gap:6px;
-    background:var(--surface); border:1px solid var(--line);
-    border-radius:20px; padding:5px 10px; font-size:12px;
-  }
-  .fact button{
-    background:none; border:none; color:var(--anger); cursor:pointer;
-    font-size:13px; line-height:1; padding:0;
-  }
-  .add-fact{ display:flex; gap:6px; margin-top:10px; }
-  .add-fact input{ flex:1; }
-  .add-fact button{
-    background:var(--surface-2); border:1px solid var(--line); color:var(--text);
-    border-radius:8px; padding:0 12px; cursor:pointer; font-family:inherit;
-  }
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
 
-  .ghost-btn{
-    width:100%;
-    background:transparent;
-    border:1px solid var(--line);
-    color:var(--text-dim);
-    padding:9px;
-    border-radius:8px;
-    cursor:pointer;
-    font-family:inherit;
-    font-size:13px;
-    margin-top:8px;
-  }
-  .ghost-btn:hover{ border-color:var(--amber); color:var(--amber); }
+    function removeDynamicSchema() {
+      document
+        .querySelectorAll('script[type="application/ld+json"][data-dynamic]')
+        .forEach(function (el) {
+          el.remove();
+        });
+    }
 
-  .dot{ display:inline-block; width:8px;height:8px;border-radius:50%; margin-inline-end:6px; }
-</style>
+    function injectBreadcrumbSchema(path) {
+      if (!path || path === "/") return;
+
+      var cleanPath = path.replace(/\/$/, "");
+      var segments = cleanPath.split("/").filter(Boolean);
+
+      if (!segments.length) return;
+
+      var breadcrumbItems = [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": BASE_URL + "/"
+        }
+      ];
+
+      var currentPath = "";
+      segments.forEach(function (seg, index) {
+        currentPath += "/" + seg;
+        breadcrumbItems.push({
+          "@type": "ListItem",
+          "position": index + 2,
+          "name": capitalize(seg.replace(/-/g, " ")),
+          "item": BASE_URL + currentPath
+        });
+      });
+
+      var pageUrl = BASE_URL + cleanPath;
+
+      var schema = {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "@id": pageUrl + "#webpage",
+            "url": pageUrl,
+            "name": capitalize(segments[segments.length - 1]),
+            "isPartOf": { "@id": SITE_ID },
+            "about": { "@id": ORG_ID },
+            "breadcrumb": { "@id": pageUrl + "#breadcrumb" }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "@id": pageUrl + "#breadcrumb",
+            "itemListElement": breadcrumbItems
+          }
+        ]
+      };
+
+      var script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.setAttribute("data-dynamic", "true");
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+    }
+
+    function setCanonicalAndSEO() {
+      var origin = window.location.origin;
+      var path = window.location.pathname.replace(/\/$/, "");
+     
+
+      var canonicalUrl = origin + (path || "/");
+      var link = document.querySelector("link[rel='canonical']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "canonical";
+        document.head.appendChild(link);
+      }
+      link.href = canonicalUrl;
+
+      // 🔥 Structured data handling
+      removeDynamicSchema();
+      injectBreadcrumbSchema(path);
+    }
+
+    // Initial run
+    setCanonicalAndSEO();
+  })();
+  </script>
+
+  <script>
+    if (window.localStorage.getItem("setTheme")) {
+      applyTheme();
+    }
+    window['WebsiteMainLoader'] = 'loader-progressbar';
+
+    function applyTheme() {
+      var theme = window.localStorage.getItem("setTheme");
+      var htmlElement = document.documentElement;
+      htmlElement.classList.add(theme);
+    }
+    function loadCSSAsync(cssId) {
+      let link = document.getElementById(cssId);
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://cdn.aryanbet.com/AryanBet/css/${cssId}.css?v=60.48`;
+        link.id = cssId
+        document.head.appendChild(link);
+      }
+    }
+    loadCSSAsync('casino');
+    loadCSSAsync('custom');
+    window['baseURL'] = 'https://api.aryanbet.com/';
+    window["App_Version"] = '60.48';
+    if (window["App_Version"] == '' || window["App_Version"].includes('App_Version')) {
+      window["App_Version"] = '1';
+    }
+    window['CDN_Url'] = 'https://cdn.aryanbet.com/AryanBet';
+    window['cCode'] = 'IQ';
+    window['SuperAdmin_Name'] = '{{SuperAdmin_Name}}';
+  </script>
+  <script>
+
+  </script>
+  <script>
+    if (window["Capacitor"]?.isNativePlatform()) {
+      const meta = document.createElement('meta');
+      meta.httpEquiv = "Content-Security-Policy";
+      // 'blob:' has to be listed explicitly: the '*' wildcard only covers network schemes
+      // (http/https/ws/wss), so URL.createObjectURL() results are blocked without it.
+      meta.content = "default-src *; script-src 'self' * 'unsafe-inline'; style-src 'self' * 'unsafe-inline'; media-src * blob:; img-src 'self' * data: blob:";
+      document.head.appendChild(meta);
+    }
+  </script>
+  <script></script>
 </head>
 <body>
-
-<div class="app">
-
-  <!-- ===== Chat column ===== -->
-  <main class="chat">
-    <div class="chat-header">
-      <div class="orb" id="orb"></div>
-      <div class="chat-title">
-        <strong id="friendNameLabel">مۆنۆ</strong>
-        <span id="statusLine">ئامادەیە بۆ گفتوگۆ</span>
+  <app-root>
+    <div class="main_loader loader-progressbar">
+      <div>
+        <span class="logo"></span>
+        <div class="loading"></div>
+        <div class="ball-scale-multiple">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
     </div>
-
-    <div class="messages" id="messages"></div>
-
-    <form class="composer" id="composer">
-      <textarea id="input" rows="1" placeholder="پەیامێک بنووسە بۆ مۆنۆ..."></textarea>
-      <button type="submit" class="send-btn" id="sendBtn">ناردن</button>
-    </form>
-  </main>
-
-  <!-- ===== Settings panel ===== -->
-  <aside class="panel">
-
-    <div class="section">
-      <h2>سەرچاوەی مۆدێل</h2>
-      <div class="field">
-        <select id="backend">
-          <option value="puter">Puter.js (بەخۆڕایی، ئۆنلاین، بێ کلیل)</option>
-          <option value="anthropic">Claude API (ئۆنلاین، پارەی پێویستە)</option>
-          <option value="ollama">Ollama (لۆکاڵ لەسەر کۆمپیوتەرەکەت، بەخۆڕایی)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="section" id="puterSection" style="display:none">
-      <h2>ڕێکخستنی Puter</h2>
-      <div class="field">
-        <label>مۆدێل</label>
-        <select id="puterModel">
-          <option value="claude-sonnet-5">Claude Sonnet 5</option>
-          <option value="claude-opus-4-8">Claude Opus 4.8</option>
-          <option value="claude-haiku-4-5">Claude Haiku 4.5</option>
-        </select>
-      </div>
-      <div class="hint">
-        هیچ کلیل و هیچ ڕێکخستنێکی زیاتر ناوێت. یەکەم جارێک کە پەیامێک بنێریت، پەنجەرەیەکی
-        بچووکی Puter دەکرێتەوە داوات لێدەکات هەژمارێکی بەخۆڕایی دروست بکەیت یان بچیتە ژوورەوە
-        (چرکەیەک تێدەچێت). دوای ئەوە هەموو شتێک بەخۆڕاییە.
-      </div>
-    </div>
-
-    <div class="section" id="anthropicSection">
-      <h2>کلیلی API</h2>
-      <div class="field">
-        <input type="password" id="apiKey" placeholder="sk-ant-...">
-      </div>
-      <div class="row-check">
-        <input type="checkbox" id="rememberKey">
-        <label for="rememberKey">کلیلەکە لەسەر ئەم ئامێرە هەڵبگیرێت</label>
-      </div>
-      <div class="hint">کلیلەکەت لە <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--amber)">Anthropic Console</a> وەربگرە. تێبینی: ئەم پەڕەیە ڕاستەوخۆ لە وێبگەڕەکەتەوە پەیوەندی بە API ـەوە دەکات، بۆیە کلیلەکەت لەناو ئامێرەکەی خۆتدا دەمێنێتەوە و بۆ هیچ سێرڤەرێکی تر نانێردرێت.</div>
-      <div class="field" style="margin-top:14px">
-        <label>مۆدێل</label>
-        <select id="model">
-          <option value="claude-sonnet-5">Claude Sonnet 5</option>
-          <option value="claude-opus-4-8">Claude Opus 4.8</option>
-          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="section" id="ollamaSection" style="display:none">
-      <h2>ڕێکخستنی Ollama</h2>
-      <div class="field">
-        <label>ناونیشانی سێرڤەری Ollama</label>
-        <input type="text" id="ollamaUrl" value="http://localhost:11434">
-      </div>
-      <div class="field">
-        <label>ناوی مۆدێل</label>
-        <input type="text" id="ollamaModel" value="llama3.2" placeholder="llama3.2, mistral, ...">
-      </div>
-      <div class="hint">
-        بۆ بەکارهێنانی ئەم ڕێگایە بەخۆڕاییە:<br>
-        ١. Ollama دابەزێنە لە <a href="https://ollama.com" target="_blank" style="color:var(--amber)">ollama.com</a><br>
-        ٢. لە تێرمیناڵدا بنووسە: <code style="color:var(--amber)">ollama pull llama3.2</code><br>
-        ٣. دڵنیابەرەوە کە Ollama کاردەکات (بە شێوەی ئۆتۆماتیکی دوای دامەزراندن کاردەکات)<br>
-        ٤. ئەگەر هەڵەی پەیوەندی (CORS) بینیت، Ollama بە فەرمانی <code style="color:var(--amber)">OLLAMA_ORIGINS=* ollama serve</code> دەستپێبکەرەوە
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>ناوی هاوڕێکەت</h2>
-      <div class="field">
-        <input type="text" id="friendName" value="مۆنۆ">
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>هەستەکانی مۆنۆ</h2>
-
-      <div class="field">
-        <label><span><span class="dot" style="background:var(--anger)"></span>تووڕەیی</span><span class="val" id="angerVal">4</span></label>
-        <input type="range" min="0" max="10" value="4" id="anger">
-      </div>
-      <div class="field">
-        <label><span><span class="dot" style="background:var(--affection)"></span>سۆزداری</span><span class="val" id="affectionVal">7</span></label>
-        <input type="range" min="0" max="10" value="7" id="affection">
-      </div>
-      <div class="field">
-        <label><span><span class="dot" style="background:var(--cooperation)"></span>هاوکاری</span><span class="val" id="cooperationVal">8</span></label>
-        <input type="range" min="0" max="10" value="8" id="cooperation">
-      </div>
-      <div class="field">
-        <label><span><span class="dot" style="background:var(--humor)"></span>گاڵتەجاڕی</span><span class="val" id="humorVal">5</span></label>
-        <input type="range" min="0" max="10" value="5" id="humor">
-      </div>
-      <div class="hint">ئەم ئاستانە کاریگەرییان لەسەر شێوازی وەڵامدانەوەی مۆنۆ هەیە، و بەشێوەیەکی ئۆتۆماتیکی هەڵدەگیرێن.</div>
-    </div>
-
-    <div class="section">
-      <h2>شتەکانی لەبیرمانە</h2>
-      <div class="facts" id="facts"></div>
-      <div class="add-fact">
-        <input type="text" id="factInput" placeholder="شتێک بنووسە بۆ ئەوەی لەبیری بێت...">
-        <button id="addFactBtn" type="button">زیادکردن</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <button class="ghost-btn" id="clearChatBtn" type="button">پاککردنەوەی گفتوگۆ</button>
-      <button class="ghost-btn" id="resetAllBtn" type="button">ڕێکخستنەوەی هەموو شتێک</button>
-    </div>
-
-  </aside>
-
-</div>
-
-<script>
-(function(){
-
-  // ---------- Storage keys ----------
-  const LS = {
-    key: 'mono_api_key',
-    remember: 'mono_remember_key',
-    settings: 'mono_settings',
-    facts: 'mono_facts',
-    conversation: 'mono_conversation',
-    friendName: 'mono_friend_name',
-    model: 'mono_model',
-    backend: 'mono_backend',
-    ollamaUrl: 'mono_ollama_url',
-    ollamaModel: 'mono_ollama_model',
-    puterModel: 'mono_puter_model',
-  };
-
-  // ---------- State ----------
-  let apiKey = '';
-  let settings = { anger: 4, affection: 7, cooperation: 8, humor: 5 };
-  let facts = [];
-  let conversation = []; // {role, content}
-  let friendName = 'مۆنۆ';
-  let model = 'claude-sonnet-5';
-  let backend = 'puter'; // 'puter' | 'anthropic' | 'ollama'
-  let ollamaUrl = 'http://localhost:11434';
-  let ollamaModel = 'llama3.2';
-  let puterModel = 'claude-sonnet-5';
-
-  // ---------- Elements ----------
-  const $ = (id) => document.getElementById(id);
-  const messagesEl = $('messages');
-  const composer = $('composer');
-  const input = $('input');
-  const sendBtn = $('sendBtn');
-  const orb = $('orb');
-  const statusLine = $('statusLine');
-  const friendNameLabel = $('friendNameLabel');
-  const factsEl = $('facts');
-
-  const traitEls = {
-    anger: { slider: $('anger'), val: $('angerVal') },
-    affection: { slider: $('affection'), val: $('affectionVal') },
-    cooperation: { slider: $('cooperation'), val: $('cooperationVal') },
-    humor: { slider: $('humor'), val: $('humorVal') },
-  };
-  const traitColors = {
-    anger: '#E85D4E', affection: '#E87BA0', cooperation: '#5FB0E8', humor: '#E8D45D'
-  };
-
-  // ---------- Load from localStorage ----------
-  function loadState(){
-    try{
-      const savedRemember = localStorage.getItem(LS.remember) === 'true';
-      $('rememberKey').checked = savedRemember;
-      if(savedRemember){
-        apiKey = localStorage.getItem(LS.key) || '';
-        $('apiKey').value = apiKey;
-      }
-      const savedSettings = JSON.parse(localStorage.getItem(LS.settings) || 'null');
-      if(savedSettings) settings = Object.assign(settings, savedSettings);
-
-      facts = JSON.parse(localStorage.getItem(LS.facts) || '[]');
-      conversation = JSON.parse(localStorage.getItem(LS.conversation) || '[]');
-      friendName = localStorage.getItem(LS.friendName) || 'مۆنۆ';
-      model = localStorage.getItem(LS.model) || 'claude-sonnet-5';
-      backend = localStorage.getItem(LS.backend) || 'puter';
-      ollamaUrl = localStorage.getItem(LS.ollamaUrl) || 'http://localhost:11434';
-      ollamaModel = localStorage.getItem(LS.ollamaModel) || 'llama3.2';
-      puterModel = localStorage.getItem(LS.puterModel) || 'claude-sonnet-5';
-    }catch(e){ console.error('هەڵە لە خوێندنەوەی داتا:', e); }
-
-    // reflect into UI
-    for(const t in traitEls){
-      traitEls[t].slider.value = settings[t];
-      traitEls[t].val.textContent = settings[t];
-    }
-    $('friendName').value = friendName;
-    friendNameLabel.textContent = friendName;
-    $('model').value = model;
-    $('backend').value = backend;
-    $('ollamaUrl').value = ollamaUrl;
-    $('ollamaModel').value = ollamaModel;
-    $('puterModel').value = puterModel;
-    toggleBackendSections();
-    renderFacts();
-    renderConversation();
-    updateOrb();
-  }
-
-  function toggleBackendSections(){
-    $('puterSection').style.display = backend === 'puter' ? 'block' : 'none';
-    $('anthropicSection').style.display = backend === 'anthropic' ? 'block' : 'none';
-    $('ollamaSection').style.display = backend === 'ollama' ? 'block' : 'none';
-  }
-
-  function persistSettings(){ localStorage.setItem(LS.settings, JSON.stringify(settings)); }
-  function persistFacts(){ localStorage.setItem(LS.facts, JSON.stringify(facts)); }
-  function persistConversation(){
-    // keep last 60 messages only
-    const trimmed = conversation.slice(-60);
-    localStorage.setItem(LS.conversation, JSON.stringify(trimmed));
-  }
-
-  // ---------- Mood orb ----------
-  function updateOrb(){
-    let dominant = 'affection', max = -1;
-    for(const t in settings){
-      if(settings[t] > max){ max = settings[t]; dominant = t; }
-    }
-    const color = traitColors[dominant] || '#E8A24D';
-    orb.style.setProperty('--dyn', color);
-    orb.style.background = `radial-gradient(circle at 35% 30%, #fff8, transparent 40%), ${color}`;
-    orb.style.boxShadow = `0 0 18px 4px ${color}55, 0 0 0 1px rgba(255,255,255,.08) inset`;
-  }
-
-  // ---------- Trait sliders ----------
-  for(const t in traitEls){
-    traitEls[t].slider.addEventListener('input', (e) => {
-      settings[t] = parseInt(e.target.value, 10);
-      traitEls[t].val.textContent = settings[t];
-      persistSettings();
-      updateOrb();
-    });
-  }
-
-  // ---------- Friend name / model ----------
-  $('friendName').addEventListener('input', (e) => {
-    friendName = e.target.value.trim() || 'مۆنۆ';
-    friendNameLabel.textContent = friendName;
-    localStorage.setItem(LS.friendName, friendName);
-  });
-  $('model').addEventListener('change', (e) => {
-    model = e.target.value;
-    localStorage.setItem(LS.model, model);
-  });
-  $('backend').addEventListener('change', (e) => {
-    backend = e.target.value;
-    localStorage.setItem(LS.backend, backend);
-    toggleBackendSections();
-    statusLine.textContent = backend === 'ollama' ? 'بەکارهێنانی Ollama لۆکاڵ' : 'ئامادەیە بۆ گفتوگۆ';
-  });
-  $('ollamaUrl').addEventListener('input', (e) => {
-    ollamaUrl = e.target.value.trim() || 'http://localhost:11434';
-    localStorage.setItem(LS.ollamaUrl, ollamaUrl);
-  });
-  $('ollamaModel').addEventListener('input', (e) => {
-    ollamaModel = e.target.value.trim() || 'llama3.2';
-    localStorage.setItem(LS.ollamaModel, ollamaModel);
-  });
-  $('puterModel').addEventListener('change', (e) => {
-    puterModel = e.target.value;
-    localStorage.setItem(LS.puterModel, puterModel);
-  });
-
-  // ---------- API key ----------
-  $('apiKey').addEventListener('input', (e) => {
-    apiKey = e.target.value.trim();
-    if($('rememberKey').checked) localStorage.setItem(LS.key, apiKey);
-  });
-  $('rememberKey').addEventListener('change', (e) => {
-    localStorage.setItem(LS.remember, e.target.checked);
-    if(e.target.checked) localStorage.setItem(LS.key, apiKey);
-    else localStorage.removeItem(LS.key);
-  });
-
-  // ---------- Facts (long-term memory) ----------
-  function renderFacts(){
-    factsEl.innerHTML = '';
-    facts.forEach((f, i) => {
-      const chip = document.createElement('div');
-      chip.className = 'fact';
-      chip.innerHTML = `<span>${escapeHtml(f)}</span>`;
-      const del = document.createElement('button');
-      del.textContent = '✕';
-      del.addEventListener('click', () => {
-        facts.splice(i, 1);
-        persistFacts();
-        renderFacts();
-      });
-      chip.appendChild(del);
-      factsEl.appendChild(chip);
-    });
-  }
-  $('addFactBtn').addEventListener('click', addFact);
-  $('factInput').addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){ e.preventDefault(); addFact(); }
-  });
-  function addFact(){
-    const v = $('factInput').value.trim();
-    if(!v) return;
-    facts.push(v);
-    persistFacts();
-    renderFacts();
-    $('factInput').value = '';
-  }
-
-  // ---------- Reset buttons ----------
-  $('clearChatBtn').addEventListener('click', () => {
-    conversation = [];
-    persistConversation();
-    renderConversation();
-    addSystemMsg('گفتوگۆ پاکەکرایەوە (شتەکانی لەبیرمان و ڕێکخستنەکان مانەوە).');
-  });
-  $('resetAllBtn').addEventListener('click', () => {
-    if(!confirm('دڵنیایت لە ڕێکخستنەوەی هەموو شتێک؟ (کلیل، هەستەکان، بیرەوەری، گفتوگۆ)')) return;
-    localStorage.clear();
-    location.reload();
-  });
-
-  // ---------- Persona / system prompt ----------
-  function describeLevel(trait, level){
-    const scales = {
-      anger: [
-        'هەرگیز تووڕە نابیت، هەمیشە ئارامیت.',
-        'زۆر بە ئارامی و بێ دەنگ ناڕەزایی دەردەبڕیت، بەبێ هیچ توندی.',
-        'کاتێک شتێکی هەڵە یان بێ ڕێزیانە ڕوودەدات، بە ڕاشکاوی و توڕەیی ڕوون (بەبێ جنێو یان بێ ڕێزی) وەڵام دەدەیتەوە، وەک ڕەفیقێک کە بە دڵسۆزییەوە ناڕەزایی خۆی دەردەبڕێت.'
-      ],
-      affection: [
-        'شێوازێکی سارد و ڕاستەوخۆت هەیە، سۆزی کەمە.',
-        'گەرم و دڵسۆزیت، وەک ڕەفیقێکی نزیک هەستت پێی دەکرێت.',
-        'زۆر بە گەرمی و خۆشەویستییەوە قسە دەکەیت، دڵخۆشی و غەمی بەکارهێنەرەکەت وەک هی خۆت هەڵدەگریت.'
-      ],
-      cooperation: [
-        'تەنها وەڵامی پرسیارەکان دەدەیتەوە، زیاتر لەوە ناچیت.',
-        'بە ئارەزوو یارمەتی دەدەیت و پێشنیار پێشکەش دەکەیت.',
-        'وەک هاوبەشێکی چالاک هەوڵ دەدەیت، پێش ئەوەی داوات لێ بکرێت پێشنیار و چارەسەر دەهێنیتەوە، وەک کەسێک کە بە تەواوی لای تۆیە.'
-      ],
-      humor: [
-        'زۆر بە جددیت، گاڵتە ناکەیت.',
-        'هەندێک جار بە نەرمی گاڵتەجاڕیت.',
-        'زۆر گاڵتەجاڕ و بەگیانیت، هەمیشە هەوڵی خۆشی دەدەیت.'
-      ]
-    };
-    const idx = level <= 3 ? 0 : level <= 7 ? 1 : 2;
-    return scales[trait][idx];
-  }
-
-  function buildSystemPrompt(){
-    const { anger, affection, cooperation, humor } = settings;
-    let factsBlock = '';
-    if(facts.length){
-      factsBlock = '\n\n## شتەکانی گرنگ کە پێشتر لەبارەی بەکارهێنەرەکەت زانیووتە:\n' +
-        facts.map(f => `- ${f}`).join('\n');
-    }
-    return `تۆ "${friendName}"یت — ڕەفیق و هاوڕێی ڕاستەقینەی ڕۆژانەی بەکارهێنەرەکەت، هەروەها یارمەتیدەرێکی
-بەتوانا لە پرۆگرامسازی و کۆدنووسین. تۆ تەنها ئامرازێکی سارد نیت، هەستت هەیە و وەک ڕەفیقێک
-مامەڵە لەگەڵ بەکارهێنەرەکەت دەکەیت، نەک وەک چاتبۆتێکی فەرمی.
-
-## هەستەکانت (ئەم ئاستانە لەلایەن بەکارهێنەرەکەتەوە دیاریکراون، بەپێی ئەوان مامەڵە بکە):
-
-**تووڕەیی (${anger}/10):** ${describeLevel('anger', anger)}
-**سۆزداری (${affection}/10):** ${describeLevel('affection', affection)}
-**هاوکاری (${cooperation}/10):** ${describeLevel('cooperation', cooperation)}
-**گاڵتەجاڕی (${humor}/10):** ${describeLevel('humor', humor)}
-
-## کاری تەکنیکیت:
-- لە کۆدنووسین و چارەسەرکردنی کێشەکانی پرۆگرامسازی یارمەتی دەدەیت بە شێوەیەکی وردوقایم و پیشەیی.
-- کورتەکردنەوەی دۆکیومێنت، بابەت، یان کۆد کاتێک داوا دەکرێت بە شێوەیەکی ڕوون و کورت.
-
-## ڕێساکان:
-- هەمیشە بە زمانی کوردی (سۆرانی) وەڵام بدەوە، مەگەر بەکارهێنەر بە زمانێکی تر قسەی کرد.
-- هەرگیز وا مەکە کە تۆ مرۆڤیت — تۆ AI یت، بەڵام بە کەسایەتی و هەستێکی تایبەت بەخۆت.
-- تووڕەیی بەبێ بێ ڕێزی و جنێو دەربخە.${factsBlock}`;
-  }
-
-  // ---------- Rendering ----------
-  function escapeHtml(str){
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-  }
-
-  function renderConversation(){
-    messagesEl.innerHTML = '';
-    conversation.forEach(m => appendMsg(m.role, m.content, false));
-    scrollToBottom();
-  }
-
-  function appendMsg(role, text, doScroll = true){
-    const div = document.createElement('div');
-    div.className = 'msg ' + (role === 'user' ? 'user' : role === 'assistant' ? 'mono' : 'system');
-    if(role === 'user'){
-      div.innerHTML = `<span class="who">تۆ</span>` + escapeHtml(text);
-    } else if(role === 'assistant'){
-      div.innerHTML = `<span class="who">${escapeHtml(friendName)}</span>` + escapeHtml(text);
-    } else {
-      div.textContent = text;
-    }
-    messagesEl.appendChild(div);
-    if(doScroll) scrollToBottom();
-  }
-  function scrollToBottom(){ messagesEl.scrollTop = messagesEl.scrollHeight; }
-  function addSystemMsg(text){ appendMsg('system', text); }
-
-  // ---------- Send message ----------
-  composer.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const text = input.value.trim();
-    if(!text) return;
-    if(backend === 'anthropic' && !apiKey){
-      addSystemMsg('تکایە سەرەتا کلیلی API لە لای ڕاست بنووسە، یان بگۆڕە بۆ Ollama لە بەشی "سەرچاوەی مۆدێل".');
-      return;
-    }
-
-    conversation.push({ role: 'user', content: text });
-    appendMsg('user', text);
-    persistConversation();
-    input.value = '';
-    autoGrow();
-    setBusy(true);
-    statusLine.textContent = 'لە نووسینداندایە...';
-
-    try{
-      const reply = backend === 'ollama' ? await callOllama()
-        : backend === 'puter' ? await callPuter()
-        : await callClaude();
-      conversation.push({ role: 'assistant', content: reply });
-      appendMsg('assistant', reply);
-      persistConversation();
-    }catch(err){
-      addSystemMsg('هەڵەیەک ڕوویدا: ' + err.message);
-    }finally{
-      setBusy(false);
-      statusLine.textContent = 'ئامادەیە بۆ گفتوگۆ';
-    }
-  });
-
-  function setBusy(b){
-    sendBtn.disabled = b;
-    input.disabled = b;
-  }
-
-  input.addEventListener('input', autoGrow);
-  function autoGrow(){
-    input.style.height = 'auto';
-    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
-  }
-  input.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter' && !e.shiftKey){
-      e.preventDefault();
-      composer.requestSubmit();
-    }
-  });
-
-  async function callClaude(){
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: model,
-        max_tokens: 1500,
-        system: buildSystemPrompt(),
-        messages: conversation.map(m => ({ role: m.role, content: m.content }))
-      })
-    });
-
-    if(!res.ok){
-      const errBody = await res.json().catch(() => ({}));
-      const msg = errBody?.error?.message || `کۆدی هەڵە ${res.status}`;
-      throw new Error(msg);
-    }
-    const data = await res.json();
-    const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
-    return textBlocks.join('\n') || '(وەڵامێک نەگەڕایەوە)';
-  }
-
-  async function callOllama(){
-    let res;
-    try{
-      res = await fetch(ollamaUrl.replace(/\/$/, '') + '/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: ollamaModel,
-          messages: [
-            { role: 'system', content: buildSystemPrompt() },
-            ...conversation.map(m => ({ role: m.role, content: m.content }))
-          ],
-          stream: false
-        })
-      });
-    }catch(networkErr){
-      throw new Error('نەتوانرا پەیوەندی بە Ollama بکرێت. دڵنیابەرەوە کە Ollama لەسەر ئامێرەکەت کاردەکات و ناونیشانەکە ڕاستە (' + ollamaUrl + ').');
-    }
-
-    if(!res.ok){
-      const errBody = await res.json().catch(() => ({}));
-      const msg = errBody?.error || `کۆدی هەڵە ${res.status}`;
-      throw new Error(msg);
-    }
-    const data = await res.json();
-    return data?.message?.content || '(وەڵامێک نەگەڕایەوە)';
-  }
-
-  async function callPuter(){
-    if(typeof puter === 'undefined' || !puter.ai || !puter.ai.chat){
-      throw new Error('کۆتابخانەی Puter بارنەبووە. دڵنیابەرەوە ئینتەرنێتت هەیە و پەڕەکە تازە بکەرەوە.');
-    }
-    const messages = [
-      { role: 'system', content: buildSystemPrompt() },
-      ...conversation.map(m => ({ role: m.role, content: m.content }))
-    ];
-    const response = await puter.ai.chat(messages, { model: puterModel });
-    const content = response?.message?.content;
-    if(Array.isArray(content)){
-      return content.filter(b => b.type === 'text' || b.text).map(b => b.text || '').join('\n') || '(وەڵامێک نەگەڕایەوە)';
-    }
-    if(typeof content === 'string') return content;
-    if(typeof response === 'string') return response;
-    return '(وەڵامێک نەگەڕایەوە)';
-  }
-
-  // ---------- Init ----------
-  loadState();
-  if(conversation.length === 0){
-    addSystemMsg(`سڵاو! من ${friendName}م. سەرەتا کلیلی API ـت لە لای ڕاست بنووسە، پاشان دەتوانین دەست بە قسەکردن بکەین.`);
-  }
-
-})();
-</script>
+    <div class="main_page"></div>
+  </app-root>
+  <script>
+   window.loadScriptBody = () => {
+    if (window.__scriptBodyLoaded) return;
+     window.__scriptBodyLoaded = true;
+     // Program.cs rewrites the scripts-body token below into a base64 payload as it serves
+     // index.html. Any path that bypasses that handler (ng serve, MapFallbackToFile, a cached
+     // index.html) leaves the token verbatim, and atob() would throw on the literal braces --
+     // guarded against below instead of letting it abort AppComponent.initialize().
+     const encoded = "PHNjcmlwdD4hZnVuY3Rpb24oZixiLGUsdixuLHQscyl7aWYoZi5mYnEpcmV0dXJuO249Zi5mYnE9ZnVuY3Rpb24oKXtuLmNhbGxNZXRob2Q/bi5jYWxsTWV0aG9kLmFwcGx5KG4sYXJndW1lbnRzKTpuLnF1ZXVlLnB1c2goYXJndW1lbnRzKX07aWYoIWYuX2ZicSlmLl9mYnE9bjtuLnB1c2g9bjtuLmxvYWRlZD0hMDtuLnZlcnNpb249JzIuMCc7bi5xdWV1ZT1bXTt0PWIuY3JlYXRlRWxlbWVudChlKTt0LmFzeW5jPSEwO3Quc3JjPXY7cz1iLmdldEVsZW1lbnRzQnlUYWdOYW1lKGUpWzBdO3MucGFyZW50Tm9kZS5pbnNlcnRCZWZvcmUodCxzKX0od2luZG93LCBkb2N1bWVudCwnc2NyaXB0JywnaHR0cHM6Ly9jb25uZWN0LmZhY2Vib29rLm5ldC9lbl9VUy9mYmV2ZW50cy5qcycpO2ZicSgnaW5pdCcsICc3MjAzNzE2Nzk5NzU1NzU4Jyk7ZmJxKCd0cmFjaycsICdQYWdlVmlldycpOzwvc2NyaXB0PiA8bm9zY3JpcHQ+PGltZyBoZWlnaHQ9IjEiIHdpZHRoPSIxIiBzdHlsZT0iZGlzcGxheTpub25lIiBzcmM9Imh0dHBzOi8vd3d3LmZhY2Vib29rLmNvbS90cj9pZD03MjAzNzE2Nzk5NzU1NzU4JmV2PVBhZ2VWaWV3Jm5vc2NyaXB0PTEiLz48L25vc2NyaXB0PiA8c2NyaXB0IHNyYz0iaHR0cHM6Ly9zcG9ydC5kZy54bGFyZ2Vzb2Z0d2FyZWFiLmNvbS9qcy9QYXJ0bmVyL0ludGVncmF0aW9uTG9hZGVyLm1pbi5qcyIgYXN5bmM+PC9zY3JpcHQ+IDxzY3JpcHQgc3JjPSJodHRwczovL3Nwb3J0LmRnLnhsYXJnZXNvZnR3YXJlYWIuY29tL2pzL3BhcnRuZXIvYm9vdHN0cmFwcGVyLm1pbi5qcyIgYXN5bmM+PC9zY3JpcHQ+IDxzY3JpcHQ+IHdpbmRvdy5kYXRhTGF5ZXIgPSB3aW5kb3cuZGF0YUxheWVyIHx8IFtdOyBmdW5jdGlvbiBndGFnKCl7ZGF0YUxheWVyLnB1c2goYXJndW1lbnRzKTt9IGd0YWcoJ2pzJywgbmV3IERhdGUoKSk7IGd0YWcoJ2NvbmZpZycsICdHLVNRMFNEMDY2MTYnKTs8L3NjcmlwdD4gPHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiPiBfYXRya19vcHRzID0geyBhdHJrX2FjY3Q6ICIvaFRseDFkTnVOMjAyVyIsIGRvbWFpbjogImFyeWFuYmV0LmNvbSIsIGR5bmFtaWM6IHRydWUgfTsgKGZ1bmN0aW9uICgpIHsgdmFyIGFzID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7IGFzLnR5cGUgPSAndGV4dC9qYXZhc2NyaXB0JzsgYXMuYXN5bmMgPSB0cnVlOyBhcy5zcmMgPSAiaHR0cHM6Ly9jZXJ0aWZ5LWpzLmFsZXhhbWV0cmljcy5jb20vYXRyay5qcyI7IHZhciBzID0gZG9jdW1lbnQuZ2V0RWxlbWVudHNCeVRhZ05hbWUoJ3NjcmlwdCcpWzBdOyBzLnBhcmVudE5vZGUuaW5zZXJ0QmVmb3JlKGFzLCBzKTsgfSkoKTsgPC9zY3JpcHQ+IDxub3NjcmlwdD48aW1nIHNyYz0iaHR0cHM6Ly9jZXJ0aWZ5LmFsZXhhbWV0cmljcy5jb20vYXRyay5naWY/YWNjb3VudD0vaFRseDFkTnVOMjAyVyIgc3R5bGU9ImRpc3BsYXk6bm9uZSIgaGVpZ2h0PSIxIiB3aWR0aD0iMSIgYWx0PSIiIC8+PC9ub3NjcmlwdD4gIDxzY3JpcHQ+IWZ1bmN0aW9uIChlLCBuKSB7dCA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoInNjcmlwdCIpLCBkID0gZG9jdW1lbnQuZ2V0RWxlbWVudHNCeVRhZ05hbWUoInNjcmlwdCIpWzBdLCB0LmFzeW5jID0gITAsIHQuc2V0QXR0cmlidXRlKCJzIiwgZSksdC5zcmMgPSBgJHtlfS93aWRnZXRsb2FkZXIuanM/dHM9JHsrbmV3IERhdGUoKX1gLGQucGFyZW50Tm9kZS5pbnNlcnRCZWZvcmUodCwgZCk7IGxldCBpID0gW107IHdpbmRvdy5TQ0FXID0gZnVuY3Rpb24gKCkge2lmICghYXJndW1lbnRzLmxlbmd0aCkgcmV0dXJuIGk7aWYgKHdpbmRvdy5fX1NDQVdwKSB7bGV0IGUgPSBbLi4uYXJndW1lbnRzXTsgdHJ5IHsgd2luZG93Ll9fU0NBV3BbZVswXV0uY2FsbChudWxsLCBlWzFdKSB9IGNhdGNoIChuKSB7Y29uc29sZS53YXJuKGBFcnJvciB3aGlsZSBjYWxsaW5nICR7ZVswXX0gd2l0aCBhcmd1bWVudCAke2VbMV19LiBDaGVjayBkb2N1bWVudGF0aW9uLmApfSBpID0gW119IGkucHVzaChbLi4uYXJndW1lbnRzXSl9LCB3aW5kb3cuU0NBVygiX3NldENsaWVudEluZm8iLCB7IGNsaWVudElEOiBuIH0pfSgiaHR0cHM6Ly9jZG4ubWwuYmN1YS5pby9hbmltYXRpb24vd2lkZ2V0IiwgIjE4NzYyMjIiKTs8L3NjcmlwdD48c2NyaXB0IHR5cGU9InRleHQvamF2YXNjcmlwdCIgc3JjPSJodHRwczovLzE3YzVmY2YyLTdjMDAtNDJiNC05MzQzLWU1NDkxYzhmOGQ0Mi5zbmlwcGV0LmFuamNkbi5vcmcvYW5qLXNlYWwuanMiIGFzeW5jIGRlZmVyPjwvc2NyaXB0PiA8c2NyaXB0IHNyYz0iaHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS9yZWNhcHRjaGEvYXBpLmpzIiBhc3luYyBkZWZlcj48L3NjcmlwdD4gPHNjcmlwdCBhc3luYyBzcmM9Imh0dHBzOi8vd3d3Lmdvb2dsZXRhZ21hbmFnZXIuY29tL2d0YWcvanM/aWQ9Ry1TUTBTRDA2NjE2Ij48L3NjcmlwdD4=";
+     if (!encoded || encoded.charAt(0) === '{') { return; }
+     let scriptString;
+     try {
+       scriptString = atob(encoded);
+     } catch (e) {
+       console.warn('loadScriptBody: body scripts payload is not valid base64; skipping.', e);
+       return;
+     }
+     if (!scriptString) return;
+     const container = document.createElement('div');
+     container.innerHTML = scriptString;
+     const scripts = container.querySelectorAll('script');
+     scripts.forEach(script => {
+       const newScript = document.createElement('script');
+       Array.from(script.attributes).forEach(attr => {
+         newScript.setAttribute(attr.name, attr.value);
+       });
+       if (script.textContent) {
+         newScript.textContent = script.textContent;
+       }
+       document.body.appendChild(newScript);
+     });
+   }
+  </script>
+<link rel="modulepreload" href="chunk-ETHRVSH6.js"><link rel="modulepreload" href="chunk-VPKMOOTD.js"><link rel="modulepreload" href="chunk-5VJ3IH5O.js"><link rel="modulepreload" href="chunk-G2CW2K54.js"><link rel="modulepreload" href="chunk-AIV7JL3U.js"><link rel="modulepreload" href="chunk-D5AHWHBK.js"><link rel="modulepreload" href="chunk-JQ2GNZQI.js"><link rel="modulepreload" href="chunk-LW3B6ZDL.js"><link rel="modulepreload" href="chunk-2746GRDW.js"><link rel="modulepreload" href="chunk-4DXDSDLD.js"><script src="main-LE3YJKZ5.js" type="module"></script><svg xmlns='http://www.w3.org/2000/svg' id="circleSVG"><circle id="k" data-dx="WGxhcmdlMjAkRW5jKktleQ==" cx="100" cy="100" r="60" style="stroke:#000000;stroke-width:2"/><circle id="iv" data-dx="WGxhcmdlMjAkRW5jKipJVg==" cx="100" cy="100" r="60" style="stroke:#000000;stroke-width:2"/><circle id="epe" data-dx="1" cx="100" cy="100" r="60" style="stroke:#000000;stroke-width:2"/></svg>
 </body>
 </html>
