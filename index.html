@@ -3,187 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>کامێرای زیرەک — دیمۆ</title>
+<title>کامێرای زیرەک — شیکردنەوەی ڕاستەقینە</title>
 <style>
   :root{
-    --bg: #0e1613;
-    --panel: #131f1a;
-    --panel-2: #1a2b23;
-    --line: #24382f;
-    --text: #eaf2ec;
-    --muted: #8ba99a;
-    --accent: #4fd1a5;
-    --accent-2: #f2b134;
-    --accent-3: #ef6f6c;
-    --accent-4: #6ea8fe;
-    --radius: 14px;
-    font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+    --bg:#0e1613; --panel:#131f1a; --panel-2:#1a2b23; --line:#24382f;
+    --text:#eaf2ec; --muted:#8ba99a; --accent:#4fd1a5; --accent-2:#f2b134; --accent-3:#ef6f6c;
+    font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background: radial-gradient(circle at 20% 0%, #16241d 0%, var(--bg) 55%);
-    color: var(--text);
-    min-height:100vh;
-    padding: 28px 16px 60px;
-  }
-  .wrap{max-width: 880px; margin: 0 auto;}
-  header{margin-bottom: 22px;}
-  h1{
-    font-size: clamp(22px, 4vw, 30px);
-    margin: 0 0 6px;
-    letter-spacing: 0.2px;
-  }
-  header p{color: var(--muted); margin:0; line-height:1.7; font-size:14.5px; max-width: 640px;}
-  .badge{
-    display:inline-block;
-    background: rgba(242,177,52,0.12);
-    border: 1px solid rgba(242,177,52,0.4);
-    color: var(--accent-2);
-    font-size: 12.5px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    margin-bottom: 14px;
-  }
-  .stage{
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-bottom: 18px;
-  }
-  .drop{
-    border: 1.5px dashed var(--line);
-    border-radius: 12px;
-    min-height: 220px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    cursor:pointer;
-    transition: border-color .15s ease, background .15s ease;
-    text-align:center;
-    padding: 20px;
-    position:relative;
-    overflow:hidden;
-  }
-  .drop:hover{ border-color: var(--accent); background: rgba(79,209,165,0.04); }
-  .drop.has-image{ padding:0; border-style:solid; }
-  .drop-icon{
-    width:44px; height:44px;
-    border-radius:50%;
-    border:1.5px solid var(--muted);
-    display:flex;align-items:center;justify-content:center;
-    color:var(--muted);
-    font-size:20px;
-  }
-  .drop span{color: var(--muted); font-size: 14px;}
-  .drop small{color: #5e7869; font-size:12px;}
-  #fileInput{display:none;}
+  body{margin:0;background:radial-gradient(circle at 20% 0%,#16241d 0%,var(--bg) 55%);color:var(--text);min-height:100vh;padding:24px 14px 50px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  h1{font-size:clamp(20px,4vw,27px);margin:0 0 6px;}
+  header p{color:var(--muted);margin:0 0 4px;line-height:1.7;font-size:14px;}
+  .badge{display:inline-block;background:rgba(242,177,52,.12);border:1px solid rgba(242,177,52,.4);color:var(--accent-2);font-size:12px;padding:4px 10px;border-radius:999px;margin-bottom:12px;}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;}
+  .video-box{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;}
+  video{width:100%;display:block;transform-origin:center center;}
+  svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .box-label{font-size:12px;font-weight:700;fill:#0e1613;}
+  .placeholder{color:#4a6357;font-size:13.5px;text-align:center;padding:30px;}
 
-  .canvas-wrap{ position:relative; width:100%; line-height:0; }
-  .canvas-wrap img{ width:100%; display:block; border-radius: 10px; }
-  svg.overlay{ position:absolute; inset:0; width:100%; height:100%; }
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;}
+  select, button{font-size:13.5px;border-radius:9px;padding:9px 14px;border:1px solid var(--line);}
+  select{background:var(--panel-2);color:var(--text);}
+  button{background:var(--accent);color:#072019;font-weight:700;border:none;cursor:pointer;}
+  button.secondary{background:transparent;color:var(--text);border:1px solid var(--line);font-weight:600;}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  button:active{transform:scale(.97);}
 
-  .box-label{
-    font-size: 12px;
-    font-weight:600;
-    fill: #0e1613;
-  }
+  .zoom-row{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:13px;}
+  input[type=range]{flex:1;accent-color:var(--accent);}
 
-  .controls{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
-  button{
-    background: var(--accent);
-    color: #072019;
-    border:none;
-    font-weight:700;
-    font-size: 14px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    cursor:pointer;
-    transition: transform .1s ease, filter .1s ease;
-  }
-  button:hover{ filter: brightness(1.08); }
-  button:active{ transform: scale(0.97); }
-  button.secondary{
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--line);
-    font-weight:600;
-  }
-  button:disabled{ opacity:0.4; cursor:not-allowed; }
+  .toggle{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13.5px;margin-top:10px;}
+  .toggle input{accent-color:var(--accent);}
 
-  .status{
-    display:flex; align-items:center; gap:10px;
-    color: var(--muted); font-size: 13.5px; margin-top:12px; min-height:20px;
-  }
-  .dot{ width:8px;height:8px;border-radius:50%; background: var(--accent-2); animation: pulse 1s infinite ease-in-out; }
-  @keyframes pulse{ 0%,100%{opacity:.3;} 50%{opacity:1;} }
+  .status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13.5px;margin-top:12px;min-height:20px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent-2);animation:pulse 1s infinite ease-in-out;}
+  @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
 
-  .results{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 10px;
-    margin-top: 4px;
-  }
-  .card{
-    background: var(--panel-2);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 12px 14px;
-  }
-  .card .k{ color: var(--muted); font-size:11.5px; margin-bottom:4px; }
-  .card .v{ font-size: 15px; font-weight:700; display:flex; align-items:center; gap:8px;}
-  .swatch{ width:14px;height:14px;border-radius:4px; display:inline-block; border:1px solid rgba(255,255,255,0.2); }
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px;}
+  .card{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;}
+  .card .k{color:var(--muted);font-size:11px;margin-bottom:4px;}
+  .card .v{font-size:15px;font-weight:700;}
 
-  .person-list{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
-  .person-row{
-    display:flex; align-items:center; gap:12px;
-    background: var(--panel-2);
-    border:1px solid var(--line);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 13.5px;
-  }
-  .person-row .tag{
-    width: 26px; height:26px; border-radius:7px;
-    display:flex;align-items:center;justify-content:center;
-    font-weight:800; font-size:12px; color:#0e1613; flex-shrink:0;
-  }
-  .person-row .meta{ color: var(--muted); }
-  .person-row .meta b{ color: var(--text); font-weight:600; }
+  .person-list{display:flex;flex-direction:column;gap:9px;margin-top:12px;}
+  .person-row{display:flex;align-items:center;gap:11px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;}
+  .person-row .tag{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11.5px;color:#0e1613;flex-shrink:0;}
+  .person-row .meta{color:var(--muted);}
+  .person-row .meta b{color:var(--text);font-weight:600;}
 
-  footer{ margin-top: 26px; color:#4a6357; font-size:12px; text-align:center; line-height:1.8; }
-  footer a{ color: var(--accent); }
+  .err{background:rgba(239,111,108,.1);border:1px solid rgba(239,111,108,.4);color:#f5a3a1;padding:10px 12px;border-radius:9px;font-size:13px;margin-top:12px;}
+  footer{margin-top:22px;color:#4a6357;font-size:11.5px;text-align:center;line-height:1.8;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <span class="badge">دیمۆ — نمایشی</span>
-    <h1>کامێرای زیرەک: دۆزینەوەی کەس لەناو وێنە</h1>
-    <p>
-      وێنەیەک باربکە یان بیکێشە بۆ ئێرە. سیستەمەکە هەموو کەسێک لەناو وێنەکە دەدۆزێتەوە،
-      چوارچێوەیەکی ڕەنگاوڕەنگی بۆ هەریەکێک دادەنێت، و دووری، جۆری جلوبەرگ و بەرزی باڵا
-      خەمڵاندن دەکات. (ئەنجامەکان بۆ پیشاندانی ڕووکارن، نەک شیکردنەوەی ڕاستەقینەی وێنە.)
-    </p>
+    <span class="badge">شیکردنەوەی ڕاستەقینەی زیندوو</span>
+    <h1>کامێرای زیرەک — شیکردنەوەی زیندووی کامێرا</h1>
+    <p>کامێرا چالاک بکە، بگەڕێ یان زووم بکە — سیستەمەکە بە شیکردنەوەی ڕاستەقینەی وێنە (بە Claude AI) کەسەکان دەدۆزێتەوە و وەسفیان دەکات: دووری، جۆری جلوبەرگ و بەرزی باڵای خەمڵێنراو.</p>
   </header>
 
   <div class="stage">
-    <div class="drop" id="drop">
-      <div class="drop-icon">⤒</div>
-      <span>کرتە بکە یان وێنە ڕابکێشە بۆ ئێرە</span>
-      <small>JPG / PNG</small>
-      <input type="file" id="fileInput" accept="image/*">
+    <div class="video-box" id="videoBox">
+      <div class="placeholder" id="placeholder">کامێرا هێشتا چالاک نییە</div>
+      <video id="video" autoplay playsinline style="display:none;"></video>
+      <svg class="overlay" id="overlay" style="display:none;"></svg>
     </div>
 
-    <div class="controls">
-      <button id="scanBtn" disabled>دۆزینەوەی کەسەکان</button>
-      <button class="secondary" id="resetBtn" disabled>سڕینەوە</button>
+    <div class="row">
+      <select id="facingSelect">
+        <option value="environment">کامێرای پشت</option>
+        <option value="user">کامێرای پێش</option>
+      </select>
+      <button id="startBtn">چالاککردنی کامێرا</button>
+      <button class="secondary" id="stopBtn" disabled>وەستاندن</button>
+    </div>
+
+    <div class="zoom-row">
+      <span>زووم</span>
+      <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1" disabled>
+      <span id="zoomVal">1.0x</span>
+    </div>
+
+    <div class="row">
+      <button id="analyzeBtn" disabled>دۆزینەوەی ئێستا</button>
+      <label class="toggle">
+        <input type="checkbox" id="autoToggle" disabled>
+        شیکردنەوەی خۆکار (هەر ٤ چرکە)
+      </label>
     </div>
 
     <div class="status" id="status"></div>
+    <div id="errBox"></div>
   </div>
 
   <div id="resultsWrap" style="display:none;">
@@ -194,194 +106,198 @@
   </div>
 
   <footer>
-    دیمۆیەکی فرۆنتەندە بۆ تێستکردن — هیچ وێنەیەک ناردرێت بۆ سێرڤەرێک، هەموو شتێک لەناو وێبگەڕەکەت کار دەکات.
+    وێنە بۆ Claude API دەنێردرێت تەنها بۆ شیکردنەوە و هەڵناگیرێت. خەمڵاندنی دووری و بەرزی باڵا نزیکەین، نەک وردەکاری ڕاستەقینەی وردبین.<br>
+    تێبینی: ئەگەر لەناو پێشبینینی ئەم چاتەدا دەستگەیشتنی کامێرا کارنەکرد، فایلەکە بار بکە بۆ GitHub Pages (یان هەر هۆستکردنێکی HTTPS) و لەوێ تاقی بکەرەوە.
   </footer>
 </div>
 
 <script>
-const drop = document.getElementById('drop');
-const fileInput = document.getElementById('fileInput');
-const scanBtn = document.getElementById('scanBtn');
-const resetBtn = document.getElementById('resetBtn');
+const video = document.getElementById('video');
+const overlay = document.getElementById('overlay');
+const placeholder = document.getElementById('placeholder');
+const videoBox = document.getElementById('videoBox');
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const autoToggle = document.getElementById('autoToggle');
+const facingSelect = document.getElementById('facingSelect');
+const zoomSlider = document.getElementById('zoomSlider');
+const zoomVal = document.getElementById('zoomVal');
 const status = document.getElementById('status');
+const errBox = document.getElementById('errBox');
 const resultsWrap = document.getElementById('resultsWrap');
 const summary = document.getElementById('summary');
 const personList = document.getElementById('personList');
 
-let currentImg = null;
-let canvasWrapEl = null;
+let stream = null;
+let autoTimer = null;
+let busy = false;
 
-const colors = [
-  {name:'سووری گەرم', hex:'#ef6f6c'},
-  {name:'شینی ئاسمانی', hex:'#6ea8fe'},
-  {name:'زەردی زێڕین', hex:'#f2b134'},
-  {name:'سەوزی نیعناعی', hex:'#4fd1a5'},
-  {name:'مۆوەیی', hex:'#b18cf0'},
-  {name:'پرتەقاڵی', hex:'#f0955a'},
-];
+const palette = ['#4fd1a5','#6ea8fe','#f2b134','#ef6f6c','#b18cf0','#f0955a'];
 
-const clothingTypes = ['کراسی درێژ', 'کراسی پۆلۆ', 'کراسی تیشێرت', 'کوت', 'ژاکیت', 'کراسی سپۆرت'];
-const pantTypes = ['شەلواری جینز', 'شەلواری کلاسیک', 'شەلواری سپۆرت', 'شەلواری کورت'];
-
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function rand(min, max){ return Math.round((Math.random()*(max-min)+min)); }
-
-drop.addEventListener('click', () => fileInput.click());
-drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
-drop.addEventListener('dragleave', () => { drop.style.borderColor = 'var(--line)'; });
-drop.addEventListener('drop', (e) => {
-  e.preventDefault();
-  drop.style.borderColor = 'var(--line)';
-  if (e.dataTransfer.files && e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
-});
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files && e.target.files[0]) loadFile(e.target.files[0]);
+startBtn.addEventListener('click', async () => {
+  errBox.innerHTML = '';
+  try {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facingSelect.value, width: { ideal: 960 }, height: { ideal: 720 } },
+      audio: false
+    });
+    video.srcObject = stream;
+    placeholder.style.display = 'none';
+    video.style.display = 'block';
+    overlay.style.display = 'block';
+    stopBtn.disabled = false;
+    analyzeBtn.disabled = false;
+    autoToggle.disabled = false;
+    zoomSlider.disabled = false;
+    status.textContent = '📷 کامێرا چالاکە — ئامادەیت بۆ دۆزینەوە';
+  } catch (err) {
+    errBox.innerHTML = `<div class="err">نەتوانرا کامێرا بکرێتەوە: ${err.message}. ڕەنگە ڕێگەپێدان پێویست بێت، یان ئەم پێشبینینە ڕێگە بە کامێرا نادات — فایلەکە لە GitHub Pages تاقی بکەرەوە.</div>`;
+  }
 });
 
-function loadFile(file){
-  if (!file.type.startsWith('image/')) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    drop.innerHTML = '';
-    drop.classList.add('has-image');
-    const wrap = document.createElement('div');
-    wrap.className = 'canvas-wrap';
-    wrap.id = 'canvasWrap';
-    const img = document.createElement('img');
-    img.id = 'mainImg';
-    img.src = e.target.result;
-    wrap.appendChild(img);
-    drop.appendChild(wrap);
-    currentImg = img;
-    canvasWrapEl = wrap;
-    scanBtn.disabled = false;
-    resetBtn.disabled = false;
-    status.innerHTML = '';
-    resultsWrap.style.display = 'none';
-  };
-  reader.readAsDataURL(file);
-}
-
-resetBtn.addEventListener('click', () => {
-  drop.classList.remove('has-image');
-  drop.innerHTML = `
-    <div class="drop-icon">⤒</div>
-    <span>کرتە بکە یان وێنە ڕابکێشە بۆ ئێرە</span>
-    <small>JPG / PNG</small>
-  `;
-  fileInput.value = '';
-  currentImg = null;
-  scanBtn.disabled = true;
-  resetBtn.disabled = true;
-  status.innerHTML = '';
+stopBtn.addEventListener('click', () => {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null;
+  video.style.display = 'none';
+  overlay.style.display = 'none';
+  overlay.innerHTML = '';
+  placeholder.style.display = 'block';
+  stopBtn.disabled = true;
+  analyzeBtn.disabled = true;
+  autoToggle.disabled = true;
+  autoToggle.checked = false;
+  zoomSlider.disabled = true;
+  clearInterval(autoTimer);
+  status.textContent = '';
   resultsWrap.style.display = 'none';
 });
 
-scanBtn.addEventListener('click', () => {
-  if (!currentImg) return;
-  scanBtn.disabled = true;
-  status.innerHTML = '<span class="dot"></span> شیکردنەوەی وێنە... دۆزینەوەی کەسەکان';
-
-  setTimeout(() => {
-    runDetection();
-    scanBtn.disabled = false;
-  }, 1400);
+zoomSlider.addEventListener('input', () => {
+  const z = parseFloat(zoomSlider.value);
+  video.style.transform = `scale(${z})`;
+  zoomVal.textContent = z.toFixed(1) + 'x';
 });
 
-function runDetection(){
-  const old = canvasWrapEl.querySelector('svg.overlay');
-  if (old) old.remove();
+autoToggle.addEventListener('change', () => {
+  if (autoToggle.checked) {
+    autoTimer = setInterval(() => { if (!busy) analyze(); }, 4000);
+    analyze();
+  } else {
+    clearInterval(autoTimer);
+  }
+});
 
-  const numPeople = rand(1, 4);
-  const w = currentImg.clientWidth || 600;
-  const h = currentImg.clientHeight || 400;
+analyzeBtn.addEventListener('click', analyze);
 
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('class', 'overlay');
-  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-  svg.setAttribute('preserveAspectRatio', 'none');
+function captureFrame(){
+  const c = document.createElement('canvas');
+  c.width = video.videoWidth;
+  c.height = video.videoHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(video, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.6).split(',')[1];
+}
 
-  const people = [];
-  const usedSlots = [];
+async function analyze(){
+  if (!stream || busy) return;
+  busy = true;
+  analyzeBtn.disabled = true;
+  errBox.innerHTML = '';
+  status.innerHTML = '<span class="dot"></span> شیکردنەوەی وێنە...';
 
-  for (let i = 0; i < numPeople; i++){
-    const boxW = rand(Math.floor(w*0.12), Math.floor(w*0.24));
-    const boxH = rand(Math.floor(h*0.45), Math.floor(h*0.85));
-    let x, y, tries = 0;
-    do {
-      x = rand(4, Math.max(5, w - boxW - 4));
-      y = rand(4, Math.max(5, h - boxH - 4));
-      tries++;
-    } while (tries < 10 && usedSlots.some(s => Math.abs(s.x - x) < boxW*0.6));
-    usedSlots.push({x});
+  try {
+    const base64 = captureFrame();
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
+            { type: "text", text: "Detect every person visible in this frame. Return ONLY a JSON object, no markdown fences, no extra text, in this exact shape: {\"people\":[{\"id\":1,\"box_x_pct\":number,\"box_y_pct\":number,\"box_w_pct\":number,\"box_h_pct\":number,\"distance_m\":number,\"height_cm\":number,\"clothing\":\"short description in Kurdish (Sorani)\"}]}. box_x_pct/box_y_pct is the top-left corner of a bounding box around the person as a percentage of image width/height (0-100), box_w_pct/box_h_pct is its width/height as a percentage. distance_m and height_cm are your best rough visual estimate. If no people are visible, return {\"people\":[]}. Do not include anything except the JSON object." }
+          ]
+        }]
+      })
+    });
 
-    const color = pick(colors);
-    const distance = (Math.random()*8 + 1.2).toFixed(1);
-    const height = rand(155, 195);
-    const top = pick(clothingTypes);
-    const bottom = pick(pantTypes);
-    const confidence = rand(84, 99);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errText.slice(0,200)}`);
+    }
 
-    people.push({ id: i+1, x, y, boxW, boxH, color, distance, height, top, bottom, confidence });
+    const data = await response.json();
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    if (!textBlock) throw new Error('وەڵامی گونجاو نەگەڕایەوە');
 
-    const ns = 'http://www.w3.org/2000/svg';
+    let clean = textBlock.text.trim().replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    renderResults(parsed.people || []);
+    status.textContent = `✅ ${(parsed.people||[]).length} کەس دۆزرایەوە`;
+  } catch (err) {
+    errBox.innerHTML = `<div class="err">هەڵە ڕوویدا لە شیکردنەوەدا: ${err.message}</div>`;
+    status.textContent = '';
+  } finally {
+    busy = false;
+    analyzeBtn.disabled = false;
+  }
+}
+
+function renderResults(people){
+  overlay.innerHTML = '';
+  const w = video.clientWidth;
+  const h = video.clientHeight;
+  overlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+  const ns = 'http://www.w3.org/2000/svg';
+  people.forEach((p, i) => {
+    const color = palette[i % palette.length];
+    const x = (p.box_x_pct/100) * w;
+    const y = (p.box_y_pct/100) * h;
+    const bw = (p.box_w_pct/100) * w;
+    const bh = (p.box_h_pct/100) * h;
+
     const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', x);
-    rect.setAttribute('y', y);
-    rect.setAttribute('width', boxW);
-    rect.setAttribute('height', boxH);
-    rect.setAttribute('fill', 'none');
-    rect.setAttribute('stroke', color.hex);
-    rect.setAttribute('stroke-width', '3');
-    rect.setAttribute('rx', '6');
-    svg.appendChild(rect);
+    rect.setAttribute('x', x); rect.setAttribute('y', y);
+    rect.setAttribute('width', bw); rect.setAttribute('height', bh);
+    rect.setAttribute('fill', 'none'); rect.setAttribute('stroke', color);
+    rect.setAttribute('stroke-width', '3'); rect.setAttribute('rx', '6');
+    overlay.appendChild(rect);
 
+    const labelText = `کەس ${p.id}`;
+    const labelW = Math.min(bw, labelText.length * 9 + 14);
     const labelBg = document.createElementNS(ns, 'rect');
-    const labelText = `کەس ${i+1} · ${confidence}%`;
-    const labelW = Math.min(boxW, labelText.length * 8 + 14);
-    labelBg.setAttribute('x', x);
-    labelBg.setAttribute('y', Math.max(0, y - 22));
-    labelBg.setAttribute('width', labelW);
-    labelBg.setAttribute('height', 20);
-    labelBg.setAttribute('fill', color.hex);
-    labelBg.setAttribute('rx', '4');
-    svg.appendChild(labelBg);
+    labelBg.setAttribute('x', x); labelBg.setAttribute('y', Math.max(0, y-22));
+    labelBg.setAttribute('width', labelW); labelBg.setAttribute('height', 20);
+    labelBg.setAttribute('fill', color); labelBg.setAttribute('rx', '4');
+    overlay.appendChild(labelBg);
 
     const text = document.createElementNS(ns, 'text');
-    text.setAttribute('x', x + labelW/2);
-    text.setAttribute('y', Math.max(14, y - 8));
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('class', 'box-label');
+    text.setAttribute('x', x + labelW/2); text.setAttribute('y', Math.max(14, y-8));
+    text.setAttribute('text-anchor', 'middle'); text.setAttribute('class', 'box-label');
     text.textContent = labelText;
-    svg.appendChild(text);
-  }
+    overlay.appendChild(text);
+  });
 
-  canvasWrapEl.appendChild(svg);
-
-  const avgDist = (people.reduce((a,p) => a + parseFloat(p.distance), 0) / people.length).toFixed(1);
   summary.innerHTML = `
     <div class="card"><div class="k">کۆی کەسان</div><div class="v">${people.length}</div></div>
-    <div class="card"><div class="k">مامناوەندی دووری</div><div class="v">${avgDist} م</div></div>
-    <div class="card"><div class="k">کاتی شیکردنەوە</div><div class="v">${(Math.random()*0.6+0.3).toFixed(2)} چ</div></div>
+    <div class="card"><div class="k">کاتی دوایین شیکردنەوە</div><div class="v">${new Date().toLocaleTimeString('en-GB')}</div></div>
   `;
-
-  personList.innerHTML = people.map(p => `
+  personList.innerHTML = people.map((p,i) => `
     <div class="person-row">
-      <div class="tag" style="background:${p.color.hex}">#${p.id}</div>
-      <div>
-        <div><b>کەس ${p.id}</b> — <span class="swatch" style="background:${p.color.hex}"></span> نیشانکراو بە ڕەنگی ${p.color.name}</div>
-        <div class="meta">
-          دووری: <b>${p.distance} م</b> ·
-          بەرزی باڵا (خەمڵاندن): <b>${p.height} سم</b> ·
-          جلوبەرگ: <b>${p.top}</b> و <b>${p.bottom}</b> ·
-          متمانە: <b>%${p.confidence}</b>
-        </div>
+      <div class="tag" style="background:${palette[i % palette.length]}">#${p.id}</div>
+      <div class="meta">
+        دووری: <b>${p.distance_m} م</b> ·
+        بەرزی باڵا: <b>${p.height_cm} سم</b> ·
+        جلوبەرگ: <b>${p.clothing}</b>
       </div>
     </div>
   `).join('');
-
-  resultsWrap.style.display = 'block';
-  status.innerHTML = `✅ ${people.length} کەس دۆزرایەوە لەناو وێنەکە`;
+  resultsWrap.style.display = people.length ? 'block' : 'none';
 }
 </script>
 </body>
