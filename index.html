@@ -54,6 +54,13 @@
   .attr .k{color:var(--muted);font-size:10.5px;margin-bottom:2px;}
   .attr .v{font-size:13px;font-weight:600;}
 
+  .radar-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .radar{background:#0a120e;border:1px solid var(--line);border-radius:50%;width:120px;height:120px;position:relative;flex-shrink:0;}
+  .radar svg{width:100%;height:100%;}
+  .timeline{flex:1;min-width:180px;max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
+  .timeline-item{font-size:11.5px;color:var(--muted);display:flex;gap:8px;}
+  .timeline-item b{color:var(--text);font-weight:600;}
+
   .err{background:rgba(239,111,108,.1);border:1px solid rgba(239,111,108,.4);color:#f5a3a1;padding:10px 12px;border-radius:9px;font-size:13px;margin-top:12px;}
   footer{margin-top:22px;color:#4a6357;font-size:11.5px;text-align:center;line-height:1.8;}
 </style>
@@ -95,6 +102,10 @@
   <div id="resultsWrap" style="display:none;">
     <div class="stage">
       <div class="results" id="summary"></div>
+      <div class="radar-wrap" style="margin-top:14px;">
+        <div class="radar"><svg id="radarSvg" viewBox="0 0 120 120"></svg></div>
+        <div class="timeline" id="timeline"></div>
+      </div>
       <div class="person-list" id="personList"></div>
     </div>
   </div>
@@ -118,9 +129,29 @@ const errBox = document.getElementById('errBox');
 const resultsWrap = document.getElementById('resultsWrap');
 const summary = document.getElementById('summary');
 const personList = document.getElementById('personList');
+const radarSvg = document.getElementById('radarSvg');
+const timelineEl = document.getElementById('timeline');
 
 let stream = null;
 let liveTimer = null;
+let sessionTotal = 0;
+let lastCount = 0;
+let history = [];
+let audioCtx = null;
+
+function beep(){
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+  } catch(e) {}
+}
 
 const colors = [
   {name:'سووری گەرم', hex:'#ef6f6c'},
@@ -135,6 +166,11 @@ const pantTypes = ['شەلواری جینز', 'شەلواری کلاسیک', 'ش
 const hairColors = ['ڕەش', 'قاوەیی تۆخ', 'قاوەیی ڕووناک', 'زەرد', 'سپی/کاڵ', 'سوور'];
 const eyeColors = ['قاوەیی تۆخ', 'قاوەیی ڕووناک', 'شین', 'سەوز', 'کەوی'];
 const clothingColors = ['ڕەش', 'سپی', 'شین', 'سوور', 'خۆڵەمێشی', 'زەرد', 'سەوز', 'قاوەیی'];
+const genders = ['نێر', 'مێ'];
+const accessories = ['کلاو', 'عەینەک', 'ماسک', 'هیچ شتێک'];
+const belongings = ['مۆبایل', 'جانتا', 'کیسە', 'هیچ شتێک'];
+const directions = ['بەرەو کامێرا', 'دوورکەوتنەوە لە کامێرا', 'بەلای ڕاست', 'بەلای چەپ', 'وەستاوە'];
+const activities = ['ڕاوەستاوە', 'ڕۆیشتن', 'دانیشتووە', 'قسەکردن لەسەر مۆبایل', 'تەماشاکردنی دەوروبەر'];
 
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function rand(min, max){ return Math.round((Math.random()*(max-min)+min)); }
@@ -154,6 +190,7 @@ startBtn.addEventListener('click', async () => {
     stopBtn.disabled = false;
     zoomSlider.disabled = false;
     status.innerHTML = '<span class="dot"></span> دۆزینەوەی زیندوو کاردەکات...';
+    sessionTotal = 0; lastCount = 0; history = [];
 
     liveTimer = setInterval(runDetection, 2500);
     setTimeout(runDetection, 500);
@@ -217,8 +254,14 @@ function runDetection(){
     const confidence = rand(84, 99);
     const hair = pick(hairColors);
     const eyes = pick(eyeColors);
+    const age = rand(18, 60);
+    const gender = pick(genders);
+    const accessory = pick(accessories);
+    const belonging = pick(belongings);
+    const direction = pick(directions);
+    const activity = pick(activities);
 
-    people.push({ id: i+1, color, distance, height, top, topColor, bottom, bottomColor, confidence, hair, eyes });
+    people.push({ id: i+1, color, distance, height, top, topColor, bottom, bottomColor, confidence, hair, eyes, age, gender, accessory, belonging, direction, activity, cx: x + boxW/2, cy: y + boxH/2 });
 
     const rect = document.createElementNS(ns, 'rect');
     rect.setAttribute('x', x); rect.setAttribute('y', y);
@@ -242,10 +285,43 @@ function runDetection(){
     overlay.appendChild(text);
   }
 
+  if (people.length > lastCount) beep();
+  lastCount = people.length;
+  sessionTotal += people.length;
+
+  const nowStr = new Date().toLocaleTimeString('en-GB');
+  if (people.length > 0) {
+    history.unshift({ time: nowStr, count: people.length });
+    history = history.slice(0, 12);
+  }
+
   summary.innerHTML = `
-    <div class="card"><div class="k">کۆی کەسان</div><div class="v">${people.length}</div></div>
-    <div class="card"><div class="k">کاتی دوایین نوێکردنەوە</div><div class="v">${new Date().toLocaleTimeString('en-GB')}</div></div>
+    <div class="card"><div class="k">کۆی کەسان (ئێستا)</div><div class="v">${people.length}</div></div>
+    <div class="card"><div class="k">کۆی گشتی ئەم دیمانە</div><div class="v">${sessionTotal}</div></div>
+    <div class="card"><div class="k">کاتی دوایین نوێکردنەوە</div><div class="v">${nowStr}</div></div>
   `;
+
+  radarSvg.innerHTML = '';
+  const rns = 'http://www.w3.org/2000/svg';
+  [30,50].forEach(r => {
+    const c = document.createElementNS(rns,'circle');
+    c.setAttribute('cx',60); c.setAttribute('cy',60); c.setAttribute('r',r);
+    c.setAttribute('fill','none'); c.setAttribute('stroke','#24382f'); c.setAttribute('stroke-width','1');
+    radarSvg.appendChild(c);
+  });
+  people.forEach(p => {
+    const rx = 12 + (p.cx / w) * 96;
+    const ry = 12 + (p.cy / h) * 96;
+    const dot = document.createElementNS(rns,'circle');
+    dot.setAttribute('cx', rx); dot.setAttribute('cy', ry); dot.setAttribute('r', 5);
+    dot.setAttribute('fill', p.color.hex);
+    radarSvg.appendChild(dot);
+  });
+
+  timelineEl.innerHTML = history.map(h => `
+    <div class="timeline-item"><span>${h.time}</span> — <b>${h.count}</b> کەس دۆزرایەوە</div>
+  `).join('') || '<div class="timeline-item">هێشتا هیچ کەسێک تۆمار نەکراوە</div>';
+
   personList.innerHTML = people.map(p => `
     <div class="person-card">
       <div class="head">
@@ -256,10 +332,16 @@ function runDetection(){
       <div class="attr-grid">
         <div class="attr"><div class="k">دووری</div><div class="v">${p.distance} م</div></div>
         <div class="attr"><div class="k">درێژی باڵا</div><div class="v">${p.height} سم</div></div>
+        <div class="attr"><div class="k">تەمەنی خەمڵێنراو</div><div class="v">${p.age} ساڵ</div></div>
+        <div class="attr"><div class="k">ڕەگەز</div><div class="v">${p.gender}</div></div>
         <div class="attr"><div class="k">ڕەنگی پرچ</div><div class="v">${p.hair}</div></div>
         <div class="attr"><div class="k">ڕەنگی چاو</div><div class="v">${p.eyes}</div></div>
         <div class="attr"><div class="k">کراس</div><div class="v">${p.top} (${p.topColor})</div></div>
         <div class="attr"><div class="k">شەلوار</div><div class="v">${p.bottom} (${p.bottomColor})</div></div>
+        <div class="attr"><div class="k">پێداویستی سەرپشت</div><div class="v">${p.accessory}</div></div>
+        <div class="attr"><div class="k">شتی لەبەردەست</div><div class="v">${p.belonging}</div></div>
+        <div class="attr"><div class="k">ئاراستەی جوڵە</div><div class="v">${p.direction}</div></div>
+        <div class="attr"><div class="k">کردار</div><div class="v">${p.activity}</div></div>
       </div>
     </div>
   `).join('');
