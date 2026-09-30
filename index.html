@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05070a">
+<link rel="manifest" href="manifest.json">
 <title>KRD TEC — SENTINEL-CAM</title>
 <style>
   :root{
@@ -141,11 +143,80 @@
   .log-item{font-size:10.5px;color:var(--muted);display:flex;gap:8px;border-bottom:1px dotted var(--line);padding-bottom:3px;}
   .log-item b{color:var(--text);}
 
+  .upload-drop{border:1.5px dashed var(--line);min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-align:center;padding:16px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;}
+  .upload-drop:hover{border-color:var(--accent-dim);}
+  #photoFileInput{display:none;}
+  .photo-box{position:relative;width:100%;overflow:hidden;background:#000;border:1px solid var(--line);display:none;}
+  .photo-box img{width:100%;display:block;}
+  .photo-box svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .found-blink{animation:foundpulse 1s infinite;}
+  @keyframes foundpulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  .qform{display:none;margin-top:14px;}
+  .qform .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+  .qfield{display:flex;flex-direction:column;gap:4px;}
+  .qfield label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+  .qfield select{width:100%;}
+  .lock-summary{display:none;margin-top:14px;}
+
+  .privacy-blur{position:absolute;backdrop-filter:blur(9px);background:rgba(0,0,0,0.15);pointer-events:none;z-index:2;border-radius:4px;}
+
+  .bolo-ribbon{background:linear-gradient(90deg,#ffb300,#ff5c5c);color:#04140a;font-size:9.5px;font-weight:800;letter-spacing:1px;padding:3px 8px;text-transform:uppercase;animation:pulse .8s infinite;}
+  .bolo-alert{background:rgba(255,179,0,.12);border:1px solid var(--amber);color:var(--amber);font-size:11.5px;padding:8px 10px;margin-top:10px;text-transform:uppercase;letter-spacing:1px;}
+
+  .lang-sel{font-size:10.5px;padding:4px 8px;}
+  .candidate-box{cursor:pointer;pointer-events:all;}
+  .candidate-tag{fill:#04140a;font-size:11px;font-weight:700;font-family:'Consolas','Courier New',monospace;}
+
+  .gate{position:fixed;inset:0;background:#04070a;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .gate-box{max-width:340px;width:100%;border:1px solid var(--accent-dim);background:var(--panel);padding:24px;text-align:center;}
+  .gate-box svg{width:40px;height:40px;margin-bottom:10px;}
+  .gate-box h2{color:var(--accent);font-size:15px;text-transform:uppercase;letter-spacing:2px;margin:0 0 4px;}
+  .gate-box p{color:var(--muted);font-size:11px;margin:0 0 16px;text-transform:uppercase;letter-spacing:1px;}
+  .gate-box input{width:100%;padding:10px;margin-bottom:10px;background:var(--panel-2);border:1px solid var(--line);color:var(--accent);text-align:center;font-size:16px;letter-spacing:4px;font-family:inherit;}
+  .gate-box button{width:100%;}
+  .gate-err{color:#ff8a8a;font-size:11px;margin-top:8px;min-height:14px;}
+  .gate-hint{color:#2f4a34;font-size:9.5px;margin-top:10px;}
+
+  .modal{position:fixed;inset:0;background:rgba(2,4,3,.85);z-index:99;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal-box{max-width:400px;width:100%;border:1px solid var(--line);background:var(--panel);padding:22px;}
+  .modal-box h2{color:var(--accent);font-size:14px;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 12px;}
+  .modal-box ol{color:var(--text);font-size:12.5px;line-height:2;padding-inline-start:20px;margin:0 0 16px;}
+  .modal-box button{width:100%;}
+
   .err{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.4);color:#ff8a8a;padding:10px 12px;font-size:12.5px;margin-top:12px;text-transform:none;}
   footer{margin-top:20px;color:#2f4a34;font-size:10.5px;text-align:center;line-height:1.8;text-transform:uppercase;letter-spacing:1px;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+
+<div class="gate" id="loginGate">
+  <div class="gate-box">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L21 6 V11 C21 16.5 17 20.5 12 22 C7 20.5 3 16.5 3 11 V6 L12 2 Z" stroke="#39ff6a" stroke-width="1.5"/><path d="M9 12 L11 14 L15.5 9" stroke="#39ff6a" stroke-width="1.5" fill="none"/></svg>
+    <h2>KRD TEC // ACCESS CODE</h2>
+    <p>SENTINEL-CAM RESTRICTED SYSTEM</p>
+    <input type="password" id="gateInput" placeholder="کۆدی چوونەژوورەوە" maxlength="8" inputmode="numeric">
+    <button id="gateBtn">چوونەژوورەوە</button>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-hint">کۆدی بنەڕەتی: 1234</div>
+  </div>
+</div>
+
+<div class="modal" id="tutorialModal" style="display:none;">
+  <div class="modal-box">
+    <h2>ڕێنمایی خێرا</h2>
+    <ol>
+      <li>کامێرا چالاک بکە و مۆدی نمایش هەڵبژێرە</li>
+      <li>سیستەم خۆکارانە "ئامانج" لە کامێراکەت دەدۆزێتەوە (هەڕەمەکی/فەیک)</li>
+      <li>وێنەیەکی کەس بار بکە بۆ گەڕانی تایبەت لەناو قەڵەباڵغ</li>
+      <li>پرۆفایلێک قوفڵ بکە و بیخە لیستی چاودێری (Watchlist)</li>
+      <li>هەموو تۆمارەکان لە لاپەڕەی خوارەوە پاشەکەوت دەبن، دەتوانیت وەک CSV دەریان بهێنیت</li>
+    </ol>
+    <button id="tutorialCloseBtn">تێگەیشتم، دەستپێبکە</button>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="topbar">
     <div class="org">
@@ -158,17 +229,29 @@
     <div class="sysinfo">
       <div id="clockLine">--:--:--</div>
       <div>UNIT ID: <b id="unitId">KRD-000000</b> · SENTINEL-CAM v2.4.1</div>
+      <select id="langSel" class="lang-sel">
+        <option value="ku">کوردی</option>
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+      </select>
+      <select id="themeSel" class="lang-sel">
+        <option value="green">HUD: سەوز</option>
+        <option value="cyan">HUD: شین</option>
+        <option value="red">HUD: سوور</option>
+        <option value="amber">HUD: زەرد</option>
+      </select>
+      <button class="secondary" id="logoutBtn" style="padding:4px 8px;font-size:10px;">دەرچوون</button>
     </div>
   </div>
-  <div class="classified">⚠ RESTRICTED ACCESS — KRD TEC INTERNAL USE ONLY ⚠</div>
+  <div class="classified" id="i18n-classified">⚠ RESTRICTED ACCESS — KRD TEC INTERNAL USE ONLY ⚠</div>
 
   <header>
-    <div class="sys-tag"><span class="blink"></span> SENTINEL-CAM // SIMULATION MODE // NO LIVE AI</div>
-    <h1>کامێرای زیرەک</h1>
+    <div class="sys-tag"><span class="blink"></span> <span id="i18n-systag">SENTINEL-CAM // SIMULATION MODE // NO LIVE AI</span></div>
+    <h1 id="i18n-h1">کامێرای زیرەک</h1>
   </header>
 
   <div class="stage">
-    <div class="stage-title"><span>FEED // CAM-01</span><span id="feedStatus">STANDBY</span></div>
+    <div class="stage-title"><span id="i18n-feed">FEED // CAM-01</span><span id="feedStatus">STANDBY</span></div>
     <div class="video-box" id="videoBox">
       <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
       <div class="hud-corner bl"></div><div class="hud-corner br"></div>
@@ -176,6 +259,7 @@
       <div class="placeholder" id="placeholder">NO SIGNAL</div>
       <video id="video" class="mode-normal" autoplay playsinline muted style="display:none;"></video>
       <svg class="overlay" id="overlay" style="display:none;"></svg>
+      <div id="blurLayer" style="position:absolute;inset:0;pointer-events:none;z-index:2;"></div>
     </div>
 
     <div class="row">
@@ -206,6 +290,8 @@
     <div class="row">
       <label class="toggle-row"><input type="checkbox" id="gridToggle" checked> GRID OVERLAY</label>
       <label class="toggle-row"><input type="checkbox" id="ambientToggle"> AMBIENT AUDIO</label>
+      <label class="toggle-row"><input type="checkbox" id="blurToggle"> PRIVACY BLUR (FACES)</label>
+      <label class="toggle-row"><input type="checkbox" id="voiceToggle"> VOICE ALERTS (TTS)</label>
     </div>
 
     <div class="status" id="status"></div>
@@ -214,7 +300,8 @@
 
   <div id="resultsWrap" style="display:none;">
     <div class="stage">
-      <div class="stage-title"><span>TARGET ANALYSIS</span><span>LIVE</span></div>
+      <div class="stage-title"><span id="i18n-analysis">TARGET ANALYSIS</span><span>LIVE</span></div>
+      <div id="boloAlertLine"></div>
       <div class="results" id="summary"></div>
       <div class="radar-wrap">
         <div class="radar"><svg id="radarSvg" viewBox="0 0 120 120"></svg></div>
@@ -224,9 +311,98 @@
     </div>
   </div>
 
+  <div class="stage">
+    <div class="stage-title"><span id="i18n-search">TARGET SEARCH // PHOTO UPLOAD</span><span id="searchStatus">IDLE</span></div>
+
+    <div class="upload-drop" id="photoDrop">
+      <span>⤒ کرتە بکە بۆ ناردنی وێنە</span>
+      <span style="font-size:10px;">تەنانەت ئەگەر ناو قەڵەباڵغیش بێت</span>
+      <input type="file" id="photoFileInput" accept="image/*">
+    </div>
+
+    <div class="photo-box" id="photoBox">
+      <img id="photoImg" alt="">
+      <svg class="overlay" id="photoOverlay"></svg>
+    </div>
+
+    <div class="row">
+      <button id="findBtn" disabled>دۆزینەوەی کەسەکە</button>
+      <button class="secondary" id="photoResetBtn" disabled>سڕینەوە / وێنەیەکی نوێ</button>
+    </div>
+    <div class="status" id="searchStatusLine"></div>
+
+    <div class="qform" id="qform">
+      <div class="stage-title" style="margin-top:6px;"><span id="i18n-idform">TARGET IDENTIFICATION FORM</span><span id="i18n-selconf">SELECT TO CONFIRM</span></div>
+      <div class="qgrid">
+        <div class="qfield"><label>جۆری کراس</label>
+          <select id="q_top"></select>
+        </div>
+        <div class="qfield"><label>ڕەنگی کراس</label>
+          <select id="q_topColor"></select>
+        </div>
+        <div class="qfield"><label>جۆری شەلوار</label>
+          <select id="q_bottom"></select>
+        </div>
+        <div class="qfield"><label>ڕەنگی شەلوار</label>
+          <select id="q_bottomColor"></select>
+        </div>
+        <div class="qfield"><label>کڵاوی لەسەرە؟</label>
+          <select id="q_hasHat">
+            <option value="no">نەخێر</option>
+            <option value="yes">بەڵێ</option>
+          </select>
+        </div>
+        <div class="qfield"><label>ڕەنگی کڵاو</label>
+          <select id="q_hatColor"></select>
+        </div>
+        <div class="qfield"><label>ڕەنگی پرچ</label>
+          <select id="q_hair"></select>
+        </div>
+        <div class="qfield"><label>ڕەنگی چاو</label>
+          <select id="q_eyes"></select>
+        </div>
+      </div>
+      <div class="row">
+        <button id="confirmBtn">پشتڕاستکردنەوەی پرۆفایل</button>
+      </div>
+    </div>
+
+    <div class="lock-summary" id="lockSummary">
+      <div class="stage-title"><span id="i18n-profile">TARGET PROFILE // LOCKED</span><span id="i18n-confirmed">CONFIRMED</span></div>
+      <div class="person-card" id="lockCard"></div>
+      <div class="row">
+        <input type="text" id="watchNameInput" placeholder="ناوی ئامانج (وەک: کەسی #١)" style="flex:1;min-width:140px;">
+        <button class="secondary" id="posterBtn">پۆستەری گەڕان (PDF)</button>
+        <button class="secondary" id="boloBtn">زیادکردن بۆ لیستی چاودێری</button>
+      </div>
+      <div class="bolo-alert" id="boloSetMsg" style="display:none;">✅ زیادکرا بۆ لیستی چاودێری — کاتێک کامێرای زیندوو چالاکە، ئەگەر (بە هەڕەمەکی) هاتە بەرچاو ئاگادارت دەکاتەوە</div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-title"><span>WATCHLIST // ACTIVE TARGETS</span><span id="watchCount">0</span></div>
+    <div class="log-list" id="watchList"></div>
+  </div>
+
+  <div class="stage">
+    <div class="stage-title"><span>ACTIVITY CHART // BY HOUR</span><span>24H</span></div>
+    <canvas id="activityChart" width="700" height="140" style="width:100%;height:140px;"></canvas>
+  </div>
+
+  <div class="stage">
+    <div class="head-row">
+      <span class="stage-title" style="margin:0;">SEARCH LOG // TARGET IDENTIFICATIONS</span>
+      <button id="clearSearchLogBtn">سڕینەوە</button>
+    </div>
+    <div class="log-list" id="searchLogList"></div>
+    <div class="row">
+      <button class="secondary" id="exportCsvBtn">دەرهێنانی هەموو تۆمارەکان (CSV)</button>
+    </div>
+  </div>
+
   <div class="stage mission-log">
     <div class="head-row">
-      <span class="stage-title" style="margin:0;">MISSION LOG // ALL-TIME</span>
+      <span class="stage-title" style="margin:0;" id="i18n-missionlog">MISSION LOG // ALL-TIME</span>
       <button id="clearLogBtn">سڕینەوە</button>
     </div>
     <div class="log-list" id="logList"></div>
@@ -262,6 +438,40 @@ const sweepLine = document.getElementById('sweepLine');
 const logList = document.getElementById('logList');
 const clearLogBtn = document.getElementById('clearLogBtn');
 const videoBox = document.getElementById('videoBox');
+
+// ---- Login gate ----
+const GATE_CODE_KEY = 'sentinel_access_code';
+const GATE_SESSION_KEY = 'sentinel_gate_unlocked';
+function getAccessCode(){ return localStorage.getItem(GATE_CODE_KEY) || '1234'; }
+if (sessionStorage.getItem(GATE_SESSION_KEY) === '1') {
+  document.getElementById('loginGate').style.display = 'none';
+}
+document.getElementById('gateBtn').addEventListener('click', () => {
+  const val = document.getElementById('gateInput').value;
+  if (val === getAccessCode()) {
+    sessionStorage.setItem(GATE_SESSION_KEY, '1');
+    document.getElementById('loginGate').style.display = 'none';
+    maybeShowTutorial();
+  } else {
+    document.getElementById('gateErr').textContent = 'کۆدی هەڵەیە — دووبارە هەوڵ بدەرەوە';
+  }
+});
+document.getElementById('gateInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('gateBtn').click();
+});
+
+// ---- Tutorial modal ----
+const TUTORIAL_KEY = 'sentinel_tutorial_seen';
+function maybeShowTutorial(){
+  if (!localStorage.getItem(TUTORIAL_KEY)) {
+    document.getElementById('tutorialModal').style.display = 'flex';
+  }
+}
+document.getElementById('tutorialCloseBtn').addEventListener('click', () => {
+  localStorage.setItem(TUTORIAL_KEY, '1');
+  document.getElementById('tutorialModal').style.display = 'none';
+});
+if (sessionStorage.getItem(GATE_SESSION_KEY) === '1') maybeShowTutorial();
 
 const clockLine = document.getElementById('clockLine');
 const unitIdEl = document.getElementById('unitId');
@@ -302,6 +512,79 @@ function beep(){
     osc.start(); osc.stop(audioCtx.currentTime + 0.2);
   } catch(e) {}
 }
+
+function tick(){
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 2200 + Math.random()*400;
+    gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.03);
+  } catch(e) {}
+}
+function typeSound(chars){
+  let i = 0;
+  const n = setInterval(() => { tick(); i++; if (i >= chars) clearInterval(n); }, 45);
+}
+
+const WATCHLIST_KEY = 'sentinel_watchlist_v1';
+function loadWatchlist(){ try { return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'); } catch(e){ return []; } }
+function saveWatchlist(list){ try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify(list.slice(0,30))); } catch(e){} }
+function renderWatchlist(){
+  const list = loadWatchlist();
+  document.getElementById('watchCount').textContent = list.length;
+  const el = document.getElementById('watchList');
+  el.innerHTML = list.length ? list.map(w => `
+    <div class="log-item" style="justify-content:space-between;">
+      <span><b>${w.name}</b> — ${w.top} (${w.topColor}), ${w.hair} پرچ</span>
+      <button class="secondary" style="padding:2px 8px;font-size:9.5px;" onclick="removeWatch('${w.id}')">سڕینەوە</button>
+    </div>
+  `).join('') : '<div class="log-item">لیستی چاودێری بەتاڵە</div>';
+}
+function removeWatch(id){
+  const list = loadWatchlist().filter(w => w.id !== id);
+  saveWatchlist(list);
+  renderWatchlist();
+}
+window.removeWatch = removeWatch;
+
+const HOURLY_KEY = 'sentinel_hourly_stats_v1';
+function loadHourly(){ try { return JSON.parse(localStorage.getItem(HOURLY_KEY) || '{}'); } catch(e){ return {}; } }
+function bumpHourly(count){
+  const stats = loadHourly();
+  const hr = new Date().getHours();
+  stats[hr] = (stats[hr] || 0) + count;
+  try { localStorage.setItem(HOURLY_KEY, JSON.stringify(stats)); } catch(e){}
+  return stats;
+}
+function renderActivityChart(){
+  const stats = loadHourly();
+  const canvas = document.getElementById('activityChart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const max = Math.max(1, ...Object.values(stats));
+  const barW = W / 24;
+  for (let hr=0; hr<24; hr++){
+    const v = stats[hr] || 0;
+    const bh = (v / max) * (H - 24);
+    ctx.fillStyle = v > 0 ? '#39ff6a' : '#1f3a24';
+    ctx.fillRect(hr*barW + 2, H - 18 - bh, barW - 4, bh);
+    if (hr % 3 === 0) {
+      ctx.fillStyle = '#5f8a63';
+      ctx.font = '9px Consolas, monospace';
+      ctx.fillText(String(hr).padStart(2,'0'), hr*barW + 2, H - 4);
+    }
+  }
+}
+
+const SEARCH_LOG_KEY = 'sentinel_search_log_v1';
+function loadSearchLog(){ try { return JSON.parse(localStorage.getItem(SEARCH_LOG_KEY) || '[]'); } catch(e){ return []; } }
+function saveSearchLog(log){ try { localStorage.setItem(SEARCH_LOG_KEY, JSON.stringify(log.slice(0,40))); } catch(e){} }
 
 function startAmbient(){
   try {
@@ -410,7 +693,16 @@ zoomSlider.addEventListener('input', () => {
   zoomVal.textContent = z.toFixed(1) + 'x';
 });
 
-shotBtn.addEventListener('click', async () => {
+function speak(text){
+  try {
+    if (!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.05; u.pitch = 0.85;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+async function captureLiveReport(isAuto){
   if (!stream) return;
   const w = video.videoWidth, h = video.videoHeight;
   const canvas = document.createElement('canvas');
@@ -427,14 +719,13 @@ shotBtn.addEventListener('click', async () => {
     URL.revokeObjectURL(url);
   } catch(e) {}
 
-  // Official report header stamp
   const bandH = Math.max(46, Math.floor(h*0.09));
   ctx.fillStyle = 'rgba(4,7,10,0.88)';
   ctx.fillRect(0, 0, w, bandH);
   ctx.fillStyle = '#39ff6a';
   ctx.font = `bold ${Math.floor(bandH*0.34)}px Consolas, monospace`;
   ctx.textBaseline = 'top';
-  ctx.fillText('KRD TEC — SENTINEL-CAM v2.4.1', 12, 6);
+  ctx.fillText('KRD TEC — SENTINEL-CAM v2.4.1' + (isAuto ? ' · AUTO-CAPTURE' : ''), 12, 6);
   ctx.fillStyle = '#5f8a63';
   ctx.font = `${Math.floor(bandH*0.24)}px Consolas, monospace`;
   const reportNo = 'RPT-' + Date.now().toString().slice(-8);
@@ -442,7 +733,7 @@ shotBtn.addEventListener('click', async () => {
   ctx.fillStyle = 'rgba(255,59,59,0.9)';
   ctx.font = `bold ${Math.floor(bandH*0.24)}px Consolas, monospace`;
   ctx.textAlign = 'right';
-  ctx.fillText('RESTRICTED', w-12, bandH*0.35);
+  ctx.fillText(isAuto ? 'AUTO MATCH' : 'RESTRICTED', w-12, bandH*0.35);
   ctx.textAlign = 'left';
 
   canvas.toBlob(blob => {
@@ -451,7 +742,9 @@ shotBtn.addEventListener('click', async () => {
     link.href = URL.createObjectURL(blob);
     link.click();
   });
-});
+}
+
+shotBtn.addEventListener('click', () => captureLiveReport(false));
 
 function drawGrid(w, h){
   const ns = 'http://www.w3.org/2000/svg';
@@ -481,6 +774,8 @@ function runDetection(){
   overlay.innerHTML = '';
   overlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
   if (gridToggle.checked) drawGrid(w, h);
+  document.getElementById('blurLayer').innerHTML = '';
+  document.getElementById('boloAlertLine').innerHTML = '';
 
   const sensLevel = parseInt(sensSlider.value);
   const maxPeople = sensLevel === 1 ? 1 : (sensLevel === 2 ? 3 : 5);
@@ -520,7 +815,15 @@ function runDetection(){
     const iff = Math.random() < 0.3 ? 'friend' : 'unknown';
     const points = 10 + Math.floor(confidence/10) + (threat==='high'?10:threat==='medium'?5:0);
 
-    people.push({ id: i+1, color, distance, height, top, topColor, bottom, bottomColor, confidence, hair, eyes, age, gender, accessory, belonging, direction, activity, threat, iff, points, cx: x + boxW/2, cy: y + boxH/2 });
+    people.push({ id: i+1, color, distance, height, top, topColor, bottom, bottomColor, confidence, hair, eyes, age, gender, accessory, belonging, direction, activity, threat, iff, points, cx: x + boxW/2, cy: y + boxH/2, boloMatch:false });
+
+    if (document.getElementById('blurToggle').checked) {
+      const bd = document.createElement('div');
+      bd.className = 'privacy-blur';
+      bd.style.left = x + 'px'; bd.style.top = y + 'px';
+      bd.style.width = boxW*0.55 + 'px'; bd.style.height = boxH*0.28 + 'px';
+      document.getElementById('blurLayer').appendChild(bd);
+    }
 
     const cl = 16;
     const corners = [
@@ -570,9 +873,27 @@ function runDetection(){
     overlay.appendChild(text);
   }
 
+  const watchlist = loadWatchlist();
+  if (watchlist.length > 0 && people.length > 0 && Math.random() < 0.22) {
+    const idx = rand(0, people.length-1);
+    const wname = pick(watchlist).name;
+    people[idx].boloMatch = true;
+    people[idx].boloName = wname;
+    document.getElementById('boloAlertLine').innerHTML =
+      `<div class="bolo-alert">⚠ POSSIBLE MATCH — "${wname}" DETECTED (TARGET-${String(people[idx].id).padStart(2,'0')})</div>`;
+    if (document.getElementById('voiceToggle').checked) speak(`ئاگاداری، ${wname} دۆزرایەوە`);
+    const now = Date.now();
+    if (!window._lastAutoShot || now - window._lastAutoShot > 12000) {
+      window._lastAutoShot = now;
+      setTimeout(() => captureLiveReport(true), 200);
+    }
+  }
+
   if (people.length > lastCount) {
     beep();
+    typeSound(10);
     sweepLine.classList.remove('go'); void sweepLine.offsetWidth; sweepLine.classList.add('go');
+    if (document.getElementById('voiceToggle').checked) speak(`${people.length} ئامانج دۆزرایەوە`);
   }
   lastCount = people.length;
   sessionTotal += people.length;
@@ -587,6 +908,8 @@ function runDetection(){
     log.unshift({ time: nowStr, count: people.length, pts: cyclePoints });
     saveLog(log);
     renderLog();
+    bumpHourly(people.length);
+    renderActivityChart();
   }
 
   summary.innerHTML = `
@@ -624,10 +947,11 @@ function runDetection(){
   `).join('') || '<div class="timeline-item">NO LOG DATA</div>';
 
   personList.innerHTML = people.map(p => `
-    <div class="person-card threat-${p.threat}">
+    <div class="person-card threat-${p.threat}" style="${p.boloMatch ? 'border-inline-start-color:#ffb300;' : ''}">
       <div class="head">
         <div class="tag" style="background:${p.color.hex}">#${p.id}</div>
         <b>TARGET-${String(p.id).padStart(2,'0')}</b>
+        ${p.boloMatch ? `<span class="bolo-ribbon">⚠ MATCH: ${p.boloName}</span>` : ''}
         <span class="iff ${p.iff}">${p.iff === 'friend' ? 'دۆست' : 'نەزانراو'}</span>
         <span class="threat ${p.threat}">مەترسی: ${threatLabel[p.threat]}</span>
         <span class="conf">CONF ${p.confidence}%</span>
@@ -653,6 +977,369 @@ function runDetection(){
   resultsWrap.style.display = people.length ? 'block' : 'none';
   status.innerHTML = `<span class="dot"></span> ${people.length} TARGET(S) LOCKED · SCORE ${sessionScore}`;
 }
+
+// ---- Photo upload / target search (simulated) ----
+const photoDrop = document.getElementById('photoDrop');
+const photoFileInput = document.getElementById('photoFileInput');
+const photoBox = document.getElementById('photoBox');
+const photoImg = document.getElementById('photoImg');
+const photoOverlay = document.getElementById('photoOverlay');
+const findBtn = document.getElementById('findBtn');
+const photoResetBtn = document.getElementById('photoResetBtn');
+const searchStatus = document.getElementById('searchStatus');
+const searchStatusLine = document.getElementById('searchStatusLine');
+const qform = document.getElementById('qform');
+const lockSummary = document.getElementById('lockSummary');
+const lockCard = document.getElementById('lockCard');
+
+function fillSelect(sel, arr, selected){
+  sel.innerHTML = arr.map(v => `<option value="${v}" ${v===selected?'selected':''}>${v}</option>`).join('');
+}
+
+photoDrop.addEventListener('click', () => photoFileInput.click());
+photoFileInput.addEventListener('change', (e) => {
+  if (e.target.files && e.target.files[0]) loadPhoto(e.target.files[0]);
+});
+
+function loadPhoto(file){
+  if (!file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    photoImg.src = e.target.result;
+    photoBox.style.display = 'block';
+    photoOverlay.innerHTML = '';
+    findBtn.disabled = false;
+    photoResetBtn.disabled = false;
+    searchStatus.textContent = 'IMAGE LOADED';
+    searchStatusLine.innerHTML = '';
+    qform.style.display = 'none';
+    lockSummary.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+photoResetBtn.addEventListener('click', () => {
+  photoBox.style.display = 'none';
+  photoOverlay.innerHTML = '';
+  photoImg.src = '';
+  findBtn.disabled = true;
+  photoResetBtn.disabled = true;
+  searchStatus.textContent = 'IDLE';
+  searchStatusLine.innerHTML = '';
+  qform.style.display = 'none';
+  lockSummary.style.display = 'none';
+  photoFileInput.value = '';
+});
+
+function showQformFor(x, y, boxW, boxH){
+  const ns = 'http://www.w3.org/2000/svg';
+  const existing = photoOverlay.querySelectorAll('.candidate-box, .candidate-tag, .candidate-bg');
+  existing.forEach(el => el.remove());
+
+  const rect = document.createElementNS(ns,'rect');
+  rect.setAttribute('x',x); rect.setAttribute('y',y);
+  rect.setAttribute('width',boxW); rect.setAttribute('height',boxH);
+  rect.setAttribute('fill','none'); rect.setAttribute('stroke','#ffb300');
+  rect.setAttribute('stroke-width','4'); rect.setAttribute('class','found-blink');
+  photoOverlay.appendChild(rect);
+
+  const labelText = 'TARGET SELECTED';
+  const labelW = labelText.length * 8 + 16;
+  const labelBg = document.createElementNS(ns,'rect');
+  labelBg.setAttribute('x', x); labelBg.setAttribute('y', Math.max(0,y-24));
+  labelBg.setAttribute('width', labelW); labelBg.setAttribute('height', 22);
+  labelBg.setAttribute('fill', '#ffb300');
+  photoOverlay.appendChild(labelBg);
+  const text = document.createElementNS(ns,'text');
+  text.setAttribute('x', x + labelW/2); text.setAttribute('y', Math.max(15,y-9));
+  text.setAttribute('text-anchor','middle'); text.setAttribute('class','box-label');
+  text.textContent = labelText;
+  photoOverlay.appendChild(text);
+
+  searchStatus.textContent = 'FOUND';
+  searchStatusLine.innerHTML = '✅ کەسەکە دیاریکرا — تکایە زانیارییەکان پشتڕاست بکەرەوە لە خوارەوە';
+
+  fillSelect(document.getElementById('q_top'), clothingTypes, pick(clothingTypes));
+  fillSelect(document.getElementById('q_topColor'), clothingColors, pick(clothingColors));
+  fillSelect(document.getElementById('q_bottom'), pantTypes, pick(pantTypes));
+  fillSelect(document.getElementById('q_bottomColor'), clothingColors, pick(clothingColors));
+  fillSelect(document.getElementById('q_hatColor'), clothingColors, pick(clothingColors));
+  fillSelect(document.getElementById('q_hair'), hairColors, pick(hairColors));
+  fillSelect(document.getElementById('q_eyes'), eyeColors, pick(eyeColors));
+  document.getElementById('q_hasHat').value = Math.random() < 0.4 ? 'yes' : 'no';
+
+  qform.style.display = 'block';
+  lockSummary.style.display = 'none';
+}
+
+findBtn.addEventListener('click', () => {
+  findBtn.disabled = true;
+  searchStatus.textContent = 'SCANNING';
+  searchStatusLine.innerHTML = '<span class="dot"></span> گەڕان بەناو وێنەکەدا بۆ دۆزینەوەی هەموو کەسەکان...';
+  qform.style.display = 'none';
+  lockSummary.style.display = 'none';
+
+  setTimeout(() => {
+    const w = photoImg.clientWidth, h = photoImg.clientHeight;
+    photoOverlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    photoOverlay.innerHTML = '';
+    const ns = 'http://www.w3.org/2000/svg';
+
+    const numCandidates = rand(1, 3);
+    const candidates = [];
+    const used = [];
+    for (let i=0;i<numCandidates;i++){
+      const boxW = rand(Math.floor(w*0.14), Math.floor(w*0.26));
+      const boxH = rand(Math.floor(h*0.3), Math.floor(h*0.75));
+      let x, y, tries=0;
+      do {
+        x = rand(4, Math.max(5, w - boxW - 4));
+        y = rand(4, Math.max(5, h - boxH - 4));
+        tries++;
+      } while (tries < 10 && used.some(s => Math.abs(s.x-x) < boxW*0.5));
+      used.push({x});
+      candidates.push({x,y,boxW,boxH});
+    }
+
+    findBtn.disabled = false;
+
+    if (candidates.length === 1) {
+      showQformFor(candidates[0].x, candidates[0].y, candidates[0].boxW, candidates[0].boxH);
+      searchStatusLine.innerHTML = '✅ تەنها کەسێک دۆزرایەوە — بە خۆکار هەڵبژێردرا';
+      return;
+    }
+
+    candidates.forEach((c, i) => {
+      const rect = document.createElementNS(ns,'rect');
+      rect.setAttribute('x',c.x); rect.setAttribute('y',c.y);
+      rect.setAttribute('width',c.boxW); rect.setAttribute('height',c.boxH);
+      rect.setAttribute('fill','none'); rect.setAttribute('stroke','#4fd1c5');
+      rect.setAttribute('stroke-width','3'); rect.setAttribute('stroke-dasharray','5,4');
+      rect.setAttribute('class','candidate-box');
+      rect.addEventListener('click', () => { showQformFor(c.x, c.y, c.boxW, c.boxH); });
+      photoOverlay.appendChild(rect);
+
+      const tagBg = document.createElementNS(ns,'circle');
+      tagBg.setAttribute('cx', c.x+18); tagBg.setAttribute('cy', c.y+18); tagBg.setAttribute('r', 14);
+      tagBg.setAttribute('fill', '#4fd1c5'); tagBg.setAttribute('class','candidate-box');
+      tagBg.addEventListener('click', () => { showQformFor(c.x, c.y, c.boxW, c.boxH); });
+      photoOverlay.appendChild(tagBg);
+
+      const tag = document.createElementNS(ns,'text');
+      tag.setAttribute('x', c.x+18); tag.setAttribute('y', c.y+23);
+      tag.setAttribute('text-anchor','middle'); tag.setAttribute('class','candidate-tag');
+      tag.textContent = i+1;
+      photoOverlay.appendChild(tag);
+    });
+
+    searchStatus.textContent = `${candidates.length} FOUND`;
+    searchStatusLine.innerHTML = `⚠ ${candidates.length} کەس دۆزرایەوە لەناو قەڵەباڵغەکەدا — کرتە لەسەر یەکێکیان بکە بۆ دیاریکردنی مەبەستت`;
+  }, 1300);
+});
+
+let currentLockedProfile = null;
+
+document.getElementById('confirmBtn').addEventListener('click', () => {
+  const top = document.getElementById('q_top').value;
+  const topColor = document.getElementById('q_topColor').value;
+  const bottom = document.getElementById('q_bottom').value;
+  const bottomColor = document.getElementById('q_bottomColor').value;
+  const hasHat = document.getElementById('q_hasHat').value === 'yes';
+  const hatColor = document.getElementById('q_hatColor').value;
+  const hair = document.getElementById('q_hair').value;
+  const eyes = document.getElementById('q_eyes').value;
+  const distance = (Math.random()*8 + 1.2).toFixed(1);
+  const height = rand(155, 195);
+  const confidence = rand(88, 99);
+  const nowStr = new Date().toLocaleString('en-GB');
+
+  currentLockedProfile = { top, topColor, bottom, bottomColor, hasHat, hatColor, hair, eyes, distance, height, confidence, time: nowStr, photo: photoImg.src };
+
+  lockCard.innerHTML = `
+    <div class="head">
+      <div class="tag" style="background:#ffb300">#1</div>
+      <b>TARGET LOCKED</b>
+      <span class="conf">CONF ${confidence}%</span>
+    </div>
+    <div class="attr-grid">
+      <div class="attr"><div class="k">دووری خەمڵێنراو</div><div class="v">${distance} م</div></div>
+      <div class="attr"><div class="k">درێژی باڵا</div><div class="v">${height} سم</div></div>
+      <div class="attr"><div class="k">کراس</div><div class="v">${top} (${topColor})</div></div>
+      <div class="attr"><div class="k">شەلوار</div><div class="v">${bottom} (${bottomColor})</div></div>
+      <div class="attr"><div class="k">کڵاو</div><div class="v">${hasHat ? 'بەڵێ، ' + hatColor : 'نییە'}</div></div>
+      <div class="attr"><div class="k">ڕەنگی پرچ</div><div class="v">${hair}</div></div>
+      <div class="attr"><div class="k">ڕەنگی چاو</div><div class="v">${eyes}</div></div>
+    </div>
+  `;
+  lockSummary.style.display = 'block';
+  document.getElementById('boloSetMsg').style.display = 'none';
+  typeSound(24);
+
+  const log = loadSearchLog();
+  log.unshift({ time: nowStr, top, topColor, bottom, bottomColor, hair, eyes, confidence });
+  saveSearchLog(log);
+  renderSearchLog();
+});
+
+function renderSearchLog(){
+  const log = loadSearchLog();
+  const el = document.getElementById('searchLogList');
+  el.innerHTML = log.length ? log.map(l => `
+    <div class="log-item"><span>${l.time}</span> — <b>${l.top} (${l.topColor})</b>, ${l.hair} پرچ, ${l.eyes} چاو — CONF ${l.confidence}%</div>
+  `).join('') : '<div class="log-item">هیچ گەڕانێک تۆمار نەکراوە</div>';
+}
+renderSearchLog();
+document.getElementById('clearSearchLogBtn').addEventListener('click', () => {
+  localStorage.removeItem(SEARCH_LOG_KEY); renderSearchLog();
+});
+
+document.getElementById('boloBtn').addEventListener('click', () => {
+  if (!currentLockedProfile) return;
+  const name = document.getElementById('watchNameInput').value.trim() || ('ئامانج-' + (loadWatchlist().length+1));
+  const entry = Object.assign({}, currentLockedProfile, { name, id: 'w'+Date.now() });
+  const list = loadWatchlist();
+  list.unshift(entry);
+  saveWatchlist(list);
+  renderWatchlist();
+  document.getElementById('boloSetMsg').style.display = 'block';
+  document.getElementById('watchNameInput').value = '';
+});
+renderWatchlist();
+
+document.getElementById('posterBtn').addEventListener('click', () => {
+  if (!currentLockedProfile || !window.jspdf) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a5' });
+  const p = currentLockedProfile;
+
+  doc.setFillColor(10,15,11); doc.rect(0,0,148,210,'F');
+  doc.setTextColor(57,255,106); doc.setFont('courier','bold'); doc.setFontSize(16);
+  doc.text('KRD TEC — SENTINEL-CAM', 10, 16);
+  doc.setTextColor(255,179,0); doc.setFontSize(10);
+  doc.text('TARGET IDENTIFICATION — RESTRICTED', 10, 23);
+
+  try {
+    if (p.photo) doc.addImage(p.photo, 'JPEG', 10, 30, 128, 90);
+  } catch(e){}
+
+  doc.setTextColor(200,240,200); doc.setFontSize(11);
+  let yy = 130;
+  const line = (label, val) => { doc.setTextColor(95,138,99); doc.text(label, 10, yy);
+    doc.setTextColor(200,240,200); doc.text(String(val), 55, yy); yy += 8; };
+  line('UNIT ID:', unitIdEl.textContent);
+  line('CONFIDENCE:', p.confidence + '%');
+  line('DISTANCE:', p.distance + ' m');
+  line('HEIGHT:', p.height + ' cm');
+  line('CLOTHING:', p.top + ' (' + p.topColor + ')');
+  line('PANTS:', p.bottom + ' (' + p.bottomColor + ')');
+  line('HAT:', p.hasHat ? p.hatColor : 'NONE');
+  line('HAIR:', p.hair);
+  line('EYES:', p.eyes);
+  line('TIMESTAMP:', p.time);
+
+  doc.save(`krdtec-wanted-poster-${Date.now()}.pdf`);
+});
+
+// ---- Language toggle (key HUD labels only — content stays Kurdish) ----
+const i18n = {
+  ku: {
+    classified: '⚠ ڕێگەپێدانی سنووردار — تەنها بۆ ناوخۆی KRD TEC ⚠',
+    systag: 'SENTINEL-CAM // دۆخی سیمولەیشن // بێ AI ڕاستەقینە',
+    h1: 'کامێرای زیرەک',
+    feed: 'کامێرا // CAM-01',
+    analysis: 'شیکردنەوەی ئامانج',
+    search: 'گەڕان بۆ ئامانج // بارکردنی وێنە',
+    idform: 'فۆرمی ناسنامەی ئامانج',
+    selconf: 'هەڵبژاردن بۆ پشتڕاستکردنەوە',
+    profile: 'پرۆفایلی ئامانج // قوفڵکراو',
+    confirmed: 'پشتڕاستکراوە',
+    missionlog: 'تۆماری میشن // هەموو کات',
+  },
+  ar: {
+    classified: '⚠ وصول مقيد — لاستخدام KRD TEC الداخلي فقط ⚠',
+    systag: 'SENTINEL-CAM // وضع المحاكاة // بدون ذكاء اصطناعي حقيقي',
+    h1: 'الكاميرا الذكية',
+    feed: 'البث // CAM-01',
+    analysis: 'تحليل الهدف',
+    search: 'البحث عن هدف // رفع صورة',
+    idform: 'استمارة تحديد الهوية',
+    selconf: 'اختر للتأكيد',
+    profile: 'ملف الهدف // مؤكد',
+    confirmed: 'تم التأكيد',
+    missionlog: 'سجل المهمة // كل الأوقات',
+  },
+  en: {
+    classified: '⚠ RESTRICTED ACCESS — KRD TEC INTERNAL USE ONLY ⚠',
+    systag: 'SENTINEL-CAM // SIMULATION MODE // NO LIVE AI',
+    h1: 'Smart Camera',
+    feed: 'FEED // CAM-01',
+    analysis: 'TARGET ANALYSIS',
+    search: 'TARGET SEARCH // PHOTO UPLOAD',
+    idform: 'TARGET IDENTIFICATION FORM',
+    selconf: 'SELECT TO CONFIRM',
+    profile: 'TARGET PROFILE // LOCKED',
+    confirmed: 'CONFIRMED',
+    missionlog: 'MISSION LOG // ALL-TIME',
+  }
+};
+// ---- HUD color theme ----
+const THEME_KEY = 'sentinel_theme';
+const themes = {
+  green: { accent:'#39ff6a', dim:'#1f9e40' },
+  cyan:  { accent:'#4fd1f5', dim:'#1f8a9e' },
+  red:   { accent:'#ff5c5c', dim:'#9e1f1f' },
+  amber: { accent:'#ffcf40', dim:'#9e7a1f' },
+};
+function applyTheme(name){
+  const t = themes[name] || themes.green;
+  document.documentElement.style.setProperty('--accent', t.accent);
+  document.documentElement.style.setProperty('--accent-dim', t.dim);
+}
+const savedTheme = localStorage.getItem(THEME_KEY) || 'green';
+document.getElementById('themeSel').value = savedTheme;
+applyTheme(savedTheme);
+document.getElementById('themeSel').addEventListener('change', (e) => {
+  localStorage.setItem(THEME_KEY, e.target.value);
+  applyTheme(e.target.value);
+});
+
+// ---- Logout ----
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem(GATE_SESSION_KEY);
+  document.getElementById('gateInput').value = '';
+  document.getElementById('loginGate').style.display = 'flex';
+});
+
+// ---- CSV export ----
+document.getElementById('exportCsvBtn').addEventListener('click', () => {
+  const mission = loadLog();
+  const search = loadSearchLog();
+  let csv = 'TYPE,TIME,COUNT_OR_TOP,DETAIL1,DETAIL2,DETAIL3\n';
+  mission.forEach(l => { csv += `MISSION_LOG,"${l.time}",${l.count},"pts:${l.pts}",,\n`; });
+  search.forEach(l => { csv += `TARGET_ID,"${l.time}","${l.top}","${l.topColor}","${l.hair}/${l.eyes}",conf:${l.confidence}\n`; });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const link = document.createElement('a');
+  link.download = `krdtec-sentinel-logs-${Date.now()}.csv`;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+});
+
+renderActivityChart();
+
+document.getElementById('langSel').addEventListener('change', (e) => {
+  const t = i18n[e.target.value] || i18n.ku;
+  document.getElementById('i18n-classified').textContent = t.classified;
+  document.getElementById('i18n-systag').textContent = t.systag;
+  document.getElementById('i18n-h1').textContent = t.h1;
+  document.getElementById('i18n-feed').textContent = t.feed;
+  document.getElementById('i18n-analysis').textContent = t.analysis;
+  document.getElementById('i18n-search').textContent = t.search;
+  document.getElementById('i18n-idform').textContent = t.idform;
+  document.getElementById('i18n-selconf').textContent = t.selconf;
+  document.getElementById('i18n-profile').textContent = t.profile;
+  document.getElementById('i18n-confirmed').textContent = t.confirmed;
+  document.getElementById('i18n-missionlog').textContent = t.missionlog;
+});
 </script>
 </body>
 </html>
