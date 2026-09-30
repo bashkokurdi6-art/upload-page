@@ -3,80 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>کامێرای زیرەک — دیمۆی زیندوو (فەیک)</title>
+<title>KRD TEC — SENTINEL-CAM</title>
 <style>
   :root{
-    --bg:#0e1613; --panel:#131f1a; --panel-2:#1a2b23; --line:#24382f;
-    --text:#eaf2ec; --muted:#8ba99a; --accent:#4fd1a5; --accent-2:#f2b134; --accent-3:#ef6f6c;
-    font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif;
+    --bg:#05070a; --panel:#0a0f0b; --panel-2:#0e1510; --line:#1f3a24;
+    --text:#c8f0c8; --muted:#5f8a63; --accent:#39ff6a; --accent-dim:#1f9e40;
+    --amber:#ffb300; --red:#ff3b3b; --cyan:#4fd1c5;
+    font-family:'Consolas','Courier New',monospace;
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:radial-gradient(circle at 20% 0%,#16241d 0%,var(--bg) 55%);color:var(--text);min-height:100vh;padding:24px 14px 50px;}
-  .wrap{max-width:760px;margin:0 auto;}
-  h1{font-size:clamp(20px,4vw,27px);margin:0 0 6px;}
-  header p{color:var(--muted);margin:0 0 4px;line-height:1.7;font-size:14px;}
-  .badge{display:inline-block;background:rgba(242,177,52,.12);border:1px solid rgba(242,177,52,.4);color:var(--accent-2);font-size:12px;padding:4px 10px;border-radius:999px;margin-bottom:12px;}
-  .stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;}
-  .video-box{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;}
-  video{width:100%;display:block;transform-origin:center center;}
-  svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-  .box-label{font-size:12px;font-weight:700;fill:#0e1613;}
-  .placeholder{color:#4a6357;font-size:13.5px;text-align:center;padding:30px;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(0deg, rgba(57,255,106,0.025) 0px, rgba(57,255,106,0.025) 1px, transparent 1px, transparent 3px),
+      radial-gradient(circle at 50% 0%, #0c1710 0%, var(--bg) 60%);
+    color:var(--text);min-height:100vh;padding:20px 12px 50px;
+    letter-spacing:0.3px;
+  }
+  .wrap{max-width:780px;margin:0 auto;}
 
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;}
-  select, button{font-size:13.5px;border-radius:9px;padding:9px 14px;border:1px solid var(--line);}
-  select{background:var(--panel-2);color:var(--text);}
-  button{background:var(--accent);color:#072019;font-weight:700;border:none;cursor:pointer;}
-  button.secondary{background:transparent;color:var(--text);border:1px solid var(--line);font-weight:600;}
-  button:disabled{opacity:.4;cursor:not-allowed;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px;margin-bottom:10px;border:1px solid var(--line);background:var(--panel-2);}
+  .org{display:flex;align-items:center;gap:9px;}
+  .org svg{width:26px;height:26px;flex-shrink:0;}
+  .org .name{font-size:15px;font-weight:800;color:var(--accent);letter-spacing:2px;line-height:1;}
+  .org .sub{font-size:8.5px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+  .sysinfo{text-align:end;font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;line-height:1.5;}
+  .sysinfo b{color:var(--accent-dim);}
+  #clockLine{color:var(--amber);font-weight:700;}
+
+  .classified{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:repeating-linear-gradient(45deg, rgba(255,59,59,.08), rgba(255,59,59,.08) 10px, rgba(255,59,59,.02) 10px, rgba(255,59,59,.02) 20px);
+    border:1px solid rgba(255,59,59,.4);color:#ff8a8a;font-size:10.5px;letter-spacing:2px;
+    text-transform:uppercase;font-weight:700;padding:6px;margin-bottom:14px;
+  }
+
+  header{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px;}
+  .sys-tag{display:flex;align-items:center;gap:8px;color:var(--accent-dim);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+  .sys-tag .blink{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:blink 1.2s infinite;box-shadow:0 0 8px var(--accent);}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+  h1{font-size:clamp(19px,4vw,25px);margin:0 0 6px;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;text-shadow:0 0 10px rgba(57,255,106,.3);}
+  header p{color:var(--muted);margin:0;line-height:1.7;font-size:12.5px;}
+
+  .stage{
+    background:linear-gradient(180deg,var(--panel) 0%,#080b09 100%);
+    border:1px solid var(--line);
+    position:relative;
+    padding:14px;margin-bottom:14px;
+    clip-path:polygon(0 10px,10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
+  }
+  .stage::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    border:1px solid rgba(57,255,106,.15);
+    clip-path:polygon(0 10px,10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
+  }
+  .stage-title{color:var(--accent-dim);font-size:10.5px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+
+  .video-box{position:relative;width:100%;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);}
+  video{width:100%;display:block;transform-origin:center center;transition:filter .2s;}
+  video.mode-normal{filter:contrast(1.08) saturate(0.9);}
+  video.mode-night{filter:brightness(1.3) contrast(1.15) grayscale(.4) sepia(.4) hue-rotate(60deg) saturate(4);}
+  video.mode-thermal{filter:grayscale(1) sepia(1) hue-rotate(300deg) saturate(6) contrast(1.4) brightness(1.05);}
+  svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .box-label{font-size:11px;font-weight:700;fill:#04140a;font-family:'Consolas','Courier New',monospace;}
+  .placeholder{color:#2f4a34;font-size:12.5px;text-align:center;padding:30px;text-transform:uppercase;letter-spacing:2px;}
+  .placeholder::before{content:'◎';display:block;font-size:32px;margin-bottom:10px;color:var(--line);}
+
+  .hud-corner{position:absolute;width:22px;height:22px;border-color:var(--accent-dim);opacity:.8;pointer-events:none;z-index:2;}
+  .hud-corner.tl{top:6px;left:6px;border-top:2px solid;border-left:2px solid;}
+  .hud-corner.tr{top:6px;right:6px;border-top:2px solid;border-right:2px solid;}
+  .hud-corner.bl{bottom:6px;left:6px;border-bottom:2px solid;border-left:2px solid;}
+  .hud-corner.br{bottom:6px;right:6px;border-bottom:2px solid;border-right:2px solid;}
+
+  .sweep-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;pointer-events:none;z-index:3;}
+  .sweep-line.go{animation:sweepdown .6s ease-out;}
+  @keyframes sweepdown{0%{top:0;opacity:1;}100%{top:100%;opacity:0;}}
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center;}
+  select, button{
+    font-size:12px;padding:10px 14px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--text);text-transform:uppercase;letter-spacing:1px;
+    font-family:inherit;
+  }
+  button{background:var(--accent-dim);color:#04140a;font-weight:700;border:none;cursor:pointer;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);}
+  button.secondary{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600;}
+  button:disabled{opacity:.35;cursor:not-allowed;}
   button:active{transform:scale(.97);}
 
-  .zoom-row{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:13px;}
-  input[type=range]{flex:1;accent-color:var(--accent);}
+  .zoom-row{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:1px;}
+  input[type=range]{flex:1;accent-color:var(--accent-dim);}
 
-  .status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13.5px;margin-top:12px;min-height:20px;}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent-2);animation:pulse 1s infinite ease-in-out;}
+  .toggle-row{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;}
+  .toggle-row input{accent-color:var(--accent-dim);}
+
+  .status{display:flex;align-items:center;gap:9px;color:var(--accent-dim);font-size:12px;margin-top:12px;min-height:20px;text-transform:uppercase;letter-spacing:1px;}
+  .dot{width:7px;height:7px;background:var(--amber);animation:pulse 1s infinite ease-in-out;box-shadow:0 0 6px var(--amber);}
   @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
 
-  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px;}
-  .card{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;}
-  .card .k{color:var(--muted);font-size:11px;margin-bottom:4px;}
-  .card .v{font-size:15px;font-weight:700;}
+  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:4px;}
+  .card{background:var(--panel-2);border:1px solid var(--line);padding:9px 12px;}
+  .card .k{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+  .card .v{font-size:17px;font-weight:700;color:var(--accent);}
 
-  .person-list{display:flex;flex-direction:column;gap:12px;margin-top:12px;}
-  .person-card{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
-  .person-card .head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .person-card .tag{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#0e1613;flex-shrink:0;}
-  .person-card .head b{font-size:14px;}
-  .person-card .head .conf{margin-inline-start:auto;color:var(--muted);font-size:12px;}
-  .attr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;}
-  .attr{background:rgba(255,255,255,0.02);border:1px solid var(--line);border-radius:8px;padding:7px 10px;}
-  .attr .k{color:var(--muted);font-size:10.5px;margin-bottom:2px;}
-  .attr .v{font-size:13px;font-weight:600;}
+  .radar-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px;}
+  .radar{background:#04070a;border:1px solid var(--line);border-radius:50%;width:120px;height:120px;position:relative;flex-shrink:0;overflow:hidden;}
+  .radar::after{content:'';position:absolute;inset:0;background:conic-gradient(from 0deg, rgba(57,255,106,.25), transparent 30%);animation:sweep 2.5s linear infinite;}
+  @keyframes sweep{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .radar svg{width:100%;height:100%;position:relative;z-index:1;}
+  .timeline{flex:1;min-width:180px;max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;border-inline-start:2px solid var(--line);padding-inline-start:10px;}
+  .timeline-item{font-size:10.5px;color:var(--muted);display:flex;gap:8px;text-transform:uppercase;letter-spacing:.5px;}
+  .timeline-item b{color:var(--accent);font-weight:700;}
 
-  .radar-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-  .radar{background:#0a120e;border:1px solid var(--line);border-radius:50%;width:120px;height:120px;position:relative;flex-shrink:0;}
-  .radar svg{width:100%;height:100%;}
-  .timeline{flex:1;min-width:180px;max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
-  .timeline-item{font-size:11.5px;color:var(--muted);display:flex;gap:8px;}
-  .timeline-item b{color:var(--text);font-weight:600;}
+  .person-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+  .person-card{background:var(--panel-2);border:1px solid var(--line);border-inline-start:3px solid var(--accent-dim);padding:12px 14px;}
+  .person-card.threat-high{border-inline-start-color:var(--red);}
+  .person-card.threat-medium{border-inline-start-color:var(--amber);}
+  .person-card .head{display:flex;align-items:center;gap:10px;margin-bottom:10px;border-bottom:1px dashed var(--line);padding-bottom:8px;flex-wrap:wrap;}
+  .person-card .tag{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#04140a;flex-shrink:0;}
+  .person-card .head b{font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;}
+  .person-card .head .conf{margin-inline-start:auto;color:var(--amber);font-size:11px;font-weight:700;}
+  .iff{font-size:9.5px;padding:2px 7px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+  .iff.friend{background:rgba(79,209,197,.15);color:var(--cyan);border:1px solid var(--cyan);}
+  .iff.unknown{background:rgba(255,59,59,.12);color:#ff8a8a;border:1px solid var(--red);}
+  .threat{font-size:9.5px;padding:2px 7px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+  .threat.low{background:rgba(57,255,106,.1);color:var(--accent);border:1px solid var(--accent-dim);}
+  .threat.medium{background:rgba(255,179,0,.12);color:var(--amber);border:1px solid var(--amber);}
+  .threat.high{background:rgba(255,59,59,.12);color:#ff8a8a;border:1px solid var(--red);}
+  .attr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:7px;}
+  .attr{background:rgba(57,255,106,0.03);border:1px solid var(--line);padding:6px 9px;}
+  .attr .k{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+  .attr .v{font-size:12.5px;font-weight:600;color:var(--text);}
 
-  .err{background:rgba(239,111,108,.1);border:1px solid rgba(239,111,108,.4);color:#f5a3a1;padding:10px 12px;border-radius:9px;font-size:13px;margin-top:12px;}
-  footer{margin-top:22px;color:#4a6357;font-size:11.5px;text-align:center;line-height:1.8;}
+  .mission-log{margin-top:14px;}
+  .mission-log .head-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .mission-log .head-row button{padding:6px 10px;font-size:10.5px;}
+  .log-list{max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;}
+  .log-item{font-size:10.5px;color:var(--muted);display:flex;gap:8px;border-bottom:1px dotted var(--line);padding-bottom:3px;}
+  .log-item b{color:var(--text);}
+
+  .err{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.4);color:#ff8a8a;padding:10px 12px;font-size:12.5px;margin-top:12px;text-transform:none;}
+  footer{margin-top:20px;color:#2f4a34;font-size:10.5px;text-align:center;line-height:1.8;text-transform:uppercase;letter-spacing:1px;}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="topbar">
+    <div class="org">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L21 6 V11 C21 16.5 17 20.5 12 22 C7 20.5 3 16.5 3 11 V6 L12 2 Z" stroke="#39ff6a" stroke-width="1.5"/><path d="M9 12 L11 14 L15.5 9" stroke="#39ff6a" stroke-width="1.5" fill="none"/></svg>
+      <div>
+        <div class="name">KRD TEC</div>
+        <div class="sub">Sentinel Systems Division</div>
+      </div>
+    </div>
+    <div class="sysinfo">
+      <div id="clockLine">--:--:--</div>
+      <div>UNIT ID: <b id="unitId">KRD-000000</b> · SENTINEL-CAM v2.4.1</div>
+    </div>
+  </div>
+  <div class="classified">⚠ RESTRICTED ACCESS — KRD TEC INTERNAL USE ONLY ⚠</div>
+
   <header>
-    <span class="badge">دیمۆی زیندوو — سیمولەیشن، بێ خەرجی</span>
-    <h1>کامێرای زیرەک — دیمۆی زیندوو</h1>
-    <p>کامێرا چالاک بکە، بگەڕێ یان زووم بکە — وەسفەکان بە شێوەی خۆکار هەر چەند چرکەیەک نوێ دەبنەوە. ئەم وەشانە هیچ AI-ی ڕاستەقینەی تێدا نییە، تەنها بۆ نیشاندانی ڕووکار و هەستی "زیندووی"یە.</p>
+    <div class="sys-tag"><span class="blink"></span> SENTINEL-CAM // SIMULATION MODE // NO LIVE AI</div>
+    <h1>کامێرای زیرەک</h1>
   </header>
 
   <div class="stage">
+    <div class="stage-title"><span>FEED // CAM-01</span><span id="feedStatus">STANDBY</span></div>
     <div class="video-box" id="videoBox">
-      <div class="placeholder" id="placeholder">کامێرا هێشتا چالاک نییە</div>
-      <video id="video" autoplay playsinline muted style="display:none;"></video>
+      <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
+      <div class="hud-corner bl"></div><div class="hud-corner br"></div>
+      <div class="sweep-line" id="sweepLine"></div>
+      <div class="placeholder" id="placeholder">NO SIGNAL</div>
+      <video id="video" class="mode-normal" autoplay playsinline muted style="display:none;"></video>
       <svg class="overlay" id="overlay" style="display:none;"></svg>
     </div>
 
@@ -85,14 +183,29 @@
         <option value="environment">کامێرای پشت</option>
         <option value="user">کامێرای پێش</option>
       </select>
-      <button id="startBtn">چالاککردنی کامێرا</button>
+      <select id="modeSelect">
+        <option value="normal">Normal</option>
+        <option value="night">Night Vision</option>
+        <option value="thermal">Thermal</option>
+      </select>
+      <button id="startBtn">چالاککردنی سیستەم</button>
       <button class="secondary" id="stopBtn" disabled>وەستاندن</button>
+      <button class="secondary" id="shotBtn" disabled>وێنەی ڕاپۆرت</button>
     </div>
 
     <div class="zoom-row">
-      <span>زووم</span>
+      <span>ZOOM //</span>
       <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1" disabled>
       <span id="zoomVal">1.0x</span>
+    </div>
+    <div class="zoom-row">
+      <span>SENSITIVITY //</span>
+      <input type="range" id="sensSlider" min="1" max="3" step="1" value="2">
+      <span id="sensVal">MED</span>
+    </div>
+    <div class="row">
+      <label class="toggle-row"><input type="checkbox" id="gridToggle" checked> GRID OVERLAY</label>
+      <label class="toggle-row"><input type="checkbox" id="ambientToggle"> AMBIENT AUDIO</label>
     </div>
 
     <div class="status" id="status"></div>
@@ -101,8 +214,9 @@
 
   <div id="resultsWrap" style="display:none;">
     <div class="stage">
+      <div class="stage-title"><span>TARGET ANALYSIS</span><span>LIVE</span></div>
       <div class="results" id="summary"></div>
-      <div class="radar-wrap" style="margin-top:14px;">
+      <div class="radar-wrap">
         <div class="radar"><svg id="radarSvg" viewBox="0 0 120 120"></svg></div>
         <div class="timeline" id="timeline"></div>
       </div>
@@ -110,9 +224,15 @@
     </div>
   </div>
 
-  <footer>
-    ئەمە دیمۆیەکی سیمولەیشنە — هیچ وێنەیەک نانێردرێت بۆ هیچ سێرڤەرێک، هەموو شتێک لەناو وێبگەڕەکەت خۆکار دروست دەکرێت.
-  </footer>
+  <div class="stage mission-log">
+    <div class="head-row">
+      <span class="stage-title" style="margin:0;">MISSION LOG // ALL-TIME</span>
+      <button id="clearLogBtn">سڕینەوە</button>
+    </div>
+    <div class="log-list" id="logList"></div>
+  </div>
+
+  <footer>Made in Kurdish. by Bashko kurdi</footer>
 </div>
 
 <script>
@@ -121,9 +241,15 @@ const overlay = document.getElementById('overlay');
 const placeholder = document.getElementById('placeholder');
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
+const shotBtn = document.getElementById('shotBtn');
 const facingSelect = document.getElementById('facingSelect');
+const modeSelect = document.getElementById('modeSelect');
 const zoomSlider = document.getElementById('zoomSlider');
 const zoomVal = document.getElementById('zoomVal');
+const sensSlider = document.getElementById('sensSlider');
+const sensVal = document.getElementById('sensVal');
+const gridToggle = document.getElementById('gridToggle');
+const ambientToggle = document.getElementById('ambientToggle');
 const status = document.getElementById('status');
 const errBox = document.getElementById('errBox');
 const resultsWrap = document.getElementById('resultsWrap');
@@ -131,35 +257,83 @@ const summary = document.getElementById('summary');
 const personList = document.getElementById('personList');
 const radarSvg = document.getElementById('radarSvg');
 const timelineEl = document.getElementById('timeline');
+const feedStatus = document.getElementById('feedStatus');
+const sweepLine = document.getElementById('sweepLine');
+const logList = document.getElementById('logList');
+const clearLogBtn = document.getElementById('clearLogBtn');
+const videoBox = document.getElementById('videoBox');
+
+const clockLine = document.getElementById('clockLine');
+const unitIdEl = document.getElementById('unitId');
+unitIdEl.textContent = 'KRD-' + Math.floor(100000 + Math.random()*899999);
+function tickClock(){ clockLine.textContent = new Date().toLocaleTimeString('en-GB', {hour12:false}); }
+tickClock(); setInterval(tickClock, 1000);
 
 let stream = null;
 let liveTimer = null;
 let sessionTotal = 0;
+let sessionScore = 0;
 let lastCount = 0;
 let history = [];
 let audioCtx = null;
+let ambientNodes = null;
+
+const LOG_KEY = 'sentinel_mission_log_v1';
+function loadLog(){ try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch(e){ return []; } }
+function saveLog(log){ try { localStorage.setItem(LOG_KEY, JSON.stringify(log.slice(0,60))); } catch(e){} }
+function renderLog(){
+  const log = loadLog();
+  logList.innerHTML = log.length ? log.map(l => `<div class="log-item"><span>${l.time}</span> — <b>${l.count}</b> ئامانج دۆزرایەوە (خاڵ +${l.pts})</div>`).join('')
+    : '<div class="log-item">هیچ تۆمارێک نییە — سیستەم چالاک بکە</div>';
+}
+renderLog();
+clearLogBtn.addEventListener('click', () => { localStorage.removeItem(LOG_KEY); renderLog(); });
 
 function beep(){
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+    osc.type = 'square';
+    osc.frequency.value = 1200;
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
     osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.2);
   } catch(e) {}
 }
 
+function startAmbient(){
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc1.type='sine'; osc1.frequency.value=60;
+    osc2.type='sine'; osc2.frequency.value=90.5;
+    gain.gain.value = 0.02;
+    osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+    osc1.start(); osc2.start();
+    ambientNodes = { osc1, osc2, gain };
+  } catch(e) {}
+}
+function stopAmbient(){
+  if (ambientNodes) {
+    try { ambientNodes.osc1.stop(); ambientNodes.osc2.stop(); } catch(e){}
+    ambientNodes = null;
+  }
+}
+ambientToggle.addEventListener('change', () => {
+  if (ambientToggle.checked && stream) startAmbient(); else stopAmbient();
+});
+
 const colors = [
-  {name:'سووری گەرم', hex:'#ef6f6c'},
-  {name:'شینی ئاسمانی', hex:'#6ea8fe'},
-  {name:'زەردی زێڕین', hex:'#f2b134'},
-  {name:'سەوزی نیعناعی', hex:'#4fd1a5'},
+  {name:'سووری گەرم', hex:'#ff5c5c'},
+  {name:'شینی ئاسمانی', hex:'#4fd1c5'},
+  {name:'زەردی زێڕین', hex:'#ffb300'},
+  {name:'سەوزی فۆسفۆری', hex:'#39ff6a'},
   {name:'مۆوەیی', hex:'#b18cf0'},
-  {name:'پرتەقاڵی', hex:'#f0955a'},
+  {name:'پرتەقاڵی', hex:'#ff9e4f'},
 ];
 const clothingTypes = ['کراسی درێژ', 'کراسی پۆلۆ', 'کراسی تیشێرت', 'کوت', 'ژاکیت', 'کراسی سپۆرت'];
 const pantTypes = ['شەلواری جینز', 'شەلواری کلاسیک', 'شەلواری سپۆرت', 'شەلواری کورت'];
@@ -171,9 +345,20 @@ const accessories = ['کلاو', 'عەینەک', 'ماسک', 'هیچ شتێک'];
 const belongings = ['مۆبایل', 'جانتا', 'کیسە', 'هیچ شتێک'];
 const directions = ['بەرەو کامێرا', 'دوورکەوتنەوە لە کامێرا', 'بەلای ڕاست', 'بەلای چەپ', 'وەستاوە'];
 const activities = ['ڕاوەستاوە', 'ڕۆیشتن', 'دانیشتووە', 'قسەکردن لەسەر مۆبایل', 'تەماشاکردنی دەوروبەر'];
+const threats = ['low','medium','high'];
+const threatLabel = { low:'نزم', medium:'مامناوەند', high:'بەرز' };
 
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function rand(min, max){ return Math.round((Math.random()*(max-min)+min)); }
+
+modeSelect.addEventListener('change', () => {
+  video.classList.remove('mode-normal','mode-night','mode-thermal');
+  video.classList.add('mode-' + modeSelect.value);
+});
+
+sensSlider.addEventListener('input', () => {
+  sensVal.textContent = ['LOW','MED','HIGH'][sensSlider.value-1];
+});
 
 startBtn.addEventListener('click', async () => {
   errBox.innerHTML = '';
@@ -188,9 +373,12 @@ startBtn.addEventListener('click', async () => {
     video.style.display = 'block';
     overlay.style.display = 'block';
     stopBtn.disabled = false;
+    shotBtn.disabled = false;
     zoomSlider.disabled = false;
-    status.innerHTML = '<span class="dot"></span> دۆزینەوەی زیندوو کاردەکات...';
-    sessionTotal = 0; lastCount = 0; history = [];
+    status.innerHTML = '<span class="dot"></span> SCANNING...';
+    feedStatus.textContent = 'ONLINE';
+    sessionTotal = 0; sessionScore = 0; lastCount = 0; history = [];
+    if (ambientToggle.checked) startAmbient();
 
     liveTimer = setInterval(runDetection, 2500);
     setTimeout(runDetection, 500);
@@ -203,13 +391,16 @@ stopBtn.addEventListener('click', () => {
   if (stream) stream.getTracks().forEach(t => t.stop());
   stream = null;
   clearInterval(liveTimer);
+  stopAmbient();
   video.style.display = 'none';
   overlay.style.display = 'none';
   overlay.innerHTML = '';
   placeholder.style.display = 'block';
   stopBtn.disabled = true;
+  shotBtn.disabled = true;
   zoomSlider.disabled = true;
   status.textContent = '';
+  feedStatus.textContent = 'STANDBY';
   resultsWrap.style.display = 'none';
 });
 
@@ -219,6 +410,68 @@ zoomSlider.addEventListener('input', () => {
   zoomVal.textContent = z.toFixed(1) + 'x';
 });
 
+shotBtn.addEventListener('click', async () => {
+  if (!stream) return;
+  const w = video.videoWidth, h = video.videoHeight;
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, w, h);
+  try {
+    const svgData = new XMLSerializer().serializeToString(overlay);
+    const svgBlob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    await new Promise((res) => { img.onload = res; img.src = url; });
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(url);
+  } catch(e) {}
+
+  // Official report header stamp
+  const bandH = Math.max(46, Math.floor(h*0.09));
+  ctx.fillStyle = 'rgba(4,7,10,0.88)';
+  ctx.fillRect(0, 0, w, bandH);
+  ctx.fillStyle = '#39ff6a';
+  ctx.font = `bold ${Math.floor(bandH*0.34)}px Consolas, monospace`;
+  ctx.textBaseline = 'top';
+  ctx.fillText('KRD TEC — SENTINEL-CAM v2.4.1', 12, 6);
+  ctx.fillStyle = '#5f8a63';
+  ctx.font = `${Math.floor(bandH*0.24)}px Consolas, monospace`;
+  const reportNo = 'RPT-' + Date.now().toString().slice(-8);
+  ctx.fillText(`${reportNo}  ·  ${unitIdEl.textContent}  ·  ${new Date().toLocaleString('en-GB')}`, 12, bandH*0.5);
+  ctx.fillStyle = 'rgba(255,59,59,0.9)';
+  ctx.font = `bold ${Math.floor(bandH*0.24)}px Consolas, monospace`;
+  ctx.textAlign = 'right';
+  ctx.fillText('RESTRICTED', w-12, bandH*0.35);
+  ctx.textAlign = 'left';
+
+  canvas.toBlob(blob => {
+    const link = document.createElement('a');
+    link.download = `krdtec-sentinel-report-${Date.now()}.png`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  });
+});
+
+function drawGrid(w, h){
+  const ns = 'http://www.w3.org/2000/svg';
+  const cols = 6, rows = 4;
+  for (let i=1;i<cols;i++){
+    const gx = (w/cols)*i;
+    const l = document.createElementNS(ns,'line');
+    l.setAttribute('x1',gx);l.setAttribute('y1',0);l.setAttribute('x2',gx);l.setAttribute('y2',h);
+    l.setAttribute('stroke','rgba(57,255,106,0.12)');l.setAttribute('stroke-width','1');
+    overlay.appendChild(l);
+  }
+  for (let i=1;i<rows;i++){
+    const gy = (h/rows)*i;
+    const l = document.createElementNS(ns,'line');
+    l.setAttribute('x1',0);l.setAttribute('y1',gy);l.setAttribute('x2',w);l.setAttribute('y2',gy);
+    l.setAttribute('stroke','rgba(57,255,106,0.12)');l.setAttribute('stroke-width','1');
+    overlay.appendChild(l);
+  }
+}
+
 function runDetection(){
   if (!stream) return;
   const w = video.clientWidth;
@@ -227,21 +480,24 @@ function runDetection(){
 
   overlay.innerHTML = '';
   overlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  if (gridToggle.checked) drawGrid(w, h);
 
-  const numPeople = rand(0, 3);
+  const sensLevel = parseInt(sensSlider.value);
+  const maxPeople = sensLevel === 1 ? 1 : (sensLevel === 2 ? 3 : 5);
+  const numPeople = rand(0, maxPeople);
   const people = [];
   const usedSlots = [];
   const ns = 'http://www.w3.org/2000/svg';
 
   for (let i = 0; i < numPeople; i++){
-    const boxW = rand(Math.floor(w*0.14), Math.floor(w*0.26));
-    const boxH = rand(Math.floor(h*0.45), Math.floor(h*0.85));
+    const boxW = rand(Math.floor(w*0.13), Math.floor(w*0.24));
+    const boxH = rand(Math.floor(h*0.4), Math.floor(h*0.85));
     let x, y, tries = 0;
     do {
       x = rand(4, Math.max(5, w - boxW - 4));
       y = rand(4, Math.max(5, h - boxH - 4));
       tries++;
-    } while (tries < 10 && usedSlots.some(s => Math.abs(s.x - x) < boxW*0.6));
+    } while (tries < 10 && usedSlots.some(s => Math.abs(s.x - x) < boxW*0.55));
     usedSlots.push({x});
 
     const color = pick(colors);
@@ -260,22 +516,51 @@ function runDetection(){
     const belonging = pick(belongings);
     const direction = pick(directions);
     const activity = pick(activities);
+    const threat = pick(threats);
+    const iff = Math.random() < 0.3 ? 'friend' : 'unknown';
+    const points = 10 + Math.floor(confidence/10) + (threat==='high'?10:threat==='medium'?5:0);
 
-    people.push({ id: i+1, color, distance, height, top, topColor, bottom, bottomColor, confidence, hair, eyes, age, gender, accessory, belonging, direction, activity, cx: x + boxW/2, cy: y + boxH/2 });
+    people.push({ id: i+1, color, distance, height, top, topColor, bottom, bottomColor, confidence, hair, eyes, age, gender, accessory, belonging, direction, activity, threat, iff, points, cx: x + boxW/2, cy: y + boxH/2 });
 
+    const cl = 16;
+    const corners = [
+      [x,y, x+cl,y, x,y, x,y+cl],
+      [x+boxW,y, x+boxW-cl,y, x+boxW,y, x+boxW,y+cl],
+      [x,y+boxH, x+cl,y+boxH, x,y+boxH, x,y+boxH-cl],
+      [x+boxW,y+boxH, x+boxW-cl,y+boxH, x+boxW,y+boxH, x+boxW,y+boxH-cl],
+    ];
+    corners.forEach(c => {
+      const l1 = document.createElementNS(ns,'line');
+      l1.setAttribute('x1',c[0]); l1.setAttribute('y1',c[1]); l1.setAttribute('x2',c[2]); l1.setAttribute('y2',c[3]);
+      l1.setAttribute('stroke', color.hex); l1.setAttribute('stroke-width','3');
+      overlay.appendChild(l1);
+      const l2 = document.createElementNS(ns,'line');
+      l2.setAttribute('x1',c[4]); l2.setAttribute('y1',c[5]); l2.setAttribute('x2',c[6]); l2.setAttribute('y2',c[7]);
+      l2.setAttribute('stroke', color.hex); l2.setAttribute('stroke-width','3');
+      overlay.appendChild(l2);
+    });
     const rect = document.createElementNS(ns, 'rect');
     rect.setAttribute('x', x); rect.setAttribute('y', y);
     rect.setAttribute('width', boxW); rect.setAttribute('height', boxH);
     rect.setAttribute('fill', 'none'); rect.setAttribute('stroke', color.hex);
-    rect.setAttribute('stroke-width', '3'); rect.setAttribute('rx', '6');
+    rect.setAttribute('stroke-width', '1'); rect.setAttribute('stroke-dasharray','3,4'); rect.setAttribute('opacity','0.5');
     overlay.appendChild(rect);
 
-    const labelText = `کەس ${i+1} · ${confidence}%`;
-    const labelW = Math.min(boxW, labelText.length * 8 + 14);
+    const ccx = x + boxW/2, ccy = y + boxH*0.28;
+    [[-6,0,6,0],[0,-6,0,6]].forEach(d => {
+      const cl2 = document.createElementNS(ns,'line');
+      cl2.setAttribute('x1', ccx+d[0]); cl2.setAttribute('y1', ccy+d[1]);
+      cl2.setAttribute('x2', ccx+d[2]); cl2.setAttribute('y2', ccy+d[3]);
+      cl2.setAttribute('stroke', color.hex); cl2.setAttribute('stroke-width','1.5'); cl2.setAttribute('opacity','0.8');
+      overlay.appendChild(cl2);
+    });
+
+    const labelText = `TGT-${i+1} · ${confidence}%`;
+    const labelW = Math.min(boxW+30, labelText.length * 7.5 + 14);
     const labelBg = document.createElementNS(ns, 'rect');
     labelBg.setAttribute('x', x); labelBg.setAttribute('y', Math.max(0, y-22));
     labelBg.setAttribute('width', labelW); labelBg.setAttribute('height', 20);
-    labelBg.setAttribute('fill', color.hex); labelBg.setAttribute('rx', '4');
+    labelBg.setAttribute('fill', color.hex);
     overlay.appendChild(labelBg);
 
     const text = document.createElementNS(ns, 'text');
@@ -285,20 +570,30 @@ function runDetection(){
     overlay.appendChild(text);
   }
 
-  if (people.length > lastCount) beep();
+  if (people.length > lastCount) {
+    beep();
+    sweepLine.classList.remove('go'); void sweepLine.offsetWidth; sweepLine.classList.add('go');
+  }
   lastCount = people.length;
   sessionTotal += people.length;
+  const cyclePoints = people.reduce((a,p) => a + p.points, 0);
+  sessionScore += cyclePoints;
 
   const nowStr = new Date().toLocaleTimeString('en-GB');
   if (people.length > 0) {
     history.unshift({ time: nowStr, count: people.length });
     history = history.slice(0, 12);
+    const log = loadLog();
+    log.unshift({ time: nowStr, count: people.length, pts: cyclePoints });
+    saveLog(log);
+    renderLog();
   }
 
   summary.innerHTML = `
-    <div class="card"><div class="k">کۆی کەسان (ئێستا)</div><div class="v">${people.length}</div></div>
-    <div class="card"><div class="k">کۆی گشتی ئەم دیمانە</div><div class="v">${sessionTotal}</div></div>
-    <div class="card"><div class="k">کاتی دوایین نوێکردنەوە</div><div class="v">${nowStr}</div></div>
+    <div class="card"><div class="k">TARGETS NOW</div><div class="v">${people.length}</div></div>
+    <div class="card"><div class="k">SCORE</div><div class="v">${sessionScore}</div></div>
+    <div class="card"><div class="k">SESSION TOTAL</div><div class="v">${sessionTotal}</div></div>
+    <div class="card"><div class="k">LAST SCAN</div><div class="v" style="font-size:13px;">${nowStr}</div></div>
   `;
 
   radarSvg.innerHTML = '';
@@ -306,8 +601,14 @@ function runDetection(){
   [30,50].forEach(r => {
     const c = document.createElementNS(rns,'circle');
     c.setAttribute('cx',60); c.setAttribute('cy',60); c.setAttribute('r',r);
-    c.setAttribute('fill','none'); c.setAttribute('stroke','#24382f'); c.setAttribute('stroke-width','1');
+    c.setAttribute('fill','none'); c.setAttribute('stroke','#1f3a24'); c.setAttribute('stroke-width','1');
     radarSvg.appendChild(c);
+  });
+  [[10,60,110,60],[60,10,60,110]].forEach(d => {
+    const l = document.createElementNS(rns,'line');
+    l.setAttribute('x1',d[0]);l.setAttribute('y1',d[1]);l.setAttribute('x2',d[2]);l.setAttribute('y2',d[3]);
+    l.setAttribute('stroke','#1f3a24');l.setAttribute('stroke-width','1');
+    radarSvg.appendChild(l);
   });
   people.forEach(p => {
     const rx = 12 + (p.cx / w) * 96;
@@ -319,15 +620,17 @@ function runDetection(){
   });
 
   timelineEl.innerHTML = history.map(h => `
-    <div class="timeline-item"><span>${h.time}</span> — <b>${h.count}</b> کەس دۆزرایەوە</div>
-  `).join('') || '<div class="timeline-item">هێشتا هیچ کەسێک تۆمار نەکراوە</div>';
+    <div class="timeline-item"><span>${h.time}</span> — <b>${h.count}</b> TGT</div>
+  `).join('') || '<div class="timeline-item">NO LOG DATA</div>';
 
   personList.innerHTML = people.map(p => `
-    <div class="person-card">
+    <div class="person-card threat-${p.threat}">
       <div class="head">
         <div class="tag" style="background:${p.color.hex}">#${p.id}</div>
-        <b>کەس ${p.id}</b>
-        <span class="conf">متمانە %${p.confidence}</span>
+        <b>TARGET-${String(p.id).padStart(2,'0')}</b>
+        <span class="iff ${p.iff}">${p.iff === 'friend' ? 'دۆست' : 'نەزانراو'}</span>
+        <span class="threat ${p.threat}">مەترسی: ${threatLabel[p.threat]}</span>
+        <span class="conf">CONF ${p.confidence}%</span>
       </div>
       <div class="attr-grid">
         <div class="attr"><div class="k">دووری</div><div class="v">${p.distance} م</div></div>
@@ -342,12 +645,13 @@ function runDetection(){
         <div class="attr"><div class="k">شتی لەبەردەست</div><div class="v">${p.belonging}</div></div>
         <div class="attr"><div class="k">ئاراستەی جوڵە</div><div class="v">${p.direction}</div></div>
         <div class="attr"><div class="k">کردار</div><div class="v">${p.activity}</div></div>
+        <div class="attr"><div class="k">خاڵ</div><div class="v">+${p.points}</div></div>
       </div>
     </div>
   `).join('');
 
   resultsWrap.style.display = people.length ? 'block' : 'none';
-  status.innerHTML = `<span class="dot"></span> زیندوو — ${people.length} کەس دۆزرایەوە`;
+  status.innerHTML = `<span class="dot"></span> ${people.length} TARGET(S) LOCKED · SCORE ${sessionScore}`;
 }
 </script>
 </body>
