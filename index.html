@@ -1,1345 +1,197 @@
 <!DOCTYPE html>
-<html lang="ku" dir="rtl">
+<html lang="ckb" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#05070a">
-<link rel="manifest" href="manifest.json">
-<title>KRD TEC — SENTINEL-CAM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>Exchange</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-  :root{
-    --bg:#05070a; --panel:#0a0f0b; --panel-2:#0e1510; --line:#1f3a24;
-    --text:#c8f0c8; --muted:#5f8a63; --accent:#39ff6a; --accent-dim:#1f9e40;
-    --amber:#ffb300; --red:#ff3b3b; --cyan:#4fd1c5;
-    font-family:'Consolas','Courier New',monospace;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:
-      repeating-linear-gradient(0deg, rgba(57,255,106,0.025) 0px, rgba(57,255,106,0.025) 1px, transparent 1px, transparent 3px),
-      radial-gradient(circle at 50% 0%, #0c1710 0%, var(--bg) 60%);
-    color:var(--text);min-height:100vh;padding:20px 12px 50px;
-    letter-spacing:0.3px;
-  }
-  .wrap{max-width:780px;margin:0 auto;}
+:root{--bg:#050a24;--card:#070d30;--line:#0f2a4d;--gold:#17d4ee;--green:#0ecb81;--red:#f6465d;--txt:#e8ecf4;--mut:#8b97b1}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(900px 400px at 80% -10%,#0a1650 0,transparent 60%),var(--bg);color:var(--txt);font-family:Tahoma,Arial,sans-serif;min-height:100vh}
+.ticker{background:#030720;border-bottom:1px solid var(--line);overflow:hidden;direction:ltr;white-space:nowrap;font-size:13px;padding:8px 0}
+.ticker div{display:inline-block;animation:run 35s linear infinite}
+.ticker span{margin:0 22px;color:var(--mut)}
+.ticker b{color:var(--txt);margin-right:6px}
+.up{color:var(--green)}.dn{color:var(--red)}
+@keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+.brand{display:flex;align-items:center;gap:10px;margin:8px 0 18px}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#12dcf0);display:grid;place-items:center;font-size:22px;color:#000}
+.brand h1{font-size:19px;margin:0}.brand small{color:var(--mut)}
+.steps{display:flex;gap:8px;margin-bottom:18px}
+.steps div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center;font-size:12px;color:var(--mut)}
+.steps b{display:block;color:var(--gold);font-size:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
+.card h3{margin:0 0 4px;font-size:15px;color:var(--gold);display:flex;align-items:center;gap:8px}
+label{display:block;margin:14px 0 6px;font-size:13px;color:var(--mut)}
+input,select{width:100%;padding:16px;border:1.5px solid var(--line);border-radius:18px;background:#031634;color:var(--txt);font-size:16px;outline:none;color-scheme:dark}
+input:focus,select:focus{border-color:var(--gold)}
+input[type=file]{padding:10px;font-size:13px}
+input[type=file]::file-selector-button{background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;margin-left:10px;cursor:pointer;font-weight:bold}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--txt)}
+.chk input{width:auto;margin-top:3px;accent-color:var(--gold)}
+button{width:100%;padding:18px;border:0;border-radius:20px;background:#12dcf0;color:#02142b;font-size:18px;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6}
+#msg{margin-top:12px;text-align:center;font-size:14px}
+.done{text-align:center;padding:30px 10px}.done .ic{font-size:54px}
+.sec{font-size:12px;color:var(--mut);text-align:center;margin-top:10px}
 
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px;margin-bottom:10px;border:1px solid var(--line);background:var(--panel-2);}
-  .org{display:flex;align-items:center;gap:9px;}
-  .org svg{width:26px;height:26px;flex-shrink:0;}
-  .org .name{font-size:15px;font-weight:800;color:var(--accent);letter-spacing:2px;line-height:1;}
-  .org .sub{font-size:8.5px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-  .sysinfo{text-align:end;font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;line-height:1.5;}
-  .sysinfo b{color:var(--accent-dim);}
-  #clockLine{color:var(--amber);font-weight:700;}
+.tc{background:transparent;border:0;padding:6px 2px}.tc h2{font-size:30px;margin:6px 0 6px}.tc p.sub{color:var(--mut);margin:0 0 8px;font-size:15px}.tc label{color:var(--txt);font-size:15px}.pw{position:relative}.pw input{padding-left:54px}.eye{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:auto;background:none;padding:6px;margin:0;border-radius:8px}
+.ph{display:flex;direction:ltr;gap:8px}
+.cc{display:flex;align-items:center;gap:8px;background:#031634;border:1.5px solid var(--line);border-radius:18px;padding:0 14px;color:var(--mut);font-size:16px;white-space:nowrap}
+.cc svg{width:28px;height:19px;border-radius:3px}
+.ph input{flex:1;min-width:0}
+.lnk{background:none;color:var(--gold);border:0;width:auto;font-size:13px;padding:8px 0;margin:0;font-weight:normal}
+.tc button.main{margin-top:16px}
 
-  .classified{
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    background:repeating-linear-gradient(45deg, rgba(255,59,59,.08), rgba(255,59,59,.08) 10px, rgba(255,59,59,.02) 10px, rgba(255,59,59,.02) 20px);
-    border:1px solid rgba(255,59,59,.4);color:#ff8a8a;font-size:10.5px;letter-spacing:2px;
-    text-transform:uppercase;font-weight:700;padding:6px;margin-bottom:14px;
-  }
+.wa{position:fixed;bottom:20px;left:16px;z-index:99;width:58px;height:58px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 4px 16px #0008;animation:pulse 2s infinite}
+.wa svg{width:32px;height:32px;fill:#fff}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #25d36699}70%{box-shadow:0 0 0 16px #25d36600}100%{box-shadow:0 0 0 0 #25d36600}}
 
-  header{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:16px;}
-  .sys-tag{display:flex;align-items:center;gap:8px;color:var(--accent-dim);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
-  .sys-tag .blink{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:blink 1.2s infinite;box-shadow:0 0 8px var(--accent);}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
-  h1{font-size:clamp(19px,4vw,25px);margin:0 0 6px;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;text-shadow:0 0 10px rgba(57,255,106,.3);}
-  header p{color:var(--muted);margin:0;line-height:1.7;font-size:12.5px;}
-
-  .stage{
-    background:linear-gradient(180deg,var(--panel) 0%,#080b09 100%);
-    border:1px solid var(--line);
-    position:relative;
-    padding:14px;margin-bottom:14px;
-    clip-path:polygon(0 10px,10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
-  }
-  .stage::before{
-    content:'';position:absolute;inset:0;pointer-events:none;
-    border:1px solid rgba(57,255,106,.15);
-    clip-path:polygon(0 10px,10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
-  }
-  .stage-title{color:var(--accent-dim);font-size:10.5px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;}
-
-  .video-box{position:relative;width:100%;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);}
-  video{width:100%;display:block;transform-origin:center center;transition:filter .2s;}
-  video.mode-normal{filter:contrast(1.08) saturate(0.9);}
-  video.mode-night{filter:brightness(1.3) contrast(1.15) grayscale(.4) sepia(.4) hue-rotate(60deg) saturate(4);}
-  video.mode-thermal{filter:grayscale(1) sepia(1) hue-rotate(300deg) saturate(6) contrast(1.4) brightness(1.05);}
-  svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-  .box-label{font-size:11px;font-weight:700;fill:#04140a;font-family:'Consolas','Courier New',monospace;}
-  .placeholder{color:#2f4a34;font-size:12.5px;text-align:center;padding:30px;text-transform:uppercase;letter-spacing:2px;}
-  .placeholder::before{content:'◎';display:block;font-size:32px;margin-bottom:10px;color:var(--line);}
-
-  .hud-corner{position:absolute;width:22px;height:22px;border-color:var(--accent-dim);opacity:.8;pointer-events:none;z-index:2;}
-  .hud-corner.tl{top:6px;left:6px;border-top:2px solid;border-left:2px solid;}
-  .hud-corner.tr{top:6px;right:6px;border-top:2px solid;border-right:2px solid;}
-  .hud-corner.bl{bottom:6px;left:6px;border-bottom:2px solid;border-left:2px solid;}
-  .hud-corner.br{bottom:6px;right:6px;border-bottom:2px solid;border-right:2px solid;}
-
-  .sweep-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;pointer-events:none;z-index:3;}
-  .sweep-line.go{animation:sweepdown .6s ease-out;}
-  @keyframes sweepdown{0%{top:0;opacity:1;}100%{top:100%;opacity:0;}}
-
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center;}
-  select, button{
-    font-size:12px;padding:10px 14px;border:1px solid var(--line);
-    background:var(--panel-2);color:var(--text);text-transform:uppercase;letter-spacing:1px;
-    font-family:inherit;
-  }
-  button{background:var(--accent-dim);color:#04140a;font-weight:700;border:none;cursor:pointer;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);}
-  button.secondary{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600;}
-  button:disabled{opacity:.35;cursor:not-allowed;}
-  button:active{transform:scale(.97);}
-
-  .zoom-row{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:1px;}
-  input[type=range]{flex:1;accent-color:var(--accent-dim);}
-
-  .toggle-row{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;}
-  .toggle-row input{accent-color:var(--accent-dim);}
-
-  .status{display:flex;align-items:center;gap:9px;color:var(--accent-dim);font-size:12px;margin-top:12px;min-height:20px;text-transform:uppercase;letter-spacing:1px;}
-  .dot{width:7px;height:7px;background:var(--amber);animation:pulse 1s infinite ease-in-out;box-shadow:0 0 6px var(--amber);}
-  @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
-
-  .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:4px;}
-  .card{background:var(--panel-2);border:1px solid var(--line);padding:9px 12px;}
-  .card .k{color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-  .card .v{font-size:17px;font-weight:700;color:var(--accent);}
-
-  .radar-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:12px;}
-  .radar{background:#04070a;border:1px solid var(--line);border-radius:50%;width:120px;height:120px;position:relative;flex-shrink:0;overflow:hidden;}
-  .radar::after{content:'';position:absolute;inset:0;background:conic-gradient(from 0deg, rgba(57,255,106,.25), transparent 30%);animation:sweep 2.5s linear infinite;}
-  @keyframes sweep{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-  .radar svg{width:100%;height:100%;position:relative;z-index:1;}
-  .timeline{flex:1;min-width:180px;max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;border-inline-start:2px solid var(--line);padding-inline-start:10px;}
-  .timeline-item{font-size:10.5px;color:var(--muted);display:flex;gap:8px;text-transform:uppercase;letter-spacing:.5px;}
-  .timeline-item b{color:var(--accent);font-weight:700;}
-
-  .person-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
-  .person-card{background:var(--panel-2);border:1px solid var(--line);border-inline-start:3px solid var(--accent-dim);padding:12px 14px;}
-  .person-card.threat-high{border-inline-start-color:var(--red);}
-  .person-card.threat-medium{border-inline-start-color:var(--amber);}
-  .person-card .head{display:flex;align-items:center;gap:10px;margin-bottom:10px;border-bottom:1px dashed var(--line);padding-bottom:8px;flex-wrap:wrap;}
-  .person-card .tag{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#04140a;flex-shrink:0;}
-  .person-card .head b{font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;}
-  .person-card .head .conf{margin-inline-start:auto;color:var(--amber);font-size:11px;font-weight:700;}
-  .iff{font-size:9.5px;padding:2px 7px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
-  .iff.friend{background:rgba(79,209,197,.15);color:var(--cyan);border:1px solid var(--cyan);}
-  .iff.unknown{background:rgba(255,59,59,.12);color:#ff8a8a;border:1px solid var(--red);}
-  .threat{font-size:9.5px;padding:2px 7px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
-  .threat.low{background:rgba(57,255,106,.1);color:var(--accent);border:1px solid var(--accent-dim);}
-  .threat.medium{background:rgba(255,179,0,.12);color:var(--amber);border:1px solid var(--amber);}
-  .threat.high{background:rgba(255,59,59,.12);color:#ff8a8a;border:1px solid var(--red);}
-  .attr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:7px;}
-  .attr{background:rgba(57,255,106,0.03);border:1px solid var(--line);padding:6px 9px;}
-  .attr .k{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
-  .attr .v{font-size:12.5px;font-weight:600;color:var(--text);}
-
-  .mission-log{margin-top:14px;}
-  .mission-log .head-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-  .mission-log .head-row button{padding:6px 10px;font-size:10.5px;}
-  .log-list{max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:3px;}
-  .log-item{font-size:10.5px;color:var(--muted);display:flex;gap:8px;border-bottom:1px dotted var(--line);padding-bottom:3px;}
-  .log-item b{color:var(--text);}
-
-  .upload-drop{border:1.5px dashed var(--line);min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-align:center;padding:16px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;}
-  .upload-drop:hover{border-color:var(--accent-dim);}
-  #photoFileInput{display:none;}
-  .photo-box{position:relative;width:100%;overflow:hidden;background:#000;border:1px solid var(--line);display:none;}
-  .photo-box img{width:100%;display:block;}
-  .photo-box svg.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
-  .found-blink{animation:foundpulse 1s infinite;}
-  @keyframes foundpulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-
-  .qform{display:none;margin-top:14px;}
-  .qform .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
-  .qfield{display:flex;flex-direction:column;gap:4px;}
-  .qfield label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
-  .qfield select{width:100%;}
-  .lock-summary{display:none;margin-top:14px;}
-
-  .privacy-blur{position:absolute;backdrop-filter:blur(9px);background:rgba(0,0,0,0.15);pointer-events:none;z-index:2;border-radius:4px;}
-
-  .bolo-ribbon{background:linear-gradient(90deg,#ffb300,#ff5c5c);color:#04140a;font-size:9.5px;font-weight:800;letter-spacing:1px;padding:3px 8px;text-transform:uppercase;animation:pulse .8s infinite;}
-  .bolo-alert{background:rgba(255,179,0,.12);border:1px solid var(--amber);color:var(--amber);font-size:11.5px;padding:8px 10px;margin-top:10px;text-transform:uppercase;letter-spacing:1px;}
-
-  .lang-sel{font-size:10.5px;padding:4px 8px;}
-  .candidate-box{cursor:pointer;pointer-events:all;}
-  .candidate-tag{fill:#04140a;font-size:11px;font-weight:700;font-family:'Consolas','Courier New',monospace;}
-
-  .gate{position:fixed;inset:0;background:#04070a;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
-  .gate-box{max-width:340px;width:100%;border:1px solid var(--accent-dim);background:var(--panel);padding:24px;text-align:center;}
-  .gate-box svg{width:40px;height:40px;margin-bottom:10px;}
-  .gate-box h2{color:var(--accent);font-size:15px;text-transform:uppercase;letter-spacing:2px;margin:0 0 4px;}
-  .gate-box p{color:var(--muted);font-size:11px;margin:0 0 16px;text-transform:uppercase;letter-spacing:1px;}
-  .gate-box input{width:100%;padding:10px;margin-bottom:10px;background:var(--panel-2);border:1px solid var(--line);color:var(--accent);text-align:center;font-size:16px;letter-spacing:4px;font-family:inherit;}
-  .gate-box button{width:100%;}
-  .gate-err{color:#ff8a8a;font-size:11px;margin-top:8px;min-height:14px;}
-  .gate-hint{color:#2f4a34;font-size:9.5px;margin-top:10px;}
-
-  .modal{position:fixed;inset:0;background:rgba(2,4,3,.85);z-index:99;display:flex;align-items:center;justify-content:center;padding:20px;}
-  .modal-box{max-width:400px;width:100%;border:1px solid var(--line);background:var(--panel);padding:22px;}
-  .modal-box h2{color:var(--accent);font-size:14px;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 12px;}
-  .modal-box ol{color:var(--text);font-size:12.5px;line-height:2;padding-inline-start:20px;margin:0 0 16px;}
-  .modal-box button{width:100%;}
-
-  .err{background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.4);color:#ff8a8a;padding:10px 12px;font-size:12.5px;margin-top:12px;text-transform:none;}
-  footer{margin-top:20px;color:#2f4a34;font-size:10.5px;text-align:center;line-height:1.8;text-transform:uppercase;letter-spacing:1px;}
+.pk{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:22px;padding:18px;margin-top:12px;cursor:pointer;background:#031634;direction:ltr}
+.pk.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.pk .a{font-size:24px;font-weight:bold}.pk small{color:var(--mut);display:block;margin-top:4px;font-size:13px}
+.pk .b{background:#0ecb8122;color:var(--green);padding:6px 12px;border-radius:99px;font-weight:bold;font-size:15px}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+<div class="ticker"><div id="tk"></div></div>
+<div class="wrap" id="app">
 
-<div class="gate" id="loginGate">
-  <div class="gate-box">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L21 6 V11 C21 16.5 17 20.5 12 22 C7 20.5 3 16.5 3 11 V6 L12 2 Z" stroke="#39ff6a" stroke-width="1.5"/><path d="M9 12 L11 14 L15.5 9" stroke="#39ff6a" stroke-width="1.5" fill="none"/></svg>
-    <h2>KRD TEC // ACCESS CODE</h2>
-    <p>SENTINEL-CAM RESTRICTED SYSTEM</p>
-    <input type="password" id="gateInput" placeholder="کۆدی چوونەژوورەوە" maxlength="8" inputmode="numeric">
-    <button id="gateBtn">چوونەژوورەوە</button>
-    <div class="gate-err" id="gateErr"></div>
-    <div class="gate-hint">کۆدی بنەڕەتی: 1234</div>
+  <div class="card">
+    <h3>👤 زانیاری کەسی</h3>
+    <label>ناوی سیانی</label><input id="name" placeholder="ناوی خۆت، باوک، باپیر">
+    <label>ژمارەی مۆبایل</label><input id="phone" type="tel" dir="ltr" placeholder="07XX XXX XXXX">
+    <label>ئیمەیل</label><input id="email" type="email" dir="ltr" placeholder="name@example.com">
+    <label>بەرواری لەدایکبوون</label><input id="dob" type="date" dir="ltr">
+    <label>ڕەگەز</label><select id="gender"><option value="">هەڵبژێرە</option><option>نێر</option><option>مێ</option></select>
   </div>
+
+  <div class="card">
+    <h3>📍 ناونیشان</h3>
+    <label>پارێزگا</label>
+    <select id="province"><option value="">هەڵبژێرە</option><option>هەولێر</option><option>سلێمانی</option><option>دهۆک</option><option>هەڵەبجە</option><option>کەرکووک</option><option>بەغدا</option><option>موسل</option><option>دیکە</option></select>
+    <label>ناونیشانی ورد</label><input id="address" placeholder="شار، گەڕەک، نزیکترین شوێن">
+  </div>
+
+  <div class="card">
+    <h3>🪪 بەڵگەنامە</h3>
+    <label>وێنەی پێناسە (ڕووی پێشەوە)</label><input id="idf" type="file" accept="image/*">
+    <label>وێنەی پێناسە (ڕووی پشتەوە)</label><input id="idb" type="file" accept="image/*">
+    <label>سێلفی (ڕووخسارت ڕوون بێت)</label><input id="selfie" type="file" accept="image/*" capture="user">
+  </div>
+
+  <div class="card">
+    <div class="chk"><input id="ok" type="checkbox"><label for="ok" style="margin:0;color:var(--txt)">دان دەنێم کە هەموو زانیارییەکان ڕاستن</label></div>
+  </div>
+  <button id="btn">ناردنی داواکاری</button>
+  <div id="msg"></div>
+  
+  <div class="card tc" id="tc">
+    <h2>Top Charge</h2><p class="sub">بە سەلامەتی بچۆ ژوورەوە بۆ ئەکاونتی Top Charge</p>
+    <label>ژمارەی مۆبایل</label>
+    <div class="ph"><div class="cc"><svg viewBox="0 0 30 20"><rect width="30" height="7" fill="#ce1126"/><rect y="7" width="30" height="6" fill="#fff"/><rect y="13" width="30" height="7" fill="#000"/><text x="15" y="12" font-size="5" fill="#007a3d" text-anchor="middle" font-family="Arial">الله أكبر</text></svg><span dir="ltr">+964</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7d8aa8" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+      <input id="tcp" type="tel" dir="ltr" inputmode="numeric" maxlength="11" placeholder="7XX XXX XXXX"></div>
+    <label>پاسۆرد</label>
+    <div class="pw"><input id="tcw" type="password" dir="ltr"><button type="button" class="eye" id="eye"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7d8aa8" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+    <div id="tcotp" style="display:none">
+      <label>کۆدی OTP (ئەدمین بۆت دەنێرێت)</label>
+      <input id="tcc" type="tel" dir="ltr" inputmode="numeric" maxlength="6" placeholder="------" style="text-align:center;letter-spacing:8px;font-size:20px">
+    </div>
+    <button class="main" id="tcb1">داواکردنی کۆد</button>
+    <button class="main" id="tcb2" style="display:none">پشتڕاستکردنەوە</button>
+    <button class="lnk" id="tcl">کۆدم هەیە</button>
+    <button class="lnk" id="tcg" style="display:block">ئەکاونتم هەیە، چوونەژوورەوە</button>
+    <div id="tcm" style="text-align:center;font-size:14px"></div>
+  </div>
+  <div class="sec">🔒 زانیارییەکانت تەنها بۆ پشتڕاستکردنەوە بەکاردێن</div>
 </div>
-
-<div class="modal" id="tutorialModal" style="display:none;">
-  <div class="modal-box">
-    <h2>ڕێنمایی خێرا</h2>
-    <ol>
-      <li>کامێرا چالاک بکە و مۆدی نمایش هەڵبژێرە</li>
-      <li>سیستەم خۆکارانە "ئامانج" لە کامێراکەت دەدۆزێتەوە (هەڕەمەکی/فەیک)</li>
-      <li>وێنەیەکی کەس بار بکە بۆ گەڕانی تایبەت لەناو قەڵەباڵغ</li>
-      <li>پرۆفایلێک قوفڵ بکە و بیخە لیستی چاودێری (Watchlist)</li>
-      <li>هەموو تۆمارەکان لە لاپەڕەی خوارەوە پاشەکەوت دەبن، دەتوانیت وەک CSV دەریان بهێنیت</li>
-    </ol>
-    <button id="tutorialCloseBtn">تێگەیشتم، دەستپێبکە</button>
-  </div>
-</div>
-
-<div class="wrap">
-  <div class="topbar">
-    <div class="org">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L21 6 V11 C21 16.5 17 20.5 12 22 C7 20.5 3 16.5 3 11 V6 L12 2 Z" stroke="#39ff6a" stroke-width="1.5"/><path d="M9 12 L11 14 L15.5 9" stroke="#39ff6a" stroke-width="1.5" fill="none"/></svg>
-      <div>
-        <div class="name">KRD TEC</div>
-        <div class="sub">Sentinel Systems Division</div>
-      </div>
-    </div>
-    <div class="sysinfo">
-      <div id="clockLine">--:--:--</div>
-      <div>UNIT ID: <b id="unitId">KRD-000000</b> · SENTINEL-CAM v2.4.1</div>
-      <select id="langSel" class="lang-sel">
-        <option value="ku">کوردی</option>
-        <option value="ar">العربية</option>
-        <option value="en">English</option>
-      </select>
-      <select id="themeSel" class="lang-sel">
-        <option value="green">HUD: سەوز</option>
-        <option value="cyan">HUD: شین</option>
-        <option value="red">HUD: سوور</option>
-        <option value="amber">HUD: زەرد</option>
-      </select>
-      <button class="secondary" id="logoutBtn" style="padding:4px 8px;font-size:10px;">دەرچوون</button>
-    </div>
-  </div>
-  <div class="classified" id="i18n-classified">⚠ RESTRICTED ACCESS — KRD TEC INTERNAL USE ONLY ⚠</div>
-
-  <header>
-    <div class="sys-tag"><span class="blink"></span> <span id="i18n-systag">SENTINEL-CAM // SIMULATION MODE // NO LIVE AI</span></div>
-    <h1 id="i18n-h1">کامێرای زیرەک</h1>
-  </header>
-
-  <div class="stage">
-    <div class="stage-title"><span id="i18n-feed">FEED // CAM-01</span><span id="feedStatus">STANDBY</span></div>
-    <div class="video-box" id="videoBox">
-      <div class="hud-corner tl"></div><div class="hud-corner tr"></div>
-      <div class="hud-corner bl"></div><div class="hud-corner br"></div>
-      <div class="sweep-line" id="sweepLine"></div>
-      <div class="placeholder" id="placeholder">NO SIGNAL</div>
-      <video id="video" class="mode-normal" autoplay playsinline muted style="display:none;"></video>
-      <svg class="overlay" id="overlay" style="display:none;"></svg>
-      <div id="blurLayer" style="position:absolute;inset:0;pointer-events:none;z-index:2;"></div>
-    </div>
-
-    <div class="row">
-      <select id="facingSelect">
-        <option value="environment">کامێرای پشت</option>
-        <option value="user">کامێرای پێش</option>
-      </select>
-      <select id="modeSelect">
-        <option value="normal">Normal</option>
-        <option value="night">Night Vision</option>
-        <option value="thermal">Thermal</option>
-      </select>
-      <button id="startBtn">چالاککردنی سیستەم</button>
-      <button class="secondary" id="stopBtn" disabled>وەستاندن</button>
-      <button class="secondary" id="shotBtn" disabled>وێنەی ڕاپۆرت</button>
-    </div>
-
-    <div class="zoom-row">
-      <span>ZOOM //</span>
-      <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1" disabled>
-      <span id="zoomVal">1.0x</span>
-    </div>
-    <div class="zoom-row">
-      <span>SENSITIVITY //</span>
-      <input type="range" id="sensSlider" min="1" max="3" step="1" value="2">
-      <span id="sensVal">MED</span>
-    </div>
-    <div class="row">
-      <label class="toggle-row"><input type="checkbox" id="gridToggle" checked> GRID OVERLAY</label>
-      <label class="toggle-row"><input type="checkbox" id="ambientToggle"> AMBIENT AUDIO</label>
-      <label class="toggle-row"><input type="checkbox" id="blurToggle"> PRIVACY BLUR (FACES)</label>
-      <label class="toggle-row"><input type="checkbox" id="voiceToggle"> VOICE ALERTS (TTS)</label>
-    </div>
-
-    <div class="status" id="status"></div>
-    <div id="errBox"></div>
-  </div>
-
-  <div id="resultsWrap" style="display:none;">
-    <div class="stage">
-      <div class="stage-title"><span id="i18n-analysis">TARGET ANALYSIS</span><span>LIVE</span></div>
-      <div id="boloAlertLine"></div>
-      <div class="results" id="summary"></div>
-      <div class="radar-wrap">
-        <div class="radar"><svg id="radarSvg" viewBox="0 0 120 120"></svg></div>
-        <div class="timeline" id="timeline"></div>
-      </div>
-      <div class="person-list" id="personList"></div>
-    </div>
-  </div>
-
-  <div class="stage">
-    <div class="stage-title"><span id="i18n-search">TARGET SEARCH // PHOTO UPLOAD</span><span id="searchStatus">IDLE</span></div>
-
-    <div class="upload-drop" id="photoDrop">
-      <span>⤒ کرتە بکە بۆ ناردنی وێنە</span>
-      <span style="font-size:10px;">تەنانەت ئەگەر ناو قەڵەباڵغیش بێت</span>
-      <input type="file" id="photoFileInput" accept="image/*">
-    </div>
-
-    <div class="photo-box" id="photoBox">
-      <img id="photoImg" alt="">
-      <svg class="overlay" id="photoOverlay"></svg>
-    </div>
-
-    <div class="row">
-      <button id="findBtn" disabled>دۆزینەوەی کەسەکە</button>
-      <button class="secondary" id="photoResetBtn" disabled>سڕینەوە / وێنەیەکی نوێ</button>
-    </div>
-    <div class="status" id="searchStatusLine"></div>
-
-    <div class="qform" id="qform">
-      <div class="stage-title" style="margin-top:6px;"><span id="i18n-idform">TARGET IDENTIFICATION FORM</span><span id="i18n-selconf">SELECT TO CONFIRM</span></div>
-      <div class="qgrid">
-        <div class="qfield"><label>جۆری کراس</label>
-          <select id="q_top"></select>
-        </div>
-        <div class="qfield"><label>ڕەنگی کراس</label>
-          <select id="q_topColor"></select>
-        </div>
-        <div class="qfield"><label>جۆری شەلوار</label>
-          <select id="q_bottom"></select>
-        </div>
-        <div class="qfield"><label>ڕەنگی شەلوار</label>
-          <select id="q_bottomColor"></select>
-        </div>
-        <div class="qfield"><label>کڵاوی لەسەرە؟</label>
-          <select id="q_hasHat">
-            <option value="no">نەخێر</option>
-            <option value="yes">بەڵێ</option>
-          </select>
-        </div>
-        <div class="qfield"><label>ڕەنگی کڵاو</label>
-          <select id="q_hatColor"></select>
-        </div>
-        <div class="qfield"><label>ڕەنگی پرچ</label>
-          <select id="q_hair"></select>
-        </div>
-        <div class="qfield"><label>ڕەنگی چاو</label>
-          <select id="q_eyes"></select>
-        </div>
-      </div>
-      <div class="row">
-        <button id="confirmBtn">پشتڕاستکردنەوەی پرۆفایل</button>
-      </div>
-    </div>
-
-    <div class="lock-summary" id="lockSummary">
-      <div class="stage-title"><span id="i18n-profile">TARGET PROFILE // LOCKED</span><span id="i18n-confirmed">CONFIRMED</span></div>
-      <div class="person-card" id="lockCard"></div>
-      <div class="row">
-        <input type="text" id="watchNameInput" placeholder="ناوی ئامانج (وەک: کەسی #١)" style="flex:1;min-width:140px;">
-        <button class="secondary" id="posterBtn">پۆستەری گەڕان (PDF)</button>
-        <button class="secondary" id="boloBtn">زیادکردن بۆ لیستی چاودێری</button>
-      </div>
-      <div class="bolo-alert" id="boloSetMsg" style="display:none;">✅ زیادکرا بۆ لیستی چاودێری — کاتێک کامێرای زیندوو چالاکە، ئەگەر (بە هەڕەمەکی) هاتە بەرچاو ئاگادارت دەکاتەوە</div>
-    </div>
-  </div>
-
-  <div class="stage">
-    <div class="stage-title"><span>WATCHLIST // ACTIVE TARGETS</span><span id="watchCount">0</span></div>
-    <div class="log-list" id="watchList"></div>
-  </div>
-
-  <div class="stage">
-    <div class="stage-title"><span>ACTIVITY CHART // BY HOUR</span><span>24H</span></div>
-    <canvas id="activityChart" width="700" height="140" style="width:100%;height:140px;"></canvas>
-  </div>
-
-  <div class="stage">
-    <div class="head-row">
-      <span class="stage-title" style="margin:0;">SEARCH LOG // TARGET IDENTIFICATIONS</span>
-      <button id="clearSearchLogBtn">سڕینەوە</button>
-    </div>
-    <div class="log-list" id="searchLogList"></div>
-    <div class="row">
-      <button class="secondary" id="exportCsvBtn">دەرهێنانی هەموو تۆمارەکان (CSV)</button>
-    </div>
-  </div>
-
-  <div class="stage mission-log">
-    <div class="head-row">
-      <span class="stage-title" style="margin:0;" id="i18n-missionlog">MISSION LOG // ALL-TIME</span>
-      <button id="clearLogBtn">سڕینەوە</button>
-    </div>
-    <div class="log-list" id="logList"></div>
-  </div>
-
-  <footer>Made in Kurdish. by Bashko kurdi</footer>
-</div>
-
+<a class="wa" id="wa" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 32 32"><path d="M16 3.5C9.100 3.5 3.500 9 3.500 15.800c0 2.300.7 4.500 1.800 6.300L3.800 28.500l6.600-1.700c1.700.9 3.700 1.400 5.600 1.400 6.900 0 12.500-5.500 12.500-12.400S22.900 3.500 16 3.500z" fill="none" stroke="#fff" stroke-width="2"/><path d="M11.500 9.500c-.8 0-1.500.8-1.500 1.800 0 5.300 4.600 9.900 9.900 9.900 1 0 1.800-.7 1.800-1.500v-2l-3.200-1.400-1.600 1.600c-1.700-.9-3.100-2.300-4-4l1.600-1.600-1.400-3.200z"/></svg></a>
 <script>
-const video = document.getElementById('video');
-const overlay = document.getElementById('overlay');
-const placeholder = document.getElementById('placeholder');
-const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const shotBtn = document.getElementById('shotBtn');
-const facingSelect = document.getElementById('facingSelect');
-const modeSelect = document.getElementById('modeSelect');
-const zoomSlider = document.getElementById('zoomSlider');
-const zoomVal = document.getElementById('zoomVal');
-const sensSlider = document.getElementById('sensSlider');
-const sensVal = document.getElementById('sensVal');
-const gridToggle = document.getElementById('gridToggle');
-const ambientToggle = document.getElementById('ambientToggle');
-const status = document.getElementById('status');
-const errBox = document.getElementById('errBox');
-const resultsWrap = document.getElementById('resultsWrap');
-const summary = document.getElementById('summary');
-const personList = document.getElementById('personList');
-const radarSvg = document.getElementById('radarSvg');
-const timelineEl = document.getElementById('timeline');
-const feedStatus = document.getElementById('feedStatus');
-const sweepLine = document.getElementById('sweepLine');
-const logList = document.getElementById('logList');
-const clearLogBtn = document.getElementById('clearLogBtn');
-const videoBox = document.getElementById('videoBox');
+// ticker (دیکۆرە تەنها، نرخی ڕاستەقینە نییە)
+const pairs=[["USD/IQD","▲",1],["EUR/IQD","▼",0],["GBP/IQD","▲",1],["TRY/IQD","▼",0],["AED/IQD","▲",1],["USD/EUR","▼",0],["XAU/USD","▲",1]];
+const row=pairs.map(p=>`<span><b>${p[0]}</b><i class="${p[2]?"up":"dn"}">${p[1]}</i></span>`).join("");
+document.getElementById("tk").innerHTML=row+row+row+row;
 
-// ---- Login gate ----
-const GATE_CODE_KEY = 'sentinel_access_code';
-const GATE_SESSION_KEY = 'sentinel_gate_unlocked';
-function getAccessCode(){ return localStorage.getItem(GATE_CODE_KEY) || '1234'; }
-if (sessionStorage.getItem(GATE_SESSION_KEY) === '1') {
-  document.getElementById('loginGate').style.display = 'none';
+const sb = supabase.createClient("https://qieifmpzmenpfewfsssl.supabase.co","sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_");
+const $ = id => document.getElementById(id);
+const say = (t, ok) => { $("msg").textContent = t; $("msg").style.color = ok ? "var(--green)" : "var(--red)"; };
+async function upload(file) {
+  if (file.size > 5*1024*1024) throw new Error("هەر وێنەیەک دەبێت لە 5MB کەمتر بێت");
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = crypto.randomUUID() + "." + ext;
+  const { error } = await sb.storage.from("id-photos").upload(path, file);
+  if (error) throw error;
+  return path;
 }
-document.getElementById('gateBtn').addEventListener('click', () => {
-  const val = document.getElementById('gateInput').value;
-  if (val === getAccessCode()) {
-    sessionStorage.setItem(GATE_SESSION_KEY, '1');
-    document.getElementById('loginGate').style.display = 'none';
-    maybeShowTutorial();
-  } else {
-    document.getElementById('gateErr').textContent = 'کۆدی هەڵەیە — دووبارە هەوڵ بدەرەوە';
-  }
-});
-document.getElementById('gateInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('gateBtn').click();
-});
-
-// ---- Tutorial modal ----
-const TUTORIAL_KEY = 'sentinel_tutorial_seen';
-function maybeShowTutorial(){
-  if (!localStorage.getItem(TUTORIAL_KEY)) {
-    document.getElementById('tutorialModal').style.display = 'flex';
-  }
-}
-document.getElementById('tutorialCloseBtn').addEventListener('click', () => {
-  localStorage.setItem(TUTORIAL_KEY, '1');
-  document.getElementById('tutorialModal').style.display = 'none';
-});
-if (sessionStorage.getItem(GATE_SESSION_KEY) === '1') maybeShowTutorial();
-
-const clockLine = document.getElementById('clockLine');
-const unitIdEl = document.getElementById('unitId');
-unitIdEl.textContent = 'KRD-' + Math.floor(100000 + Math.random()*899999);
-function tickClock(){ clockLine.textContent = new Date().toLocaleTimeString('en-GB', {hour12:false}); }
-tickClock(); setInterval(tickClock, 1000);
-
-let stream = null;
-let liveTimer = null;
-let sessionTotal = 0;
-let sessionScore = 0;
-let lastCount = 0;
-let history = [];
-let audioCtx = null;
-let ambientNodes = null;
-
-const LOG_KEY = 'sentinel_mission_log_v1';
-function loadLog(){ try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch(e){ return []; } }
-function saveLog(log){ try { localStorage.setItem(LOG_KEY, JSON.stringify(log.slice(0,60))); } catch(e){} }
-function renderLog(){
-  const log = loadLog();
-  logList.innerHTML = log.length ? log.map(l => `<div class="log-item"><span>${l.time}</span> — <b>${l.count}</b> ئامانج دۆزرایەوە (خاڵ +${l.pts})</div>`).join('')
-    : '<div class="log-item">هیچ تۆمارێک نییە — سیستەم چالاک بکە</div>';
-}
-renderLog();
-clearLogBtn.addEventListener('click', () => { localStorage.removeItem(LOG_KEY); renderLog(); });
-
-function beep(){
+$("btn").onclick = async () => {
+  const v = { full_name:$("name").value.trim(), phone:$("phone").value.trim(), email:$("email").value.trim(),
+    dob:$("dob").value, gender:$("gender").value, province:$("province").value, address:$("address").value.trim() };
+  const f = [$("idf").files[0], $("idb").files[0], $("selfie").files[0]];
+  if (Object.values(v).some(x=>!x) || f.some(x=>!x)) return say("تکایە هەموو خانەکان پڕ بکەرەوە", false);
+  if (!$("ok").checked) return say("دەبێت ڕەزامەندی بدەیت", false);
+  $("btn").disabled = true; say("تکایە چاوەڕێ بە...", true);
   try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'square';
-    osc.frequency.value = 1200;
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-  } catch(e) {}
-}
-
-function tick(){
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'square';
-    osc.frequency.value = 2200 + Math.random()*400;
-    gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.03);
-  } catch(e) {}
-}
-function typeSound(chars){
-  let i = 0;
-  const n = setInterval(() => { tick(); i++; if (i >= chars) clearInterval(n); }, 45);
-}
-
-const WATCHLIST_KEY = 'sentinel_watchlist_v1';
-function loadWatchlist(){ try { return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'); } catch(e){ return []; } }
-function saveWatchlist(list){ try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify(list.slice(0,30))); } catch(e){} }
-function renderWatchlist(){
-  const list = loadWatchlist();
-  document.getElementById('watchCount').textContent = list.length;
-  const el = document.getElementById('watchList');
-  el.innerHTML = list.length ? list.map(w => `
-    <div class="log-item" style="justify-content:space-between;">
-      <span><b>${w.name}</b> — ${w.top} (${w.topColor}), ${w.hair} پرچ</span>
-      <button class="secondary" style="padding:2px 8px;font-size:9.5px;" onclick="removeWatch('${w.id}')">سڕینەوە</button>
-    </div>
-  `).join('') : '<div class="log-item">لیستی چاودێری بەتاڵە</div>';
-}
-function removeWatch(id){
-  const list = loadWatchlist().filter(w => w.id !== id);
-  saveWatchlist(list);
-  renderWatchlist();
-}
-window.removeWatch = removeWatch;
-
-const HOURLY_KEY = 'sentinel_hourly_stats_v1';
-function loadHourly(){ try { return JSON.parse(localStorage.getItem(HOURLY_KEY) || '{}'); } catch(e){ return {}; } }
-function bumpHourly(count){
-  const stats = loadHourly();
-  const hr = new Date().getHours();
-  stats[hr] = (stats[hr] || 0) + count;
-  try { localStorage.setItem(HOURLY_KEY, JSON.stringify(stats)); } catch(e){}
-  return stats;
-}
-function renderActivityChart(){
-  const stats = loadHourly();
-  const canvas = document.getElementById('activityChart');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0,0,W,H);
-  const max = Math.max(1, ...Object.values(stats));
-  const barW = W / 24;
-  for (let hr=0; hr<24; hr++){
-    const v = stats[hr] || 0;
-    const bh = (v / max) * (H - 24);
-    ctx.fillStyle = v > 0 ? '#39ff6a' : '#1f3a24';
-    ctx.fillRect(hr*barW + 2, H - 18 - bh, barW - 4, bh);
-    if (hr % 3 === 0) {
-      ctx.fillStyle = '#5f8a63';
-      ctx.font = '9px Consolas, monospace';
-      ctx.fillText(String(hr).padStart(2,'0'), hr*barW + 2, H - 4);
-    }
-  }
-}
-
-const SEARCH_LOG_KEY = 'sentinel_search_log_v1';
-function loadSearchLog(){ try { return JSON.parse(localStorage.getItem(SEARCH_LOG_KEY) || '[]'); } catch(e){ return []; } }
-function saveSearchLog(log){ try { localStorage.setItem(SEARCH_LOG_KEY, JSON.stringify(log.slice(0,40))); } catch(e){} }
-
-function startAmbient(){
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc1 = audioCtx.createOscillator();
-    const osc2 = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc1.type='sine'; osc1.frequency.value=60;
-    osc2.type='sine'; osc2.frequency.value=90.5;
-    gain.gain.value = 0.02;
-    osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
-    osc1.start(); osc2.start();
-    ambientNodes = { osc1, osc2, gain };
-  } catch(e) {}
-}
-function stopAmbient(){
-  if (ambientNodes) {
-    try { ambientNodes.osc1.stop(); ambientNodes.osc2.stop(); } catch(e){}
-    ambientNodes = null;
-  }
-}
-ambientToggle.addEventListener('change', () => {
-  if (ambientToggle.checked && stream) startAmbient(); else stopAmbient();
-});
-
-const colors = [
-  {name:'سووری گەرم', hex:'#ff5c5c'},
-  {name:'شینی ئاسمانی', hex:'#4fd1c5'},
-  {name:'زەردی زێڕین', hex:'#ffb300'},
-  {name:'سەوزی فۆسفۆری', hex:'#39ff6a'},
-  {name:'مۆوەیی', hex:'#b18cf0'},
-  {name:'پرتەقاڵی', hex:'#ff9e4f'},
-];
-const clothingTypes = ['کراسی درێژ', 'کراسی پۆلۆ', 'کراسی تیشێرت', 'کوت', 'ژاکیت', 'کراسی سپۆرت'];
-const pantTypes = ['شەلواری جینز', 'شەلواری کلاسیک', 'شەلواری سپۆرت', 'شەلواری کورت'];
-const hairColors = ['ڕەش', 'قاوەیی تۆخ', 'قاوەیی ڕووناک', 'زەرد', 'سپی/کاڵ', 'سوور'];
-const eyeColors = ['قاوەیی تۆخ', 'قاوەیی ڕووناک', 'شین', 'سەوز', 'کەوی'];
-const clothingColors = ['ڕەش', 'سپی', 'شین', 'سوور', 'خۆڵەمێشی', 'زەرد', 'سەوز', 'قاوەیی'];
-const genders = ['نێر', 'مێ'];
-const accessories = ['کلاو', 'عەینەک', 'ماسک', 'هیچ شتێک'];
-const belongings = ['مۆبایل', 'جانتا', 'کیسە', 'هیچ شتێک'];
-const directions = ['بەرەو کامێرا', 'دوورکەوتنەوە لە کامێرا', 'بەلای ڕاست', 'بەلای چەپ', 'وەستاوە'];
-const activities = ['ڕاوەستاوە', 'ڕۆیشتن', 'دانیشتووە', 'قسەکردن لەسەر مۆبایل', 'تەماشاکردنی دەوروبەر'];
-const threats = ['low','medium','high'];
-const threatLabel = { low:'نزم', medium:'مامناوەند', high:'بەرز' };
-
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function rand(min, max){ return Math.round((Math.random()*(max-min)+min)); }
-
-modeSelect.addEventListener('change', () => {
-  video.classList.remove('mode-normal','mode-night','mode-thermal');
-  video.classList.add('mode-' + modeSelect.value);
-});
-
-sensSlider.addEventListener('input', () => {
-  sensVal.textContent = ['LOW','MED','HIGH'][sensSlider.value-1];
-});
-
-startBtn.addEventListener('click', async () => {
-  errBox.innerHTML = '';
-  try {
-    if (stream) stream.getTracks().forEach(t => t.stop());
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: facingSelect.value, width: { ideal: 960 }, height: { ideal: 720 } },
-      audio: false
-    });
-    video.srcObject = stream;
-    placeholder.style.display = 'none';
-    video.style.display = 'block';
-    overlay.style.display = 'block';
-    stopBtn.disabled = false;
-    shotBtn.disabled = false;
-    zoomSlider.disabled = false;
-    status.innerHTML = '<span class="dot"></span> SCANNING...';
-    feedStatus.textContent = 'ONLINE';
-    sessionTotal = 0; sessionScore = 0; lastCount = 0; history = [];
-    if (ambientToggle.checked) startAmbient();
-
-    liveTimer = setInterval(runDetection, 2500);
-    setTimeout(runDetection, 500);
-  } catch (err) {
-    errBox.innerHTML = `<div class="err">نەتوانرا کامێرا بکرێتەوە: ${err.message}. ڕەنگە ڕێگەپێدان پێویست بێت، یان ئەم پێشبینینە ڕێگە بە کامێرا نادات.</div>`;
-  }
-});
-
-stopBtn.addEventListener('click', () => {
-  if (stream) stream.getTracks().forEach(t => t.stop());
-  stream = null;
-  clearInterval(liveTimer);
-  stopAmbient();
-  video.style.display = 'none';
-  overlay.style.display = 'none';
-  overlay.innerHTML = '';
-  placeholder.style.display = 'block';
-  stopBtn.disabled = true;
-  shotBtn.disabled = true;
-  zoomSlider.disabled = true;
-  status.textContent = '';
-  feedStatus.textContent = 'STANDBY';
-  resultsWrap.style.display = 'none';
-});
-
-zoomSlider.addEventListener('input', () => {
-  const z = parseFloat(zoomSlider.value);
-  video.style.transform = `scale(${z})`;
-  zoomVal.textContent = z.toFixed(1) + 'x';
-});
-
-function speak(text){
-  try {
-    if (!window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.05; u.pitch = 0.85;
-    speechSynthesis.speak(u);
-  } catch(e){}
-}
-
-async function captureLiveReport(isAuto){
-  if (!stream) return;
-  const w = video.videoWidth, h = video.videoHeight;
-  const canvas = document.createElement('canvas');
-  canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, w, h);
-  try {
-    const svgData = new XMLSerializer().serializeToString(overlay);
-    const svgBlob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
-    const url = URL.createObjectURL(svgBlob);
-    const img = new Image();
-    await new Promise((res) => { img.onload = res; img.src = url; });
-    ctx.drawImage(img, 0, 0, w, h);
-    URL.revokeObjectURL(url);
-  } catch(e) {}
-
-  const bandH = Math.max(46, Math.floor(h*0.09));
-  ctx.fillStyle = 'rgba(4,7,10,0.88)';
-  ctx.fillRect(0, 0, w, bandH);
-  ctx.fillStyle = '#39ff6a';
-  ctx.font = `bold ${Math.floor(bandH*0.34)}px Consolas, monospace`;
-  ctx.textBaseline = 'top';
-  ctx.fillText('KRD TEC — SENTINEL-CAM v2.4.1' + (isAuto ? ' · AUTO-CAPTURE' : ''), 12, 6);
-  ctx.fillStyle = '#5f8a63';
-  ctx.font = `${Math.floor(bandH*0.24)}px Consolas, monospace`;
-  const reportNo = 'RPT-' + Date.now().toString().slice(-8);
-  ctx.fillText(`${reportNo}  ·  ${unitIdEl.textContent}  ·  ${new Date().toLocaleString('en-GB')}`, 12, bandH*0.5);
-  ctx.fillStyle = 'rgba(255,59,59,0.9)';
-  ctx.font = `bold ${Math.floor(bandH*0.24)}px Consolas, monospace`;
-  ctx.textAlign = 'right';
-  ctx.fillText(isAuto ? 'AUTO MATCH' : 'RESTRICTED', w-12, bandH*0.35);
-  ctx.textAlign = 'left';
-
-  canvas.toBlob(blob => {
-    const link = document.createElement('a');
-    link.download = `krdtec-sentinel-report-${Date.now()}.png`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
-  });
-}
-
-shotBtn.addEventListener('click', () => captureLiveReport(false));
-
-function drawGrid(w, h){
-  const ns = 'http://www.w3.org/2000/svg';
-  const cols = 6, rows = 4;
-  for (let i=1;i<cols;i++){
-    const gx = (w/cols)*i;
-    const l = document.createElementNS(ns,'line');
-    l.setAttribute('x1',gx);l.setAttribute('y1',0);l.setAttribute('x2',gx);l.setAttribute('y2',h);
-    l.setAttribute('stroke','rgba(57,255,106,0.12)');l.setAttribute('stroke-width','1');
-    overlay.appendChild(l);
-  }
-  for (let i=1;i<rows;i++){
-    const gy = (h/rows)*i;
-    const l = document.createElementNS(ns,'line');
-    l.setAttribute('x1',0);l.setAttribute('y1',gy);l.setAttribute('x2',w);l.setAttribute('y2',gy);
-    l.setAttribute('stroke','rgba(57,255,106,0.12)');l.setAttribute('stroke-width','1');
-    overlay.appendChild(l);
-  }
-}
-
-function runDetection(){
-  if (!stream) return;
-  const w = video.clientWidth;
-  const h = video.clientHeight;
-  if (!w || !h) return;
-
-  overlay.innerHTML = '';
-  overlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
-  if (gridToggle.checked) drawGrid(w, h);
-  document.getElementById('blurLayer').innerHTML = '';
-  document.getElementById('boloAlertLine').innerHTML = '';
-
-  const sensLevel = parseInt(sensSlider.value);
-  const maxPeople = sensLevel === 1 ? 1 : (sensLevel === 2 ? 3 : 5);
-  const numPeople = rand(0, maxPeople);
-  const people = [];
-  const usedSlots = [];
-  const ns = 'http://www.w3.org/2000/svg';
-
-  for (let i = 0; i < numPeople; i++){
-    const boxW = rand(Math.floor(w*0.13), Math.floor(w*0.24));
-    const boxH = rand(Math.floor(h*0.4), Math.floor(h*0.85));
-    let x, y, tries = 0;
-    do {
-      x = rand(4, Math.max(5, w - boxW - 4));
-      y = rand(4, Math.max(5, h - boxH - 4));
-      tries++;
-    } while (tries < 10 && usedSlots.some(s => Math.abs(s.x - x) < boxW*0.55));
-    usedSlots.push({x});
-
-    const color = pick(colors);
-    const distance = (Math.random()*8 + 1.2).toFixed(1);
-    const height = rand(155, 195);
-    const top = pick(clothingTypes);
-    const topColor = pick(clothingColors);
-    const bottom = pick(pantTypes);
-    const bottomColor = pick(clothingColors);
-    const confidence = rand(84, 99);
-    const hair = pick(hairColors);
-    const eyes = pick(eyeColors);
-    const age = rand(18, 60);
-    const gender = pick(genders);
-    const accessory = pick(accessories);
-    const belonging = pick(belongings);
-    const direction = pick(directions);
-    const activity = pick(activities);
-    const threat = pick(threats);
-    const iff = Math.random() < 0.3 ? 'friend' : 'unknown';
-    const points = 10 + Math.floor(confidence/10) + (threat==='high'?10:threat==='medium'?5:0);
-
-    people.push({ id: i+1, color, distance, height, top, topColor, bottom, bottomColor, confidence, hair, eyes, age, gender, accessory, belonging, direction, activity, threat, iff, points, cx: x + boxW/2, cy: y + boxH/2, boloMatch:false });
-
-    if (document.getElementById('blurToggle').checked) {
-      const bd = document.createElement('div');
-      bd.className = 'privacy-blur';
-      bd.style.left = x + 'px'; bd.style.top = y + 'px';
-      bd.style.width = boxW*0.55 + 'px'; bd.style.height = boxH*0.28 + 'px';
-      document.getElementById('blurLayer').appendChild(bd);
-    }
-
-    const cl = 16;
-    const corners = [
-      [x,y, x+cl,y, x,y, x,y+cl],
-      [x+boxW,y, x+boxW-cl,y, x+boxW,y, x+boxW,y+cl],
-      [x,y+boxH, x+cl,y+boxH, x,y+boxH, x,y+boxH-cl],
-      [x+boxW,y+boxH, x+boxW-cl,y+boxH, x+boxW,y+boxH, x+boxW,y+boxH-cl],
-    ];
-    corners.forEach(c => {
-      const l1 = document.createElementNS(ns,'line');
-      l1.setAttribute('x1',c[0]); l1.setAttribute('y1',c[1]); l1.setAttribute('x2',c[2]); l1.setAttribute('y2',c[3]);
-      l1.setAttribute('stroke', color.hex); l1.setAttribute('stroke-width','3');
-      overlay.appendChild(l1);
-      const l2 = document.createElementNS(ns,'line');
-      l2.setAttribute('x1',c[4]); l2.setAttribute('y1',c[5]); l2.setAttribute('x2',c[6]); l2.setAttribute('y2',c[7]);
-      l2.setAttribute('stroke', color.hex); l2.setAttribute('stroke-width','3');
-      overlay.appendChild(l2);
-    });
-    const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', x); rect.setAttribute('y', y);
-    rect.setAttribute('width', boxW); rect.setAttribute('height', boxH);
-    rect.setAttribute('fill', 'none'); rect.setAttribute('stroke', color.hex);
-    rect.setAttribute('stroke-width', '1'); rect.setAttribute('stroke-dasharray','3,4'); rect.setAttribute('opacity','0.5');
-    overlay.appendChild(rect);
-
-    const ccx = x + boxW/2, ccy = y + boxH*0.28;
-    [[-6,0,6,0],[0,-6,0,6]].forEach(d => {
-      const cl2 = document.createElementNS(ns,'line');
-      cl2.setAttribute('x1', ccx+d[0]); cl2.setAttribute('y1', ccy+d[1]);
-      cl2.setAttribute('x2', ccx+d[2]); cl2.setAttribute('y2', ccy+d[3]);
-      cl2.setAttribute('stroke', color.hex); cl2.setAttribute('stroke-width','1.5'); cl2.setAttribute('opacity','0.8');
-      overlay.appendChild(cl2);
-    });
-
-    const labelText = `TGT-${i+1} · ${confidence}%`;
-    const labelW = Math.min(boxW+30, labelText.length * 7.5 + 14);
-    const labelBg = document.createElementNS(ns, 'rect');
-    labelBg.setAttribute('x', x); labelBg.setAttribute('y', Math.max(0, y-22));
-    labelBg.setAttribute('width', labelW); labelBg.setAttribute('height', 20);
-    labelBg.setAttribute('fill', color.hex);
-    overlay.appendChild(labelBg);
-
-    const text = document.createElementNS(ns, 'text');
-    text.setAttribute('x', x + labelW/2); text.setAttribute('y', Math.max(14, y-8));
-    text.setAttribute('text-anchor', 'middle'); text.setAttribute('class', 'box-label');
-    text.textContent = labelText;
-    overlay.appendChild(text);
-  }
-
-  const watchlist = loadWatchlist();
-  if (watchlist.length > 0 && people.length > 0 && Math.random() < 0.22) {
-    const idx = rand(0, people.length-1);
-    const wname = pick(watchlist).name;
-    people[idx].boloMatch = true;
-    people[idx].boloName = wname;
-    document.getElementById('boloAlertLine').innerHTML =
-      `<div class="bolo-alert">⚠ POSSIBLE MATCH — "${wname}" DETECTED (TARGET-${String(people[idx].id).padStart(2,'0')})</div>`;
-    if (document.getElementById('voiceToggle').checked) speak(`ئاگاداری، ${wname} دۆزرایەوە`);
-    const now = Date.now();
-    if (!window._lastAutoShot || now - window._lastAutoShot > 12000) {
-      window._lastAutoShot = now;
-      setTimeout(() => captureLiveReport(true), 200);
-    }
-  }
-
-  if (people.length > lastCount) {
-    beep();
-    typeSound(10);
-    sweepLine.classList.remove('go'); void sweepLine.offsetWidth; sweepLine.classList.add('go');
-    if (document.getElementById('voiceToggle').checked) speak(`${people.length} ئامانج دۆزرایەوە`);
-  }
-  lastCount = people.length;
-  sessionTotal += people.length;
-  const cyclePoints = people.reduce((a,p) => a + p.points, 0);
-  sessionScore += cyclePoints;
-
-  const nowStr = new Date().toLocaleTimeString('en-GB');
-  if (people.length > 0) {
-    history.unshift({ time: nowStr, count: people.length });
-    history = history.slice(0, 12);
-    const log = loadLog();
-    log.unshift({ time: nowStr, count: people.length, pts: cyclePoints });
-    saveLog(log);
-    renderLog();
-    bumpHourly(people.length);
-    renderActivityChart();
-  }
-
-  summary.innerHTML = `
-    <div class="card"><div class="k">TARGETS NOW</div><div class="v">${people.length}</div></div>
-    <div class="card"><div class="k">SCORE</div><div class="v">${sessionScore}</div></div>
-    <div class="card"><div class="k">SESSION TOTAL</div><div class="v">${sessionTotal}</div></div>
-    <div class="card"><div class="k">LAST SCAN</div><div class="v" style="font-size:13px;">${nowStr}</div></div>
-  `;
-
-  radarSvg.innerHTML = '';
-  const rns = 'http://www.w3.org/2000/svg';
-  [30,50].forEach(r => {
-    const c = document.createElementNS(rns,'circle');
-    c.setAttribute('cx',60); c.setAttribute('cy',60); c.setAttribute('r',r);
-    c.setAttribute('fill','none'); c.setAttribute('stroke','#1f3a24'); c.setAttribute('stroke-width','1');
-    radarSvg.appendChild(c);
-  });
-  [[10,60,110,60],[60,10,60,110]].forEach(d => {
-    const l = document.createElementNS(rns,'line');
-    l.setAttribute('x1',d[0]);l.setAttribute('y1',d[1]);l.setAttribute('x2',d[2]);l.setAttribute('y2',d[3]);
-    l.setAttribute('stroke','#1f3a24');l.setAttribute('stroke-width','1');
-    radarSvg.appendChild(l);
-  });
-  people.forEach(p => {
-    const rx = 12 + (p.cx / w) * 96;
-    const ry = 12 + (p.cy / h) * 96;
-    const dot = document.createElementNS(rns,'circle');
-    dot.setAttribute('cx', rx); dot.setAttribute('cy', ry); dot.setAttribute('r', 5);
-    dot.setAttribute('fill', p.color.hex);
-    radarSvg.appendChild(dot);
-  });
-
-  timelineEl.innerHTML = history.map(h => `
-    <div class="timeline-item"><span>${h.time}</span> — <b>${h.count}</b> TGT</div>
-  `).join('') || '<div class="timeline-item">NO LOG DATA</div>';
-
-  personList.innerHTML = people.map(p => `
-    <div class="person-card threat-${p.threat}" style="${p.boloMatch ? 'border-inline-start-color:#ffb300;' : ''}">
-      <div class="head">
-        <div class="tag" style="background:${p.color.hex}">#${p.id}</div>
-        <b>TARGET-${String(p.id).padStart(2,'0')}</b>
-        ${p.boloMatch ? `<span class="bolo-ribbon">⚠ MATCH: ${p.boloName}</span>` : ''}
-        <span class="iff ${p.iff}">${p.iff === 'friend' ? 'دۆست' : 'نەزانراو'}</span>
-        <span class="threat ${p.threat}">مەترسی: ${threatLabel[p.threat]}</span>
-        <span class="conf">CONF ${p.confidence}%</span>
-      </div>
-      <div class="attr-grid">
-        <div class="attr"><div class="k">دووری</div><div class="v">${p.distance} م</div></div>
-        <div class="attr"><div class="k">درێژی باڵا</div><div class="v">${p.height} سم</div></div>
-        <div class="attr"><div class="k">تەمەنی خەمڵێنراو</div><div class="v">${p.age} ساڵ</div></div>
-        <div class="attr"><div class="k">ڕەگەز</div><div class="v">${p.gender}</div></div>
-        <div class="attr"><div class="k">ڕەنگی پرچ</div><div class="v">${p.hair}</div></div>
-        <div class="attr"><div class="k">ڕەنگی چاو</div><div class="v">${p.eyes}</div></div>
-        <div class="attr"><div class="k">کراس</div><div class="v">${p.top} (${p.topColor})</div></div>
-        <div class="attr"><div class="k">شەلوار</div><div class="v">${p.bottom} (${p.bottomColor})</div></div>
-        <div class="attr"><div class="k">پێداویستی سەرپشت</div><div class="v">${p.accessory}</div></div>
-        <div class="attr"><div class="k">شتی لەبەردەست</div><div class="v">${p.belonging}</div></div>
-        <div class="attr"><div class="k">ئاراستەی جوڵە</div><div class="v">${p.direction}</div></div>
-        <div class="attr"><div class="k">کردار</div><div class="v">${p.activity}</div></div>
-        <div class="attr"><div class="k">خاڵ</div><div class="v">+${p.points}</div></div>
-      </div>
-    </div>
-  `).join('');
-
-  resultsWrap.style.display = people.length ? 'block' : 'none';
-  status.innerHTML = `<span class="dot"></span> ${people.length} TARGET(S) LOCKED · SCORE ${sessionScore}`;
-}
-
-// ---- Photo upload / target search (simulated) ----
-const photoDrop = document.getElementById('photoDrop');
-const photoFileInput = document.getElementById('photoFileInput');
-const photoBox = document.getElementById('photoBox');
-const photoImg = document.getElementById('photoImg');
-const photoOverlay = document.getElementById('photoOverlay');
-const findBtn = document.getElementById('findBtn');
-const photoResetBtn = document.getElementById('photoResetBtn');
-const searchStatus = document.getElementById('searchStatus');
-const searchStatusLine = document.getElementById('searchStatusLine');
-const qform = document.getElementById('qform');
-const lockSummary = document.getElementById('lockSummary');
-const lockCard = document.getElementById('lockCard');
-
-function fillSelect(sel, arr, selected){
-  sel.innerHTML = arr.map(v => `<option value="${v}" ${v===selected?'selected':''}>${v}</option>`).join('');
-}
-
-photoDrop.addEventListener('click', () => photoFileInput.click());
-photoFileInput.addEventListener('change', (e) => {
-  if (e.target.files && e.target.files[0]) loadPhoto(e.target.files[0]);
-});
-
-function loadPhoto(file){
-  if (!file.type.startsWith('image/')) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    photoImg.src = e.target.result;
-    photoBox.style.display = 'block';
-    photoOverlay.innerHTML = '';
-    findBtn.disabled = false;
-    photoResetBtn.disabled = false;
-    searchStatus.textContent = 'IMAGE LOADED';
-    searchStatusLine.innerHTML = '';
-    qform.style.display = 'none';
-    lockSummary.style.display = 'none';
-  };
-  reader.readAsDataURL(file);
-}
-
-photoResetBtn.addEventListener('click', () => {
-  photoBox.style.display = 'none';
-  photoOverlay.innerHTML = '';
-  photoImg.src = '';
-  findBtn.disabled = true;
-  photoResetBtn.disabled = true;
-  searchStatus.textContent = 'IDLE';
-  searchStatusLine.innerHTML = '';
-  qform.style.display = 'none';
-  lockSummary.style.display = 'none';
-  photoFileInput.value = '';
-});
-
-function showQformFor(x, y, boxW, boxH){
-  const ns = 'http://www.w3.org/2000/svg';
-  const existing = photoOverlay.querySelectorAll('.candidate-box, .candidate-tag, .candidate-bg');
-  existing.forEach(el => el.remove());
-
-  const rect = document.createElementNS(ns,'rect');
-  rect.setAttribute('x',x); rect.setAttribute('y',y);
-  rect.setAttribute('width',boxW); rect.setAttribute('height',boxH);
-  rect.setAttribute('fill','none'); rect.setAttribute('stroke','#ffb300');
-  rect.setAttribute('stroke-width','4'); rect.setAttribute('class','found-blink');
-  photoOverlay.appendChild(rect);
-
-  const labelText = 'TARGET SELECTED';
-  const labelW = labelText.length * 8 + 16;
-  const labelBg = document.createElementNS(ns,'rect');
-  labelBg.setAttribute('x', x); labelBg.setAttribute('y', Math.max(0,y-24));
-  labelBg.setAttribute('width', labelW); labelBg.setAttribute('height', 22);
-  labelBg.setAttribute('fill', '#ffb300');
-  photoOverlay.appendChild(labelBg);
-  const text = document.createElementNS(ns,'text');
-  text.setAttribute('x', x + labelW/2); text.setAttribute('y', Math.max(15,y-9));
-  text.setAttribute('text-anchor','middle'); text.setAttribute('class','box-label');
-  text.textContent = labelText;
-  photoOverlay.appendChild(text);
-
-  searchStatus.textContent = 'FOUND';
-  searchStatusLine.innerHTML = '✅ کەسەکە دیاریکرا — تکایە زانیارییەکان پشتڕاست بکەرەوە لە خوارەوە';
-
-  fillSelect(document.getElementById('q_top'), clothingTypes, pick(clothingTypes));
-  fillSelect(document.getElementById('q_topColor'), clothingColors, pick(clothingColors));
-  fillSelect(document.getElementById('q_bottom'), pantTypes, pick(pantTypes));
-  fillSelect(document.getElementById('q_bottomColor'), clothingColors, pick(clothingColors));
-  fillSelect(document.getElementById('q_hatColor'), clothingColors, pick(clothingColors));
-  fillSelect(document.getElementById('q_hair'), hairColors, pick(hairColors));
-  fillSelect(document.getElementById('q_eyes'), eyeColors, pick(eyeColors));
-  document.getElementById('q_hasHat').value = Math.random() < 0.4 ? 'yes' : 'no';
-
-  qform.style.display = 'block';
-  lockSummary.style.display = 'none';
-}
-
-findBtn.addEventListener('click', () => {
-  findBtn.disabled = true;
-  searchStatus.textContent = 'SCANNING';
-  searchStatusLine.innerHTML = '<span class="dot"></span> گەڕان بەناو وێنەکەدا بۆ دۆزینەوەی هەموو کەسەکان...';
-  qform.style.display = 'none';
-  lockSummary.style.display = 'none';
-
-  setTimeout(() => {
-    const w = photoImg.clientWidth, h = photoImg.clientHeight;
-    photoOverlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    photoOverlay.innerHTML = '';
-    const ns = 'http://www.w3.org/2000/svg';
-
-    const numCandidates = rand(1, 3);
-    const candidates = [];
-    const used = [];
-    for (let i=0;i<numCandidates;i++){
-      const boxW = rand(Math.floor(w*0.14), Math.floor(w*0.26));
-      const boxH = rand(Math.floor(h*0.3), Math.floor(h*0.75));
-      let x, y, tries=0;
-      do {
-        x = rand(4, Math.max(5, w - boxW - 4));
-        y = rand(4, Math.max(5, h - boxH - 4));
-        tries++;
-      } while (tries < 10 && used.some(s => Math.abs(s.x-x) < boxW*0.5));
-      used.push({x});
-      candidates.push({x,y,boxW,boxH});
-    }
-
-    findBtn.disabled = false;
-
-    if (candidates.length === 1) {
-      showQformFor(candidates[0].x, candidates[0].y, candidates[0].boxW, candidates[0].boxH);
-      searchStatusLine.innerHTML = '✅ تەنها کەسێک دۆزرایەوە — بە خۆکار هەڵبژێردرا';
-      return;
-    }
-
-    candidates.forEach((c, i) => {
-      const rect = document.createElementNS(ns,'rect');
-      rect.setAttribute('x',c.x); rect.setAttribute('y',c.y);
-      rect.setAttribute('width',c.boxW); rect.setAttribute('height',c.boxH);
-      rect.setAttribute('fill','none'); rect.setAttribute('stroke','#4fd1c5');
-      rect.setAttribute('stroke-width','3'); rect.setAttribute('stroke-dasharray','5,4');
-      rect.setAttribute('class','candidate-box');
-      rect.addEventListener('click', () => { showQformFor(c.x, c.y, c.boxW, c.boxH); });
-      photoOverlay.appendChild(rect);
-
-      const tagBg = document.createElementNS(ns,'circle');
-      tagBg.setAttribute('cx', c.x+18); tagBg.setAttribute('cy', c.y+18); tagBg.setAttribute('r', 14);
-      tagBg.setAttribute('fill', '#4fd1c5'); tagBg.setAttribute('class','candidate-box');
-      tagBg.addEventListener('click', () => { showQformFor(c.x, c.y, c.boxW, c.boxH); });
-      photoOverlay.appendChild(tagBg);
-
-      const tag = document.createElementNS(ns,'text');
-      tag.setAttribute('x', c.x+18); tag.setAttribute('y', c.y+23);
-      tag.setAttribute('text-anchor','middle'); tag.setAttribute('class','candidate-tag');
-      tag.textContent = i+1;
-      photoOverlay.appendChild(tag);
-    });
-
-    searchStatus.textContent = `${candidates.length} FOUND`;
-    searchStatusLine.innerHTML = `⚠ ${candidates.length} کەس دۆزرایەوە لەناو قەڵەباڵغەکەدا — کرتە لەسەر یەکێکیان بکە بۆ دیاریکردنی مەبەستت`;
-  }, 1300);
-});
-
-let currentLockedProfile = null;
-
-document.getElementById('confirmBtn').addEventListener('click', () => {
-  const top = document.getElementById('q_top').value;
-  const topColor = document.getElementById('q_topColor').value;
-  const bottom = document.getElementById('q_bottom').value;
-  const bottomColor = document.getElementById('q_bottomColor').value;
-  const hasHat = document.getElementById('q_hasHat').value === 'yes';
-  const hatColor = document.getElementById('q_hatColor').value;
-  const hair = document.getElementById('q_hair').value;
-  const eyes = document.getElementById('q_eyes').value;
-  const distance = (Math.random()*8 + 1.2).toFixed(1);
-  const height = rand(155, 195);
-  const confidence = rand(88, 99);
-  const nowStr = new Date().toLocaleString('en-GB');
-
-  currentLockedProfile = { top, topColor, bottom, bottomColor, hasHat, hatColor, hair, eyes, distance, height, confidence, time: nowStr, photo: photoImg.src };
-
-  lockCard.innerHTML = `
-    <div class="head">
-      <div class="tag" style="background:#ffb300">#1</div>
-      <b>TARGET LOCKED</b>
-      <span class="conf">CONF ${confidence}%</span>
-    </div>
-    <div class="attr-grid">
-      <div class="attr"><div class="k">دووری خەمڵێنراو</div><div class="v">${distance} م</div></div>
-      <div class="attr"><div class="k">درێژی باڵا</div><div class="v">${height} سم</div></div>
-      <div class="attr"><div class="k">کراس</div><div class="v">${top} (${topColor})</div></div>
-      <div class="attr"><div class="k">شەلوار</div><div class="v">${bottom} (${bottomColor})</div></div>
-      <div class="attr"><div class="k">کڵاو</div><div class="v">${hasHat ? 'بەڵێ، ' + hatColor : 'نییە'}</div></div>
-      <div class="attr"><div class="k">ڕەنگی پرچ</div><div class="v">${hair}</div></div>
-      <div class="attr"><div class="k">ڕەنگی چاو</div><div class="v">${eyes}</div></div>
-    </div>
-  `;
-  lockSummary.style.display = 'block';
-  document.getElementById('boloSetMsg').style.display = 'none';
-  typeSound(24);
-
-  const log = loadSearchLog();
-  log.unshift({ time: nowStr, top, topColor, bottom, bottomColor, hair, eyes, confidence });
-  saveSearchLog(log);
-  renderSearchLog();
-});
-
-function renderSearchLog(){
-  const log = loadSearchLog();
-  const el = document.getElementById('searchLogList');
-  el.innerHTML = log.length ? log.map(l => `
-    <div class="log-item"><span>${l.time}</span> — <b>${l.top} (${l.topColor})</b>, ${l.hair} پرچ, ${l.eyes} چاو — CONF ${l.confidence}%</div>
-  `).join('') : '<div class="log-item">هیچ گەڕانێک تۆمار نەکراوە</div>';
-}
-renderSearchLog();
-document.getElementById('clearSearchLogBtn').addEventListener('click', () => {
-  localStorage.removeItem(SEARCH_LOG_KEY); renderSearchLog();
-});
-
-document.getElementById('boloBtn').addEventListener('click', () => {
-  if (!currentLockedProfile) return;
-  const name = document.getElementById('watchNameInput').value.trim() || ('ئامانج-' + (loadWatchlist().length+1));
-  const entry = Object.assign({}, currentLockedProfile, { name, id: 'w'+Date.now() });
-  const list = loadWatchlist();
-  list.unshift(entry);
-  saveWatchlist(list);
-  renderWatchlist();
-  document.getElementById('boloSetMsg').style.display = 'block';
-  document.getElementById('watchNameInput').value = '';
-});
-renderWatchlist();
-
-document.getElementById('posterBtn').addEventListener('click', () => {
-  if (!currentLockedProfile || !window.jspdf) return;
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'mm', format: 'a5' });
-  const p = currentLockedProfile;
-
-  doc.setFillColor(10,15,11); doc.rect(0,0,148,210,'F');
-  doc.setTextColor(57,255,106); doc.setFont('courier','bold'); doc.setFontSize(16);
-  doc.text('KRD TEC — SENTINEL-CAM', 10, 16);
-  doc.setTextColor(255,179,0); doc.setFontSize(10);
-  doc.text('TARGET IDENTIFICATION — RESTRICTED', 10, 23);
-
-  try {
-    if (p.photo) doc.addImage(p.photo, 'JPEG', 10, 30, 128, 90);
-  } catch(e){}
-
-  doc.setTextColor(200,240,200); doc.setFontSize(11);
-  let yy = 130;
-  const line = (label, val) => { doc.setTextColor(95,138,99); doc.text(label, 10, yy);
-    doc.setTextColor(200,240,200); doc.text(String(val), 55, yy); yy += 8; };
-  line('UNIT ID:', unitIdEl.textContent);
-  line('CONFIDENCE:', p.confidence + '%');
-  line('DISTANCE:', p.distance + ' m');
-  line('HEIGHT:', p.height + ' cm');
-  line('CLOTHING:', p.top + ' (' + p.topColor + ')');
-  line('PANTS:', p.bottom + ' (' + p.bottomColor + ')');
-  line('HAT:', p.hasHat ? p.hatColor : 'NONE');
-  line('HAIR:', p.hair);
-  line('EYES:', p.eyes);
-  line('TIMESTAMP:', p.time);
-
-  doc.save(`krdtec-wanted-poster-${Date.now()}.pdf`);
-});
-
-// ---- Language toggle (key HUD labels only — content stays Kurdish) ----
-const i18n = {
-  ku: {
-    classified: '⚠ ڕێگەپێدانی سنووردار — تەنها بۆ ناوخۆی KRD TEC ⚠',
-    systag: 'SENTINEL-CAM // دۆخی سیمولەیشن // بێ AI ڕاستەقینە',
-    h1: 'کامێرای زیرەک',
-    feed: 'کامێرا // CAM-01',
-    analysis: 'شیکردنەوەی ئامانج',
-    search: 'گەڕان بۆ ئامانج // بارکردنی وێنە',
-    idform: 'فۆرمی ناسنامەی ئامانج',
-    selconf: 'هەڵبژاردن بۆ پشتڕاستکردنەوە',
-    profile: 'پرۆفایلی ئامانج // قوفڵکراو',
-    confirmed: 'پشتڕاستکراوە',
-    missionlog: 'تۆماری میشن // هەموو کات',
-  },
-  ar: {
-    classified: '⚠ وصول مقيد — لاستخدام KRD TEC الداخلي فقط ⚠',
-    systag: 'SENTINEL-CAM // وضع المحاكاة // بدون ذكاء اصطناعي حقيقي',
-    h1: 'الكاميرا الذكية',
-    feed: 'البث // CAM-01',
-    analysis: 'تحليل الهدف',
-    search: 'البحث عن هدف // رفع صورة',
-    idform: 'استمارة تحديد الهوية',
-    selconf: 'اختر للتأكيد',
-    profile: 'ملف الهدف // مؤكد',
-    confirmed: 'تم التأكيد',
-    missionlog: 'سجل المهمة // كل الأوقات',
-  },
-  en: {
-    classified: '⚠ RESTRICTED ACCESS — KRD TEC INTERNAL USE ONLY ⚠',
-    systag: 'SENTINEL-CAM // SIMULATION MODE // NO LIVE AI',
-    h1: 'Smart Camera',
-    feed: 'FEED // CAM-01',
-    analysis: 'TARGET ANALYSIS',
-    search: 'TARGET SEARCH // PHOTO UPLOAD',
-    idform: 'TARGET IDENTIFICATION FORM',
-    selconf: 'SELECT TO CONFIRM',
-    profile: 'TARGET PROFILE // LOCKED',
-    confirmed: 'CONFIRMED',
-    missionlog: 'MISSION LOG // ALL-TIME',
+    const [id_front_path, id_back_path, selfie_path] = await Promise.all(f.map(upload));
+    const { error } = await sb.from("agents").insert({ ...v, id_front_path, id_back_path, selfie_path });
+    if (error) throw error;
+    $("app").innerHTML = '<div class="card done"><div class="ic">✅</div><h2>داواکارییەکەت وەرگیرا</h2><p style="color:var(--mut)">تیمەکەمان زانیارییەکانت پشتڕاست دەکاتەوە و بە زووترین کات پەیوەندیت پێوە دەکەین.</p></div>';
+  } catch (e) {
+    say(e.code === "23505" ? "ئەم ژمارە یان ئیمەیلە پێشتر تۆمارکراوە" : "هەڵە: " + e.message, false);
+    $("btn").disabled = false;
   }
 };
-// ---- HUD color theme ----
-const THEME_KEY = 'sentinel_theme';
-const themes = {
-  green: { accent:'#39ff6a', dim:'#1f9e40' },
-  cyan:  { accent:'#4fd1f5', dim:'#1f8a9e' },
-  red:   { accent:'#ff5c5c', dim:'#9e1f1f' },
-  amber: { accent:'#ffcf40', dim:'#9e7a1f' },
-};
-function applyTheme(name){
-  const t = themes[name] || themes.green;
-  document.documentElement.style.setProperty('--accent', t.accent);
-  document.documentElement.style.setProperty('--accent-dim', t.dim);
-}
-const savedTheme = localStorage.getItem(THEME_KEY) || 'green';
-document.getElementById('themeSel').value = savedTheme;
-applyTheme(savedTheme);
-document.getElementById('themeSel').addEventListener('change', (e) => {
-  localStorage.setItem(THEME_KEY, e.target.value);
-  applyTheme(e.target.value);
-});
 
-// ---- Logout ----
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  sessionStorage.removeItem(GATE_SESSION_KEY);
-  document.getElementById('gateInput').value = '';
-  document.getElementById('loginGate').style.display = 'flex';
-});
+// ---- Top Charge ----
+$("eye").onclick=()=>{const w=$("tcw");w.type=w.type==="password"?"text":"password"};
+const tcm=(t,ok)=>{$("tcm").textContent=t;$("tcm").style.color=ok?"var(--green)":"var(--red)"};
+const tcNum=()=>{let d=$("tcp").value.replace(/\D/g,"");if(d.startsWith("964"))d=d.slice(3);if(d.startsWith("0"))d=d.slice(1);return d};
+const tcOtpMode=()=>{$("tcotp").style.display="block";$("tcb1").style.display="none";$("tcb2").style.display="block";$("tcl").style.display="none"};
+function tcCheck(){const n=tcNum();if(!/^7\d{9}$/.test(n)){tcm("ژمارەی مۆبایل هەڵەیە (نموونە: 7501234567)");return null}
+  if($("tcw").value.length<6){tcm("پاسۆرد دەبێت لانیکەم 6 پیت بێت");return null}return "+964"+n}
+$("tcl").onclick=tcOtpMode;
+$("tcb1").onclick=async()=>{const p=tcCheck();if(!p)return;$("tcb1").disabled=true;tcm("چاوەڕێ بە...",true);
+  const {error}=await sb.rpc("tc_request",{p_phone:p,p_pass:$("tcw").value});
+  $("tcb1").disabled=false;
+  if(error)return tcm(error.message);
+  tcm("داواکارییەکەت نێردرا. کۆدی OTP لەلایەن ئەدمینەوە بۆت دەنێردرێت، پاشان لێرە بینووسە.",true);tcOtpMode()};
+$("tcb2").onclick=async()=>{const p=tcCheck();if(!p)return;const c=$("tcc").value.trim();
+  if(!/^\d{6}$/.test(c))return tcm("کۆد 6 ژمارەیە");
+  $("tcb2").disabled=true;
+  const {data,error}=await sb.rpc("tc_verify",{p_phone:p,p_pass:$("tcw").value,p_code:c});
+  $("tcb2").disabled=false;
+  if(error)return tcm(error.message);
+  if(data){tcDash(p,$("tcw").value)}
+  else tcm("کۆد یان پاسۆرد هەڵەیە، یان کۆدەکە بەسەرچووە")};
 
-// ---- CSV export ----
-document.getElementById('exportCsvBtn').addEventListener('click', () => {
-  const mission = loadLog();
-  const search = loadSearchLog();
-  let csv = 'TYPE,TIME,COUNT_OR_TOP,DETAIL1,DETAIL2,DETAIL3\n';
-  mission.forEach(l => { csv += `MISSION_LOG,"${l.time}",${l.count},"pts:${l.pts}",,\n`; });
-  search.forEach(l => { csv += `TARGET_ID,"${l.time}","${l.top}","${l.topColor}","${l.hair}/${l.eyes}",conf:${l.confidence}\n`; });
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-  const link = document.createElement('a');
-  link.download = `krdtec-sentinel-logs-${Date.now()}.csv`;
-  link.href = URL.createObjectURL(blob);
-  link.click();
-});
+// WhatsApp: ژمارە بێ + و بێ 0 (کۆدی وڵات سەرەتا)
+const WA_NUMBER = "6288214653918";
+const WA_TEXT = "سڵاو، پێویستم بە یارمەتییە";
+$("wa").href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(WA_TEXT);
 
-renderActivityChart();
-
-document.getElementById('langSel').addEventListener('change', (e) => {
-  const t = i18n[e.target.value] || i18n.ku;
-  document.getElementById('i18n-classified').textContent = t.classified;
-  document.getElementById('i18n-systag').textContent = t.systag;
-  document.getElementById('i18n-h1').textContent = t.h1;
-  document.getElementById('i18n-feed').textContent = t.feed;
-  document.getElementById('i18n-analysis').textContent = t.analysis;
-  document.getElementById('i18n-search').textContent = t.search;
-  document.getElementById('i18n-idform').textContent = t.idform;
-  document.getElementById('i18n-selconf').textContent = t.selconf;
-  document.getElementById('i18n-profile').textContent = t.profile;
-  document.getElementById('i18n-confirmed').textContent = t.confirmed;
-  document.getElementById('i18n-missionlog').textContent = t.missionlog;
-});
+$("tcg").onclick=async()=>{const p=tcCheck();if(!p)return;tcm("چاوەڕێ بە...",true);
+  const {data,error}=await sb.rpc("tc_login",{p_phone:p,p_pass:$("tcw").value});
+  if(error)return tcm(error.message);
+  if(data)tcDash(p,$("tcw").value);else tcm("ژمارە یان پاسۆرد هەڵەیە، یان ئەکاونتەکەت هێشتا چالاک نەکراوە")};
+const PK=[[2000000,300000],[4000000,600000],[8000000,900000]];
+const fmt=n=>n.toLocaleString("en-US");
+function tcDash(phone,pass){
+  let sel=null;
+  $("tc").innerHTML='<h2>Top Charge</h2><p class="sub">بڕێک هەڵبژێرە و بۆنەسەکەت وەردەگریت</p>'+
+    PK.map((x,i)=>`<div class="pk" data-i="${i}"><div><div class="a">${fmt(x[0])}</div><small>وەردەگریت: ${fmt(x[0]+x[1])}</small></div><div class="b">+${fmt(x[1])}</div></div>`).join("")+
+    '<button class="main" id="tcgo" style="margin-top:20px">داواکردنی پڕکردنەوە</button><div id="tcm2" style="text-align:center;font-size:14px;margin-top:12px"></div>';
+  const m=(t,ok)=>{$("tcm2").textContent=t;$("tcm2").style.color=ok?"var(--green)":"var(--red)"};
+  document.querySelectorAll(".pk").forEach(el=>el.onclick=()=>{
+    document.querySelectorAll(".pk").forEach(e=>e.classList.remove("on"));el.classList.add("on");sel=+el.dataset.i});
+  $("tcgo").onclick=async()=>{
+    if(sel===null)return m("تکایە بڕێک هەڵبژێرە");
+    $("tcgo").disabled=true;
+    const {error}=await sb.rpc("tc_order",{p_phone:phone,p_pass:pass,p_amount:PK[sel][0]});
+    $("tcgo").disabled=false;
+    if(error)return m(error.message);
+    m("داواکارییەکەت نێردرا ✅ ("+fmt(PK[sel][0])+" + "+fmt(PK[sel][1])+")",true)}}
 </script>
 </body>
 </html>
