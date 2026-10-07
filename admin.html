@@ -1,666 +1,185 @@
 <!DOCTYPE html>
 <html lang="ckb" dir="rtl">
-
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIWAK ADMIN</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>Admin | Exchange</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-
-:root{
-  --bg-deep:#050f0a;
-  --bg-panel:#0a2015;
-  --bg-card:#0c2419;
-  --bg-input:#0a1c13;
-  --gold:#d4af37;
-  --gold-light:#f2d17a;
-  --gold-dim:#8f7a3c;
-  --line:rgba(212,175,55,.22);
-  --teal:#1f6f54;
-  --text:#f3ede0;
-  --text-dim:#a9baa9;
-  --red:#c0392b;
-}
-
-*{ margin:0; padding:0; box-sizing:border-box; }
-
-body{
-  font-family:'Noto Sans Arabic',sans-serif;
-  background:var(--bg-deep);
-  background-image:
-    radial-gradient(ellipse at top, rgba(212,175,55,.06), transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84'%3E%3Cg fill='none' stroke='%23d4af37' stroke-opacity='0.06' stroke-width='1'%3E%3Crect x='22' y='22' width='40' height='40'/%3E%3Crect x='22' y='22' width='40' height='40' transform='rotate(45 42 42)'/%3E%3C/g%3E%3C/svg%3E");
-  min-height:100vh;
-  padding:24px 16px;
-  color:var(--text);
-}
-
-.star{
-  display:inline-block;
-  width:1em; height:1em;
-  vertical-align:-.12em;
-}
-
-/* ============ HEADER ============ */
-
-.brand{
-  text-align:center;
-  margin:0 auto 22px;
-  max-width:1200px;
-}
-
-.brand-mark{
-  width:34px; height:34px;
-  margin:0 auto 10px;
-  color:var(--gold);
-  opacity:.9;
-}
-
-.brand h1{
-  font-family:'Aref Ruqaa',serif;
-  font-weight:700;
-  font-size:38px;
-  color:var(--gold-light);
-  text-shadow:0 0 24px rgba(212,175,55,.25);
-}
-
-.brand p{
-  margin-top:6px;
-  font-size:13px;
-  color:var(--gold-dim);
-}
-
-.divider{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  max-width:420px;
-  margin:18px auto 0;
-}
-.divider .line{
-  flex:1;
-  height:1px;
-  background:linear-gradient(90deg, transparent, var(--line));
-}
-.divider .line.rev{ background:linear-gradient(90deg, var(--line), transparent); }
-.divider .star{ color:var(--gold); opacity:.75; width:14px; height:14px; }
-
-/* ============ SHARED PANEL ============ */
-
-.login-box, .dashboard{
-  max-width:1200px;
-  margin:auto;
-  position:relative;
-  background:linear-gradient(180deg, var(--bg-panel), #071710);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:30px 26px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(212,175,55,.08);
-}
-
-.login-box{ max-width:420px; }
-
-.corner{
-  position:absolute;
-  width:20px; height:20px;
-  opacity:.55;
-  color:var(--gold);
-  pointer-events:none;
-}
-.corner.tl{ top:12px; left:12px; }
-.corner.tr{ top:12px; right:12px; transform:scaleX(-1); }
-
-/* ============ LOGIN ============ */
-
-.login-box h2{
-  text-align:center;
-  font-family:'Aref Ruqaa',serif;
-  font-size:24px;
-  color:var(--gold-light);
-  margin-bottom:22px;
-}
-
-.login-input{
-  width:100%;
-  padding:14px 16px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:var(--bg-input);
-  color:var(--text);
-  font-size:15px;
-  margin-bottom:14px;
-  outline:none;
-  transition:border-color .2s;
-}
-.login-input:focus{ border-color:var(--gold-dim); }
-
-.login-btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  color:#062015;
-  font-weight:700;
-  font-size:15px;
-  cursor:pointer;
-  transition:filter .2s, transform .2s;
-}
-.login-btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
-
-/* ============ DASHBOARD ============ */
-
-.dashboard-title{
-  font-family:'Aref Ruqaa',serif;
-  font-size:24px;
-  color:var(--gold-light);
-  margin-bottom:22px;
-  text-align:center;
-}
-
-.top-box{ margin-bottom:26px; }
-
-.price-card{
-  position:relative;
-  background:var(--bg-card);
-  padding:22px;
-  border-radius:18px;
-  border:1px solid var(--line);
-  max-width:420px;
-  margin:auto;
-}
-
-.price-card + .price-card{ margin-top:18px; }
-
-.price-card h3{
-  font-size:14px;
-  color:var(--gold-dim);
-  margin-bottom:14px;
-  font-weight:500;
-}
-
-.price-input{
-  width:100%;
-  padding:14px 16px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--bg-input);
-  color:var(--gold-light);
-  font-size:20px;
-  font-weight:600;
-  margin-bottom:14px;
-  outline:none;
-}
-.price-input:focus{ border-color:var(--gold-dim); }
-
-.pay-field{ margin-bottom:14px; }
-.pay-field label{
-  display:block;
-  font-size:12px;
-  color:var(--text-dim);
-  margin-bottom:6px;
-}
-.pay-field input{
-  width:100%;
-  padding:12px 14px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--bg-input);
-  color:var(--gold-light);
-  font-size:15px;
-  font-weight:600;
-  outline:none;
-}
-.pay-field input:focus{ border-color:var(--gold-dim); }
-
-.save-btn{
-  padding:12px 22px;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  color:#062015;
-  font-weight:700;
-  font-size:14px;
-  cursor:pointer;
-  transition:filter .2s;
-}
-.save-btn:hover{ filter:brightness(1.08); }
-
-/* ============ REQUEST CARDS ============ */
-
-.requests{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:18px;
-}
-
-.card{
-  position:relative;
-  background:var(--bg-card);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:20px;
-  transition:border-color .2s, transform .2s;
-}
-.card:hover{ border-color:var(--gold-dim); transform:translateY(-2px); }
-
-.card h3{
-  font-family:'Aref Ruqaa',serif;
-  font-size:20px;
-  color:var(--gold-light);
-  margin-bottom:14px;
-  padding-bottom:12px;
-  border-bottom:1px solid var(--line);
-}
-
-.item{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  margin-bottom:10px;
-  font-size:14px;
-  line-height:1.7;
-  color:var(--text);
-}
-.item .ic{
-  flex-shrink:0;
-  width:17px; height:17px;
-  color:var(--gold-dim);
-  margin-top:2px;
-}
-.item .lbl{ color:var(--text-dim); font-size:12px; margin-left:4px; }
-
-.images{
-  display:flex;
-  gap:10px;
-  margin-top:14px;
-  padding-top:14px;
-  border-top:1px solid var(--line);
-}
-
-.images img{
-  width:96px;
-  height:96px;
-  object-fit:cover;
-  border-radius:12px;
-  border:1px solid var(--line);
-}
-
-.image-empty{
-  width:96px;
-  height:96px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  font-size:11px;
-  background:var(--bg-input);
-  border-radius:12px;
-  border:1px dashed var(--line);
-  color:var(--text-dim);
-  padding:6px;
-}
-
-.delete-btn{
-  margin-top:16px;
-  width:100%;
-  padding:11px;
-  border:1px solid rgba(192,57,43,.4);
-  border-radius:12px;
-  background:transparent;
-  color:#e07a6f;
-  font-weight:600;
-  font-size:13px;
-  cursor:pointer;
-  transition:background .2s, color .2s;
-}
-.delete-btn:hover{ background:var(--red); color:white; border-color:var(--red); }
-
-@media(max-width:768px){
-  .brand h1{ font-size:30px; }
-}
-
+:root{--bg:#050a24;--card:#070d30;--line:#0f2a4d;--gold:#17d4ee;--green:#0ecb81;--red:#f6465d;--txt:#e8ecf4;--mut:#8b97b1}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(900px 400px at 80% -10%,#0a1650 0,transparent 60%),var(--bg);color:var(--txt);font-family:Tahoma,Arial,sans-serif;min-height:100vh}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+.box{max-width:380px;margin:80px auto;background:var(--card);border:1px solid var(--line);padding:24px;border-radius:16px}
+input{width:100%;padding:15px;margin:8px 0;border:1.5px solid var(--line);border-radius:16px;background:#031634;color:var(--txt);font-size:16px;outline:none}
+input:focus{border-color:var(--gold)}
+button{padding:10px 16px;border:0;border-radius:14px;cursor:pointer;font-size:14px;font-weight:bold;background:var(--gold);color:#000}
+button.g{background:var(--green)}button.r{background:var(--red);color:#fff}button.x{background:#2a3858;color:var(--txt)}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#12dcf0);display:grid;place-items:center;font-size:20px}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:26px}.stat small{color:var(--mut)}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button{background:var(--card);color:var(--mut);border:1px solid var(--line)}
+.tabs button.on{background:var(--gold);color:#000;border-color:var(--gold)}
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.item h4{margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 16px;font-size:14px;color:var(--mut)}
+.info span{color:var(--txt)}
+.imgs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.imgs figure{margin:0}.imgs img{height:120px;border-radius:10px;border:1px solid var(--line)}
+.imgs figcaption{font-size:12px;text-align:center;color:var(--mut);margin-top:4px}
+.badge{padding:2px 10px;border-radius:99px;font-size:12px;color:#000;font-weight:bold}
+.pending{background:var(--gold)}.approved{background:var(--green)}.rejected{background:var(--red);color:#fff}
+.code{font-size:22px;letter-spacing:6px;color:var(--gold);font-weight:bold;direction:ltr}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+#err{color:var(--red);font-size:14px}
+#panel{display:none}
 </style>
 </head>
-
 <body>
-
-<div class="brand">
-  <svg class="brand-mark" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4">
-    <rect x="8" y="8" width="24" height="24"/>
-    <rect x="8" y="8" width="24" height="24" transform="rotate(45 20 20)"/>
-  </svg>
-  <h1>ڕەوزە</h1>
-  <p>بەڕێوەبردنی داواکارییەکان</p>
+<div class="box" id="login">
+  <div class="brand" style="margin-bottom:10px"><div class="logo">💱</div><h3 style="margin:0">پانێڵی بەڕێوەبەر</h3></div>
+  <input id="em" type="email" dir="ltr" placeholder="ئیمەیل">
+  <input id="pw" type="password" dir="ltr" placeholder="پاسوۆرد">
+  <button onclick="doLogin()" style="width:100%;padding:13px">چوونەژوورەوە</button>
+  <div id="err"></div>
 </div>
-
-<div class="login-box" id="loginBox">
-  <svg class="corner tl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16"/><rect x="4" y="4" width="16" height="16" transform="rotate(45 12 12)"/></svg>
-  <svg class="corner tr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16"/><rect x="4" y="4" width="16" height="16" transform="rotate(45 12 12)"/></svg>
-
-  <h2>چوونە ژوورەوە</h2>
-
-  <input type="password" id="password" class="login-input" placeholder="وشەی نهێنی">
-  <button class="login-btn" onclick="login()">چوونە ژوورەوە</button>
-</div>
-
-<div class="dashboard" id="dashboard">
-
-  <div class="dashboard-title">بەڕێوەبردنی ڕەوزە</div>
-
-  <div class="top-box">
-    <div class="price-card">
-      <svg class="corner tl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16"/><rect x="4" y="4" width="16" height="16" transform="rotate(45 12 12)"/></svg>
-      <svg class="corner tr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16"/><rect x="4" y="4" width="16" height="16" transform="rotate(45 12 12)"/></svg>
-      <h3>گۆڕینی نرخ</h3>
-      <input type="text" id="priceInput" class="price-input">
-      <button class="save-btn" onclick="updatePrice()">پاشەکەوتکردن</button>
-    </div>
-
-    <div class="price-card">
-      <svg class="corner tl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16"/><rect x="4" y="4" width="16" height="16" transform="rotate(45 12 12)"/></svg>
-      <svg class="corner tr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16"/><rect x="4" y="4" width="16" height="16" transform="rotate(45 12 12)"/></svg>
-      <h3>گۆڕینی ژمارەکانی پارەدان</h3>
-
-      <div class="pay-field">
-        <label>FastPay</label>
-        <input type="text" id="fastpayInput" placeholder="ژمارەی FastPay">
-      </div>
-
-      <div class="pay-field">
-        <label>FIB</label>
-        <input type="text" id="fibInput" placeholder="ژمارەی FIB">
-      </div>
-
-      <div class="pay-field">
-        <label>QiCard</label>
-        <input type="text" id="qicardInput" placeholder="ژمارەی QiCard">
-      </div>
-
-      <button class="save-btn" onclick="updatePaymentNumbers()">پاشەکەوتکردن</button>
-    </div>
+<div class="wrap" id="panel">
+  <div class="top">
+    <div class="brand"><div class="logo">💱</div><h3 style="margin:0">داواکارییەکانی ئەگینت</h3></div>
+    <div><button class="x" onclick="load();loadTC()">نوێکردنەوە</button> <button class="r" onclick="logout()">دەرچوون</button></div>
   </div>
-
-  <div class="divider">
-    <span class="line"></span>
-    <svg class="star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="5" width="14" height="14"/><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/></svg>
-    <span class="line rev"></span>
+  <div class="tabs"><button id="n1" class="on" onclick="nav(1)">ئەگینتەکان</button><button id="n2" onclick="nav(2)">⚡ Top Charge</button></div>
+  <div id="v1">
+  <div class="stats" id="stats"></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="list"></div>
   </div>
-
-  <br>
-
-  <div class="requests" id="requests"></div>
-
+  <div id="v2" style="display:none"><h4 style="margin:0 0 10px">داواکارییەکانی پڕکردنەوە</h4><div id="orders"></div><h4 style="margin:20px 0 10px">ئەکاونتەکان</h4><div id="tclist"></div></div>
 </div>
-
-<audio id="notifySound" src="notify.mp3" preload="auto"></audio>
-
 <script>
+const sb = supabase.createClient("https://qieifmpzmenpfewfsssl.supabase.co","sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const L = { pending:"چاوەڕوان", approved:"پەسەندکراو", rejected:"ڕەتکراو" };
+let all = [], tab = "pending";
 
-const ICONS = {
-  phone:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
-  clock:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
-  calendar:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 9h18"/></svg>',
-  user:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
-  card:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>',
-  note:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>'
-};
-
-const ADMIN_PASSWORD = "SIWAK2026";
-
-const SUPABASE_URL = "https://slllcibigutjivauryvc.supabase.co";
-const SUPABASE_KEY = "sb_publishable_NRCDy249HKEkJwKywxRw3Q_krlu95TH";
-
-/* ناوی Bucket ـی وێنەکان */
-const IMAGE_BUCKET = "rawda-images";
-
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-function login(){
-  const pass = document.getElementById("password").value;
-
-  if(pass === ADMIN_PASSWORD){
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-    loadRequests();
-    loadPrice();
-    loadPaymentNumbers();
-  }else{
-    alert("وشەی نهێنی هەڵەیە");
-  }
+async function doLogin() {
+  const { error } = await sb.auth.signInWithPassword({ email:$("em").value.trim(), password:$("pw").value });
+  if (error) return $("err").textContent = "ئیمەیل یان پاسوۆرد هەڵەیە";
+  show();
 }
-
-/* ======================
-   دروستکردنی لینکی وێنە
-====================== */
-
-async function getImageUrl(savedValue){
-  if(!savedValue) return "";
-
-  let imageValue = String(savedValue).trim();
-  if(!imageValue) return "";
-
-  if(imageValue.startsWith("http://") || imageValue.startsWith("https://")){
-    return imageValue;
-  }
-
-  imageValue = imageValue.replace(/^\/+/, "");
-
-  if(imageValue.startsWith(IMAGE_BUCKET + "/")){
-    imageValue = imageValue.substring(IMAGE_BUCKET.length + 1);
-  }
-
-  const { data: signedData, error: signedError } =
-    await client.storage.from(IMAGE_BUCKET).createSignedUrl(imageValue, 60 * 60);
-
-  if(!signedError && signedData?.signedUrl){
-    return signedData.signedUrl;
-  }
-
-  const { data: publicData } = client.storage.from(IMAGE_BUCKET).getPublicUrl(imageValue);
-  return publicData?.publicUrl || "";
+async function logout() { await sb.auth.signOut(); location.reload(); }
+function show() { $("login").style.display="none"; $("panel").style.display="block"; load(); loadTC(); }
+const n = s => all.filter(a => a.status === s).length;
+function head() {
+  $("stats").innerHTML = `<div class="stat"><b style="color:var(--gold)">${n("pending")}</b><small>چاوەڕوان</small></div>
+    <div class="stat"><b style="color:var(--green)">${n("approved")}</b><small>پەسەندکراو</small></div>
+    <div class="stat"><b style="color:var(--red)">${n("rejected")}</b><small>ڕەتکراو</small></div>`;
+  $("tabs").innerHTML = ["pending","approved","rejected","all"].map(t =>
+    `<button class="${t===tab?"on":""}" onclick="tab='${t}';render()">${t==="all"?"هەموو ("+all.length+")":L[t]}</button>`).join("");
 }
-
-/* ======================
-   LOAD PRICE
-====================== */
-
-async function loadPrice(){
-  const { data, error } = await client.from("rawda_prices").select("*").limit(1).maybeSingle();
-
-  if(error){ console.error("Price error:", error); return; }
-  if(data){ document.getElementById("priceInput").value = data.price ?? ""; }
+async function load() {
+  const { data, error } = await sb.from("agents").select("*").order("created_at", { ascending:false });
+  if (error) return alert(error.message);
+  all = data; render();
 }
-
-/* ======================
-   UPDATE PRICE
-====================== */
-
-async function updatePrice(){
-  const newPrice = document.getElementById("priceInput").value;
-
-  const { error } = await client.from("rawda_prices").update({ price:newPrice }).eq("id",1);
-
-  if(error){
-    console.error(error);
-    alert("هەڵە لە نوێکردنەوەی نرخ");
-    return;
-  }
-
-  alert("نرخ نوێ کرایەوە");
+async function url(p) {
+  if (!p) return null;
+  const { data } = await sb.storage.from("id-photos").createSignedUrl(p, 3600);
+  return data?.signedUrl;
 }
-
-/* ======================
-   LOAD PAYMENT NUMBERS
-====================== */
-
-async function loadPaymentNumbers(){
-  const { data, error } = await client.from("payment_numbers").select("*").limit(1).maybeSingle();
-
-  if(error){ console.error("Payment numbers error:", error); return; }
-  if(data){
-    document.getElementById("fastpayInput").value = data.fastpay ?? "";
-    document.getElementById("fibInput").value = data.fib ?? "";
-    document.getElementById("qicardInput").value = data.qicard ?? "";
-  }
-}
-
-/* ======================
-   UPDATE PAYMENT NUMBERS
-====================== */
-
-async function updatePaymentNumbers(){
-  const fastpay = document.getElementById("fastpayInput").value.trim();
-  const fib = document.getElementById("fibInput").value.trim();
-  const qicard = document.getElementById("qicardInput").value.trim();
-
-  const { data: existing, error: fetchError } = await client
-    .from("payment_numbers")
-    .select("id")
-    .limit(1)
-    .maybeSingle();
-
-  if(fetchError){
-    console.error(fetchError);
-    alert("هەڵە لە هێنانی ژمارەکان");
-    return;
-  }
-
-  let error;
-
-  if(existing && existing.id !== undefined){
-    ({ error } = await client
-      .from("payment_numbers")
-      .update({ fastpay, fib, qicard })
-      .eq("id", existing.id));
-  }else{
-    ({ error } = await client
-      .from("payment_numbers")
-      .insert([{ fastpay, fib, qicard }]));
-  }
-
-  if(error){
-    console.error(error);
-    alert("هەڵە لە نوێکردنەوەی ژمارەکان");
-    return;
-  }
-
-  alert("ژمارەکانی پارەدان نوێ کرانەوە");
-}
-
-/* ======================
-   LOAD REQUESTS
-====================== */
-
-async function loadRequests(){
-  const requests = document.getElementById("requests");
-  requests.innerHTML = "<p style='text-align:center'>چاوەڕێ بکە...</p>";
-
-  const { data, error } = await client.from("rawda_requests").select("*").order("id",{ascending:false});
-
-  if(error){
-    console.error("Load requests error:", error);
-    requests.innerHTML = "<p style='text-align:center;color:#e07a6f'>هەڵە لە هێنانی داواکارییەکان</p>";
-    return;
-  }
-
-  requests.innerHTML = "";
-
-  if(!data || data.length === 0){
-    requests.innerHTML = "<p style='text-align:center'>هیچ داواکارییەک نییە</p>";
-    return;
-  }
-
-  for(const item of data){
-    const passportUrl = await getImageUrl(item.passport_image);
-    const paymentUrl = await getImageUrl(item.payment_image);
-
-    const passportBox = passportUrl
-      ? `<a href="${passportUrl}" target="_blank"><img src="${passportUrl}" alt="وێنەی پاسپۆرت" onerror="this.parentElement.innerHTML='<div class=&quot;image-empty&quot;>وێنەکە نەکرایەوە</div>'"></a>`
-      : `<div class="image-empty">وێنەی پاسپۆرت نییە</div>`;
-
-    const paymentBox = paymentUrl
-      ? `<a href="${paymentUrl}" target="_blank"><img src="${paymentUrl}" alt="وێنەی پارەدان" onerror="this.parentElement.innerHTML='<div class=&quot;image-empty&quot;>وێنەکە نەکرایەوە</div>'"></a>`
-      : `<div class="image-empty">وێنەی پارەدان نییە</div>`;
-
-    requests.innerHTML += `
-      <div class="card">
-        <h3>${item.naw_syani || "ناو دیاری نەکراوە"}</h3>
-
-        <div class="item">${ICONS.phone}<span>${item.mobile || "-"}</span></div>
-        <div class="item">${ICONS.clock}<span>${item.katzhmer || "-"}</span></div>
-        <div class="item">${ICONS.calendar}<span>${item.roj || "-"}</span></div>
-        <div class="item">${ICONS.user}<span>${item.gender || "-"}</span></div>
-        <div class="item">${ICONS.card}<span>${item.paradan || "-"}</span></div>
-        <div class="item">${ICONS.note}<span>${item.tebini || "-"}</span></div>
-
-        <div class="images">
-          ${passportBox}
-          ${paymentBox}
-        </div>
-
-        <button class="delete-btn" onclick="deleteRequest(${item.id})">سڕینەوە</button>
+async function render() {
+  head();
+  const rows = all.filter(a => tab === "all" || a.status === tab);
+  $("list").innerHTML = rows.length ? "" : '<p style="color:var(--mut);text-align:center">هیچ داواکارییەک نییە</p>';
+  for (const a of rows) {
+    const [f,b,s] = await Promise.all([url(a.id_front_path || a.id_photo_path), url(a.id_back_path), url(a.selfie_path)]);
+    const img = (u,c) => u ? `<figure><a href="${u}" target="_blank"><img src="${u}"></a><figcaption>${c}</figcaption></figure>` : "";
+    const d = document.createElement("div");
+    d.className = "item";
+    d.innerHTML = `<h4>${esc(a.full_name)} <span class="badge ${a.status}">${L[a.status]}</span></h4>
+      <div class="info">
+        <div>📱 <span dir="ltr">${esc(a.phone)}</span></div><div>✉️ <span dir="ltr">${esc(a.email)}</span></div>
+        <div>🎂 <span>${esc(a.dob)}</span></div><div>ڕەگەز: <span>${esc(a.gender)}</span></div>
+        <div>📍 <span>${esc(a.province)} - ${esc(a.address)}</span></div>
+        <div>🕒 <span>${new Date(a.created_at).toLocaleString("en-GB")}</span></div>
       </div>
-    `;
+      <div class="imgs">${img(f,"پێناسە (پێش)")}${img(b,"پێناسە (پشت)")}${img(s,"سێلفی")}</div>
+      <div class="acts">
+        ${a.status!=="approved"?'<button class="g" data-s="approved">پەسەندکردن</button>':""}
+        ${a.status!=="rejected"?'<button class="x" data-s="rejected">ڕەتکردنەوە</button>':""}
+        <button class="r" data-s="del">سڕینەوە</button>
+      </div>`;
+    d.querySelectorAll("button").forEach(btn => btn.onclick = () => act(a, btn.dataset.s));
+    $("list").appendChild(d);
   }
 }
-
-/* ======================
-   DELETE
-====================== */
-
-async function deleteRequest(id){
-  const ok = confirm("دڵنیایت؟");
-  if(!ok) return;
-
-  const { error } = await client.from("rawda_requests").delete().eq("id",id);
-
-  if(error){
-    console.error(error);
-    alert("داواکارییەکە نەسڕایەوە");
-    return;
+async function act(a, s) {
+  if (s === "del") {
+    if (!confirm("دڵنیایت لە سڕینەوە؟")) return;
+    const paths = [a.id_front_path,a.id_back_path,a.selfie_path,a.id_photo_path].filter(Boolean);
+    if (paths.length) await sb.storage.from("id-photos").remove(paths);
+    const { error } = await sb.from("agents").delete().eq("id", a.id);
+    if (error) return alert(error.message);
+  } else {
+    const { error } = await sb.from("agents").update({ status:s, reviewed_at:new Date().toISOString() }).eq("id", a.id);
+    if (error) return alert(error.message);
   }
-
-  loadRequests();
+  load();
 }
+sb.auth.getSession().then(({ data }) => { if (data.session) show(); });
 
-/* ======================
-   REALTIME NOTIFICATION
-====================== */
-
-if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-  Notification.requestPermission();
-}
-
-function notifyNewRequest(item){
-  const sound = document.getElementById("notifySound");
-  if(sound){
-    sound.currentTime = 0;
-    sound.play().catch(()=>{});
-  }
-
-  if (Notification.permission === "granted") {
-    new Notification("داواکاری نوێی ڕەوزە", {
-      body: item.naw_syani ? `لە: ${item.naw_syani}` : "داواکارییەکی نوێ هاتووە"
-    });
-  }
-}
-
-client
-  .channel("rawda_requests_channel")
-  .on(
-    "postgres_changes",
-    { event: "INSERT", schema: "public", table: "rawda_requests" },
-    (payload) => {
-      notifyNewRequest(payload.new);
-      loadRequests();
-    }
-  )
-  .subscribe();
-
+function nav(i){$("v1").style.display=i==1?"block":"none";$("v2").style.display=i==2?"block":"none";
+  $("n1").className=i==1?"on":"";$("n2").className=i==2?"on":""}
+let tcs=[];
+async function loadTC(){
+  const {data,error}=await sb.from("topcharge_accounts").select("*").order("created_at",{ascending:false});
+  if(error)return;tcs=data;renderTC();
+  const o=await sb.from("topcharge_orders").select("*").order("created_at",{ascending:false});
+  if(!o.error)renderOrders(o.data)}
+const nf=n=>Number(n).toLocaleString("en-US");
+function renderOrders(list){
+  const box=$("orders");box.innerHTML=list.length?"":'<p style="color:var(--mut);text-align:center">هیچ داواکارییەک نییە</p>';
+  for(const o of list){
+    const d=document.createElement("div");d.className="item";
+    d.innerHTML=`<h4>🇮🇶 <span dir="ltr">${esc(o.phone)}</span> <span class="badge ${o.status}">${L[o.status]}</span></h4>
+      <div class="info"><div>بڕ: <span>${nf(o.amount)}</span></div><div>بۆنەس: <span style="color:var(--green)">+${nf(o.bonus)}</span></div>
+      <div>کۆی گشتی: <span>${nf(+o.amount+ +o.bonus)}</span></div><div>🕒 <span>${new Date(o.created_at).toLocaleString("en-GB")}</span></div></div>
+      <div class="acts" style="margin-top:10px">
+        ${o.status!=="approved"?'<button class="g" data-s="approved">پەسەندکردن</button>':""}
+        ${o.status!=="rejected"?'<button class="x" data-s="rejected">ڕەتکردنەوە</button>':""}
+        <button class="r" data-s="del">سڕینەوە</button></div>`;
+    d.querySelectorAll("button").forEach(b=>b.onclick=async()=>{
+      let r;
+      if(b.dataset.s==="del"){if(!confirm("دڵنیایت؟"))return;r=await sb.from("topcharge_orders").delete().eq("id",o.id)}
+      else r=await sb.from("topcharge_orders").update({status:b.dataset.s}).eq("id",o.id);
+      if(r.error)return alert(r.error.message);loadTC()});
+    box.appendChild(d)}}
+function renderTC(){
+  const box=$("tclist");box.innerHTML=tcs.length?"":'<p style="color:var(--mut);text-align:center">هیچ داواکارییەک نییە</p>';
+  for(const a of tcs){
+    const live=a.otp_code&&new Date(a.otp_expires)>new Date();
+    const d=document.createElement("div");d.className="item";
+    d.innerHTML=`<h4>🇮🇶 <span dir="ltr">${esc(a.phone)}</span>
+      <span class="badge ${a.verified?"approved":"pending"}">${a.verified?"چالاک":"چاوەڕوان"}</span></h4>
+      <div class="info"><div>🕒 <span>${new Date(a.created_at).toLocaleString("en-GB")}</span></div></div>
+      ${live?`<div style="margin:10px 0"><div class="code">${esc(a.otp_code)}</div><small style="color:var(--mut)">بەسەردەچێت: ${new Date(a.otp_expires).toLocaleTimeString("en-GB")}</small></div>`:""}
+      <div class="acts" style="margin-top:10px">
+        ${a.verified?"":'<button data-s="code">'+(live?"کۆدی نوێ":"ناردنی کۆد")+'</button>'}
+        ${live?'<button class="g" data-s="wa">ناردن بە WhatsApp</button>':""}
+        <button class="r" data-s="del">سڕینەوە</button></div>`;
+    d.querySelectorAll("button").forEach(b=>b.onclick=()=>tcAct(a,b.dataset.s));
+    box.appendChild(d)}}
+async function tcAct(a,s){
+  if(s==="code"){const {error}=await sb.rpc("admin_tc_send_code",{p_id:a.id});if(error)return alert(error.message);loadTC()}
+  else if(s==="wa"){const t=encodeURIComponent("کۆدی پشتڕاستکردنەوەی Top Charge: "+a.otp_code+" (10 خولەک کاردەکات)");
+    window.open("https://wa.me/"+a.phone.replace("+","")+"?text="+t,"_blank")}
+  else if(s==="del"){if(!confirm("دڵنیایت؟"))return;const {error}=await sb.from("topcharge_accounts").delete().eq("id",a.id);if(error)return alert(error.message);loadTC()}}
 </script>
-
 </body>
 </html>
