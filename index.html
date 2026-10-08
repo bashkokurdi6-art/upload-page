@@ -134,9 +134,11 @@ $("btn").onclick = async () => {
   if (!$("ok").checked) return say("دەبێت ڕەزامەندی بدەیت", false);
   $("btn").disabled = true; say("تکایە چاوەڕێ بە...", true);
   try {
-    const [id_front_path, id_back_path, selfie_path] = await Promise.all(f.map(upload));
+    let id_front_path, id_back_path, selfie_path;
+    try { [id_front_path, id_back_path, selfie_path] = await Promise.all(f.map(upload)); }
+    catch (e) { e.message = "(وێنە) " + e.message; throw e; }
     const { error } = await sb.from("agents").insert({ ...v, id_front_path, id_back_path, selfie_path });
-    if (error) throw error;
+    if (error) { error.message = "(زانیاری) " + error.message; throw error; }
     $("app").innerHTML = '<div class="card done"><div class="ic">✅</div><h2>داواکارییەکەت وەرگیرا</h2><p style="color:var(--mut)">تیمەکەمان زانیارییەکانت پشتڕاست دەکاتەوە و بە زووترین کات پەیوەندیت پێوە دەکەین.</p></div>';
   } catch (e) {
     say(e.code === "23505" ? "ئەم ژمارە یان ئیمەیلە پێشتر تۆمارکراوە" : "هەڵە: " + e.message, false);
