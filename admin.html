@@ -1,185 +1,507 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="ckb" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0b1220">
-<title>Admin | Exchange</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#060c1f">
+<title>Top Charge | Admin</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
 <style>
-:root{--bg:#050a24;--card:#070d30;--line:#0f2a4d;--gold:#17d4ee;--green:#0ecb81;--red:#f6465d;--txt:#e8ecf4;--mut:#8b97b1}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(900px 400px at 80% -10%,#0a1650 0,transparent 60%),var(--bg);color:var(--txt);font-family:Tahoma,Arial,sans-serif;min-height:100vh}
-.wrap{max-width:960px;margin:0 auto;padding:16px}
-.box{max-width:380px;margin:80px auto;background:var(--card);border:1px solid var(--line);padding:24px;border-radius:16px}
-input{width:100%;padding:15px;margin:8px 0;border:1.5px solid var(--line);border-radius:16px;background:#031634;color:var(--txt);font-size:16px;outline:none}
-input:focus{border-color:var(--gold)}
-button{padding:10px 16px;border:0;border-radius:14px;cursor:pointer;font-size:14px;font-weight:bold;background:var(--gold);color:#000}
-button.g{background:var(--green)}button.r{background:var(--red);color:#fff}button.x{background:#2a3858;color:var(--txt)}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#12dcf0);display:grid;place-items:center;font-size:20px}
-.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
-.stat b{display:block;font-size:26px}.stat small{color:var(--mut)}
-.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.tabs button{background:var(--card);color:var(--mut);border:1px solid var(--line)}
-.tabs button.on{background:var(--gold);color:#000;border-color:var(--gold)}
-.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
-.item h4{margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 16px;font-size:14px;color:var(--mut)}
-.info span{color:var(--txt)}
-.imgs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-.imgs figure{margin:0}.imgs img{height:120px;border-radius:10px;border:1px solid var(--line)}
-.imgs figcaption{font-size:12px;text-align:center;color:var(--mut);margin-top:4px}
-.badge{padding:2px 10px;border-radius:99px;font-size:12px;color:#000;font-weight:bold}
-.pending{background:var(--gold)}.approved{background:var(--green)}.rejected{background:var(--red);color:#fff}
-.code{font-size:22px;letter-spacing:6px;color:var(--gold);font-weight:bold;direction:ltr}
-.acts{display:flex;gap:8px;flex-wrap:wrap}
-#err{color:var(--red);font-size:14px}
-#panel{display:none}
+:root {
+  --bg:#060c1f;
+  --card:#0b1328;
+  --line:#193650;
+  --field:#08101f;
+  --ink:#eff5fc;
+  --mut:#98a5b9;
+  --blue:#17d4ee;
+  --ok:#0ecb81;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:14px/1.7 Tahoma,Arial,sans-serif;
+}
+header,main {
+  max-width:920px;
+  margin:auto;
+  padding:20px 16px;
+}
+.top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.brand,h2 {color:var(--blue)}
+.brand {
+  font-weight:700;
+  font-size:17px;
+}
+.box {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:15px;
+}
+h1 {font-size:21px}
+h2 {font-size:16px;margin:0 0 12px}
+label {
+  display:block;
+  color:var(--mut);
+  font-size:13px;
+  margin:12px 0 5px;
+}
+input,select {
+  width:100%;
+  background:var(--field);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:12px;
+  color:var(--ink);
+  font:14px Tahoma,Arial;
+  color-scheme:dark;
+}
+button {
+  cursor:pointer;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:10px 14px;
+  background:#12223b;
+  color:white;
+  font:700 14px Tahoma,Arial;
+}
+.submit {
+  background:linear-gradient(90deg,#12c2ff,#2a6bff);
+  border:0;
+}
+.mut {color:var(--mut)}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:10px;
+}
+.bar {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.bar select {width:auto;max-width:240px}
+.item {
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:13px;
+  margin:10px 0;
+  overflow-wrap:anywhere;
+}
+.row {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.status {color:var(--blue)}
+.err {color:#ff6b7d}
+.ok {color:var(--ok)}
+.hidden {display:none!important}
+small {color:var(--mut)}
+a {color:var(--blue)}
+.photos {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.photos button {font-size:12px}
+#msg {min-height:23px}
 </style>
 </head>
 <body>
-<div class="box" id="login">
-  <div class="brand" style="margin-bottom:10px"><div class="logo">💱</div><h3 style="margin:0">پانێڵی بەڕێوەبەر</h3></div>
-  <input id="em" type="email" dir="ltr" placeholder="ئیمەیل">
-  <input id="pw" type="password" dir="ltr" placeholder="پاسوۆرد">
-  <button onclick="doLogin()" style="width:100%;padding:13px">چوونەژوورەوە</button>
-  <div id="err"></div>
-</div>
-<div class="wrap" id="panel">
+
+<header>
   <div class="top">
-    <div class="brand"><div class="logo">💱</div><h3 style="margin:0">داواکارییەکانی ئەگینت</h3></div>
-    <div><button class="x" onclick="load();loadTC()">نوێکردنەوە</button> <button class="r" onclick="logout()">دەرچوون</button></div>
+    <span class="brand">◈ Top Charge | Admin</span>
+    <button id="logout" class="hidden">
+      چوونەدەرەوە
+    </button>
   </div>
-  <div class="tabs"><button id="n1" class="on" onclick="nav(1)">ئەگینتەکان</button><button id="n2" onclick="nav(2)">⚡ Top Charge</button></div>
-  <div id="v1">
-  <div class="stats" id="stats"></div>
-  <div class="tabs" id="tabs"></div>
-  <div id="list"></div>
+  <h1>داشبۆردی ئەدمین</h1>
+  <p class="mut">
+    تۆمارکردنەکان و داواکارییەکانی پڕکردنەوە
+  </p>
+</header>
+
+<main>
+<section id="login" class="box">
+  <h2>چوونەژوورەوەی ئەدمین</h2>
+
+  <label>ئیمەیڵ</label>
+  <input id="email" type="email"
+         autocomplete="username">
+
+  <label>پاسۆردی تایبەتی ئەدمین</label>
+  <input id="password" type="password"
+         autocomplete="current-password">
+
+  <p>
+    <button class="submit" id="signin">
+      چوونەژوورەوە
+    </button>
+  </p>
+</section>
+
+<section id="dashboard" class="hidden">
+  <div class="grid">
+    <div class="box">
+      تۆماربووان
+      <div><b id="agent-count">—</b></div>
+    </div>
+    <div class="box">
+      داواکارییەکان
+      <div><b id="request-count">—</b></div>
+    </div>
+    <div class="box">
+      چاوەڕوان
+      <div><b id="pending-count">—</b></div>
+    </div>
   </div>
-  <div id="v2" style="display:none"><h4 style="margin:0 0 10px">داواکارییەکانی پڕکردنەوە</h4><div id="orders"></div><h4 style="margin:20px 0 10px">ئەکاونتەکان</h4><div id="tclist"></div></div>
-</div>
+
+  <div class="box">
+    <div class="bar">
+      <button id="show-agents">تۆماربووان</button>
+      <button id="show-requests">داواکارییەکان</button>
+
+      <select id="filter">
+        <option value="all">هەموو دۆخەکان</option>
+        <option value="pending">چاوەڕوان</option>
+        <option value="approved">پەسەندکراو</option>
+        <option value="rejected">ڕەتکراو</option>
+      </select>
+
+      <button id="refresh">نوێکردنەوە</button>
+    </div>
+  </div>
+
+  <div id="results" class="box"></div>
+</section>
+
+<p id="msg" role="status"></p>
+</main>
+
 <script>
-const sb = supabase.createClient("https://qieifmpzmenpfewfsssl.supabase.co","sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_");
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const L = { pending:"چاوەڕوان", approved:"پەسەندکراو", rejected:"ڕەتکراو" };
-let all = [], tab = "pending";
 
-async function doLogin() {
-  const { error } = await sb.auth.signInWithPassword({ email:$("em").value.trim(), password:$("pw").value });
-  if (error) return $("err").textContent = "ئیمەیل یان پاسوۆرد هەڵەیە";
-  show();
+const sb = window.supabase?.createClient(
+  "https://qieifmpzmenpfewfsssl.supabase.co",
+  "sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_"
+);
+
+let tab = "agents";
+let agents = [];
+let requests = [];
+
+function say(s, bad=false) {
+  $("msg").textContent = s;
+  $("msg").className = bad ? "err" : "ok";
 }
-async function logout() { await sb.auth.signOut(); location.reload(); }
-function show() { $("login").style.display="none"; $("panel").style.display="block"; load(); loadTC(); }
-const n = s => all.filter(a => a.status === s).length;
-function head() {
-  $("stats").innerHTML = `<div class="stat"><b style="color:var(--gold)">${n("pending")}</b><small>چاوەڕوان</small></div>
-    <div class="stat"><b style="color:var(--green)">${n("approved")}</b><small>پەسەندکراو</small></div>
-    <div class="stat"><b style="color:var(--red)">${n("rejected")}</b><small>ڕەتکراو</small></div>`;
-  $("tabs").innerHTML = ["pending","approved","rejected","all"].map(t =>
-    `<button class="${t===tab?"on":""}" onclick="tab='${t}';render()">${t==="all"?"هەموو ("+all.length+")":L[t]}</button>`).join("");
+
+function node(tag, text, cls) {
+  const el = document.createElement(tag);
+  el.textContent = String(text ?? "");
+  if (cls) el.className = cls;
+  return el;
 }
+
+function add(parent, tag, text, cls) {
+  const e = node(tag, text, cls);
+  parent.append(e);
+  return e;
+}
+
+function line(parent, k, v) {
+  const d = node("div");
+  add(d, "small", k + " : ");
+  add(d, "span", v ?? "—");
+  parent.append(d);
+}
+
+function updateAuth(authorized) {
+  $("login").classList.toggle("hidden", authorized);
+  $("dashboard").classList.toggle("hidden", !authorized);
+  $("logout").classList.toggle("hidden", !authorized);
+}
+
+async function authorize() {
+  if (!sb) {
+    say("Supabase کار ناکات", true);
+    return false;
+  }
+
+  const {data:{user}} = await sb.auth.getUser();
+
+  if (!user) {
+    updateAuth(false);
+    return false;
+  }
+
+  const {data,error} = await sb.rpc("is_tc_admin");
+
+  if (error || !data) {
+    await sb.auth.signOut();
+    updateAuth(false);
+    say("ئەم ئەکاونتە مۆڵەتی ئەدمینی نییە.", true);
+    return false;
+  }
+
+  updateAuth(true);
+  return true;
+}
+
 async function load() {
-  const { data, error } = await sb.from("agents").select("*").order("created_at", { ascending:false });
-  if (error) return alert(error.message);
-  all = data; render();
-}
-async function url(p) {
-  if (!p) return null;
-  const { data } = await sb.storage.from("id-photos").createSignedUrl(p, 3600);
-  return data?.signedUrl;
-}
-async function render() {
-  head();
-  const rows = all.filter(a => tab === "all" || a.status === tab);
-  $("list").innerHTML = rows.length ? "" : '<p style="color:var(--mut);text-align:center">هیچ داواکارییەک نییە</p>';
-  for (const a of rows) {
-    const [f,b,s] = await Promise.all([url(a.id_front_path || a.id_photo_path), url(a.id_back_path), url(a.selfie_path)]);
-    const img = (u,c) => u ? `<figure><a href="${u}" target="_blank"><img src="${u}"></a><figcaption>${c}</figcaption></figure>` : "";
-    const d = document.createElement("div");
-    d.className = "item";
-    d.innerHTML = `<h4>${esc(a.full_name)} <span class="badge ${a.status}">${L[a.status]}</span></h4>
-      <div class="info">
-        <div>📱 <span dir="ltr">${esc(a.phone)}</span></div><div>✉️ <span dir="ltr">${esc(a.email)}</span></div>
-        <div>🎂 <span>${esc(a.dob)}</span></div><div>ڕەگەز: <span>${esc(a.gender)}</span></div>
-        <div>📍 <span>${esc(a.province)} - ${esc(a.address)}</span></div>
-        <div>🕒 <span>${new Date(a.created_at).toLocaleString("en-GB")}</span></div>
-      </div>
-      <div class="imgs">${img(f,"پێناسە (پێش)")}${img(b,"پێناسە (پشت)")}${img(s,"سێلفی")}</div>
-      <div class="acts">
-        ${a.status!=="approved"?'<button class="g" data-s="approved">پەسەندکردن</button>':""}
-        ${a.status!=="rejected"?'<button class="x" data-s="rejected">ڕەتکردنەوە</button>':""}
-        <button class="r" data-s="del">سڕینەوە</button>
-      </div>`;
-    d.querySelectorAll("button").forEach(btn => btn.onclick = () => act(a, btn.dataset.s));
-    $("list").appendChild(d);
-  }
-}
-async function act(a, s) {
-  if (s === "del") {
-    if (!confirm("دڵنیایت لە سڕینەوە؟")) return;
-    const paths = [a.id_front_path,a.id_back_path,a.selfie_path,a.id_photo_path].filter(Boolean);
-    if (paths.length) await sb.storage.from("id-photos").remove(paths);
-    const { error } = await sb.from("agents").delete().eq("id", a.id);
-    if (error) return alert(error.message);
-  } else {
-    const { error } = await sb.from("agents").update({ status:s, reviewed_at:new Date().toISOString() }).eq("id", a.id);
-    if (error) return alert(error.message);
-  }
-  load();
-}
-sb.auth.getSession().then(({ data }) => { if (data.session) show(); });
+  say("داتا دەهێنرێت...");
 
-function nav(i){$("v1").style.display=i==1?"block":"none";$("v2").style.display=i==2?"block":"none";
-  $("n1").className=i==1?"on":"";$("n2").className=i==2?"on":""}
-let tcs=[];
-async function loadTC(){
-  const {data,error}=await sb.from("topcharge_accounts").select("*").order("created_at",{ascending:false});
-  if(error)return;tcs=data;renderTC();
-  const o=await sb.from("topcharge_orders").select("*").order("created_at",{ascending:false});
-  if(!o.error)renderOrders(o.data)}
-const nf=n=>Number(n).toLocaleString("en-US");
-function renderOrders(list){
-  const box=$("orders");box.innerHTML=list.length?"":'<p style="color:var(--mut);text-align:center">هیچ داواکارییەک نییە</p>';
-  for(const o of list){
-    const d=document.createElement("div");d.className="item";
-    d.innerHTML=`<h4>🇮🇶 <span dir="ltr">${esc(o.phone)}</span> <span class="badge ${o.status}">${L[o.status]}</span></h4>
-      <div class="info"><div>بڕ: <span>${nf(o.amount)}</span></div><div>بۆنەس: <span style="color:var(--green)">+${nf(o.bonus)}</span></div>
-      <div>کۆی گشتی: <span>${nf(+o.amount+ +o.bonus)}</span></div><div>🕒 <span>${new Date(o.created_at).toLocaleString("en-GB")}</span></div></div>
-      <div class="acts" style="margin-top:10px">
-        ${o.status!=="approved"?'<button class="g" data-s="approved">پەسەندکردن</button>':""}
-        ${o.status!=="rejected"?'<button class="x" data-s="rejected">ڕەتکردنەوە</button>':""}
-        <button class="r" data-s="del">سڕینەوە</button></div>`;
-    d.querySelectorAll("button").forEach(b=>b.onclick=async()=>{
-      let r;
-      if(b.dataset.s==="del"){if(!confirm("دڵنیایت؟"))return;r=await sb.from("topcharge_orders").delete().eq("id",o.id)}
-      else r=await sb.from("topcharge_orders").update({status:b.dataset.s}).eq("id",o.id);
-      if(r.error)return alert(r.error.message);loadTC()});
-    box.appendChild(d)}}
-function renderTC(){
-  const box=$("tclist");box.innerHTML=tcs.length?"":'<p style="color:var(--mut);text-align:center">هیچ داواکارییەک نییە</p>';
-  for(const a of tcs){
-    const live=a.otp_code&&new Date(a.otp_expires)>new Date();
-    const d=document.createElement("div");d.className="item";
-    d.innerHTML=`<h4>🇮🇶 <span dir="ltr">${esc(a.phone)}</span>
-      <span class="badge ${a.verified?"approved":"pending"}">${a.verified?"چالاک":"چاوەڕوان"}</span></h4>
-      <div class="info"><div>🕒 <span>${new Date(a.created_at).toLocaleString("en-GB")}</span></div></div>
-      ${live?`<div style="margin:10px 0"><div class="code">${esc(a.otp_code)}</div><small style="color:var(--mut)">بەسەردەچێت: ${new Date(a.otp_expires).toLocaleTimeString("en-GB")}</small></div>`:""}
-      <div class="acts" style="margin-top:10px">
-        ${a.verified?"":'<button data-s="code">'+(live?"کۆدی نوێ":"ناردنی کۆد")+'</button>'}
-        ${live?'<button class="g" data-s="wa">ناردن بە WhatsApp</button>':""}
-        <button class="r" data-s="del">سڕینەوە</button></div>`;
-    d.querySelectorAll("button").forEach(b=>b.onclick=()=>tcAct(a,b.dataset.s));
-    box.appendChild(d)}}
-async function tcAct(a,s){
-  if(s==="code"){const {error}=await sb.rpc("admin_tc_send_code",{p_id:a.id});if(error)return alert(error.message);loadTC()}
-  else if(s==="wa"){const t=encodeURIComponent("کۆدی پشتڕاستکردنەوەی Top Charge: "+a.otp_code+" (10 خولەک کاردەکات)");
-    window.open("https://wa.me/"+a.phone.replace("+","")+"?text="+t,"_blank")}
-  else if(s==="del"){if(!confirm("دڵنیایت؟"))return;const {error}=await sb.from("topcharge_accounts").delete().eq("id",a.id);if(error)return alert(error.message);loadTC()}}
+  try {
+    const [a,r,ac,rc,pc] = await Promise.all([
+      sb.from("agents")
+        .select("*")
+        .order("created_at",{ascending:false})
+        .limit(200),
+
+      sb.from("tc_requests")
+        .select("*")
+        .order("created_at",{ascending:false})
+        .limit(200),
+
+      sb.from("agents")
+        .select("id",{count:"exact",head:true}),
+
+      sb.from("tc_requests")
+        .select("id",{count:"exact",head:true}),
+
+      sb.from("tc_requests")
+        .select("id",{count:"exact",head:true})
+        .eq("status","pending")
+    ]);
+
+    for (const response of [a,r,ac,rc,pc]) {
+      if (response.error) throw response.error;
+    }
+
+    agents = a.data || [];
+    requests = r.data || [];
+
+    $("agent-count").textContent = ac.count ?? "—";
+    $("request-count").textContent = rc.count ?? "—";
+    $("pending-count").textContent = pc.count ?? "—";
+
+    draw();
+    say("زانیاری نوێکرایەوە (٢٠٠ تۆماری دواوە بۆ هەر بەش)");
+
+  } catch (e) {
+    say("هەڵە: " + e.message, true);
+  }
+}
+
+function statusPicker(item, table, card) {
+  const sel = document.createElement("select");
+
+  for (const [v,n] of [
+    ["pending","چاوەڕوان"],
+    ["approved","پەسەندکراو"],
+    ["rejected","ڕەتکراو"]
+  ]) {
+    sel.add(new Option(n,v));
+  }
+
+  sel.value = item.status || "pending";
+
+  const save = node("button","پاشەکەوتکردنی دۆخ");
+
+  save.onclick = async () => {
+    save.disabled = true;
+
+    const {error} = await sb.from(table)
+      .update({status:sel.value})
+      .eq("id",item.id);
+
+    save.disabled = false;
+
+    if (error) {
+      say(error.message,true);
+    } else {
+      await load();
+    }
+  };
+
+  card.append(sel,save);
+}
+
+async function openPhoto(path) {
+  if (!path) return;
+
+  const {data,error} = await sb.storage
+    .from("id-photos")
+    .createSignedUrl(path,60);
+
+  if (error) {
+    say(error.message,true);
+    return;
+  }
+
+  window.open(
+    data.signedUrl,
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
+
+function draw() {
+  const root = $("results");
+  root.replaceChildren();
+
+  add(
+    root,
+    "h2",
+    tab === "agents" ? "تۆماربووان" : "داواکارییەکان"
+  );
+
+  const entries = (
+    tab === "agents" ? agents : requests
+  ).filter(x =>
+    $("filter").value === "all" ||
+    (x.status || "pending") === $("filter").value
+  );
+
+  if (!entries.length) {
+    add(root,"p","هیچ تۆمارێک نییە","mut");
+    return;
+  }
+
+  for (const item of entries) {
+    const card = add(root,"div","","item");
+    const hd = add(card,"div","","row");
+
+    add(
+      hd,
+      "b",
+      tab === "agents"
+        ? (item.full_name || "—")
+        : (item.request_reference
+            ? "#" + item.request_reference
+            : "داواکاری")
+    );
+
+    add(
+      hd,
+      "small",
+      item.created_at
+        ? new Date(item.created_at).toLocaleString("en-GB")
+        : ""
+    );
+
+    line(card,"مۆبایل",item.phone);
+    line(card,"دۆخ",item.status || "pending");
+
+    if (tab === "agents") {
+      line(card,"ئیمەیڵ",item.email);
+      line(card,"لەدایکبوون",item.dob);
+      line(card,"ڕەگەز",item.gender);
+      line(card,"پارێزگا",item.province);
+      line(card,"ناونیشان",item.address);
+
+      const photos = add(card,"div","","photos");
+
+      for (const [label,path] of [
+        ["پێناسە پێش",item.id_front_path],
+        ["پێناسە پشت",item.id_back_path],
+        ["سێلفی",item.selfie_path]
+      ]) {
+        if (path) {
+          const b = node("button",label);
+          b.onclick = () => openPhoto(path);
+          photos.append(b);
+        }
+      }
+
+    } else {
+      line(
+        card,
+        "بڕی پارە",
+        (item.amount ?? 0).toLocaleString("en-US") + " IQD"
+      );
+
+      line(
+        card,
+        "بۆنەس",
+        (item.bonus_amount ?? 0).toLocaleString("en-US") + " IQD"
+      );
+
+      line(card,"تێبینی",item.address);
+    }
+
+    statusPicker(
+      item,
+      tab === "agents" ? "agents" : "tc_requests",
+      card
+    );
+  }
+}
+
+$("signin").onclick = async () => {
+  if (!sb) {
+    return say("Supabase unavailable",true);
+  }
+
+  $("signin").disabled = true;
+
+  const {error} = await sb.auth.signInWithPassword({
+    email:$("email").value.trim(),
+    password:$("password").value
+  });
+
+  $("signin").disabled = false;
+
+  if (error) {
+    return say(error.message,true);
+  }
+
+  if (await authorize()) {
+    await load();
+  }
+};
+
+$("logout").onclick = async () => {
+  await sb.auth.signOut();
+  updateAuth(false);
+  say("چوویتە دەرەوە");
+};
+
+$("refresh").onclick = load;
+
+$("show-agents").onclick = () => {
+  tab = "agents";
+  draw();
+};
+
+$("show-requests").onclick = () => {
+  tab = "requests";
+  draw();
+};
+
+$("filter").onchange = draw;
+
+(async () => {
+  if (await authorize()) {
+    await load();
+  }
+})();
 </script>
 </body>
 </html>
