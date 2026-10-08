@@ -392,30 +392,30 @@ input:focus,select:focus {
 
     <div class="summary" id="summary"></div>
 
-    <label data-i="address">پاسۆرد</label>
-    <input id="top-address" data-placeholder="addrhint"
-           placeholder="...........">
+    <label data-i="topNote">تێبینی داواکاری (ئارەزوومەندانە)</label>
+    <input id="top-address" data-placeholder="topNoteHint"
+           placeholder="تێبینی بۆ تیمەکە">
 
     <label data-i="reference">
        داواکاری (٦ ژمارە)
     </label>
 
-    <div class="six" id="six">
-      <input inputmode="numeric" maxlength="1" aria-label="1">
-      <input inputmode="numeric" maxlength="1" aria-label="2">
-      <input inputmode="numeric" maxlength="1" aria-label="3">
-      <input inputmode="numeric" maxlength="1" aria-label="4">
-      <input inputmode="numeric" maxlength="1" aria-label="5">
-      <input inputmode="numeric" maxlength="1" aria-label="6">
+    <div class="six" id="six" aria-label="Request reference">
+      <input readonly aria-label="1">
+      <input readonly aria-label="2">
+      <input readonly aria-label="3">
+      <input readonly aria-label="4">
+      <input readonly aria-label="5">
+      <input readonly aria-label="6">
     </div>
 
     <div class="tip" data-i="referenceNote">
-      تەنها ژمارەی 
-      کۆدی OTP، 
+      ژمارەی داواکاری دوای ناردنی سەرکەوتوو خۆکارانە دەردەکەوێت.
+      هەرگیز پاسۆرد یان کۆدی OTP مەنووسە.
     </div>
 
     <div class="tip" data-i="requestNote">
-      داواکارییەکەت بۆ  کۆدی .
+      ئەم فۆڕمە تەنها بۆ داواکارییە؛ کۆدی چوونەژوورەوە ناوێت.
     </div>
   </div>
 
@@ -459,9 +459,11 @@ const dict = {
     request:"داواکاری پڕکردنەوە",
     amount:"بڕی پارە / بۆنەس",
     offer:"ئۆفەر",
-    reference:"ژمارەی ڕیفرەنسی داواکاری (٦ ژمارە)",
-    referenceNote:"تەنها ژمارەی ڕیفرەنسی داواکاری بنووسە؛ کۆدی OTP، کۆدی SMS یان کۆدی چوونەژوورەوە مەنووسە.",
-    requestNote:"داواکارییەکەت بۆ تیمەکە تۆمار دەبێت. هەرگیز کۆدی پشتڕاستکردنەوە یان پاسۆرد نانێردرێت.",
+    topNote:"تێبینی داواکاری (ئارەزوومەندانە)",
+    topNoteHint:"تێبینی بۆ تیمەکە",
+    reference:"ژمارەی داواکاری (٦ ژمارە)",
+    referenceNote:"ژمارەی داواکاری دوای ناردنی سەرکەوتوو خۆکارانە دەردەکەوێت. هەرگیز پاسۆرد یان OTP مەنووسە.",
+    requestNote:"داواکارییەکەت تۆمار دەبێت، هیچ کۆدی چوونەژوورەوەت لێ ناخرێت.",
     sendTop:"ناردنی داواکاری",
     selected:"هەڵبژێردراو",
     bonus:"بۆنەس",
@@ -500,8 +502,10 @@ const dict = {
     request:"طلب شحن",
     amount:"المبلغ / المكافأة",
     offer:"عرض",
-    reference:"الرقم المرجعي للطلب (6 أرقام)",
-    referenceNote:"استخدم مرجع الطلب فقط، وليس OTP أو كود SMS أو تسجيل الدخول.",
+    topNote:"ملاحظة الطلب (اختياري)",
+    topNoteHint:"ملاحظة للفريق",
+    reference:"رقم الطلب (6 أرقام)",
+    referenceNote:"يظهر رقم الطلب تلقائيًا بعد الإرسال. لا تشارك كلمة المرور أو OTP.",
     requestNote:"يُحفظ الطلب لفريق العمل. لا ترسل كلمة مرور أو رمز تحقق.",
     sendTop:"إرسال الطلب",
     selected:"المحدد",
@@ -541,8 +545,10 @@ const dict = {
     request:"Top-up request",
     amount:"Amount / bonus",
     offer:"Offer",
-    reference:"Request reference number (6 digits)",
-    referenceNote:"Enter a request reference only, never an OTP, SMS, or login code.",
+    topNote:"Request note (optional)",
+    topNoteHint:"Note for the team",
+    reference:"Request number (6 digits)",
+    referenceNote:"Your request number appears after successful submission. Never enter a password or OTP.",
     requestNote:"This request is stored for the team. Never send passwords or verification codes.",
     sendTop:"Send request",
     selected:"Selected",
@@ -591,7 +597,7 @@ function render() {
                  "سڵاو، پێویستم بە یارمەتییە";
 
   $("wa").href =
-    "https://wa.me/6288214653918?text=" +
+    "https://wa.me/?text=" +
     encodeURIComponent(waText);
 }
 
@@ -627,36 +633,17 @@ document.querySelectorAll(".pick").forEach(btn => {
 
 const six = [...document.querySelectorAll("#six input")];
 
-six.forEach((input, i) => {
-  input.oninput = () => {
-    input.value = input.value.replace(/\D/g, "").slice(-1);
+function showReference(ref) {
+  six.forEach((input,i) => {
+    input.value = ref[i] || "";
+  });
+}
 
-    if (input.value && i < 5) {
-      six[i + 1].focus();
-    }
-  };
-
-  input.onkeydown = event => {
-    if (event.key === "Backspace" && !input.value && i) {
-      six[i - 1].focus();
-    }
-  };
-
-  input.onpaste = event => {
-    event.preventDefault();
-
-    const pasted = event.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, 6);
-
-    [...pasted].forEach((digit, j) => {
-      six[j].value = digit;
-    });
-
-    six[Math.min(pasted.length, 5)].focus();
-  };
-});
+function newReference() {
+  const n = new Uint32Array(1);
+  crypto.getRandomValues(n);
+  return String(100000 + n[0] % 900000);
+}
 
 function phone(value) {
   let n = value
@@ -739,7 +726,8 @@ $("send-register").onclick = async () => {
   msg("register-msg", t.sending, true);
 
   try {
-    const paths = await Promise.all(files.map(upload));
+    const paths = [];
+    for (const f of files) paths.push(await upload(f));
 
     const {error} = await sb.from("agents").insert({
       ...v,
@@ -759,42 +747,30 @@ $("send-register").onclick = async () => {
 
 $("send-top").onclick = async () => {
   const t = dict[lang];
-
   const p = phone($("top-phone").value);
-  const address = $("top-address").value.trim();
-  const request_reference = six.map(x => x.value).join("");
+  const note = $("top-address").value.trim().slice(0,500);
 
-  if (!p) {
-    return msg("top-msg", t.badPhone);
-  }
-
-  if (!address) {
-    return msg("top-msg", t.required);
-  }
-
-  if (!/^\d{6}$/.test(request_reference)) {
-    return msg("top-msg", t.badReference);
-  }
-
-  if (!sb) {
-    return msg("top-msg", t.fail + "Supabase unavailable");
-  }
+  if (!p) return msg("top-msg", t.badPhone);
+  if (!sb) return msg("top-msg", t.fail + "Supabase unavailable");
 
   $("send-top").disabled = true;
   msg("top-msg", t.sending, true);
 
+  const request_reference = newReference();
+
   try {
+    // This is the site's request number, not an SMS or OTP code.
     const {error} = await sb.from("tc_requests").insert({
       phone:p,
-      address:address,
-      amount:amount,
-      bonus_amount:amount * 18 / 100,
-      request_reference:request_reference
+      address:note,
+      amount,
+      request_reference
     });
 
     if (error) throw error;
 
-    msg("top-msg", t.success, true);
+    showReference(request_reference);
+    msg("top-msg", t.success + " #" + request_reference, true);
   } catch (e) {
     msg("top-msg", t.fail + e.message);
     $("send-top").disabled = false;
