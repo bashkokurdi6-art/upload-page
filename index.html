@@ -1,783 +1,141 @@
-
 <!DOCTYPE html>
-<html lang="ckb" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#060c1f">
-<title>Top Charge Agents</title>
-
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>فرص العمل</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-
 <style>
-:root {
-  --bg:#060c1f;
-  --card:#0b1328;
-  --line:#193650;
-  --field:#08101f;
-  --ink:#eff5fc;
-  --mut:#98a5b9;
-  --blue:#17d4ee;
-  --ok:#0ecb81;
-}
-* {box-sizing:border-box}
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font:14px/1.7 Tahoma,Arial,sans-serif;
-}
-header,main {
-  max-width:480px;
-  margin:auto;
-  padding:20px 16px;
-}
-.top {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.brand {
-  color:var(--blue);
-  font-weight:700;
-  font-size:17px;
-}
-.langs {display:flex;gap:4px}
-.langs button {
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:6px 10px;
-  color:var(--ink);
-}
-.langs button.on {
-  background:var(--blue);
-  color:#001127;
-}
-h1 {font-size:21px;margin:25px 0 3px}
-p {color:var(--mut);margin:4px 0 13px}
-.tabs {
-  display:flex;
-  gap:6px;
-  background:var(--card);
-  padding:5px;
-  border:1px solid var(--line);
-  border-radius:40px;
-  margin-bottom:16px;
-}
-.tabs button {
-  flex:1;
-  background:transparent;
-  border:0;
-  border-radius:35px;
-  color:var(--mut);
-  padding:11px;
-  font:700 14px Tahoma,Arial;
-}
-.tabs button.on,.submit {
-  background:linear-gradient(90deg,#12c2ff,#2a6bff);
-  color:#fff;
-}
-.panel {display:none}
-.panel.on {display:block}
-.box {
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:15px;
-}
-h2 {
-  font-size:16px;
-  color:var(--blue);
-  margin:0 0 9px;
-}
-label {
-  display:block;
-  color:var(--mut);
-  font-size:13px;
-  margin:12px 0 5px;
-}
-input,select {
-  width:100%;
-  background:var(--field);
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:12px;
-  color:var(--ink);
-  font:14px Tahoma,Arial;
-  color-scheme:dark;
-  min-width:0;
-}
-input:focus,select:focus {
-  outline:2px solid #17d4ee66;
-}
-.phone {
-  display:flex;
-  gap:7px;
-  direction:ltr;
-}
-.prefix {
-  display:flex;
-  align-items:center;
-  gap:7px;
-  padding:0 10px;
-  background:var(--field);
-  border:1px solid var(--line);
-  border-radius:13px;
-  white-space:nowrap;
-}
-.prefix img {width:25px}
-.phone input {
-  flex:1;
-  direction:ltr;
-  text-align:left;
-}
-.ltr {direction:ltr;text-align:left}
-.pick {
-  position:relative;
-  width:100%;
-  padding:13px 14px;
-  margin:5px 0;
-  border:1px solid var(--line);
-  border-radius:13px;
-  background:var(--field);
-  color:var(--ink);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  cursor:pointer;
-}
-.pick.active {
-  border-color:var(--blue);
-  background:#102a45;
-  box-shadow:0 0 0 2px #17d4ee19;
-}
-.pick strong {font-size:15px}
-.pick small {
-  color:var(--ok);
-  font-size:13px;
-}
-.tag {
-  position:absolute;
-  inset-inline-start:10px;
-  top:-9px;
-  background:#2873ed;
-  color:white;
-  border-radius:12px;
-  padding:0 8px;
-  font-size:10px;
-}
-.summary {
-  color:var(--blue);
-  font-size:12px;
-  margin:12px 0;
-}
-.six {
-  display:flex;
-  direction:ltr;
-  gap:5px;
-  justify-content:center;
-}
-.six input {
-  width:calc((100% - 25px)/6);
-  max-width:54px;
-  text-align:center;
-  padding:11px 0;
-  font-size:19px;
-  font-weight:700;
-}
-.tip {
-  padding:11px;
-  background:#0d2a3a;
-  border:1px solid #14405a;
-  color:var(--mut);
-  border-radius:12px;
-  font-size:12px;
-  margin:13px 0;
-}
-.check {
-  display:flex;
-  align-items:center;
-  gap:9px;
-}
-.check input {width:18px}
-.check label {margin:0}
-.submit {
-  width:100%;
-  border:0;
-  border-radius:35px;
-  padding:14px;
-  font-weight:700;
-  font-size:15px;
-  cursor:pointer;
-}
-.submit:disabled {opacity:.5}
-.msg {
-  text-align:center;
-  margin:10px 0;
-  color:#ff6b7d;
-  font-size:13px;
-}
-.wa {
-  position:fixed;
-  bottom:18px;
-  left:18px;
-  background:#25d366;
-  border-radius:50%;
-  width:53px;
-  height:53px;
-  display:grid;
-  place-items:center;
-  text-decoration:none;
-  color:white;
-  font-size:29px;
-  box-shadow:0 4px 14px #0008;
-}
-</style>
-</head>
-
+:root{--g:#006C35;--gd:#00502a;--gold:#B8975A;--ink:#1c2b24;--mut:#5b6b63;--bd:#e1e6e3;--bg:#f6f8f7}
+*{box-sizing:border-box;margin:0}body{font-family:'IBM Plex Sans Arabic',Tajawal,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+button{font:inherit;cursor:pointer}
+.bar{background:var(--gd);color:#dfeee5;font-size:12.5px;direction:ltr;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 16px;padding-top:calc(6px + env(safe-area-inset-top))}
+.bar b{color:#fff;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+header{background:#fff;border-bottom:1px solid var(--bd);position:relative;z-index:20;box-shadow:0 1px 0 var(--gold)}
+.hi{direction:ltr;max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px}
+.brand{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;direction:rtl;text-align:center}.brand img{height:78px;max-width:60vw;object-fit:contain}
+.lg{width:38px;height:38px;border-radius:8px;background:var(--g);display:grid;place-items:center;flex:none}
+.brand h1{font-size:16px;font-weight:700;color:var(--g)}
+.ib{background:#fff;border:1px solid var(--bd);color:var(--ink);border-radius:8px;padding:8px 12px;font-weight:600;font-size:14px;position:relative;display:flex;align-items:center;gap:6px}
+.ib:hover{border-color:var(--g)}
+.dd{position:absolute;top:100%;margin-top:4px;background:#fff;color:var(--ink);border:1px solid var(--bd);border-radius:8px;box-shadow:0 8px 24px #0000001f;min-width:190px;max-width:86vw;display:none;overflow:hidden;z-index:30}
+.dd.on{display:block}.dd button,.dd div{display:block;width:100%;text-align:start;padding:10px 14px;border:0;background:none;border-bottom:1px solid #eef1ef;font-size:14px}.dd button:hover{background:#f1f6f3}
+#lg{left:12px}#bl{right:12px}
+.bd{position:absolute;top:-6px;right:-6px;background:#c62828;color:#fff;border-radius:99px;font-size:11px;min-width:18px;height:18px;line-height:18px;text-align:center}
+.wrap{max-width:1100px;margin:auto;padding:0 16px}
+.sl{position:relative;overflow:hidden;margin:18px 0;border-radius:10px;aspect-ratio:16/7;cursor:pointer;direction:ltr;background:#dfe7e2}
+.tr{display:flex;height:100%;transition:transform .7s ease}.s{min-width:100%;height:100%;background-size:cover;background-position:center;display:flex;align-items:flex-end}
+.ph{background:linear-gradient(135deg,#e3ebe6,#cfdcd4)}
+.s span{width:100%;padding:44px 22px 20px;color:#fff;font-weight:700;font-size:clamp(16px,3.4vw,26px);background:linear-gradient(transparent,#000b);direction:rtl;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.s em{font-style:normal;font-size:13px;font-weight:500;border:1px solid #fffa;border-radius:6px;padding:4px 12px;white-space:nowrap}
+.dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px}.dots i{width:7px;height:7px;border-radius:9px;background:#fff8}.dots i.on{background:#fff;width:20px}
+h2{font-size:20px;font-weight:700;margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--bd);position:relative}
+h2:after{content:"";position:absolute;bottom:-2px;inset-inline-start:0;width:64px;height:2px;background:var(--g)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.card{background:#fff;border-radius:10px;overflow:hidden;border:1px solid var(--bd);display:flex;flex-direction:column;transition:border-color .2s}
+.card:hover{border-color:var(--g)}
+.card .im{aspect-ratio:16/10;background-size:cover;background-position:center}
+.card .bd2{padding:16px;display:flex;flex-direction:column;flex:1}.card h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.card p{font-size:14px;color:var(--mut);line-height:1.8;white-space:pre-line;flex:1}
+.btn{background:var(--g);color:#fff;border:1px solid var(--g);border-radius:8px;padding:10px 20px;font-weight:600}
+.btn:hover{background:var(--gd)}.card .btn{width:100%;margin-top:14px}
+#info{display:grid;gap:12px;margin-bottom:10px}.inf{background:#fff;border:1px solid var(--bd);border-inline-start:4px solid var(--g);border-radius:8px;padding:16px;line-height:1.9;white-space:pre-line;color:#33423a}.inf b{color:var(--g)}.inf.hl{box-shadow:0 0 0 2px var(--g)}
+footer{background:#f0f1ee;color:var(--ink);text-align:center;padding:26px 16px 22px;margin-top:40px;border-top:1px solid var(--bd)}
+footer h3{font-size:20px;font-weight:700;max-width:560px;margin:0 auto 14px;padding-bottom:12px;border-bottom:1px solid #c4c6c2}
+footer a{display:block;color:var(--ink);text-decoration:none;font-size:15px;padding:7px 0}footer a:hover{color:var(--g)}
+footer .fs{margin-bottom:26px}footer .cp{max-width:560px;margin:10px auto 0;padding-top:18px;border-top:1px solid #dcdedb;color:#8a8f8b;font-size:13px;line-height:1.9}
+.md{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}.md.on{display:flex}
+.sh{background:#fff;width:100%;max-width:500px;max-height:92vh;overflow:auto;border-radius:12px;padding:22px}
+.sh h3{font-size:18px;color:var(--g);padding-bottom:10px;border-bottom:1px solid var(--bd)}
+label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px;color:#33423a}
+input{width:100%;padding:11px 12px;border:1px solid #c5d0ca;border-radius:8px;font:inherit;background:#fff}input:focus{outline:2px solid #006c3533;border-color:var(--g)}
+.row{display:flex;gap:8px;margin-top:20px}.row .btn{flex:1}.gh{background:#fff;color:var(--ink);border-color:#c5d0ca}.gh:hover{background:#f1f4f2}
+.pay{background:#f6f8f7;border:1px solid var(--bd);border-radius:8px;padding:6px 14px;margin-top:14px}
+.pay div{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;direction:ltr;word-break:break-all;border-bottom:1px solid var(--bd);font-size:14px}.pay div:last-child{border:0}.pay small{color:var(--mut);margin-inline-end:6px}
+.pay button{background:#fff;color:var(--g);border:1px solid var(--g);border-radius:6px;padding:3px 10px;font-size:13px}
+.ok{text-align:center;padding:24px 8px;font-size:17px;font-weight:600;line-height:2}
+</style></head>
 <body>
-
-<header>
-  <div class="top">
-    <div class="brand">◈ Agents</div>
-    <div class="langs">
-      <button data-lang="ckb" class="on">کوردی</button>
-      <button data-lang="ar">عربي</button>
-      <button data-lang="en">EN</button>
-    </div>
-  </div>
-  <h1 data-i="headline">ببە بە ئەگینتی Top Charge</h1>
-  <p data-i="subtitle">
-    زانیارییەکانت تۆمار بکە و تیمەکەمان پەیوەندیت پێوە دەکات.
-  </p>
-</header>
-
-<main>
-<nav class="tabs">
-  <button id="tab-register" class="on" data-i="register">
-    تۆمارکردن
-  </button>
-  <button id="tab-top" data-i="topup">
-    پڕکردنەوە
-  </button>
-</nav>
-
-<section id="register-panel" class="panel on">
-  <div class="box">
-    <h2 data-i="personal">زانیاری کەسی</h2>
-
-    <label data-i="name">ناوی سیانی</label>
-    <input id="name">
-
-    <label data-i="phone">ژمارەی مۆبایل</label>
-    <div class="phone">
-      <span class="prefix">
-        <img alt="Iraq" src="https://flagcdn.com/w40/iq.png">
-        +964
-      </span>
-      <input id="phone" type="tel" maxlength="10"
-             inputmode="numeric" placeholder="7XXXXXXXXX">
-    </div>
-
-    <label data-i="email">ئیمەیل</label>
-    <input id="email" type="email" class="ltr">
-
-    <label data-i="dob">بەرواری لەدایکبوون</label>
-    <input id="dob" type="date">
-
-    <label data-i="gender">ڕەگەز</label>
-    <select id="gender">
-      <option value="" data-i="choose">هەڵبژێرە</option>
-      <option value="male" data-i="male">نێر</option>
-      <option value="female" data-i="female">مێ</option>
-    </select>
-  </div>
-
-  <div class="box">
-    <h2 data-i="addressTitle">ناونیشان</h2>
-
-    <label data-i="province">پارێزگا</label>
-    <select id="province">
-      <option value="" data-i="choose">هەڵبژێرە</option>
-      <option value="Erbil">هەولێر</option>
-      <option value="Sulaymaniyah">سلێمانی</option>
-      <option value="Duhok">دهۆک</option>
-      <option value="Halabja">هەڵەبجە</option>
-      <option value="Kirkuk">کەرکووک</option>
-      <option value="Baghdad">بەغدا</option>
-      <option value="Mosul">موسڵ</option>
-      <option value="Other">دیکە</option>
-    </select>
-
-    <label data-i="address">ناونیشانی ورد</label>
-    <input id="address" data-placeholder="addrhint"
-           placeholder="شار، گەڕەک، نزیکترین شوێن">
-  </div>
-
-  <div class="box">
-    <h2 data-i="docs">بەڵگەنامە</h2>
-
-    <label data-i="front">وێنەی پێناسە (پێشەوە)</label>
-    <input id="front" type="file"
-           accept="image/jpeg,image/png,image/webp">
-
-    <label data-i="back">وێنەی پێناسە (پشتەوە)</label>
-    <input id="back" type="file"
-           accept="image/jpeg,image/png,image/webp">
-
-    <label data-i="selfie">وێنەی سێلفی</label>
-    <input id="selfie" type="file"
-           accept="image/jpeg,image/png,image/webp"
-           capture="user">
-
-    <div class="tip" data-i="filesNote">
-      هەر وێنەیەک لە ٥ مێگابایت کەمتر بێت.
-      پێویستە بەڵگەنامەکان بە پاراستنی تایبەتمەندی هەڵبگیرێن.
-    </div>
-  </div>
-
-  <div class="box check">
-    <input id="agree" type="checkbox">
-    <label for="agree" data-i="agree">
-      ڕازیم بە پشکنینی زانیارییەکانم.
-    </label>
-  </div>
-
-  <button class="submit" id="send-register" data-i="sendRegister">
-    ناردنی تۆمارکردن
-  </button>
-  <div class="msg" id="register-msg" role="status"></div>
-</section>
-
-<section id="top-panel" class="panel">
-  <div class="box">
-    <h2 data-i="request">داواکاری پڕکردنەوە</h2>
-
-    <label data-i="phone">ژمارەی مۆبایل</label>
-    <div class="phone">
-      <span class="prefix">
-        <img alt="Iraq" src="https://flagcdn.com/w40/iq.png">
-        +964
-      </span>
-      <input id="top-phone" type="tel"
-             maxlength="10" inputmode="numeric"
-             placeholder="7XXXXXXXXX">
-    </div>
-
-    <label data-i="amount">بڕی پارە / بۆنەس</label>
-
-    <div id="packages">
-      <button class="pick active" data-amount="1000000"
-              aria-pressed="true">
-        <strong>1,000,000 IQD</strong>
-        <small>+180,000</small>
-      </button>
-
-      <button class="pick" data-amount="3000000"
-              aria-pressed="false">
-        <strong>3,000,000 IQD</strong>
-        <small>+540,000</small>
-      </button>
-
-      <button class="pick" data-amount="5000000"
-              aria-pressed="false">
-        <span class="tag" data-i="offer">ئۆفەر</span>
-        <strong>5,000,000 IQD</strong>
-        <small>+900,000</small>
-      </button>
-    </div>
-
-    <div class="summary" id="summary"></div>
-
-    <label data-i="topNote">تێبینی داواکاری (ئارەزوومەندانە)</label>
-    <input id="top-address" data-placeholder="topNoteHint"
-           placeholder="تێبینی بۆ تیمەکە">
-
-    <label data-i="reference">
-       داواکاری (٦ ژمارە)
-    </label>
-
-    <div class="six" id="six" aria-label="Request reference">
-      <input readonly aria-label="1">
-      <input readonly aria-label="2">
-      <input readonly aria-label="3">
-      <input readonly aria-label="4">
-      <input readonly aria-label="5">
-      <input readonly aria-label="6">
-    </div>
-
-    <div class="tip" data-i="referenceNote">
-      ژمارەی داواکاری دوای ناردنی سەرکەوتوو خۆکارانە دەردەکەوێت.
-      هەرگیز پاسۆرد یان کۆدی OTP مەنووسە.
-    </div>
-
-    <div class="tip" data-i="requestNote">
-      ئەم فۆڕمە تەنها بۆ داواکارییە؛ کۆدی چوونەژوورەوە ناوێت.
-    </div>
-  </div>
-
-  <button class="submit" id="send-top" data-i="sendTop">
-    ناردنی داواکاری
-  </button>
-  <div class="msg" id="top-msg" role="status"></div>
-</section>
-</main>
-
-<a class="wa" id="wa" target="_blank"
-   rel="noopener noreferrer" aria-label="WhatsApp">✆</a>
-
+<div class="bar"><span id="gr"></span><b id="clk"></b><span id="hj"></span></div>
+<header><div class="hi"><button class="ib" id="lb"></button>
+<div class="brand"><img src="IMG_0200.png" alt="logo"><h1 id="ti"></h1></div>
+<button class="ib" id="bb" aria-label="notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1112 0c0 6 2 7 2 7H4s2-1 2-7zM10 20a2 2 0 004 0"/></svg><span class="bd" id="bc" hidden></span></button></div>
+<div class="dd" id="lg"></div><div class="dd" id="bl"></div></header>
+<div class="wrap">
+<div class="sl" id="sl"><div class="tr" id="tr"></div><div class="dots" id="dt"></div></div>
+<h2 id="h1"></h2><div class="grid" id="jb"></div>
+<h2 id="h2"></h2><div id="info"></div></div>
+<footer id="ft"></footer>
+<div class="md" id="md"><div class="sh" id="sh"></div></div>
 <script>
-const dict = {
-  ckb: {
-    headline:"ببە بە ئەگینتی Top Charge",
-    subtitle:"زانیارییەکانت تۆمار بکە و تیمەکەمان پەیوەندیت پێوە دەکات.",
-    register:"تۆمارکردن",
-    topup:"پڕکردنەوە",
-    personal:"زانیاری کەسی",
-    name:"ناوی سیانی",
-    phone:"ژمارەی مۆبایل",
-    email:"ئیمەیل",
-    dob:"بەرواری لەدایکبوون",
-    gender:"ڕەگەز",
-    choose:"هەڵبژێرە",
-    male:"نێر",
-    female:"مێ",
-    addressTitle:"ناونیشان",
-    province:"پارێزگا",
-    address:"ناونیشانی ورد",
-    addrhint:"شار، گەڕەک، نزیکترین شوێن",
-    docs:"بەڵگەنامە",
-    front:"وێنەی پێناسە (پێشەوە)",
-    back:"وێنەی پێناسە (پشتەوە)",
-    selfie:"وێنەی سێلفی",
-    filesNote:"هەر وێنەیەک لە ٥ مێگابایت کەمتر بێت. پێویستە بەڵگەنامەکان بە پاراستنی تایبەتمەندی هەڵبگیرێن.",
-    agree:"ڕازیم بە پشکنینی زانیارییەکانم.",
-    sendRegister:"ناردنی تۆمارکردن",
-    request:"داواکاری پڕکردنەوە",
-    amount:"بڕی پارە / بۆنەس",
-    offer:"ئۆفەر",
-    topNote:"تێبینی داواکاری (ئارەزوومەندانە)",
-    topNoteHint:"تێبینی بۆ تیمەکە",
-    reference:"ژمارەی داواکاری (٦ ژمارە)",
-    referenceNote:"ژمارەی داواکاری دوای ناردنی سەرکەوتوو خۆکارانە دەردەکەوێت. هەرگیز پاسۆرد یان OTP مەنووسە.",
-    requestNote:"داواکارییەکەت تۆمار دەبێت، هیچ کۆدی چوونەژوورەوەت لێ ناخرێت.",
-    sendTop:"ناردنی داواکاری",
-    selected:"هەڵبژێردراو",
-    bonus:"بۆنەس",
-    required:"تکایە هەموو خانەکان پڕ بکەرەوە.",
-    badPhone:"ژمارەی دروست بنووسە: 7XXXXXXXXX",
-    badReference:"ڕیفرەنسی ٦ ژمارەیی بنووسە (نەک کۆدی OTP).",
-    sending:"دەنێردرێت...",
-    success:"داواکارییەکەت بەسەرکەوتوویی تۆمارکرا.",
-    fail:"هەڵە: "
-  },
-  ar: {
-    headline:"كن وكيلًا في Top Charge",
-    subtitle:"سجل بياناتك وسيتواصل معك فريقنا.",
-    register:"التسجيل",
-    topup:"الشحن",
-    personal:"المعلومات الشخصية",
-    name:"الاسم الثلاثي",
-    phone:"رقم الموبايل",
-    email:"البريد الإلكتروني",
-    dob:"تاريخ الميلاد",
-    gender:"الجنس",
-    choose:"اختر",
-    male:"ذكر",
-    female:"أنثى",
-    addressTitle:"العنوان",
-    province:"المحافظة",
-    address:"العنوان التفصيلي",
-    addrhint:"المدينة والحي وأقرب نقطة دالة",
-    docs:"المستمسكات",
-    front:"الهوية (الأمام)",
-    back:"الهوية (الخلف)",
-    selfie:"صورة سيلفي",
-    filesNote:"كل صورة يجب أن تكون أقل من 5MB وتحفظ بخصوصية.",
-    agree:"أوافق على التحقق من بياناتي.",
-    sendRegister:"إرسال التسجيل",
-    request:"طلب شحن",
-    amount:"المبلغ / المكافأة",
-    offer:"عرض",
-    topNote:"ملاحظة الطلب (اختياري)",
-    topNoteHint:"ملاحظة للفريق",
-    reference:"رقم الطلب (6 أرقام)",
-    referenceNote:"يظهر رقم الطلب تلقائيًا بعد الإرسال. لا تشارك كلمة المرور أو OTP.",
-    requestNote:"يُحفظ الطلب لفريق العمل. لا ترسل كلمة مرور أو رمز تحقق.",
-    sendTop:"إرسال الطلب",
-    selected:"المحدد",
-    bonus:"المكافأة",
-    required:"املأ جميع الحقول.",
-    badPhone:"أدخل رقمًا صحيحًا: 7XXXXXXXXX",
-    badReference:"أدخل مرجعًا من 6 أرقام، وليس OTP.",
-    sending:"جار الإرسال...",
-    success:"تم استلام طلبك.",
-    fail:"خطأ: "
-  },
-  en: {
-    headline:"Become a Top Charge agent",
-    subtitle:"Register your details and our team will contact you.",
-    register:"Register",
-    topup:"Top up",
-    personal:"Personal information",
-    name:"Full name",
-    phone:"Mobile number",
-    email:"Email",
-    dob:"Date of birth",
-    gender:"Gender",
-    choose:"Choose",
-    male:"Male",
-    female:"Female",
-    addressTitle:"Address",
-    province:"Province",
-    address:"Detailed address",
-    addrhint:"City, neighborhood, nearest landmark",
-    docs:"Documents",
-    front:"ID front",
-    back:"ID back",
-    selfie:"Selfie",
-    filesNote:"Each image must be under 5 MB and stored privately.",
-    agree:"I consent to verification of my details.",
-    sendRegister:"Send registration",
-    request:"Top-up request",
-    amount:"Amount / bonus",
-    offer:"Offer",
-    topNote:"Request note (optional)",
-    topNoteHint:"Note for the team",
-    reference:"Request number (6 digits)",
-    referenceNote:"Your request number appears after successful submission. Never enter a password or OTP.",
-    requestNote:"This request is stored for the team. Never send passwords or verification codes.",
-    sendTop:"Send request",
-    selected:"Selected",
-    bonus:"Bonus",
-    required:"Please complete all fields.",
-    badPhone:"Use a valid number: 7XXXXXXXXX",
-    badReference:"Enter a 6-digit reference, not an OTP.",
-    sending:"Sending...",
-    success:"Your request was received.",
-    fail:"Error: "
-  }
-};
-
-const $ = id => document.getElementById(id);
-let lang = "ckb";
-let amount = 1000000;
-
-const sb = window.supabase?.createClient(
-  "https://qieifmpzmenpfewfsssl.supabase.co",
-  "sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_"
-);
-
-function render() {
-  const t = dict[lang];
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === "en" ? "ltr" : "rtl";
-
-  document.querySelectorAll("[data-i]").forEach(el => {
-    el.textContent = t[el.dataset.i];
-  });
-
-  document.querySelectorAll("[data-placeholder]").forEach(el => {
-    el.placeholder = t[el.dataset.placeholder];
-  });
-
-  document.querySelectorAll("[data-lang]").forEach(btn => {
-    btn.classList.toggle("on", btn.dataset.lang === lang);
-  });
-
-  $("summary").textContent =
-    `${t.selected}: ${amount.toLocaleString("en-US")} IQD | ` +
-    `${t.bonus}: +${(amount * 0.18).toLocaleString("en-US")} IQD`;
-
-  const waText = lang === "en" ? "Hello, I need help" :
-                 lang === "ar" ? "مرحبًا، أحتاج مساعدة" :
-                 "سڵاو، پێویستم بە یارمەتییە";
-
-  $("wa").href =
-    "https://wa.me/?text=" +
-    encodeURIComponent(waText);
+const sb=supabase.createClient('https://aptycuncoovqbjbuyjhm.supabase.co','sb_publishable_RgOL_VRlz1yf_lqV-yMrdA_01Jh0EMe');
+const T={
+ar:{more:'المزيد',t:'فرص العمل',jobs:'الوظائف المتاحة',info:'معلومات إضافية',apply:'التقديم',name:'الاسم الثلاثي',nat:'الجنسية',phone:'رقم الجوال',email:'البريد الإلكتروني',selfie:'صورة سيلفي',next:'التالي',back:'رجوع',pay:'لإنشاء السيرة الذاتية يرجى دفع الرسوم',fee:'الرسوم',receipt:'صورة إيصال الدفع',send:'إرسال الطلب',done:'تم استلام طلبك بنجاح، سنتواصل معك قريباً',copy:'نسخ',no:'لا توجد وظائف حالياً',nn:'لا جديد',fill:'يرجى تعبئة جميع الحقول',err:'حدث خطأ، حاول مرة أخرى',auto:'تم تحديد الدولة تلقائياً'},
+en:{more:'More',t:'Job Opportunities',jobs:'Available Jobs',info:'More Information',apply:'Apply',name:'Full name (3 names)',nat:'Nationality',phone:'Mobile number',email:'Email',selfie:'Selfie photo',next:'Next',back:'Back',pay:'To create your CV please pay the fee',fee:'Fee',receipt:'Payment receipt photo',send:'Submit application',done:'Your application was received. We will contact you soon.',copy:'Copy',no:'No jobs yet',nn:'Nothing new',fill:'Please fill in all fields',err:'Something went wrong, try again',auto:'Country detected automatically'},
+tr:{more:'Daha fazla',t:'İş Fırsatları',jobs:'Mevcut İşler',info:'Daha Fazla Bilgi',apply:'Başvur',name:'Ad soyad (3 isim)',nat:'Uyruk',phone:'Cep telefonu',email:'E-posta',selfie:'Selfie fotoğrafı',next:'İleri',back:'Geri',pay:'CV oluşturmak için ücreti ödeyin',fee:'Ücret',receipt:'Ödeme dekontu',send:'Başvuruyu gönder',done:'Başvurunuz alındı, sizinle iletişime geçeceğiz.',copy:'Kopyala',no:'Henüz ilan yok',nn:'Yeni bir şey yok',fill:'Tüm alanları doldurun',err:'Hata oluştu, tekrar deneyin',auto:'Ülke otomatik algılandı'},
+fa:{more:'بیشتر',t:'فرصت‌های شغلی',jobs:'مشاغل موجود',info:'اطلاعات بیشتر',apply:'ثبت‌نام',name:'نام کامل (۳ نام)',nat:'ملیت',phone:'شماره موبایل',email:'ایمیل',selfie:'عکس سلفی',next:'بعدی',back:'بازگشت',pay:'برای ساخت رزومه هزینه را پرداخت کنید',fee:'هزینه',receipt:'تصویر رسید پرداخت',send:'ارسال درخواست',done:'درخواست شما دریافت شد، به زودی تماس می‌گیریم.',copy:'کپی',no:'شغلی موجود نیست',nn:'مورد جدیدی نیست',fill:'همه فیلدها را پر کنید',err:'خطا رخ داد، دوباره تلاش کنید',auto:'کشور به صورت خودکار تشخیص داده شد'},
+ur:{more:'مزید',t:'ملازمت کے مواقع',jobs:'دستیاب ملازمتیں',info:'مزید معلومات',apply:'درخواست دیں',name:'پورا نام (3 نام)',nat:'قومیت',phone:'موبائل نمبر',email:'ای میل',selfie:'سیلفی تصویر',next:'اگلا',back:'واپس',pay:'سی وی بنانے کے لیے فیس ادا کریں',fee:'فیس',receipt:'ادائیگی کی رسید',send:'درخواست بھیجیں',done:'آپ کی درخواست موصول ہو گئی، ہم جلد رابطہ کریں گے۔',copy:'کاپی',no:'ابھی کوئی ملازمت نہیں',nn:'کچھ نیا نہیں',fill:'تمام خانے پُر کریں',err:'خرابی ہوئی، دوبارہ کوشش کریں',auto:'ملک خودکار طور پر معلوم ہوا'}};
+const LG=[['ar','🇸🇦','AR'],['en','🇬🇧','EN'],['tr','🇹🇷','TR'],['fa','🇮🇷','FA'],['ur','🇵🇰','UR']];
+const FOOT=[['روابط مهمة',[['سياسة الخصوصية','#'],['سياسة الاستخدام','#']]],['الاتصال والدعم',[['تواصل معنا','#'],['الأسئلة الشائعة','#']]]];
+function ft(){const y=new Date().getFullYear();$('ft').innerHTML=FOOT.map(([h,l])=>`<div class="fs"><h3>${h}</h3>${l.map(([n,u])=>`<a href="${u}">${n}</a>`).join('')}</div>`).join('')+`<div class="cp">جميع الحقوق محفوظة © ${y} | ${e($('ti').textContent)}</div>`}
+let L=localStorage.lang||'ar',S={},SL=[],PAY={},J=[],cur=null,F={},idx=0,tm,country='';
+const $=id=>document.getElementById(id),t=k=>T[L][k]||T.en[k]||k;
+const e=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const bg=u=>u?`style="background-image:url('${e(u)}')"`:'';
+function flag(c){return c&&c.length==2?String.fromCodePoint(...[...c.toUpperCase()].map(x=>127397+x.charCodeAt())):'🌍'}
+async function load(){
+ const [a,b]=await Promise.all([sb.from('settings').select('*'),sb.from('jobs').select('*').order('created_at',{ascending:false})]);
+ (a.data||[]).forEach(r=>{if(r.key=='site')S=r.value;if(r.key=='slides')SL=r.value;if(r.key=='pay')PAY=r.value});
+ J=b.data||[];render();
 }
-
-document.querySelectorAll("[data-lang]").forEach(btn => {
-  btn.onclick = () => {
-    lang = btn.dataset.lang;
-    render();
-  };
-});
-
-function switchTab(which) {
-  $("register-panel").classList.toggle("on", which === "register");
-  $("top-panel").classList.toggle("on", which === "top");
-  $("tab-register").classList.toggle("on", which === "register");
-  $("tab-top").classList.toggle("on", which === "top");
+function render(){
+ const lg=LG.find(x=>x[0]==L);document.documentElement.lang=L;document.documentElement.dir=['ar','fa','ur'].includes(L)?'rtl':'ltr';
+ $('lb').textContent=lg[1]+' '+lg[2];$('ti').textContent=S.title||t('t');document.title=$('ti').textContent;ft();
+ $('lg').innerHTML=LG.map(x=>`<button onclick="setL('${x[0]}')">${x[1]} ${x[2]}</button>`).join('');
+ $('h1').textContent=t('jobs');$('h2').textContent=t('info');
+ const sl=[0,1,2].map(i=>SL[i]||{});
+ $('tr').innerHTML=sl.map(s=>`<div class="s ${s.img?'':'ph'}" ${bg(s.img)}><span>${e(s.title||'')}<em>${t('more')} ‹</em></span></div>`).join('');
+ $('dt').innerHTML=sl.map((_,i)=>`<i class="${i==idx?'on':''}"></i>`).join('');go(idx);
+ $('info').innerHTML=(S.about?`<div class="inf">${e(S.about)}</div>`:'')+sl.map((s,i)=>s.title||s.text?`<div class="inf" id="inf${i}"><b>${e(s.title||'')}</b><br>${e(s.text||'')}</div>`:'').join('');
+ $('jb').innerHTML=J.length?J.map(j=>`<div class="card"><div class="im ${j.image?'':'ph'}" ${bg(j.image)}></div><div class="bd2"><h3>${e(j.title)}</h3><p>${e(j.description)}</p><button class="btn" onclick="openApply('${j.id}')">${t('apply')}</button></div></div>`).join(''):`<p style="padding:10px">${t('no')}</p>`;
+ notif();
 }
-
-$("tab-register").onclick = () => switchTab("register");
-$("tab-top").onclick = () => switchTab("top");
-
-document.querySelectorAll(".pick").forEach(btn => {
-  btn.onclick = () => {
-    amount = Number(btn.dataset.amount);
-
-    document.querySelectorAll(".pick").forEach(item => {
-      item.classList.toggle("active", item === btn);
-      item.setAttribute("aria-pressed", String(item === btn));
-    });
-
-    render();
-  };
-});
-
-const six = [...document.querySelectorAll("#six input")];
-
-function showReference(ref) {
-  six.forEach((input,i) => {
-    input.value = ref[i] || "";
-  });
-}
-
-function newReference() {
-  const n = new Uint32Array(1);
-  crypto.getRandomValues(n);
-  return String(100000 + n[0] % 900000);
-}
-
-function phone(value) {
-  let n = value
-    .replace(/[٠-٩]/g, c => c.charCodeAt(0) - 0x660)
-    .replace(/[۰-۹]/g, c => c.charCodeAt(0) - 0x6f0)
-    .replace(/\D/g, "");
-
-  if (n.startsWith("964")) n = n.slice(3);
-  if (n.startsWith("0")) n = n.slice(1);
-
-  return /^7\d{9}$/.test(n) ? "+964" + n : null;
-}
-
-function msg(id, text, ok = false) {
-  $(id).textContent = text;
-  $(id).style.color = ok ? "#0ecb81" : "#ff6b7d";
-}
-
-async function upload(file) {
-  if (file.size > 5242880) {
-    throw Error("Image too large (5 MB max)");
-  }
-
-  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-    throw Error("Invalid image type");
-  }
-
-  const ext = {
-    "image/jpeg":"jpg",
-    "image/png":"png",
-    "image/webp":"webp"
-  }[file.type];
-
-  const path = crypto.randomUUID() + "." + ext;
-
-  const {error} = await sb.storage
-    .from("id-photos")
-    .upload(path, file, {contentType:file.type});
-
-  if (error) throw error;
-  return path;
-}
-
-$("send-register").onclick = async () => {
-  const t = dict[lang];
-
-  const v = {
-    full_name:$("name").value.trim(),
-    phone:phone($("phone").value),
-    email:$("email").value.trim(),
-    dob:$("dob").value,
-    gender:$("gender").value,
-    province:$("province").value,
-    address:$("address").value.trim()
-  };
-
-  const files = [
-    $("front").files[0],
-    $("back").files[0],
-    $("selfie").files[0]
-  ];
-
-  if (!v.phone) {
-    return msg("register-msg", t.badPhone);
-  }
-
-  if (
-    Object.values(v).some(x => !x) ||
-    files.some(x => !x) ||
-    !$("agree").checked
-  ) {
-    return msg("register-msg", t.required);
-  }
-
-  if (!sb) {
-    return msg("register-msg", t.fail + "Supabase unavailable");
-  }
-
-  $("send-register").disabled = true;
-  msg("register-msg", t.sending, true);
-
-  try {
-    const paths = [];
-    for (const f of files) paths.push(await upload(f));
-
-    const {error} = await sb.from("agents").insert({
-      ...v,
-      id_front_path:paths[0],
-      id_back_path:paths[1],
-      selfie_path:paths[2]
-    });
-
-    if (error) throw error;
-
-    msg("register-msg", t.success, true);
-  } catch (e) {
-    msg("register-msg", t.fail + e.message);
-    $("send-register").disabled = false;
-  }
-};
-
-$("send-top").onclick = async () => {
-  const t = dict[lang];
-  const p = phone($("top-phone").value);
-  const note = $("top-address").value.trim().slice(0,500);
-
-  if (!p) return msg("top-msg", t.badPhone);
-  if (!sb) return msg("top-msg", t.fail + "Supabase unavailable");
-
-  $("send-top").disabled = true;
-  msg("top-msg", t.sending, true);
-
-  const request_reference = newReference();
-
-  try {
-    // This is the site's request number, not an SMS or OTP code.
-    const {error} = await sb.from("tc_requests").insert({
-      phone:p,
-      address:note,
-      amount,
-      request_reference
-    });
-
-    if (error) throw error;
-
-    showReference(request_reference);
-    msg("top-msg", t.success + " #" + request_reference, true);
-  } catch (e) {
-    msg("top-msg", t.fail + e.message);
-    $("send-top").disabled = false;
-  }
-};
-
-render();
-</script>
-</body>
-</html>
+function go(i){idx=i;$('tr').style.transform=`translateX(-${i*100}%)`;[...$('dt').children].forEach((d,k)=>d.className=k==i?'on':'')}
+function setL(l){L=l;localStorage.lang=l;$('lg').classList.remove('on');closeM();render();tick()}
+$('sl').onclick=()=>{const el=$('inf'+idx)||$('info');el.scrollIntoView({behavior:'smooth',block:'center'});document.querySelectorAll('.inf').forEach(x=>x.classList.remove('hl'));el.classList.add('hl')};
+$('lb').onclick=ev=>{ev.stopPropagation();$('bl').classList.remove('on');$('lg').classList.toggle('on')};
+$('bb').onclick=ev=>{ev.stopPropagation();$('lg').classList.remove('on');const n=newJobs();$('bl').innerHTML=(n.length?n:J.slice(0,3)).map(j=>`<div>${e(j.title)}</div>`).join('')||`<div>${t('nn')}</div>`;$('bl').classList.toggle('on');localStorage.seen=new Date().toISOString();$('bc').hidden=true};
+document.onclick=()=>{$('lg').classList.remove('on');$('bl').classList.remove('on')};
+function newJobs(){const s=new Date(localStorage.seen||0);return J.filter(j=>new Date(j.created_at)>s)}
+function notif(){const n=newJobs().length;$('bc').hidden=!n;$('bc').textContent=n}
+setInterval(()=>go((idx+1)%3),4000);
+function tick(){const d=new Date(),z='Asia/Riyadh',l=L=='ar'?'ar-SA':L;
+ $('clk').textContent=d.toLocaleTimeString('en-GB',{timeZone:z});
+ $('gr').textContent=d.toLocaleDateString(l,{timeZone:z,dateStyle:'medium'});
+ try{$('hj').textContent=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{timeZone:z,dateStyle:'medium'}).format(d)}catch(x){}}
+setInterval(tick,1000);tick();
+function closeM(){$('md').classList.remove('on')}
+$('md').onclick=ev=>{if(ev.target==$('md'))closeM()};
+async function openApply(id){cur=J.find(j=>j.id==id);F={};step1();$('md').classList.add('on');
+ if(!country){try{const d=await (await fetch('https://ipapi.co/json/')).json();country=d.country_name||'';F.cc=d.country_code;if(!$('f_nat').value){$('f_nat').value=country;$('au').textContent=flag(d.country_code)+' '+t('auto')}}catch(x){}}}
+function step1(){$('sh').innerHTML=`<h3>${e(cur.title)}</h3>
+<label>${t('name')}</label><input id="f_name" value="${e(F.name||'')}">
+<label>${t('nat')}</label><input id="f_nat" value="${e(F.nat||country)}"><small id="au" style="color:var(--g)">${country?flag(F.cc)+' '+t('auto'):''}</small>
+<label>${t('phone')}</label><input id="f_ph" type="tel" value="${e(F.ph||'')}">
+<label>${t('email')}</label><input id="f_em" type="email" value="${e(F.em||'')}">
+<label>${t('selfie')}</label><input id="f_self" type="file" accept="image/*" capture="user">
+<div class="row"><button class="btn gh" onclick="closeM()">✕</button><button class="btn" onclick="next()">${t('next')}</button></div>`}
+function next(){F.name=$('f_name').value.trim();F.nat=$('f_nat').value.trim();F.ph=$('f_ph').value.trim();F.em=$('f_em').value.trim();F.self=$('f_self').files[0]||F.self;
+ if(!F.name||!F.nat||!F.ph||!F.em||!F.self)return alert(t('fill'));
+ const p=PAY||{},r=(k,v)=>v?`<div><button onclick="navigator.clipboard.writeText('${e(v)}');this.textContent='✓'">${t('copy')}</button><span><small>${k}</small> ${e(v)}</span></div>`:'';
+ $('sh').innerHTML=`<h3>${t('pay')}</h3><div class="pay"><div><span>${t('fee')}</span><b>${e(p.fee||'')}</b></div>${r('FIB',p.fib)}${r('IBAN',p.iban)}${r('KiCard',p.kicard)}${p.note?`<p>${e(p.note)}</p>`:''}</div>
+<label>${t('receipt')}</label><input id="f_rec" type="file" accept="image/*">
+<div class="row"><button class="btn gh" onclick="step1()">${t('back')}</button><button class="btn" id="sb" onclick="submit()">${t('send')}</button></div>`}
+async function up(f,dir){const p=`${dir}/${Date.now()}-${Math.random().toString(36).slice(2)}.${(f.name.split('.').pop()||'jpg').toLowerCase()}`;
+ const r=await sb.storage.from('uploads').upload(p,f);if(r.error)throw r.error;return sb.storage.from('uploads').getPublicUrl(p).data.publicUrl}
+async function submit(){const rf=$('f_rec').files[0];if(!rf)return alert(t('fill'));const b=$('sb');b.disabled=true;b.textContent='...';
+ try{const [s,r]=await Promise.all([up(F.self,'selfies'),up(rf,'receipts')]);
+  const x=await sb.from('applications').insert({job_id:cur.id,job_title:cur.title,full_name:F.name,nationality:F.nat,phone:F.ph,email:F.em,selfie:s,receipt:r});
+  if(x.error)throw x.error;$('sh').innerHTML=`<div class="ok"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#006C35" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg><br>${t('done')}</div><button class="btn" style="width:100%" onclick="closeM()">OK</button>`}
+ catch(x){alert(t('err'));b.disabled=false;b.textContent=t('send')}}
+load();
+</script></body></html>
