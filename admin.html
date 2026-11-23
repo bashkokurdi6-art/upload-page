@@ -1,507 +1,72 @@
-
-<!doctype html>
-<html lang="ckb" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#060c1f">
-<title>Top Charge | Admin</title>
-
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-
 <style>
-:root {
-  --bg:#060c1f;
-  --card:#0b1328;
-  --line:#193650;
-  --field:#08101f;
-  --ink:#eff5fc;
-  --mut:#98a5b9;
-  --blue:#17d4ee;
-  --ok:#0ecb81;
-}
-* {box-sizing:border-box}
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font:14px/1.7 Tahoma,Arial,sans-serif;
-}
-header,main {
-  max-width:920px;
-  margin:auto;
-  padding:20px 16px;
-}
-.top {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-.brand,h2 {color:var(--blue)}
-.brand {
-  font-weight:700;
-  font-size:17px;
-}
-.box {
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:15px;
-}
-h1 {font-size:21px}
-h2 {font-size:16px;margin:0 0 12px}
-label {
-  display:block;
-  color:var(--mut);
-  font-size:13px;
-  margin:12px 0 5px;
-}
-input,select {
-  width:100%;
-  background:var(--field);
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:12px;
-  color:var(--ink);
-  font:14px Tahoma,Arial;
-  color-scheme:dark;
-}
-button {
-  cursor:pointer;
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:10px 14px;
-  background:#12223b;
-  color:white;
-  font:700 14px Tahoma,Arial;
-}
-.submit {
-  background:linear-gradient(90deg,#12c2ff,#2a6bff);
-  border:0;
-}
-.mut {color:var(--mut)}
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:10px;
-}
-.bar {
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.bar select {width:auto;max-width:240px}
-.item {
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:13px;
-  margin:10px 0;
-  overflow-wrap:anywhere;
-}
-.row {
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-.status {color:var(--blue)}
-.err {color:#ff6b7d}
-.ok {color:var(--ok)}
-.hidden {display:none!important}
-small {color:var(--mut)}
-a {color:var(--blue)}
-.photos {
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
-.photos button {font-size:12px}
-#msg {min-height:23px}
-</style>
-</head>
-<body>
-
-<header>
-  <div class="top">
-    <span class="brand">◈ Top Charge | Admin</span>
-    <button id="logout" class="hidden">
-      چوونەدەرەوە
-    </button>
-  </div>
-  <h1>داشبۆردی ئەدمین</h1>
-  <p class="mut">
-    تۆمارکردنەکان و داواکارییەکانی پڕکردنەوە
-  </p>
-</header>
-
-<main>
-<section id="login" class="box">
-  <h2>چوونەژوورەوەی ئەدمین</h2>
-
-  <label>ئیمەیڵ</label>
-  <input id="email" type="email"
-         autocomplete="username">
-
-  <label>پاسۆردی تایبەتی ئەدمین</label>
-  <input id="password" type="password"
-         autocomplete="current-password">
-
-  <p>
-    <button class="submit" id="signin">
-      چوونەژوورەوە
-    </button>
-  </p>
-</section>
-
-<section id="dashboard" class="hidden">
-  <div class="grid">
-    <div class="box">
-      تۆماربووان
-      <div><b id="agent-count">—</b></div>
-    </div>
-    <div class="box">
-      داواکارییەکان
-      <div><b id="request-count">—</b></div>
-    </div>
-    <div class="box">
-      چاوەڕوان
-      <div><b id="pending-count">—</b></div>
-    </div>
-  </div>
-
-  <div class="box">
-    <div class="bar">
-      <button id="show-agents">تۆماربووان</button>
-      <button id="show-requests">داواکارییەکان</button>
-
-      <select id="filter">
-        <option value="all">هەموو دۆخەکان</option>
-        <option value="pending">چاوەڕوان</option>
-        <option value="approved">پەسەندکراو</option>
-        <option value="rejected">ڕەتکراو</option>
-      </select>
-
-      <button id="refresh">نوێکردنەوە</button>
-    </div>
-  </div>
-
-  <div id="results" class="box"></div>
-</section>
-
-<p id="msg" role="status"></p>
-</main>
-
+:root{--g:#006C35;--gd:#004a24;--gold:#C8A24A;--ink:#12261a;--bg:#f2f6f1}
+*{box-sizing:border-box;margin:0}body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:40px}button,input,textarea,select{font:inherit}
+.pat{background:var(--g) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M24 4l5 11 11-5-5 11 11 5-11 5 5 11-11-5-5 11-5-11-11 5 5-11-11-5 11-5-5-11 11 5z' fill='none' stroke='%23ffffff' stroke-opacity='.12'/%3E%3C/svg%3E")}
+header{direction:ltr;display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;color:#fff;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:20}
+header h1{font-size:18px;flex:1;text-align:center}
+.ib{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:10px;padding:7px 11px;font-weight:700;position:relative;cursor:pointer}
+.bd{position:absolute;top:-6px;right:-6px;background:#d62828;border-radius:99px;font-size:11px;min-width:18px;height:18px;line-height:18px;text-align:center}
+.dd{position:absolute;left:10px;top:56px;background:#fff;color:var(--ink);border-radius:12px;box-shadow:0 10px 30px #0004;display:none;z-index:30}.dd.on{display:block}.dd button{display:block;width:100%;padding:11px 18px;border:0;background:none;text-align:start;cursor:pointer}
+.tabs{display:flex;gap:6px;padding:12px 14px;overflow:auto}.tabs button{border:1.5px solid var(--g);background:#fff;color:var(--g);border-radius:99px;padding:8px 16px;font-weight:700;white-space:nowrap;cursor:pointer}.tabs button.on{background:var(--g);color:#fff}
+.box{background:#fff;border:1px solid #dfe8dc;border-radius:16px;padding:14px;margin:0 14px 14px}
+label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}input,textarea,select{width:100%;padding:10px;border:1.5px solid #c9d6c6;border-radius:10px;background:#fff}textarea{min-height:80px}
+.btn{background:var(--g);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:700;border-bottom:3px solid var(--gold);cursor:pointer;margin-top:12px}.rd{background:#b3261e;border-bottom-color:#7a1812}
+.pv{width:100%;aspect-ratio:16/8;border-radius:10px;background:#e6ece4 center/cover;margin-top:6px}
+.it{display:flex;gap:10px;align-items:center;border-bottom:1px solid #eee;padding:10px 0}.it img{width:64px;height:64px;border-radius:10px;object-fit:cover}.it>div{flex:1;font-size:14px;line-height:1.6}
+.it a{color:var(--g);font-weight:700}.it .btn{margin:0;padding:6px 12px}
+#login{max-width:380px;margin:60px auto}
+</style></head><body>
+<header class="pat"><button class="ib" id="lb"></button><h1 id="ti">Admin</h1><button class="ib" id="bb" onclick="tab('apps')">🔔<span class="bd" id="bc" hidden></span></button></header>
+<div class="dd" id="lg"></div>
+<div id="login" class="box" hidden><label data-i="email"></label><input id="em" type="email"><label data-i="pass"></label><input id="pw" type="password"><button class="btn" style="width:100%" onclick="login()" data-i="enter"></button></div>
+<div id="app" hidden>
+<div class="tabs"><button data-t="site" onclick="tab('site')"></button><button data-t="jobs" onclick="tab('jobs')"></button><button data-t="apps" onclick="tab('apps')"></button><button data-t="pay" onclick="tab('pay')"></button><button onclick="sb.auth.signOut().then(()=>location.reload())" data-i="out"></button></div>
+<div id="v"></div></div>
 <script>
-const $ = id => document.getElementById(id);
-
-const sb = window.supabase?.createClient(
-  "https://qieifmpzmenpfewfsssl.supabase.co",
-  "sb_publishable_-yOD7PqBzqKuxrhbr7FmVQ_6HPhspI_"
-);
-
-let tab = "agents";
-let agents = [];
-let requests = [];
-
-function say(s, bad=false) {
-  $("msg").textContent = s;
-  $("msg").className = bad ? "err" : "ok";
-}
-
-function node(tag, text, cls) {
-  const el = document.createElement(tag);
-  el.textContent = String(text ?? "");
-  if (cls) el.className = cls;
-  return el;
-}
-
-function add(parent, tag, text, cls) {
-  const e = node(tag, text, cls);
-  parent.append(e);
-  return e;
-}
-
-function line(parent, k, v) {
-  const d = node("div");
-  add(d, "small", k + " : ");
-  add(d, "span", v ?? "—");
-  parent.append(d);
-}
-
-function updateAuth(authorized) {
-  $("login").classList.toggle("hidden", authorized);
-  $("dashboard").classList.toggle("hidden", !authorized);
-  $("logout").classList.toggle("hidden", !authorized);
-}
-
-async function authorize() {
-  if (!sb) {
-    say("Supabase کار ناکات", true);
-    return false;
-  }
-
-  const {data:{user}} = await sb.auth.getUser();
-
-  if (!user) {
-    updateAuth(false);
-    return false;
-  }
-
-  const {data,error} = await sb.rpc("is_tc_admin");
-
-  if (error || !data) {
-    await sb.auth.signOut();
-    updateAuth(false);
-    say("ئەم ئەکاونتە مۆڵەتی ئەدمینی نییە.", true);
-    return false;
-  }
-
-  updateAuth(true);
-  return true;
-}
-
-async function load() {
-  say("داتا دەهێنرێت...");
-
-  try {
-    const [a,r,ac,rc,pc] = await Promise.all([
-      sb.from("agents")
-        .select("*")
-        .order("created_at",{ascending:false})
-        .limit(200),
-
-      sb.from("tc_requests")
-        .select("*")
-        .order("created_at",{ascending:false})
-        .limit(200),
-
-      sb.from("agents")
-        .select("id",{count:"exact",head:true}),
-
-      sb.from("tc_requests")
-        .select("id",{count:"exact",head:true}),
-
-      sb.from("tc_requests")
-        .select("id",{count:"exact",head:true})
-        .eq("status","pending")
-    ]);
-
-    for (const response of [a,r,ac,rc,pc]) {
-      if (response.error) throw response.error;
-    }
-
-    agents = a.data || [];
-    requests = r.data || [];
-
-    $("agent-count").textContent = ac.count ?? "—";
-    $("request-count").textContent = rc.count ?? "—";
-    $("pending-count").textContent = pc.count ?? "—";
-
-    draw();
-    say("زانیاری نوێکرایەوە (٢٠٠ تۆماری دواوە بۆ هەر بەش)");
-
-  } catch (e) {
-    say("هەڵە: " + e.message, true);
-  }
-}
-
-function statusPicker(item, table, card) {
-  const sel = document.createElement("select");
-
-  for (const [v,n] of [
-    ["pending","چاوەڕوان"],
-    ["approved","پەسەندکراو"],
-    ["rejected","ڕەتکراو"]
-  ]) {
-    sel.add(new Option(n,v));
-  }
-
-  sel.value = item.status || "pending";
-
-  const save = node("button","پاشەکەوتکردنی دۆخ");
-
-  save.onclick = async () => {
-    save.disabled = true;
-
-    const {error} = await sb.from(table)
-      .update({status:sel.value})
-      .eq("id",item.id);
-
-    save.disabled = false;
-
-    if (error) {
-      say(error.message,true);
-    } else {
-      await load();
-    }
-  };
-
-  card.append(sel,save);
-}
-
-async function openPhoto(path) {
-  if (!path) return;
-
-  const {data,error} = await sb.storage
-    .from("id-photos")
-    .createSignedUrl(path,60);
-
-  if (error) {
-    say(error.message,true);
-    return;
-  }
-
-  window.open(
-    data.signedUrl,
-    "_blank",
-    "noopener,noreferrer"
-  );
-}
-
-function draw() {
-  const root = $("results");
-  root.replaceChildren();
-
-  add(
-    root,
-    "h2",
-    tab === "agents" ? "تۆماربووان" : "داواکارییەکان"
-  );
-
-  const entries = (
-    tab === "agents" ? agents : requests
-  ).filter(x =>
-    $("filter").value === "all" ||
-    (x.status || "pending") === $("filter").value
-  );
-
-  if (!entries.length) {
-    add(root,"p","هیچ تۆمارێک نییە","mut");
-    return;
-  }
-
-  for (const item of entries) {
-    const card = add(root,"div","","item");
-    const hd = add(card,"div","","row");
-
-    add(
-      hd,
-      "b",
-      tab === "agents"
-        ? (item.full_name || "—")
-        : (item.request_reference
-            ? "#" + item.request_reference
-            : "داواکاری")
-    );
-
-    add(
-      hd,
-      "small",
-      item.created_at
-        ? new Date(item.created_at).toLocaleString("en-GB")
-        : ""
-    );
-
-    line(card,"مۆبایل",item.phone);
-    line(card,"دۆخ",item.status || "pending");
-
-    if (tab === "agents") {
-      line(card,"ئیمەیڵ",item.email);
-      line(card,"لەدایکبوون",item.dob);
-      line(card,"ڕەگەز",item.gender);
-      line(card,"پارێزگا",item.province);
-      line(card,"ناونیشان",item.address);
-
-      const photos = add(card,"div","","photos");
-
-      for (const [label,path] of [
-        ["پێناسە پێش",item.id_front_path],
-        ["پێناسە پشت",item.id_back_path],
-        ["سێلفی",item.selfie_path]
-      ]) {
-        if (path) {
-          const b = node("button",label);
-          b.onclick = () => openPhoto(path);
-          photos.append(b);
-        }
-      }
-
-    } else {
-      line(
-        card,
-        "بڕی پارە",
-        (item.amount ?? 0).toLocaleString("en-US") + " IQD"
-      );
-
-      line(
-        card,
-        "بۆنەس",
-        (item.bonus_amount ?? 0).toLocaleString("en-US") + " IQD"
-      );
-
-      line(card,"تێبینی",item.address);
-    }
-
-    statusPicker(
-      item,
-      tab === "agents" ? "agents" : "tc_requests",
-      card
-    );
-  }
-}
-
-$("signin").onclick = async () => {
-  if (!sb) {
-    return say("Supabase unavailable",true);
-  }
-
-  $("signin").disabled = true;
-
-  const {error} = await sb.auth.signInWithPassword({
-    email:$("email").value.trim(),
-    password:$("password").value
-  });
-
-  $("signin").disabled = false;
-
-  if (error) {
-    return say(error.message,true);
-  }
-
-  if (await authorize()) {
-    await load();
-  }
-};
-
-$("logout").onclick = async () => {
-  await sb.auth.signOut();
-  updateAuth(false);
-  say("چوویتە دەرەوە");
-};
-
-$("refresh").onclick = load;
-
-$("show-agents").onclick = () => {
-  tab = "agents";
-  draw();
-};
-
-$("show-requests").onclick = () => {
-  tab = "requests";
-  draw();
-};
-
-$("filter").onchange = draw;
-
-(async () => {
-  if (await authorize()) {
-    await load();
-  }
-})();
-</script>
-</body>
-</html>
+const sb=supabase.createClient('https://aptycuncoovqbjbuyjhm.supabase.co','sb_publishable_RgOL_VRlz1yf_lqV-yMrdA_01Jh0EMe');
+const T={ar:{email:'البريد الإلكتروني',pass:'كلمة المرور',enter:'دخول',out:'خروج',site:'الموقع',jobs:'الوظائف',apps:'الطلبات',pay:'الدفع',save:'حفظ',title:'عنوان الموقع',about:'نص المعلومات',slide:'شريحة',stitle:'عنوان الشريحة',stext:'تفاصيل الشريحة',img:'الصورة',add:'إضافة وظيفة',del:'حذف',edit:'تعديل',desc:'الوصف',fee:'الرسوم',note:'ملاحظة',done:'تم الحفظ ✓',no:'لا يوجد',sure:'هل أنت متأكد؟',st:{new:'جديد',paid:'تم الدفع',done:'مكتمل',rejected:'مرفوض'}},
+en:{email:'Email',pass:'Password',enter:'Sign in',out:'Sign out',site:'Site',jobs:'Jobs',apps:'Applications',pay:'Payment',save:'Save',title:'Site title',about:'Info text',slide:'Slide',stitle:'Slide title',stext:'Slide details',img:'Image',add:'Add job',del:'Delete',edit:'Edit',desc:'Description',fee:'Fee',note:'Note',done:'Saved ✓',no:'Nothing here',sure:'Are you sure?',st:{new:'New',paid:'Paid',done:'Done',rejected:'Rejected'}},
+tr:{email:'E-posta',pass:'Şifre',enter:'Giriş',out:'Çıkış',site:'Site',jobs:'İşler',apps:'Başvurular',pay:'Ödeme',save:'Kaydet',title:'Site başlığı',about:'Bilgi metni',slide:'Slayt',stitle:'Slayt başlığı',stext:'Slayt detayı',img:'Görsel',add:'İş ekle',del:'Sil',edit:'Düzenle',desc:'Açıklama',fee:'Ücret',note:'Not',done:'Kaydedildi ✓',no:'Boş',sure:'Emin misiniz?',st:{new:'Yeni',paid:'Ödendi',done:'Tamam',rejected:'Reddedildi'}}};
+const LG=[['ar','🇸🇦','AR'],['en','🇬🇧','EN'],['tr','🇹🇷','TR']];
+let L=localStorage.alang||'ar',cur='site',S={},SL=[{},{},{}],P={},J=[],A=[];
+const $=id=>document.getElementById(id),t=k=>T[L][k]||T.en[k]||k;
+const e=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function lang(){const g=LG.find(x=>x[0]==L);document.documentElement.dir=L=='ar'?'rtl':'ltr';$('lb').textContent=g[1]+' '+g[2];
+ $('lg').innerHTML=LG.map(x=>`<button onclick="L='${x[0]}';localStorage.alang=L;lang();view()">${x[1]} ${x[2]}</button>`).join('');
+ document.querySelectorAll('[data-i]').forEach(n=>n.textContent=t(n.dataset.i));
+ document.querySelectorAll('[data-t]').forEach(n=>n.textContent=t(n.dataset.t));
+ document.querySelectorAll('.tabs button').forEach(n=>n.classList.toggle('on',n.dataset.t==cur))}
+$('lb').onclick=ev=>{ev.stopPropagation();$('lg').classList.toggle('on')};document.onclick=()=>$('lg').classList.remove('on');
+async function login(){const r=await sb.auth.signInWithPassword({email:$('em').value,password:$('pw').value});if(r.error)return alert(r.error.message);start()}
+async function start(){const {data}=await sb.auth.getSession();$('login').hidden=!!data.session;$('app').hidden=!data.session;lang();if(!data.session)return;
+ const [a,b,c]=await Promise.all([sb.from('settings').select('*'),sb.from('jobs').select('*').order('created_at',{ascending:false}),sb.from('applications').select('*').order('created_at',{ascending:false})]);
+ (a.data||[]).forEach(r=>{if(r.key=='site')S=r.value;if(r.key=='slides')SL=[0,1,2].map(i=>r.value[i]||{});if(r.key=='pay')P=r.value});J=b.data||[];A=c.data||[];view()}
+function tab(x){cur=x;lang();view()}
+function view(){const n=A.filter(a=>a.status=='new').length;$('bc').hidden=!n;$('bc').textContent=n;lang();
+ const v=$('v');
+ if(cur=='site')v.innerHTML=`<div class="box"><label>${t('title')}</label><input id="s_t" value="${e(S.title)}"><label>${t('about')}</label><textarea id="s_a">${e(S.about)}</textarea></div>`+
+  SL.map((s,i)=>`<div class="box"><b>${t('slide')} ${i+1}</b><label>${t('stitle')}</label><input id="t${i}" value="${e(s.title)}"><label>${t('stext')}</label><textarea id="x${i}">${e(s.text)}</textarea><label>${t('img')}</label><input type="file" accept="image/*" id="i${i}" onchange="pv(this,${i})"><div class="pv" id="p${i}" style="${s.img?`background-image:url('${e(s.img)}')`:''}"></div></div>`).join('')+`<div class="box"><button class="btn" onclick="saveSite()">${t('save')}</button></div>`;
+ if(cur=='pay')v.innerHTML=`<div class="box">${[['fee','fee'],['FIB','fib'],['IBAN','iban'],['KiCard','kicard'],['note','note']].map(([l,k])=>`<label>${T[L][l]||l}</label><input id="p_${k}" value="${e(P[k])}">`).join('')}<button class="btn" onclick="savePay()">${t('save')}</button></div>`;
+ if(cur=='jobs')v.innerHTML=`<div class="box"><b id="jf">${t('add')}</b><input type="hidden" id="j_id"><label>${t('title')}</label><input id="j_t"><label>${t('desc')}</label><textarea id="j_d"></textarea><label>${t('img')}</label><input type="file" accept="image/*" id="j_i"><button class="btn" onclick="saveJob()">${t('save')}</button></div><div class="box">${J.map(j=>`<div class="it"><img src="${e(j.image||'')}" onerror="this.style.visibility='hidden'"><div><b>${e(j.title)}</b></div><button class="btn" onclick="editJob('${j.id}')">${t('edit')}</button><button class="btn rd" onclick="delJob('${j.id}')">${t('del')}</button></div>`).join('')||t('no')}</div>`;
+ if(cur=='apps')v.innerHTML=`<div class="box">${A.map(a=>`<div class="it" style="align-items:flex-start"><a href="${e(a.selfie)}" target="_blank"><img src="${e(a.selfie)}"></a><div><b>${e(a.full_name)}</b> · ${e(a.nationality)}<br>💼 ${e(a.job_title)}<br>📞 <a href="tel:${e(a.phone)}">${e(a.phone)}</a><br>✉️ ${e(a.email)}<br><a href="${e(a.receipt)}" target="_blank">🧾</a> ${new Date(a.created_at).toLocaleString()}<br><select onchange="setSt('${a.id}',this.value)">${Object.entries(T[L].st).map(([k,l])=>`<option value="${k}" ${a.status==k?'selected':''}>${l}</option>`).join('')}</select></div><button class="btn rd" onclick="delApp('${a.id}')">✕</button></div>`).join('')||t('no')}</div>`}
+function pv(i,n){const f=i.files[0];if(f)$('p'+n).style.backgroundImage=`url('${URL.createObjectURL(f)}')`}
+async function up(f,dir){const p=`${dir}/${Date.now()}-${Math.random().toString(36).slice(2)}.${(f.name.split('.').pop()||'jpg').toLowerCase()}`;const r=await sb.storage.from('uploads').upload(p,f);if(r.error)throw r.error;return sb.storage.from('uploads').getPublicUrl(p).data.publicUrl}
+async function put(k,v){const r=await sb.from('settings').upsert({key:k,value:v});if(r.error)throw r.error}
+async function saveSite(){try{S={title:$('s_t').value,about:$('s_a').value};
+ for(let i=0;i<3;i++){const f=$('i'+i).files[0];SL[i]={title:$('t'+i).value,text:$('x'+i).value,img:f?await up(f,'slides'):SL[i].img}}
+ await put('site',S);await put('slides',SL);alert(t('done'))}catch(x){alert(x.message)}}
+async function savePay(){try{P={};['fee','fib','iban','kicard','note'].forEach(k=>P[k]=$('p_'+k).value);await put('pay',P);alert(t('done'))}catch(x){alert(x.message)}}
+function editJob(id){const j=J.find(x=>x.id==id);$('j_id').value=id;$('j_t').value=j.title;$('j_d').value=j.description;scrollTo(0,0)}
+async function saveJob(){try{const f=$('j_i').files[0],id=$('j_id').value,o={title:$('j_t').value,description:$('j_d').value};if(f)o.image=await up(f,'jobs');
+ const r=id?await sb.from('jobs').update(o).eq('id',id):await sb.from('jobs').insert(o);if(r.error)throw r.error;await start()}catch(x){alert(x.message)}}
+async function delJob(id){if(confirm(t('sure'))){await sb.from('jobs').delete().eq('id',id);start()}}
+async function setSt(id,s){await sb.from('applications').update({status:s}).eq('id',id);const a=A.find(x=>x.id==id);a.status=s;view()}
+async function delApp(id){if(confirm(t('sure'))){await sb.from('applications').delete().eq('id',id);start()}}
+start();
+</script></body></html>
