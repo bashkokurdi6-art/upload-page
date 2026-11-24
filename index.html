@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -53,7 +54,6 @@ h2:after{content:"";position:absolute;bottom:-2px;inset-inline-start:0;width:64p
 .sc:hover{transform:translateY(-3px);box-shadow:0 10px 24px #00502a45}
 .sc svg{flex:none;background:#ffffff14;border-radius:12px;padding:8px;width:58px;height:58px}
 .sc span{flex:1;display:flex;flex-direction:column;gap:3px;position:relative}.sc b{font-size:17px;font-weight:700}.sc small{font-size:13px;color:#cfe6d8}
-
 footer{background:#f0f1ee;color:var(--ink);text-align:center;padding:26px 16px 22px;margin-top:40px;border-top:1px solid var(--bd)}
 footer h3{font-size:20px;font-weight:700;max-width:560px;margin:0 auto 14px;padding-bottom:12px;border-bottom:1px solid #c4c6c2}
 footer a{display:block;color:var(--ink);text-decoration:none;font-size:15px;padding:7px 0}footer a:hover{color:var(--g)}
@@ -103,6 +103,33 @@ textarea{width:100%;padding:11px 12px;border:1px solid #c5d0ca;border-radius:8px
 .mg.user{align-self:flex-start;background:var(--g);color:#fff}.mg.admin{align-self:flex-end;background:#fff;border:1px solid var(--bd)}
 .cf{display:flex;gap:8px;padding:10px;border-top:1px solid var(--bd)}.cf input{flex:1;min-width:0}.cf .btn{padding:10px 14px;flex:none}
 .hint{color:var(--mut);font-size:13px;text-align:center;margin:auto;line-height:1.8}
+
+/* Contact links */
+.contact-end{
+display:flex;
+justify-content:center;
+align-items:center;
+flex-wrap:wrap;
+gap:12px;
+padding:18px 16px 95px;
+background:#f0f1ee;
+}
+.contact-end a{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:9px;
+background:#fff;
+color:var(--g);
+border:1px solid var(--bd);
+border-radius:10px;
+padding:12px 18px;
+text-decoration:none;
+font-size:15px;
+font-weight:600;
+}
+.contact-end svg{width:24px;height:24px;flex:none}
+.contact-end a:hover{border-color:var(--g)}
 </style></head>
 <body>
 <div class="bar"><span id="gr"></span><b id="clk"></b><span id="hj"></span></div>
@@ -112,11 +139,40 @@ textarea{width:100%;padding:11px 12px;border:1px solid #c5d0ca;border-radius:8px
 <div class="dd" id="lg"></div><div class="dd" id="bl"></div></header>
 <div class="wrap">
 <div class="sl" id="sl"><div class="tr" id="tr"></div><div class="dots" id="dt"></div></div>
+
+<h2 id="h3"></h2>
+<div class="lk">
+<a class="sc" target="_blank" rel="noopener" href="https://prh.gov.sa/ar/almasjed_alharam/imem-muadhen-makka">
+<svg width="50" height="50" viewBox="0 0 48 48" fill="none" stroke="#e9d9ae" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 42V29h28v13M13 29c0-7 5-11 11-11s11 4 11 11M24 18v-6M22 12h4M4 42h40M7 42V22M41 42V22M5.5 22h3M39.5 22h3"/></svg>
+<span><b id="mk"></b><small id="mk2"></small></span>
+</a>
+<a class="sc" target="_blank" rel="noopener" href="https://prh.gov.sa/ar/almasjed_alnabawi/imem-muadhen-madina">
+<svg width="50" height="50" viewBox="0 0 48 48" fill="none" stroke="#e9d9ae" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 42V29h28v13M13 29c0-7 5-11 11-11s11 4 11 11M24 18v-6M22 12h4M4 42h40M7 42V22M41 42V22M5.5 22h3M39.5 22h3"/></svg>
+<span><b id="mn"></b><small id="mn2"></small></span>
+</a>
+</div>
+
 <button class="btn gh" id="mc" hidden style="margin-top:14px"></button>
 <h2 id="h1"></h2><div class="grid" id="jb"></div>
-<h2 id="h3"></h2><div class="lk"><a class="sc" target="_blank" rel="noopener" href="https://prh.gov.sa/ar/almasjed_alharam/imem-muadhen-makka"><svg width="50" height="50" viewBox="0 0 48 48" fill="none" stroke="#e9d9ae" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 42V29h28v13M13 29c0-7 5-11 11-11s11 4 11 11M24 18v-6M22 12h4M4 42h40M7 42V22M41 42V22M5.5 22h3M39.5 22h3"/></svg><span><b id="mk"></b><small id="mk2"></small></span></a><a class="sc" target="_blank" rel="noopener" href="https://prh.gov.sa/ar/almasjed_alnabawi/imem-muadhen-madina"><svg width="50" height="50" viewBox="0 0 48 48" fill="none" stroke="#e9d9ae" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 42V29h28v13M13 29c0-7 5-11 11-11s11 4 11 11M24 18v-6M22 12h4M4 42h40M7 42V22M41 42V22M5.5 22h3M39.5 22h3"/></svg><span><b id="mn"></b><small id="mn2"></small></span></a></div>
 <h2 id="h2"></h2><div id="info"></div></div>
 <footer id="ft"></footer>
+
+<div class="contact-end">
+<a href="https://chat.whatsapp.com/BHgT7kFYVWQC37TNpmZZMV?s=cl&amp;p=i&amp;iam=2" target="_blank" rel="noopener noreferrer">
+<svg viewBox="0 0 24 24" fill="#25D366">
+<path d="M12 2a10 10 0 0 0-8.7 15L2 22l5.2-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.4-.2-2.7.7.7-2.6-.3-.5A8 8 0 1 1 12 20z"/>
+<path d="M8 7c-.4 0-1 .5-1 1.5 0 2.5 3.8 6.8 7.5 7.5 1.2.2 2.5-.8 2.5-1.6 0-.3-2.4-1.5-2.7-1.5-.4 0-.8 1-1.2 1-.8 0-3.5-2.4-3.5-3.2 0-.3.8-.8.8-1.2L9.2 7.2C9 7 8.5 7 8 7z"/>
+</svg>
+<span>مجموعة واتساب</span>
+</a>
+<a href="tel:+9647503934163">
+<svg viewBox="0 0 24 24" fill="#006C35">
+<path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.8 21 3 13.2 3 3.7c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1z"/>
+</svg>
+<span dir="ltr">+9647503934163</span>
+</a>
+</div>
+
 <button class="cb" id="cb" aria-label="chat"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="bd" id="cn" hidden></span></button>
 <div class="cw" id="cw"><div class="ch"><b id="ct"></b><button onclick="chatClose()">✕</button></div><div class="cm" id="cm"></div><div class="cf" id="cf"></div></div>
 <div class="md" id="md"><div class="sh" id="sh"></div></div>
