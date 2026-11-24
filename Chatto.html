@@ -166,15 +166,10 @@ dialog .acts{display:flex;gap:8px;margin-top:6px}
 <div id="auth">
   <div class="auth-card">
     <div class="logo"><span id="logoA"></span><h1>Bashko Room</h1></div>
-    <p class="sub">Live chat rooms with messages, photos, voice notes and files.</p>
-    <div class="tabs" id="authTabs">
-      <button class="on" data-m="in">Sign in</button>
-      <button data-m="up">Create account</button>
-    </div>
+    <p class="sub">Pick a name and jump in. No email, no password.</p>
     <div id="authErr" class="err hidden"></div>
-    <div class="field"><label for="aName">Username</label><input id="aName" autocomplete="username" maxlength="24" placeholder="e.g. Bashko"></div>
-    <div class="field" id="passField"><label for="aPass">Password</label><input id="aPass" type="password" autocomplete="current-password" placeholder="At least 6 characters"></div>
-    <button class="btn" id="authBtn">Sign in</button>
+    <div class="field"><label for="aName">Your name</label><input id="aName" autocomplete="username" maxlength="24" placeholder="e.g. Bashko"></div>
+    <button class="btn" id="authBtn">Enter chat</button>
     <p class="demo-note hidden" id="demoNote">Demo mode: Supabase is not connected, so messages stay on this device and browser only.</p>
   </div>
 </div>
@@ -299,22 +294,17 @@ const SB = {
   emailFor(n) { return 'u' + [...new TextEncoder().encode(n.trim().toLowerCase())].map(b => b.toString(16).padStart(2, '0')).join('') + '@chatto.app'; },
   user(u) { const m = u.user_metadata || {}; return { id: u.id, name: m.username || 'User', color: m.color || colorFor(m.username || 'x') }; },
   async init() {
-    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const { data } = await sb.auth.getSession();
-    return data.session ? this.user(data.session.user) : null;
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
+    try { return JSON.parse(localStorage.getItem('chatto_user')); } catch (e) { return null; }
   },
-  async signUp(n, p) {
-    const { data, error } = await sb.auth.signUp({ email: this.emailFor(n), password: p, options: { data: { username: n.trim(), color: colorFor(n.trim()) } } });
-    if (error) throw new Error(/registered/i.test(error.message) ? 'This username is already taken' : error.message);
-    if (!data.session) throw new Error('In Supabase, turn off "Confirm email" (Authentication > Providers > Email)');
-    return this.user(data.user);
+  async signUp(n) { return this.signIn(n); },
+  async signIn(n) {
+    const name = n.trim();
+    let u; try { u = JSON.parse(localStorage.getItem('chatto_user')); } catch (e) {}
+    u = { id: (u && u.id) || uid(), name, color: colorFor(name) };
+    localStorage.setItem('chatto_user', JSON.stringify(u)); sbMe = { ...u, room: null }; return u;
   },
-  async signIn(n, p) {
-    const { data, error } = await sb.auth.signInWithPassword({ email: this.emailFor(n), password: p });
-    if (error) throw new Error('Wrong username or password');
-    return this.user(data.user);
-  },
-  async signOut() { await sb.auth.signOut(); if (sbChan) sb.removeChannel(sbChan); },
+  async signOut() { localStorage.removeItem('chatto_user'); if (sbChan) sb.removeChannel(sbChan); },
   async listRooms() { const { data, error } = await sb.from('chatto_rooms').select('*').order('created_at'); if (error) throw error; return data; },
   async createRoom(name, description) { const { data, error } = await sb.from('chatto_rooms').insert({ name, description }).select().single(); if (error) throw new Error(error.code === '23505' ? 'This room already exists' : error.message); return data; },
   async loadMessages(roomId, before, limit) {
@@ -322,10 +312,10 @@ const SB = {
     if (before) q = q.lt('created_at', before);
     const { data, error } = await q; if (error) throw error; return data.reverse();
   },
-  async send(m) { const { data, error } = await sb.from('chatto_messages').insert(m).select().single(); if (error) throw error; return data; },
-  async edit(id, content) { const { data, error } = await sb.from('chatto_messages').update({ content, edited: true }).eq('id', id).select().single(); if (error) throw error; return data; },
-  async remove(id) { const { error } = await sb.from('chatto_messages').delete().eq('id', id); if (error) throw error; },
-  async react(id, emo) { const { error } = await sb.rpc('chatto_toggle_reaction', { p_id: id, p_emoji: emo }); if (error) throw error; },
+  async send(m) { const { data, error } = await sb.from('chatto_messages').insert({ ...m, user_id: sbMe.id }).select().single(); if (error) throw error; return data; },
+  async edit(id, content) { const { data, error } = await sb.from('chatto_messages').update({ content, edited: true }).eq('id', id).eq('user_id', sbMe.id).select().single(); if (error) throw error; return data; },
+  async remove(id) { const { error } = await sb.from('chatto_messages').delete().eq('id', id).eq('user_id', sbMe.id); if (error) throw error; },
+  async react(id, emo) { const { error } = await sb.rpc('chatto_toggle_reaction', { p_id: id, p_emoji: emo, p_user: sbMe.id }); if (error) throw error; },
   async upload(blob, name, me) {
     const ext = (name.split('.').pop() || 'bin').replace(/[^a-z0-9]/gi, '').slice(0, 6) || 'bin';
     const path = me.id + '/' + Date.now() + '-' + Math.random().toString(16).slice(2, 8) + '.' + ext;
@@ -443,28 +433,19 @@ const EMOJI = {
 };
 
 const gi = id => document.getElementById(id);
-let authMode = 'in';
-function setAuthMode(m) {
-  authMode = m;
-  document.querySelectorAll('#authTabs button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
-  gi('authBtn').textContent = m === 'in' ? 'Sign in' : 'Create account';
-  gi('aPass').autocomplete = m === 'in' ? 'current-password' : 'new-password';
-}
-
 async function boot() {
   gi('logoA').innerHTML = sunSVG(46); gi('logoB').innerHTML = sunSVG(30);
   gi('muteBtn').textContent = muted ? '🔕' : '🔔';
-  if (B.demo) { gi('passField').classList.add('hidden'); gi('demoNote').classList.remove('hidden'); gi('authTabs').classList.add('hidden'); }
+  if (B.demo) gi('demoNote').classList.remove('hidden');
   try { const u = await B.init(); if (u) return start(u); } catch (e) { console.error(e); }
 }
 async function doAuth() {
-  const n = gi('aName').value.trim(), p = gi('aPass').value, er = gi('authErr');
+  const n = gi('aName').value.trim(), er = gi('authErr');
   er.classList.add('hidden');
   try {
     if (n.length < 2) throw new Error('Username must be at least 2 characters');
-    if (!B.demo && p.length < 6) throw new Error('Password must be at least 6 characters');
     gi('authBtn').disabled = true;
-    const u = authMode === 'up' ? await B.signUp(n, p) : await B.signIn(n, p);
+    const u = await B.signIn(n);
     await start(u);
   } catch (e) { er.textContent = e.message || 'Something went wrong'; er.classList.remove('hidden'); }
   gi('authBtn').disabled = false;
@@ -513,7 +494,7 @@ function msgHtml(m, cont) {
   let body = '';
   if (m.reply_to) { const r = msgById(m.reply_to); body += `<div class="reply" data-act="jump" data-id="${esc(m.reply_to)}"><b>${esc(r ? r.username : '...')}</b><span>${esc(previewOf(r))}</span></div>`; }
   if (m.type === 'image') body += `<img class="pic" src="${esc(m.file_url)}" alt="Photo" data-act="zoom" loading="lazy">`;
-  else if (m.type === 'audio') body += `<audio controls preload="none" src="${esc(m.file_url)}"></audio>`;
+  else if (m.type === 'audio') body += `<audio controls preload="metadata" src="${esc(m.file_url)}"></audio>`;
   else if (m.type === 'file') body += `<a class="filebox" href="${esc(m.file_url)}" download="${esc(m.file_name || 'file')}" target="_blank" rel="noopener"><span style="font-size:26px">📄</span><span>${esc(m.file_name || 'File')}</span></a>`;
   if (m.content && m.type !== 'audio') body += `<div class="txt" dir="auto">${linkify(m.content, search)}</div>`;
   const rx = Object.entries(m.reactions || {}).filter(([, a]) => a.length).map(([e, a]) => `<button class="rx ${a.includes(me.id) ? 'on' : ''}" data-act="react" data-id="${esc(m.id)}" data-emo="${e}">${e} ${a.length}</button>`).join('');
@@ -646,9 +627,8 @@ function insertAtCursor(t) {
 }
 
 /* ---------- events ---------- */
-document.querySelectorAll('#authTabs button').forEach(b => b.onclick = () => setAuthMode(b.dataset.m));
 gi('authBtn').onclick = doAuth;
-['aName', 'aPass'].forEach(i => gi(i).addEventListener('keydown', e => { if (e.key === 'Enter') doAuth(); }));
+gi('aName').addEventListener('keydown', e => { if (e.key === 'Enter') doAuth(); });
 gi('logoutBtn').onclick = async () => { await B.signOut(); location.reload(); };
 gi('rooms').onclick = e => { const b = e.target.closest('[data-room]'); if (b) openRoom(b.dataset.room); };
 gi('menuBtn').onclick = () => document.body.classList.add('menu');
