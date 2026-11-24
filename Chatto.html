@@ -315,17 +315,17 @@ const SB = {
     return this.user(data.user);
   },
   async signOut() { await sb.auth.signOut(); if (sbChan) sb.removeChannel(sbChan); },
-  async listRooms() { const { data, error } = await sb.from('rooms').select('*').order('created_at'); if (error) throw error; return data; },
-  async createRoom(name, description) { const { data, error } = await sb.from('rooms').insert({ name, description }).select().single(); if (error) throw new Error(error.code === '23505' ? 'This room already exists' : error.message); return data; },
+  async listRooms() { const { data, error } = await sb.from('chatto_rooms').select('*').order('created_at'); if (error) throw error; return data; },
+  async createRoom(name, description) { const { data, error } = await sb.from('chatto_rooms').insert({ name, description }).select().single(); if (error) throw new Error(error.code === '23505' ? 'This room already exists' : error.message); return data; },
   async loadMessages(roomId, before, limit) {
-    let q = sb.from('messages').select('*').eq('room_id', roomId).order('created_at', { ascending: false }).limit(limit);
+    let q = sb.from('chatto_messages').select('*').eq('room_id', roomId).order('created_at', { ascending: false }).limit(limit);
     if (before) q = q.lt('created_at', before);
     const { data, error } = await q; if (error) throw error; return data.reverse();
   },
-  async send(m) { const { data, error } = await sb.from('messages').insert(m).select().single(); if (error) throw error; return data; },
-  async edit(id, content) { const { data, error } = await sb.from('messages').update({ content, edited: true }).eq('id', id).select().single(); if (error) throw error; return data; },
-  async remove(id) { const { error } = await sb.from('messages').delete().eq('id', id); if (error) throw error; },
-  async react(id, emo) { const { error } = await sb.rpc('toggle_reaction', { p_id: id, p_emoji: emo }); if (error) throw error; },
+  async send(m) { const { data, error } = await sb.from('chatto_messages').insert(m).select().single(); if (error) throw error; return data; },
+  async edit(id, content) { const { data, error } = await sb.from('chatto_messages').update({ content, edited: true }).eq('id', id).select().single(); if (error) throw error; return data; },
+  async remove(id) { const { error } = await sb.from('chatto_messages').delete().eq('id', id); if (error) throw error; },
+  async react(id, emo) { const { error } = await sb.rpc('chatto_toggle_reaction', { p_id: id, p_emoji: emo }); if (error) throw error; },
   async upload(blob, name, me) {
     const ext = (name.split('.').pop() || 'bin').replace(/[^a-z0-9]/gi, '').slice(0, 6) || 'bin';
     const path = me.id + '/' + Date.now() + '-' + Math.random().toString(16).slice(2, 8) + '.' + ext;
@@ -336,8 +336,8 @@ const SB = {
   subscribe(me, h) {
     sbMe = { id: me.id, name: me.name, color: me.color, room: null };
     sbChan = sb.channel('chatto-lobby', { config: { presence: { key: me.id }, broadcast: { self: false } } })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, p => h.onMessage(p.eventType, p.new, p.old))
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rooms' }, p => h.onRoom(p.new))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chatto_messages' }, p => h.onMessage(p.eventType, p.new, p.old))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chatto_rooms' }, p => h.onRoom(p.new))
       .on('presence', { event: 'sync' }, () => h.onPresence(Object.values(sbChan.presenceState()).map(a => a[0])))
       .on('broadcast', { event: 'typing' }, ({ payload }) => h.onTyping(payload))
       .subscribe(async s => { if (s === 'SUBSCRIBED') await sbChan.track(sbMe); });
