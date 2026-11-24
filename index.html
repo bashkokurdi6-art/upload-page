@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>فرص العمل</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{--g:#006C35;--gd:#00502a;--gold:#B8975A;--ink:#1c2b24;--mut:#5b6b63;--bd:#e1e6e3;--bg:#f6f8f7}
@@ -74,15 +75,29 @@ input{width:100%;padding:11px 12px;border:1px solid #c5d0ca;border-radius:8px;fo
 .s img{position:static;display:block;width:100%;height:auto}
 .s.ph{aspect-ratio:16/8}
 .s span{position:absolute;left:0;right:0;bottom:0;width:auto}
+select{width:100%;padding:11px 12px;border:1px solid #c5d0ca;border-radius:8px;font:inherit;background:#fff}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stp{font-size:12px;color:var(--mut);margin-top:6px}
+textarea{width:100%;padding:11px 12px;border:1px solid #c5d0ca;border-radius:8px;font:inherit;min-height:70px}
+.sum{background:#f6f8f7;border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:14px;line-height:2}
+#cvw{position:fixed;left:-10000px;top:0}
+.cvp{width:794px;height:1123px;position:relative;background:#fff;color:#1c2b24;padding:48px 52px;font-family:'IBM Plex Sans Arabic',Arial,sans-serif;direction:ltr;text-align:left;overflow:hidden}
+.cvh{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-bottom:20px;border-bottom:3px solid #006C35}
+.cvh h1{font-size:30px;color:#006C35;margin:0 0 4px}.cvh h2{font-size:17px;font-weight:500;color:#B8975A;margin:0 0 10px}.cvh p{margin:2px 0;font-size:13.5px;color:#444}
+.cvh img{width:130px;height:160px;object-fit:cover;border-radius:6px;border:2px solid #B8975A;flex:none}
+.cvp h4{font-size:14px;letter-spacing:.5px;color:#fff;background:#006C35;margin:22px 0 8px;padding:5px 12px;border-radius:4px}
+.cvp table{width:100%;border-collapse:collapse;font-size:13.5px}.cvp th{width:34%;text-align:left;color:#5b6b63;font-weight:500;padding:5px 8px;border-bottom:1px solid #eef1ef}.cvp td{padding:5px 8px;border-bottom:1px solid #eef1ef}
+.cvl{font-size:13.5px;line-height:1.9;padding:0 8px}
+.cvf{position:absolute;left:52px;right:52px;bottom:30px;border-top:1px solid #dcdedb;padding-top:12px;display:flex;align-items:center;justify-content:center;gap:12px;color:#5b6b63;font-size:12px}.cvf img{height:42px}
 </style></head>
 <body>
 <div class="bar"><span id="gr"></span><b id="clk"></b><span id="hj"></span></div>
 <header><div class="hi"><button class="ib" id="lb"></button>
-<div class="brand"><img id="lgo" src="IMG_0200.png" alt="" onerror="this.hidden=true"><h1 id="ti"></h1></div>
+<div class="brand"><img id="lgo" alt="" hidden><h1 id="ti"></h1></div>
 <button class="ib" id="bb" aria-label="notifications"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9a6 6 0 1112 0c0 6 2 7 2 7H4s2-1 2-7zM10 20a2 2 0 004 0"/></svg><span class="bd" id="bc" hidden></span></button></div>
 <div class="dd" id="lg"></div><div class="dd" id="bl"></div></header>
 <div class="wrap">
 <div class="sl" id="sl"><div class="tr" id="tr"></div><div class="dots" id="dt"></div></div>
+<button class="btn gh" id="mc" hidden style="margin-top:14px"></button>
 <h2 id="h1"></h2><div class="grid" id="jb"></div>
 <h2 id="h3"></h2><div class="lk"><a class="sc" target="_blank" rel="noopener" href="https://prh.gov.sa/ar/almasjed_alharam/imem-muadhen-makka"><svg width="50" height="50" viewBox="0 0 48 48" fill="none" stroke="#e9d9ae" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 42V29h28v13M13 29c0-7 5-11 11-11s11 4 11 11M24 18v-6M22 12h4M4 42h40M7 42V22M41 42V22M5.5 22h3M39.5 22h3"/></svg><span><b id="mk"></b><small id="mk2"></small></span></a><a class="sc" target="_blank" rel="noopener" href="https://prh.gov.sa/ar/almasjed_alnabawi/imem-muadhen-madina"><svg width="50" height="50" viewBox="0 0 48 48" fill="none" stroke="#e9d9ae" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 42V29h28v13M13 29c0-7 5-11 11-11s11 4 11 11M24 18v-6M22 12h4M4 42h40M7 42V22M41 42V22M5.5 22h3M39.5 22h3"/></svg><span><b id="mn"></b><small id="mn2"></small></span></a></div>
 <h2 id="h2"></h2><div id="info"></div></div>
@@ -91,8 +106,8 @@ input{width:100%;padding:11px 12px;border:1px solid #c5d0ca;border-radius:8px;fo
 <script>
 const sb=supabase.createClient('https://aptycuncoovqbjbuyjhm.supabase.co','sb_publishable_RgOL_VRlz1yf_lqV-yMrdA_01Jh0EMe');
 const T={
-ar:{more:'المزيد',sch:'جداول الأئمة والمؤذنين',mk:'المسجد الحرام – مكة المكرمة',vw:'عرض الجدول الرسمي',mn:'المسجد النبوي – المدينة المنورة',t:'فرص العمل',jobs:'الوظائف المتاحة',info:'معلومات إضافية',apply:'التقديم',name:'الاسم الثلاثي',nat:'الجنسية',phone:'رقم الجوال',email:'البريد الإلكتروني',selfie:'صورة سيلفي',next:'التالي',back:'رجوع',pay:'لإنشاء السيرة الذاتية يرجى دفع الرسوم',fee:'الرسوم',receipt:'صورة إيصال الدفع',send:'إرسال الطلب',done:'تم استلام طلبك بنجاح، سنتواصل معك قريباً',copy:'نسخ',no:'لا توجد وظائف حالياً',nn:'لا جديد',fill:'يرجى تعبئة جميع الحقول',err:'حدث خطأ، حاول مرة أخرى',auto:'تم تحديد الدولة تلقائياً'},
-en:{more:'More',sch:'Imam & Muezzin Schedules',mk:'Masjid al-Haram – Makkah',vw:'View official schedule',mn:'Prophet’s Mosque – Madinah',t:'Job Opportunities',jobs:'Available Jobs',info:'More Information',apply:'Apply',name:'Full name (3 names)',nat:'Nationality',phone:'Mobile number',email:'Email',selfie:'Selfie photo',next:'Next',back:'Back',pay:'To create your CV please pay the fee',fee:'Fee',receipt:'Payment receipt photo',send:'Submit application',done:'Your application was received. We will contact you soon.',copy:'Copy',no:'No jobs yet',nn:'Nothing new',fill:'Please fill in all fields',err:'Something went wrong, try again',auto:'Country detected automatically'},
+ar:{s1:'المعلومات الشخصية',s2:'التعليم واللغات والخبرة',s3:'المراجعة والدفع',gender:'الجنس',male:'ذكر',female:'أنثى',dob:'تاريخ الميلاد',pob:'مكان الميلاد',marital:'الحالة الاجتماعية',single:'أعزب',married:'متزوج',oth:'أخرى',pass:'رقم جواز السفر',pexp:'تاريخ انتهاء الجواز',addr:'العنوان (المدينة)',edu:'المستوى التعليمي',none:'بدون شهادة',primary:'ابتدائية',secondary:'ثانوية',diploma:'دبلوم',bachelor:'بكالوريوس',master:'ماجستير',phd:'دكتوراه',school:'اسم المدرسة / الجامعة',field:'التخصص',gyear:'سنة التخرج',langs:'اللغات',lang:'اللغة',basic:'مبتدئ',good:'جيد',fluent:'ممتاز',native:'اللغة الأم',exp:'سنوات الخبرة',emp:'آخر جهة عمل',role:'المسمى الوظيفي',skills:'المهارات',lic:'رخصة قيادة',yn1:'نعم',yn0:'لا',paybtn:'الدفع عبر FIB',waiting:'بانتظار تأكيد الدفع…',code:'رمز الدفع',openfib:'فتح تطبيق FIB',paid:'تم الدفع بنجاح',dl:'تحميل السيرة الذاتية PDF',mycv:'سيرتي الذاتية',wait2:'تم استلام طلبك. بعد تأكيد الإدارة للدفع يمكنك تحميل السيرة الذاتية من زر «سيرتي الذاتية».',more:'المزيد',sch:'جداول الأئمة والمؤذنين',mk:'المسجد الحرام – مكة المكرمة',vw:'عرض الجدول الرسمي',mn:'المسجد النبوي – المدينة المنورة',t:'فرص العمل',jobs:'الوظائف المتاحة',info:'معلومات إضافية',apply:'التقديم',name:'الاسم الثلاثي',nat:'الجنسية',phone:'رقم الجوال',email:'البريد الإلكتروني',selfie:'صورة سيلفي',next:'التالي',back:'رجوع',pay:'لإنشاء السيرة الذاتية يرجى دفع الرسوم',fee:'الرسوم',receipt:'صورة إيصال الدفع',send:'إرسال الطلب',done:'تم استلام طلبك بنجاح، سنتواصل معك قريباً',copy:'نسخ',no:'لا توجد وظائف حالياً',nn:'لا جديد',fill:'يرجى تعبئة جميع الحقول',err:'حدث خطأ، حاول مرة أخرى',auto:'تم تحديد الدولة تلقائياً'},
+en:{s1:'Personal details',s2:'Education, languages & experience',s3:'Review & payment',gender:'Gender',male:'Male',female:'Female',dob:'Date of birth',pob:'Place of birth',marital:'Marital status',single:'Single',married:'Married',oth:'Other',pass:'Passport number',pexp:'Passport expiry',addr:'Address (city)',edu:'Education level',none:'No formal education',primary:'Primary school',secondary:'Secondary school',diploma:'Diploma',bachelor:'Bachelor’s degree',master:'Master’s degree',phd:'PhD',school:'School / University',field:'Field of study',gyear:'Graduation year',langs:'Languages',lang:'Language',basic:'Basic',good:'Good',fluent:'Fluent',native:'Native',exp:'Years of experience',emp:'Last employer',role:'Job title',skills:'Skills',lic:'Driving licence',yn1:'Yes',yn0:'No',paybtn:'Pay with FIB',waiting:'Waiting for payment confirmation…',code:'Payment code',openfib:'Open FIB app',paid:'Payment received',dl:'Download CV (PDF)',mycv:'My CV',wait2:'Your request was received. Once the payment is confirmed you can download your CV from the “My CV” button.',more:'More',sch:'Imam & Muezzin Schedules',mk:'Masjid al-Haram – Makkah',vw:'View official schedule',mn:'Prophet’s Mosque – Madinah',t:'Job Opportunities',jobs:'Available Jobs',info:'More Information',apply:'Apply',name:'Full name (3 names)',nat:'Nationality',phone:'Mobile number',email:'Email',selfie:'Selfie photo',next:'Next',back:'Back',pay:'To create your CV please pay the fee',fee:'Fee',receipt:'Payment receipt photo',send:'Submit application',done:'Your application was received. We will contact you soon.',copy:'Copy',no:'No jobs yet',nn:'Nothing new',fill:'Please fill in all fields',err:'Something went wrong, try again',auto:'Country detected automatically'},
 tr:{more:'Daha fazla',t:'İş Fırsatları',jobs:'Mevcut İşler',info:'Daha Fazla Bilgi',apply:'Başvur',name:'Ad soyad (3 isim)',nat:'Uyruk',phone:'Cep telefonu',email:'E-posta',selfie:'Selfie fotoğrafı',next:'İleri',back:'Geri',pay:'CV oluşturmak için ücreti ödeyin',fee:'Ücret',receipt:'Ödeme dekontu',send:'Başvuruyu gönder',done:'Başvurunuz alındı, sizinle iletişime geçeceğiz.',copy:'Kopyala',no:'Henüz ilan yok',nn:'Yeni bir şey yok',fill:'Tüm alanları doldurun',err:'Hata oluştu, tekrar deneyin',auto:'Ülke otomatik algılandı'},
 fa:{more:'بیشتر',t:'فرصت‌های شغلی',jobs:'مشاغل موجود',info:'اطلاعات بیشتر',apply:'ثبت‌نام',name:'نام کامل (۳ نام)',nat:'ملیت',phone:'شماره موبایل',email:'ایمیل',selfie:'عکس سلفی',next:'بعدی',back:'بازگشت',pay:'برای ساخت رزومه هزینه را پرداخت کنید',fee:'هزینه',receipt:'تصویر رسید پرداخت',send:'ارسال درخواست',done:'درخواست شما دریافت شد، به زودی تماس می‌گیریم.',copy:'کپی',no:'شغلی موجود نیست',nn:'مورد جدیدی نیست',fill:'همه فیلدها را پر کنید',err:'خطا رخ داد، دوباره تلاش کنید',auto:'کشور به صورت خودکار تشخیص داده شد'},
 ur:{more:'مزید',t:'ملازمت کے مواقع',jobs:'دستیاب ملازمتیں',info:'مزید معلومات',apply:'درخواست دیں',name:'پورا نام (3 نام)',nat:'قومیت',phone:'موبائل نمبر',email:'ای میل',selfie:'سیلفی تصویر',next:'اگلا',back:'واپس',pay:'سی وی بنانے کے لیے فیس ادا کریں',fee:'فیس',receipt:'ادائیگی کی رسید',send:'درخواست بھیجیں',done:'آپ کی درخواست موصول ہو گئی، ہم جلد رابطہ کریں گے۔',copy:'کاپی',no:'ابھی کوئی ملازمت نہیں',nn:'کچھ نیا نہیں',fill:'تمام خانے پُر کریں',err:'خرابی ہوئی، دوبارہ کوشش کریں',auto:'ملک خودکار طور پر معلوم ہوا'}};
@@ -113,7 +128,7 @@ function render(){
  const lg=LG.find(x=>x[0]==L);document.documentElement.lang=L;document.documentElement.dir=['ar','fa','ur'].includes(L)?'rtl':'ltr';
  $('lb').textContent=lg[1]+' '+lg[2];$('ti').textContent=S.title||t('t');if(S.logo){$('lgo').src=S.logo;$('lgo').hidden=false}document.title=$('ti').textContent;ft();
  $('lg').innerHTML=LG.map(x=>`<button onclick="setL('${x[0]}')">${x[1]} ${x[2]}</button>`).join('');
- $('h1').textContent=t('jobs');$('h2').textContent=t('info');$('h3').textContent=t('sch');$('mk').textContent=t('mk');$('mn').textContent=t('mn');$('mk2').textContent=$('mn2').textContent=t('vw');
+ $('h1').textContent=t('jobs');$('mc').hidden=!localStorage.cvid;$('mc').textContent=t('mycv');$('h2').textContent=t('info');$('h3').textContent=t('sch');$('mk').textContent=t('mk');$('mn').textContent=t('mn');$('mk2').textContent=$('mn2').textContent=t('vw');
  const sl=[0,1,2].map(i=>SL[i]||{});
  $('tr').innerHTML=sl.map(s=>`<div class="s ${s.img?'':'ph'}" ${s.img?`style="--u:url('${e(s.img)}')"`:''}>${s.img?`<img src="${e(s.img)}" alt="" onload="go(idx)">`:''}<span>${e(s.title||'')}<em>${t('more')} ‹</em></span></div>`).join('');
  $('dt').innerHTML=sl.map((_,i)=>`<i class="${i==idx?'on':''}"></i>`).join('');go(idx);
@@ -135,29 +150,77 @@ function tick(){const d=new Date(),z='Asia/Riyadh',l=L=='ar'?'ar-SA':L;
  $('gr').textContent=d.toLocaleDateString(l,{timeZone:z,dateStyle:'medium'});
  try{$('hj').textContent=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{timeZone:z,dateStyle:'medium'}).format(d)}catch(x){}}
 setInterval(tick,1000);tick();
-function closeM(){$('md').classList.remove('on')}
+function closeM(){clearInterval(pt);$('md').classList.remove('on')}
 $('md').onclick=ev=>{if(ev.target==$('md'))closeM()};
-async function openApply(id){cur=J.find(j=>j.id==id);F={};step1();$('md').classList.add('on');
- if(!country){try{const d=await (await fetch('https://ipapi.co/json/')).json();country=d.country_name||'';F.cc=d.country_code;if(!$('f_nat').value){$('f_nat').value=country;$('au').textContent=flag(d.country_code)+' '+t('auto')}}catch(x){}}}
-function step1(){$('sh').innerHTML=`<h3>${e(cur.title)}</h3>
-<label>${t('name')}</label><input id="f_name" value="${e(F.name||'')}">
-<label>${t('nat')}</label><input id="f_nat" value="${e(F.nat||country)}"><small id="au" style="color:var(--g)">${country?flag(F.cc)+' '+t('auto'):''}</small>
-<label>${t('phone')}</label><input id="f_ph" type="tel" value="${e(F.ph||'')}">
-<label>${t('email')}</label><input id="f_em" type="email" value="${e(F.em||'')}">
-<label>${t('selfie')}</label><input id="f_self" type="file" accept="image/*" capture="user">
-<div class="row"><button class="btn gh" onclick="closeM()">✕</button><button class="btn" onclick="next()">${t('next')}</button></div>`}
-function next(){F.name=$('f_name').value.trim();F.nat=$('f_nat').value.trim();F.ph=$('f_ph').value.trim();F.em=$('f_em').value.trim();F.self=$('f_self').files[0]||F.self;
- if(!F.name||!F.nat||!F.ph||!F.em||!F.self)return alert(t('fill'));
- const p=PAY||{},r=(k,v)=>v?`<div><button onclick="navigator.clipboard.writeText('${e(v)}');this.textContent='✓'">${t('copy')}</button><span><small>${k}</small> ${e(v)}</span></div>`:'';
- $('sh').innerHTML=`<h3>${t('pay')}</h3><div class="pay"><div><span>${t('fee')}</span><b>${e(p.fee||'')}</b></div>${r('FIB',p.fib)}${r('IBAN',p.iban)}${r('KiCard',p.kicard)}${p.note?`<p>${e(p.note)}</p>`:''}</div>
-<label>${t('receipt')}</label><input id="f_rec" type="file" accept="image/*">
-<div class="row"><button class="btn gh" onclick="step1()">${t('back')}</button><button class="btn" id="sb" onclick="submit()">${t('send')}</button></div>`}
+const ED=['none','primary','secondary','diploma','bachelor','master','phd'],LV=['basic','good','fluent','native'];let pt,CVD;
+const en=k=>T.en[k]||k;
+const inp=(id,k,ty)=>`<label>${t(k)}</label><input id="${id}" type="${ty||'text'}" value="${e(F[id]||'')}">`;
+const sel=(id,k,o)=>`<label>${t(k)}</label><select id="${id}">${o.map(v=>`<option value="${v}" ${F[id]==v?'selected':''}>${t(v)}</option>`).join('')}</select>`;
+const rd=ids=>ids.forEach(i=>{const n=$(i);if(n)F[i]=n.value.trim()});
+const nav=(b,n)=>`<div class="row"><button class="btn gh" onclick="${b}">${b=='closeM()'?'✕':t('back')}</button><button class="btn" onclick="${n}">${t('next')}</button></div>`;
+async function openApply(id){cur=J.find(j=>j.id==id);F={nat:country};step1();$('md').classList.add('on');
+ if(!country){try{const d=await (await fetch('https://ipapi.co/json/')).json();country=d.country_name||'';F.cc=d.country_code;if($('nat')&&!$('nat').value){$('nat').value=country;F.nat=country}}catch(x){}}}
+function step1(){$('sh').innerHTML=`<h3>${e(cur.title)}</h3><div class="stp">1/3 · ${t('s1')}</div>
+${inp('name','name')}<div class="g2">${sel('gender','gender',['male','female'])}${inp('dob','dob','date')}</div>
+<div class="g2">${inp('pob','pob')}${inp('nat','nat')}</div>${sel('marital','marital',['single','married','oth'])}
+<div class="g2">${inp('pass','pass')}${inp('pexp','pexp','date')}</div>
+<div class="g2">${inp('ph','phone','tel')}${inp('em','email','email')}</div>${inp('addr','addr')}
+<label>${t('selfie')}</label><input id="self" type="file" accept="image/*" capture="user">${nav('closeM()','n1()')}`}
+function n1(){rd(['name','gender','dob','pob','nat','marital','pass','pexp','ph','em','addr']);F.self=$('self').files[0]||F.self;
+ if(['name','dob','pob','nat','pass','pexp','ph','em','addr'].some(k=>!F[k])||!F.self)return alert(t('fill'));step2()}
+function step2(){const lr=i=>`<div class="g2"><input id="l${i}" placeholder="${t('lang')}" value="${e(F['l'+i]||'')}"><select id="v${i}">${LV.map(v=>`<option value="${v}" ${F['v'+i]==v?'selected':''}>${t(v)}</option>`).join('')}</select></div>`;
+ $('sh').innerHTML=`<h3>${e(cur.title)}</h3><div class="stp">2/3 · ${t('s2')}</div>
+${sel('edu','edu',ED)}${inp('school','school')}<div class="g2">${inp('field','field')}${inp('gyear','gyear','number')}</div>
+<label>${t('langs')}</label>${[1,2,3].map(lr).join('<div style="height:8px"></div>')}
+<div class="g2">${inp('exp','exp','number')}${sel('lic','lic',['yn0','yn1'])}</div>${inp('emp','emp')}${inp('role','role')}
+<label>${t('skills')}</label><textarea id="skills">${e(F.skills||'')}</textarea>${nav('step1()','n2()')}`}
+function n2(){rd(['edu','school','field','gyear','l1','v1','l2','v2','l3','v3','exp','lic','emp','role','skills']);
+ if(!F.l1||F.exp===''||(F.edu!='none'&&!F.school))return alert(t('fill'));step3()}
+function step3(){const ls=[1,2,3].filter(i=>F['l'+i]).map(i=>`${e(F['l'+i])} (${t(F['v'+i])})`).join('، '),m=PAY.mode!='auto',
+ cp=(k,v)=>v?`<div><button onclick="navigator.clipboard.writeText('${e(v)}');this.textContent='✓'">${t('copy')}</button><span><small>${k}</small> ${e(v)}</span></div>`:'';
+ $('sh').innerHTML=`<h3>${e(cur.title)}</h3><div class="stp">3/3 · ${t('s3')}</div>
+<div class="sum"><b>${e(F.name)}</b><br>${t('edu')}: ${t(F.edu)}${F.school?' · '+e(F.school):''}<br>${t('langs')}: ${ls}<br>${t('exp')}: ${e(F.exp)}</div>
+<div class="pay"><div><span>${t('fee')}</span><b>${e(PAY.fee||'')}</b></div>${m?cp('FIB',PAY.fib)+cp('IBAN',PAY.iban)+cp('KiCard',PAY.kicard):''}</div>
+${m&&PAY.qr?`<img src="${e(PAY.qr)}" alt="" style="display:block;margin:14px auto;width:210px;max-width:100%">`:''}
+${m&&PAY.note?`<p style="margin-top:10px;font-size:14px">${e(PAY.note)}</p>`:''}
+${m?`<label>${t('receipt')}</label><input id="rec" type="file" accept="image/*">`:''}
+<div class="row"><button class="btn gh" onclick="step2()">${t('back')}</button><button class="btn" id="pb" onclick="payNow(${m})">${m?t('send'):t('paybtn')}</button></div>`}
 async function up(f,dir){const p=`${dir}/${Date.now()}-${Math.random().toString(36).slice(2)}.${(f.name.split('.').pop()||'jpg').toLowerCase()}`;
  const r=await sb.storage.from('uploads').upload(p,f);if(r.error)throw r.error;return sb.storage.from('uploads').getPublicUrl(p).data.publicUrl}
-async function submit(){const rf=$('f_rec').files[0];if(!rf)return alert(t('fill'));const b=$('sb');b.disabled=true;b.textContent='...';
- try{const [s,r]=await Promise.all([up(F.self,'selfies'),up(rf,'receipts')]);
-  const x=await sb.from('applications').insert({job_id:cur.id,job_title:cur.title,full_name:F.name,nationality:F.nat,phone:F.ph,email:F.em,selfie:s,receipt:r});
-  if(x.error)throw x.error;$('sh').innerHTML=`<div class="ok"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#006C35" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg><br>${t('done')}</div><button class="btn" style="width:100%" onclick="closeM()">OK</button>`}
- catch(x){alert(t('err'));b.disabled=false;b.textContent=t('send')}}
+async function payNow(man){const rf=man?$('rec').files[0]:null;if(man&&!rf)return alert(t('fill'));const b=$('pb');b.disabled=true;b.textContent='...';
+ try{const id=crypto.randomUUID(),s=await up(F.self,'selfies');
+  const cv={gender:F.gender,dob:F.dob,pob:F.pob,marital:F.marital,pass:F.pass,pexp:F.pexp,addr:F.addr,edu:F.edu,school:F.school,field:F.field,gyear:F.gyear,langs:[1,2,3].filter(i=>F['l'+i]).map(i=>[F['l'+i],F['v'+i]]),exp:F.exp,emp:F.emp,role:F.role,skills:F.skills,lic:F.lic};
+  const x=await sb.from('applications').insert({id,job_id:cur.id,job_title:cur.title,full_name:F.name,nationality:F.nat,phone:F.ph,email:F.em,selfie:s,receipt:rf?await up(rf,'receipts'):null,status:'pending',cv});
+  if(x.error)throw x.error;localStorage.cvid=id;$('mc').hidden=false;if(man)$('sh').innerHTML=`<div class="ok">${t('wait2')}</div><button class="btn" style="width:100%" onclick="closeM()">OK</button>`;else showPay(id)}
+ catch(x){alert(t('err'));b.disabled=false;b.textContent=man?t('send'):t('paybtn')}}
+async function showPay(id){$('sh').innerHTML=`<p class="ok">${t('waiting')}</p>`;
+ const r=await sb.functions.invoke('fib-pay',{body:{action:'create',id}}),d=r.data;
+ if(r.error||!d||d.error){$('sh').innerHTML=`<p class="ok">${t('err')}</p><button class="btn" style="width:100%" onclick="closeM()">OK</button>`;return}
+ if(d.status=='PAID'){CVD=d.app;return paidView()}
+ const qr=String(d.qrCode||'').replace('data:image/png,base64','data:image/png;base64');
+ $('sh').innerHTML=`<h3>${t('s3')}</h3><div class="pay"><div><span>${t('fee')}</span><b>${e(PAY.fee||'')}</b></div><div><span>${t('code')}</span><b>${e(d.readableCode)}</b></div></div>
+${qr?`<img src="${qr}" alt="" style="display:block;margin:14px auto;width:170px">`:''}<a class="btn" style="display:block;text-align:center;text-decoration:none" href="${e(d.personalAppLink)}">${t('openfib')}</a>
+<p style="text-align:center;margin-top:12px;color:var(--mut)">${t('waiting')}</p>`;
+ if(/Android|iPhone|iPad/i.test(navigator.userAgent))location.href=d.personalAppLink;
+ clearInterval(pt);pt=setInterval(async()=>{const q=await sb.functions.invoke('fib-pay',{body:{action:'status',id}});if(q.data&&q.data.status=='PAID'){clearInterval(pt);CVD=q.data.app;paidView()}},3000)}
+function paidView(){$('sh').innerHTML=`<div class="ok"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#006C35" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg><br>${t('paid')}</div><button class="btn" style="width:100%" onclick="dlCV()">${t('dl')}</button>`}
+async function resume(id){$('md').classList.add('on');$('sh').innerHTML=`<p class="ok">...</p>`;const man=PAY.mode!='auto';let d=null;
+ if(man){d=(await sb.rpc('get_cv',{app_id:id})).data}else{const r=await sb.functions.invoke('fib-pay',{body:{action:'status',id}});d=r.data&&r.data.status=='PAID'?r.data.app:null}
+ if(d){CVD=d;return paidView()}
+ if(man)$('sh').innerHTML=`<div class="ok">${t('wait2')}</div><button class="btn" style="width:100%" onclick="closeM()">OK</button>`;else showPay(id)}
+$('mc').onclick=()=>resume(localStorage.cvid);
+function cvHtml(d){const c=d.cv||{},r=(a,b)=>b?`<tr><th>${a}</th><td>${e(b)}</td></tr>`:'';
+ const ls=(c.langs||[]).map(l=>`${e(l[0])} — ${en(l[1])}`).join('<br>');
+ return `<div class="cvp"><div class="cvh"><div><h1 dir="auto">${e(d.full_name)}</h1><h2 dir="auto">${e(d.job_title)}</h2><p>${e(d.phone)}</p><p>${e(d.email)}</p><p dir="auto">${e(c.addr||'')}</p></div><img crossorigin="anonymous" src="${e(d.selfie)}"></div>
+<h4>Personal details</h4><table>${r('Nationality',d.nationality)}${r('Gender',en(c.gender))}${r('Date of birth',c.dob)}${r('Place of birth',c.pob)}${r('Marital status',en(c.marital))}${r('Passport no.',c.pass)}${r('Passport expiry',c.pexp)}${r('Driving licence',en(c.lic))}</table>
+<h4>Education</h4><table>${r('Level',en(c.edu))}${c.edu!='none'?r('School / University',c.school)+r('Field of study',c.field)+r('Graduation year',c.gyear):''}</table>
+<h4>Languages</h4><div class="cvl">${ls||'—'}</div>
+<h4>Experience</h4><table>${r('Years of experience',c.exp)}${r('Last employer',c.emp)}${r('Job title',c.role)}</table>
+${c.skills?`<h4>Skills</h4><div class="cvl" dir="auto">${e(c.skills)}</div>`:''}
+<div class="cvf">${S.logo?`<img crossorigin="anonymous" src="${e(S.logo)}">`:''}<span>${e($('ti').textContent)}</span></div></div>`}
+async function dlCV(){const w=document.createElement('div');w.id='cvw';w.innerHTML=cvHtml(CVD);document.body.appendChild(w);
+ await Promise.all([...w.querySelectorAll('img')].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r})));
+ try{await html2pdf().set({margin:0,filename:'CV-'+String(CVD.full_name).replace(/\s+/g,'_')+'.pdf',image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4'}}).from(w.firstChild).save()}catch(x){alert(t('err'))}
+ w.remove()}
 load();
 </script></body></html>
